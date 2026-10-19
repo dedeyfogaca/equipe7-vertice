@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 19/10/2026
 
 ---
 
@@ -107,6 +107,41 @@ Sobra a **T24**, parcial: a revisão visual está aplicada à tipografia, ao car
 A troca de formato não podia apagar o que quem já usava o sistema tinha feito. A atividade guardava a disciplina como texto livre; o modelo alvo exige a cadeia atividade → conteúdo → disciplina → grupo.
 
 A conversão cria uma disciplina para cada nome distinto que aparecia nas atividades, um conteúdo "Geral" dentro de cada uma para recebê-las, atribui peso 1 às que não tinham (RN09) e define o perfil dos membros (RN07). Roda uma vez só, controlada por um marcador de versão gravado junto com os dados.
+
+## Recorte da entrega de 20/10/2026
+
+O manual do 2º bimestre pede um recorte pequeno e demonstrável. Como o MVP já foi construído no fim do 1º bimestre, o recorte desta entrega é **o fluxo completo do MVP**, agora com testes executados e registrados.
+
+### O que funciona e será demonstrado
+
+| Passo da demonstração | Requisitos e regras | Testes |
+|---|---|---|
+| Criar o grupo e cadastrar os membros com perfil | RF01, RF02, RN07 | CT01 a CT04 |
+| Cadastrar disciplina e conteúdos, com nomes únicos | RF13, RF14, RN01, RN13 | CT05 a CT07 |
+| Cadastrar atividade com peso, recusando campos obrigatórios vazios | RF03, RN06, RN09, RN13 | CT08 a CT10 |
+| Concluir a atividade e ver o progresso do conteúdo e da disciplina subir, com a experiência creditada | RF05, RF10, RF11, RF15, RN08, RN10, RN14 | CT11 a CT13 |
+| Filtrar a lista e conferir os totais do painel | RF04, RF06, RN05 | CT14 e CT15 (o filtro por disciplina falta: CT29) |
+| Fechar e reabrir o navegador sem perder nada | RNF02 | CT16 |
+| Mostrar o que o participante não pode fazer | RN07 | CT17 a CT19 |
+
+Também estão funcionando e testados: encerramento de sessão (RF09), tema claro e escuro (RF08), dados de exemplo (RF20), exclusão em cascata (RN02), aviso de prazo em fim de semana (RF22) e o comportamento sem serviços externos (RNF10).
+
+### O que está implementado, mas não foi testado nesta entrega
+
+Sinalização de prazo em feriado (RF07) e relação dos próximos feriados (RF21). Dependem de serviço externo que não estava acessível no ambiente de teste.
+
+### O que fica para as próximas entregas
+
+| Até | O quê | Tarefas |
+|---|---|---|
+| 30/10/2026 | Correção dos defeitos D01, D02 e D07 | T28, T29, T36 |
+| 06/11/2026 | Ofensiva, conquistas e tela de desempenho do grupo | T30, T31, T32 |
+| 06/11/2026 | Nova identidade visual em todas as telas | T27 |
+| 27/11/2026 | Histórico de progresso | T35 |
+
+### Em desenvolvimento
+
+As telas de **detalhe da atividade** e de **acesso** ainda estão no desenho anterior ao das outras telas (T24). Elas funcionam normalmente, mas o visual será refeito com a nova identidade (T27).
 
 ---
 

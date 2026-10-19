@@ -1,11 +1,11 @@
 # 11 · Matriz de Rastreabilidade
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 19/10/2026
 
 ---
 
-A matriz demonstra que os artefatos não foram produzidos separadamente. Cada linha conecta um requisito ao caso de uso que o realiza, às entidades de dados que o sustentam, à tela em que ele aparece e à sua situação no [MVP](14-mvp.md).
+A matriz demonstra que os artefatos não foram produzidos separadamente. Cada linha conecta um requisito ao caso de uso que o realiza, às entidades de dados que o sustentam, à tela em que ele aparece e à sua situação no [MVP](14-mvp.md). A seção [Implementação e testes](#implementação-e-testes) completa a ligação até o código e os casos de teste.
 
 ---
 
@@ -78,6 +78,50 @@ Os vinte e dois requisitos funcionais possuem caso de uso e tela. Dois não poss
 | **RNF08** — recálculo em até 1 segundo | UC07, pós-condições |
 | **RNF09** — progresso legível sem depender da cor | UC08, passo 5: percentual exibido em número junto à barra |
 | **RNF10** — degradação com serviço externo fora do ar | UC02 fluxo 4A (avatar vira iniciais), UC08 fluxos 4A e 4B (fonte reserva e reaproveitamento) |
+
+---
+
+## Implementação e testes
+
+Atualizado em 19/10/2026, sobre o commit `c29279b`. Os caminhos são relativos a `src/src/`. Os testes estão em [Casos de Teste](15-casos-de-teste.md) e os defeitos em [Defeitos e Pendências](16-defeitos-e-pendencias.md).
+
+### Requisitos funcionais
+
+| Requisito | Implementação | Teste | Estado atual |
+|---|---|---|---|
+| **RF01** — Criar, selecionar e excluir grupos | `pages/Login.jsx`, `context/AuthContext.jsx`, `context/DataContext.jsx` | CT01, CT02 | Implementado e testado |
+| **RF02** — Gerenciar membros | `pages/Membros.jsx`, `lib/validacao.js` | CT03, CT04, CT20, CT26 | Implementado; defeito D01 aberto |
+| **RF03** — Cadastrar, editar e excluir atividades | `pages/AtividadeForm.jsx`, `lib/validacao.js` | CT08, CT09, CT10, CT18 | Implementado e testado |
+| **RF04** — Listar com busca, filtros e ordenação | `pages/Atividades.jsx`, `components/FiltrosSituacao.jsx`, `lib/situacoes.js` | CT14, CT29 | Implementado parcialmente: falta o filtro por disciplina (D07) |
+| **RF05** — Detalhe e alteração de status | `pages/AtividadeDetalhe.jsx`, `components/AtividadeCard.jsx` | CT11, CT12 | Implementado e testado; tela de detalhe em revisão visual (T27) |
+| **RF06** — Painel com totais, atrasadas e próximas entregas | `pages/Painel.jsx`, `lib/situacoes.js` | CT15 | Implementado e testado |
+| **RF07** — Sinalizar prazo em feriado nacional | `lib/feriados.js`, `hooks/useFeriados.js`, `components/AtividadeCard.jsx` | — | Implementado; não testado (T34) |
+| **RF08** — Alternar tema claro e escuro | `context/TemaContext.jsx`, `components/BotaoTema.jsx`, `styles/theme.js` | CT22 | Implementado e testado |
+| **RF09** — Encerrar a sessão do grupo | `components/layout/PrivateLayout.jsx`, `routes/ProtectedRoute.jsx` | CT21 | Implementado e testado |
+| **RF10** — Progresso do conteúdo | `lib/progresso.js`, `pages/DisciplinaDetalhe.jsx` | CT11, CT12, CT13; `verificacoes/progresso.js` | Implementado e testado |
+| **RF11** — Progresso por disciplina | `lib/progresso.js`, `pages/Disciplinas.jsx`, `pages/Painel.jsx` | CT11, CT13; `verificacoes/progresso.js` | Implementado e testado |
+| **RF12** — Histórico de progresso | — | — | Não implementado (T35) |
+| **RF13** — Gerenciar disciplinas | `pages/Disciplinas.jsx`, `lib/validacao.js` | CT05, CT06, CT23 | Implementado e testado |
+| **RF14** — Gerenciar conteúdos | `pages/DisciplinaDetalhe.jsx`, `lib/validacao.js` | CT07 | Implementado e testado |
+| **RF15** — Experiência por atividade concluída | `lib/gamificacao.js`, `components/RetornoConclusao.jsx`, `components/SeloXp.jsx` | CT11, CT12, CT13; `verificacoes/gamificacao.js` | Implementado e testado |
+| **RF16** — Ofensiva | — | — | Não implementado (T30) |
+| **RF17** — Conquistas | — | — | Não implementado (T31) |
+| **RF18** — Painel de desempenho do grupo | — | — | Não implementado (T32) |
+| **RF19** — Avatar do membro | `lib/avatar.js`, `components/ui/Avatar.jsx`, `pages/Membros.jsx` | CT24 (alternativa local) | Implementado; imagem da DiceBear não testada (T34) |
+| **RF20** — Carregar dados de exemplo | `lib/seed.js`, `pages/Login.jsx` | CT25 | Implementado e testado |
+| **RF21** — Próximos feriados nacionais | `pages/Painel.jsx`, `components/CalendarioMes.jsx`, `lib/feriados.js` | — | Implementado; não testado (T34) |
+| **RF22** — Sinalizar prazo em fim de semana | `lib/datas.js`, `components/AtividadeCard.jsx` | CT28 | Implementado e testado |
+
+**Resumo:** 18 requisitos funcionais implementados — 15 testados (o RF04 com defeito aberto) e 3 com teste pendente (RF07, RF19 na imagem da DiceBear, RF21) — e 4 ainda não implementados (RF12, RF16, RF17, RF18).
+
+### Requisitos não funcionais verificados nesta entrega
+
+| Requisito | Implementação | Teste | Estado atual |
+|---|---|---|---|
+| **RNF02** — persistência entre sessões | `lib/storage.js`, `context/DataContext.jsx` | CT16, CT27 | Implementado; defeito D02 aberto |
+| **RNF03** — mensagem de erro por campo | `lib/validacao.js`, `components/ui/Form.jsx` | CT01, CT03, CT06, CT08 | Implementado e testado |
+| **RNF07** — mensagem em listagem vazia | `components/ui/EmptyState.jsx` | CT02, CT23 | Implementado e testado |
+| **RNF10** — serviço externo fora do ar | `lib/feriados.js`, `components/ui/Avatar.jsx` | CT24 | Implementado e testado |
 
 ---
 
