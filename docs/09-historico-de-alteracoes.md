@@ -1,11 +1,11 @@
 # 09 · Histórico de Alterações
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 19/10/2026
 
 ---
 
-Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, e os acréscimos da Entrega 3 (25/09/2026). A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
+Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026) e a revisão do início do 2º bimestre (19/10/2026). A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
 
 ---
 
@@ -93,6 +93,8 @@ Itens identificados na conferência que dependem de alteração no código, e n�
 | Responsável obrigatório no formulário de atividade | A validação da aplicação exige responsável para salvar a atividade. A documentação prevê o contrário em quatro pontos: RN06 lista como obrigatórios apenas título e prazo, RN10 trata explicitamente das atividades sem responsável, o fluxo alternativo 5A do UC05 descreve a atividade aceita sem responsável e o modelo lógico declara `id_responsavel` como opcional. **A documentação está correta; a correção cabe ao código.** |
 | Rodapé com dados de contato de um único integrante | O rodapé exibe contatos pessoais em todas as telas, sem requisito correspondente. A definir entre remover a seção ou substituí-la pela identificação dos dois integrantes da equipe. |
 
+> **Atualização de 19/10/2026:** as duas pendências foram resolvidas no código entregue em 21/09/2026. A atividade sem responsável foi verificada no CT10 e o rodapé passou a mostrar só a identificação da equipe. Detalhes em [Defeitos e Pendências](16-defeitos-e-pendencias.md).
+
 ---
 
 ## Entrega 3 — 25/09/2026
@@ -114,7 +116,7 @@ A terceira entrega não altera requisitos: acrescenta o planejamento do trabalho
 
 ## Revisão visual proposta na Entrega 3
 
-A conferência das telas apontou problemas de interface que não alteram requisito nenhum, mas mudam como o sistema é usado. Estão registrados como a tarefa **T24** do [backlog](12-backlog.md) e ainda não foram aplicados ao código.
+A conferência das telas apontou problemas de interface que não alteram requisito nenhum, mas mudam como o sistema é usado. Estão registrados como a tarefa **T24** do [backlog](12-backlog.md). Em 21/09/2026 a revisão foi aplicada a todas as telas, exceto detalhe da atividade e acesso.
 
 | Item | Situação anterior | Proposta |
 |---|---|---|
@@ -141,6 +143,24 @@ Rodada de implementação que levou o sistema do estado da Entrega 3 ao MVP cons
 Quinze das dezessete regras de negócio ficaram implementadas. As duas de fora, RN11 (ofensiva) e RN12 (conquistas), pertencem a requisitos classificados como desejáveis e não entraram no MVP — sem bloquear caminho, já que a data de conclusão da atividade passou a ser gravada.
 
 Os dados gravados no navegador por quem já usava o sistema foram convertidos ao formato novo, e não descartados: a disciplina que era texto livre dentro da atividade virou cadastro próprio, com um conteúdo "Geral" recebendo as atividades existentes.
+
+---
+
+## 2º bimestre — revisão de 19/10/2026
+
+A equipe releu problema, objetivos, perfis, escopo, requisitos, regras, casos de uso, protótipos e modelo de dados, e comparou tudo com o código entregue. **Nenhum requisito, regra ou caso de uso foi removido ou renumerado.** A proposta continua coerente e a base do 1º bimestre foi mantida; as mudanças abaixo são correções de coerência e os registros novos que o 2º bimestre exige.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 19/10/2026 | Doc. 13 — Arquitetura | A tipografia citada era Space Grotesk e Space Mono; o sistema usa Manrope e JetBrains Mono desde a revisão visual. A arquitetura passou de "prevista" a confirmada, ganhou a seção de ambiente e a organização das pastas | Atualizar documento e README |
+| 19/10/2026 | Diagrama de arquitetura | Título mudou de "Arquitetura prevista" para "Arquitetura do Vértice". O MySQL saiu do desenho, porque o projeto não o usa nesta versão; continua citado no texto como evolução futura | Atualizar SVG e PNG |
+| 19/10/2026 | README | Tecnologias passaram de "previstas" a usadas, com a tipografia corrigida; entraram versões do ambiente, `npm run verificar`, funcionalidades disponíveis, pendências, o índice da entrega e o GitHub do Matheus | Atualizar README |
+| 19/10/2026 | Doc. 14 — MVP | Seção nova com o recorte da entrega de 20/10, o que fica para 06/11 e o que está em desenvolvimento | Orienta a demonstração |
+| 19/10/2026 | Doc. 12 — Backlog | Acrescentada a coluna de prazo; tarefas T25 a T36 do 2º bimestre; critérios de conclusão das prioritárias; forma de integrar as contribuições | Planejamento até 27/11 |
+| 19/10/2026 | Doc. 11 — Matriz | Seção nova ligando cada requisito ao arquivo que o implementa, ao caso de teste e ao estado atual | Rastreabilidade até o código |
+| 19/10/2026 | Doc. 15 — Casos de teste | Documento novo: 29 casos executados sobre o commit `c29279b`, com evidências | Exigência do Passo 7 do manual |
+| 19/10/2026 | Doc. 16 — Defeitos e pendências | Documento novo: 7 defeitos encontrados nos testes (D01 a D07) e as pendências até 27/11 | Gera as tarefas T28, T29, T33 e T36 |
+| 19/10/2026 | Identidade visual | Decidido refazer o visual do Vértice para a entrega de 06/11 (T27), absorvendo a T24 | Atualizar protótipos e capturas na próxima entrega |
 
 ---
 
