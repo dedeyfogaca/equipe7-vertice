@@ -1,0 +1,15 @@
+$ npm ci && npm run build   # commit c29279b · 19/10/2026 09:17
+
+added 82 packages in 5s
+
+> vertice@1.0.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 95 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.95 kB │ gzip:  0.53 kB
+dist/assets/index-Dw7Yv77Q.js  312.43 kB │ gzip: 95.48 kB
+✓ built in 2.77s

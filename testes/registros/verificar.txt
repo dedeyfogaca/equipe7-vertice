@@ -1,0 +1,160 @@
+$ npm run verificar   # commit c29279b · 19/10/2026 09:17 · Node v22.22.0 · npm 10.9.4
+
+> vertice@1.0.0 verificar
+> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js
+
+
+O cenário destrutivo: já migrado, mas sem o marcador de versão
+
+ok    não tenta migrar -> false
+ok    e diz por quê -> "sem-tarefas-antigas"
+ok    as atividades continuam lá -> 3
+ok    o marcador é gravado, para não repetir -> 1
+
+Caminho normal: dados no formato antigo
+
+ok    migrou -> true
+ok    converteu as três -> 3
+ok    nomes iguais viram uma disciplina só -> ["Física","Sem disciplina"]
+ok    a chave antiga é apagada -> null
+ok    RN09 — toda atividade ganha peso -> true
+ok    a concluída ganha data de conclusão -> true
+ok    RN07 — o primeiro membro vira organizador -> ["organizador","participante"]
+ok    atividade não guarda grupoId -> false
+
+Rodar de novo não duplica nada
+
+ok    a segunda passada não roda -> false
+ok    e o motivo é o marcador -> "ja-migrado"
+ok    as atividades continuam três -> 3
+ok    as disciplinas continuam duas -> 2
+
+Tarefa órfã: o grupo dela não existe mais
+
+ok    converte o que dá -> 1
+ok    e conta as órfãs -> 1
+ok    a chave antiga NÃO é apagada — a órfã fica recuperável -> 2
+
+Órfã + marcador perdido: a segunda passada não pode duplicar id
+
+ok    rodou de novo, porque o marcador sumiu -> true
+ok    mas não repetiu o id -> ["t1"]
+ok    id repetido quebraria chave de lista e `find` -> true
+
+Instalação nova: nada gravado
+
+ok    não migra -> false
+ok    marca a versão mesmo assim -> 1
+ok    e não inventa coleção -> null
+
+Todas as verificações passaram.
+
+
+RN08 — progresso do conteúdo é razão de peso, não contagem
+
+ok    1 de 5 atividades concluídas, peso 5 de 9 -> 56
+ok    4 de 5 atividades concluídas, peso 4 de 9 -> 44
+ok    nada concluído -> 0
+ok    tudo concluído -> 100
+
+RN08 — conteúdo sem atividade é ausente, não 0%
+
+ok    conteúdo sem atividade devolve nulo -> null
+
+RN14 — progresso da disciplina é razão de pesos somados
+
+ok    pesos somados -> [15,21]
+ok    percentual pela razão de pesos -> 71
+ok    a média dos percentuais daria outro número (por isso não se usa) -> true
+      média: 38%   ·   correto: 71%
+
+RN14 + RN08 — conteúdo vazio não derruba a disciplina
+
+ok    conteúdo vazio fica fora da conta -> 75
+ok    disciplina só com conteúdos vazios -> null
+ok    disciplina sem nenhum conteúdo -> null
+
+RN09 — peso ausente ou fora da faixa
+
+ok    sem peso definido vale 1 -> 2
+ok    peso acima da faixa é coagido para 5 -> 5
+ok    peso abaixo da faixa é coagido para 1 -> 1
+
+RF15 — o progresso antes da conclusão, para o retorno na tela
+
+ok    depois: 5 de 10 -> 50
+ok    antes de x: 1 de 10 -> 10
+ok    o peso total nao muda — a atividade sempre existiu -> 10
+ok    antes de uma que nao esta concluida nao muda nada -> 50
+ok    unica atividade do conteudo: de 0% para 100% -> [0,100]
+
+Todas as verificações passaram.
+
+
+RN10 — xp = peso × 10, creditado ao responsável
+
+ok    peso 3 concluída vale 30 -> 30
+ok    constante bate com a regra -> 10
+ok    peso 5 concluída vale 50 -> 50
+
+RN10 — só conta quando está concluída
+
+ok    a fazer não credita -> 0
+ok    fazendo não credita -> 0
+
+RN10 — atividade sem responsável não gera experiência
+
+ok    concluída sem responsável -> 0
+ok    e não entra no total do grupo -> 20
+
+RN10 — o estorno: concluir, desmarcar e concluir de novo
+
+ok    1. antes de concluir -> 0
+ok    2. ao concluir -> 30
+ok    3. ao reverter, estornou -> 0
+ok    4. ao concluir de novo, NÃO dobrou -> 30
+ok    5. concluir duas vezes seguidas não soma -> 30
+
+RN10 — trocar o responsável leva a experiência junto
+
+ok    quem era responsável antes fica sem -> 0
+ok    quem é responsável agora recebe -> 40
+
+Experiência do membro e ranking
+
+ok    Ana soma 70 -> 70
+ok    Bruno soma 70 -> 70
+ok    Carla, sem atividade, soma 0 -> 0
+ok    total do grupo ignora a sem responsável -> 140
+ok    empate compartilha a posição e a seguinte pula -> [["Ana Souza",70,1],["Bruno Lima",70,1],["Carla Dias",0,3]]
+ok    empate ordena por nome, para a lista não dançar -> "Ana Souza"
+ok    conta as concluídas de cada um -> [2,2,0]
+
+RN09 — peso ausente ou fora da faixa também vale aqui
+
+ok    sem peso vale 1, logo 10 de xp -> 10
+ok    peso acima da faixa é coagido para 5 -> 50
+
+Todas as verificações passaram.
+
+
+RN07 — o grupo não pode ficar sem organizador
+
+ok    o único organizador é reconhecido -> true
+ok    o participante não é o último organizador -> false
+ok    rebaixar o único organizador é barrado -> "O grupo precisa de pelo menos um organizador."
+ok    mantê-lo organizador passa -> undefined
+
+Com dois organizadores a trava sai do caminho
+
+ok    nenhum dos dois é o último -> [false,false]
+ok    rebaixar um dos dois passa -> undefined
+
+A trava não atrapalha o resto da validação
+
+ok    nome continua obrigatório -> "O nome do membro é obrigatório."
+ok    e-mail invalido continua sendo apontado -> "E-mail inválido."
+ok    cadastrar membro novo nunca cai na trava -> undefined
+
+Todas as verificações passaram.
+
