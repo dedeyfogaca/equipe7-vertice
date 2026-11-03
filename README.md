@@ -31,7 +31,7 @@ O Vértice é uma plataforma web para grupos de estudo organizarem suas discipli
 
 Repositório: [github.com/dedeyfogaca/equipe-7_plataforma-acompanhamento-de-aprendizagem](https://github.com/dedeyfogaca/equipe-7_plataforma-acompanhamento-de-aprendizagem)
 
-Sistema publicado: **[vertice-equipe-7.vercel.app](https://vertice-equipe-7.vercel.app)**
+Sistema publicado: **[equipe7-vertice.vercel.app](https://equipe7-vertice.vercel.app/)**
 
 Instagram: [@go.vertice](https://www.instagram.com/go.vertice/)
 
@@ -48,7 +48,7 @@ Versão avaliada: tag **`entrega-06-11-2026`**.
 | Escopo e recorte desta entrega | [MVP — Recorte da entrega de 06/11](docs/14-mvp.md#recorte-da-entrega-de-06112026) |
 | Tecnologias e arquitetura atualizadas | [Arquitetura e Tecnologias](docs/13-arquitetura.md) |
 | Backlog com prioridades, responsáveis, prazos e situação | [Backlog do Projeto](docs/12-backlog.md) |
-| Código integrado, instruções para executar e sistema publicado | [`src/`](src/), [Como rodar](#como-rodar) e [vertice-equipe-7.vercel.app](https://vertice-equipe-7.vercel.app) |
+| Código integrado, instruções para executar e sistema publicado | [`src/`](src/), [Como rodar](#como-rodar) e [equipe7-vertice.vercel.app](https://equipe7-vertice.vercel.app/) |
 | Casos de teste executados, resultados e evidências | [Casos de Teste](docs/15-casos-de-teste.md) e [`testes/evidencias-06-11/`](testes/evidencias-06-11/) |
 | Defeitos corrigidos e pendências para 27/11 | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) |
 | Rastreabilidade até o código e os testes | [Matriz de Rastreabilidade — Implementação e testes](docs/11-matriz-de-rastreabilidade.md#implementação-e-testes) |
@@ -201,7 +201,7 @@ A classificação completa, com justificativa item a item, está em [Produto Mí
 
 ## Como rodar
 
-Para usar sem instalar nada, abra a versão publicada: **[vertice-equipe-7.vercel.app](https://vertice-equipe-7.vercel.app)**.
+Para usar sem instalar nada, abra a versão publicada: **[equipe7-vertice.vercel.app](https://equipe7-vertice.vercel.app/)**.
 
 Para rodar na própria máquina: Node.js 20 ou superior e npm. Executado e testado com Node.js 22.22.0 e npm 10.9.4.
 
