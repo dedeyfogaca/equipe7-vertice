@@ -1,15 +1,209 @@
 # Telas e Navegação
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 3 · Protótipos e MVP · Equipe 7
+> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 01/11/2026
 
 ---
+
+Este documento reúne as telas do Vértice em dois momentos: as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+
+---
+
+## Versão 2 — entrega de 06/11/2026
+
+As telas abaixo são capturas do próprio sistema, carregado com os dados de exemplo. Em tamanho original, estão em [`telas-v2/`](telas-v2/): no tema escuro, que é o padrão, em [`telas-v2/claro/`](telas-v2/claro/) no tema claro e em [`telas-v2/celular/`](telas-v2/celular/) na tela de celular.
+
+### Levantamento das telas
+
+| Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
+|---|---|---|---|---|
+| RF26 | Apresentação do produto | Início | `/` | Qualquer visitante |
+| RF26 | História da equipe | Sobre nós | `/sobre` | Qualquer visitante |
+| RF01, RF20, RF29 | Escolher ou criar o grupo, com foto, e carregar os dados de exemplo | Acesso | `/entrar` | Qualquer estudante |
+| RF01, RN07 | Dizer quem é dentro do grupo | Quem é você | `/entrar` | Qualquer estudante |
+| RF06, RF16, RF21 | Painel do grupo | Painel | `/painel` | Ambos |
+| RF07, RF23 | Calendário das entregas | Calendário | `/calendario` | Ambos |
+| RF13, RF25 | Disciplinas e paleta de cores | Disciplinas | `/disciplinas` | Organizador gerencia; participante consulta |
+| RF10, RF14 | Conteúdos e progresso | Disciplina | `/disciplina/:id` | Organizador gerencia; participante consulta |
+| RF04 | Lista com busca e filtros | Atividades | `/atividades` | Ambos |
+| RF03, RF07, RF22, RF30 | Cadastro e edição de atividade, com o calendário do prazo | Nova atividade | `/atividade/nova` | Ambos |
+| RF05, RF15, RF17 | Detalhe e conclusão | Detalhe da atividade | `/atividade/:id` | Ambos |
+| RF02, RF19, RF24 | Membros, foto de perfil e avatar em cinco estilos | Membros | `/membros` | Organizador gerencia; participante edita o próprio perfil |
+| RF16, RF17, RF18 | Experiência, ofensiva, conquistas e ranking | Conquistas | `/conquistas` | Ambos |
+| RF24, RF29 | Enquadrar a foto de perfil ou do grupo | Ajustar foto | janela, em Membros e no Acesso | Ambos |
+| RF01, RF29 | Nome, descrição e foto do grupo | Editar grupo | janela, no seletor de grupo | Organizador |
+| RF30 | Cadastrar o conteúdo sem sair da atividade | Novo conteúdo | janela, em Nova atividade | Organizador |
+
+### Mapa de navegação
+
+![Mapa de navegação da versão 2](../diagramas/png/mapa-navegacao-v2.png)
+
+> Desenho-fonte: [`../diagramas/svg/mapa-navegacao-v2.svg`](../diagramas/svg/mapa-navegacao-v2.svg)
+
+As páginas públicas levam ao acesso, e o acesso leva ao Painel. Dentro da sessão, a barra do topo liga o Painel às cinco seções, e cada seção abre as telas que dependem dela. A linha violeta de volta ao Painel é a mesma do mapa do MVP: concluir uma atividade muda o progresso, a experiência, a ofensiva e as conquistas que o Painel mostra.
+
+### As telas
+
+#### Início
+
+![Página inicial](telas-v2/inicio.png)
+
+A página de apresentação: o que o Vértice mede, como funciona e o acesso. Os cartões mostram o produto em uso, e o botão do topo troca o tema.
+
+#### Sobre nós
+
+![Página Sobre nós](telas-v2/sobre.png)
+
+A história da equipe, com os avatares em pixel art feitos pelo Andrey.
+
+#### Acesso
+
+![Tela de acesso](telas-v2/acesso.png)
+
+Sem grupos no dispositivo, a tela oferece criar o primeiro: quem cria informa o próprio nome e entra como organizador. A foto do grupo é opcional; sem ela, o grupo aparece com as iniciais do nome. Os dados de exemplo ficam a um clique.
+
+#### Quem é você
+
+![Escolha de quem é a pessoa no grupo](telas-v2/quem-e-voce.png)
+
+Num grupo com membros, a pessoa escolhe quem é. É essa escolha que decide o que ela pode gerenciar (RN07).
+
+#### Abrindo o grupo
+
+![A marca do Vértice no centro da tela, com o nome do grupo e o fio de progresso, enquanto o grupo abre](telas-v2/abrindo.png)
+
+Depois da escolha, a tela escurece e a marca do Vértice aparece no centro, com o nome do grupo e um fio de progresso. A marca dá um terço de volta — o desenho tem três pontas, então para exatamente como começou — enquanto o fio se completa, e a tela se dissolve no painel. A passagem inteira leva pouco mais de um segundo: o bastante para perceber que o grupo abriu, sem fazer ninguém esperar. Fora daqui, a marca só dá uma volta rápida quando o mouse passa por cima dela; quem pede menos movimento no sistema vê só um esmaecer curto.
+
+#### Painel
+
+![Painel](telas-v2/painel.png)
+
+No topo, a barra do sistema: a marca, o grupo, as seis seções, o tema e a conta de quem está usando. Embaixo, a saudação, as quatro situações como filtro, o aviso de entrega em feriado, as próximas entregas, o progresso por disciplina, o ritmo de quem está usando e os próximos feriados.
+
+#### Calendário
+
+![Calendário](telas-v2/calendario.png)
+
+O mês com as entregas nas cores das disciplinas, o filtro por disciplina e o painel do dia escolhido, com o atalho para criar uma atividade nele. As visões de semana e de lista ficam no topo.
+
+#### Disciplinas
+
+![Disciplinas](telas-v2/disciplinas.png)
+
+Cada disciplina com a sua cor da paleta, o progresso e os conteúdos.
+
+#### Disciplina
+
+![Conteúdos de uma disciplina](telas-v2/disciplina.png)
+
+Os conteúdos em ordem, com o progresso de cada um e as atividades que o compõem.
+
+#### Atividades
+
+![Lista de atividades](telas-v2/atividades.png)
+
+As situações como filtro, a busca, os filtros por disciplina, responsável e prazo, e a lista com peso, prazo e responsável de cada atividade. O círculo de concluir só aparece nas atividades de quem está usando (RN20).
+
+![Filtro de disciplina aberto](telas-v2/atividades-filtro.png)
+
+Os filtros seguem a identidade do sistema: cada disciplina aparece com a sua cor, cada responsável com a foto ou o avatar, e cada ordem com um símbolo. O campo repete a marca da opção escolhida.
+
+#### Nova atividade
+
+![Formulário de nova atividade](telas-v2/nova-atividade.png)
+
+O formulário começa vazio e cobra só o que é obrigatório: título, conteúdo, prazo e responsável. O peso tem cinco níveis, o prazo mostra o aviso de feriado, e o status só abre quando o responsável é quem está cadastrando (RN20).
+
+![Calendário do campo de prazo](telas-v2/campo-data.png)
+
+O prazo é escolhido num calendário com a identidade do sistema, que marca hoje, os feriados e o dia escolhido, e também funciona pelo teclado.
+
+![Janela de novo conteúdo, aberta pelo formulário de atividade](telas-v2/novo-conteudo.png)
+
+Se o conteúdo ainda não existe, o organizador escolhe "Criar novo conteúdo" no fim da lista. A janela já vem na disciplina escolhida; ao cadastrar, o conteúdo fica selecionado, e nada do que foi preenchido se perde (RF30).
+
+#### Detalhe e conclusão
+
+![Detalhe da atividade logo depois de concluída](telas-v2/detalhe.png)
+
+Logo depois de concluir: o progresso do conteúdo antes e depois, a experiência creditada e o aviso da conquista obtida.
+
+#### Membros
+
+![Membros](telas-v2/membros.png)
+
+Cada membro com foto ou avatar, perfil, experiência, atividades e ofensiva. A exclusão do grupo fica no pé da tela, separada das ações do dia a dia, só para o organizador.
+
+![Editor de foto](telas-v2/editor-foto.png)
+
+![Formulário de membro com os cinco estilos de avatar](telas-v2/membro-avatar.png)
+
+Sem foto, vale o avatar: os cinco estilos aparecem lado a lado com a mesma semente, e "Sortear outro" troca o desenho. O avatar é desenhado pelo próprio sistema, então aparece mesmo sem internet (RF19, RN15).
+
+Ao escolher uma foto, abre o editor: arrastar posiciona a foto, o zoom vai até 4 vezes, e o sistema grava só o que está dentro da moldura, reduzido a 256 × 256 (RN19). Pelo teclado, as setas movem a foto e + e − mudam o zoom.
+
+#### Editar grupo
+
+![Janela de edição do grupo](telas-v2/editar-grupo.png)
+
+No seletor de grupo da barra do topo, o organizador edita o nome, a descrição e a foto do grupo. A foto passa pelo mesmo editor, com moldura quadrada (RF29).
+
+#### Conquistas
+
+![Conquistas](telas-v2/conquistas.png)
+
+Os números de quem está usando, as seis conquistas com o andamento das que faltam e o ranking do grupo.
+
+### Tema claro
+
+| Escuro | Claro |
+|---|---|
+| ![Painel no tema escuro](telas-v2/painel.png) | ![Painel no tema claro](telas-v2/claro/painel.png) |
+| ![Início no tema escuro](telas-v2/inicio.png) | ![Início no tema claro](telas-v2/claro/inicio.png) |
+
+A escolha do tema vale para todas as telas — as do sistema, as páginas públicas e a de acesso — e fica gravada no navegador (RF08). Os dois temas saem dos mesmos tokens de cor, definidos em `src/index.css`.
+
+### No celular
+
+| Início | Painel | Menu | Calendário |
+|---|---|---|---|
+| ![Início no celular](telas-v2/celular/inicio.png) | ![Painel no celular](telas-v2/celular/painel.png) | ![Menu no celular](telas-v2/celular/menu.png) | ![Calendário no celular](telas-v2/celular/calendario.png) |
+
+Na tela de celular, a barra do topo vira um menu que desce do topo, e os filtros da lista de atividades ficam recolhidos. No calendário, deslizar o dedo troca de mês. Nenhuma tela rola para os lados (RNF01).
+
+### Decisões de interface da versão 2
+
+| Decisão | Por quê |
+|---|---|
+| Seções numa barra no topo | Pedido da equipe: a barra lateral confundia. No topo ficam a marca, o grupo, as seis seções, o tema e a conta, e o conteúdo ganha a largura toda. No celular, o mesmo menu desce do topo. A barra lateral já tinha substituído o layout de três colunas, cuja coluna da direita terminava no meio da tela (D05) |
+| Marca nova do Vértice | Arte da equipe, redesenhada com o traço mais grosso para continuar legível em 24 px. Ao abrir o grupo, aparece no centro e dá um terço de volta enquanto a tela se dissolve no painel; dá uma volta rápida quando o mouse passa por cima; fica parada para quem pede menos movimento no sistema |
+| Avatares desenhados no próprio sistema, em cinco estilos | O sorteio não mudava nada onde a imagem externa era bloqueada, como na versão de demonstração. Desenhado no navegador, o avatar sempre aparece, e a pessoa escolhe entre cinco estilos |
+| Fotos da equipe enquadradas pela cabeça | Na página inicial, o círculo cortava a cabeça; agora mostra a cabeça inteira e os ombros |
+| Cores mantidas | Pedido da professora: o ciano da marca e o violeta da gamificação continuam os mesmos |
+| Calendário como tela própria | Pedido da professora. O mês inteiro, com as entregas nas cores das disciplinas, no lugar do calendário pequeno do painel |
+| Paleta de 18 cores | Pedido da professora por mais cores. As cores foram escolhidas para continuar legíveis nos dois temas, e o violeta da gamificação ficou fora da paleta |
+| Foto enquadrada num editor e reduzida no navegador | Pedido da professora e da equipe. A pessoa ajusta a posição e o zoom, e o sistema grava só o que está na moldura: uma foto de celular de vários megabytes vira um arquivo de poucos KB, em 256 × 256 |
+| Tema claro e escuro em todas as telas | Pedido da equipe. A escolha vale para o sistema inteiro, inclusive as páginas públicas e a tela de acesso (RF08) |
+| Inter Tight no texto e JetBrains Mono nos números, servidas pelo próprio sistema | Visual mais profissional, e a tela não depende do Google Fonts para desenhar o texto |
+| Diálogos, menus e dicas acessíveis | Componentes Radix: teclado, foco e leitor de tela já resolvidos |
+| Situações como filtro e peso em anel | Decisões da Entrega 3 mantidas: as quatro situações filtram a lista, e o peso aparece como anel de cinco segmentos |
+| Listas de escolha com a marca de cada opção | Pedido da equipe. Filtros e campos mostram a cor da disciplina, a foto do responsável e um símbolo para status, prioridade, perfil e ordem, como no resto do sistema |
+| Calendário próprio no campo de prazo | O calendário do navegador muda de um navegador para outro e não conhece os feriados. O do sistema segue a identidade visual, marca hoje e os feriados e funciona pelo teclado |
+| Formulário de atividade começa vazio | Pedido da equipe. Nada vem escolhido sem a pessoa decidir; só os campos obrigatórios são cobrados, e o que fica em branco recebe o padrão da regra: peso 1 e status "a fazer" |
+| Conteúdo criado numa janela, sem sair da atividade | Pedido da equipe. Quem esquece de cadastrar o conteúdo antes não perde o que já preencheu |
+| Mês que desliza no calendário | Pedido da equipe. A página nova entra pelo lado do movimento, e no celular basta deslizar o dedo; com "reduzir movimento" ativado no sistema operacional, a troca é imediata |
+| Exclusão do grupo no pé da tela de Membros | Pedido da equipe. A ação que apaga tudo fica separada das ações do dia a dia |
+| Só o responsável conclui a atividade | Pedido da equipe. A experiência e a ofensiva são de quem fez; quem não é o responsável vê a situação da atividade, mas não a altera (RN20) |
+
+---
+
+## Protótipo do MVP — Entrega 3
 
 As oito telas abaixo são exatamente as necessárias para executar o [fluxo completo do MVP](../docs/14-mvp.md). Nenhuma tela de funcionalidade desejável foi prototipada: o protótipo mostra a primeira versão, não o sistema inteiro.
 
 ---
 
-## Levantamento das telas
+### Levantamento das telas
 
 | Requisito | Funcionalidade | Tela | Perfil que utiliza |
 |---|---|---|---|
@@ -24,7 +218,7 @@ As oito telas abaixo são exatamente as necessárias para executar o [fluxo comp
 
 ---
 
-## Mapa de navegação
+### Mapa de navegação
 
 ![Mapa de navegação do Vértice](../diagramas/png/mapa-navegacao.png)
 
@@ -36,53 +230,53 @@ A linha violeta de volta ao Painel é o que fecha o ciclo do produto: concluir u
 
 ---
 
-## As telas
+### As telas
 
 Todas exportadas do protótipo navegável. Os arquivos em alta resolução estão em [`telas/`](telas/).
 
-### Acesso
+#### Acesso
 
 ![Tela de acesso](telas/acesso.png)
 
 Grupos salvos neste dispositivo, criação de grupo novo e a carga de dados de exemplo. Não há senha: o acesso é a escolha do grupo.
 
-### Primeiro acesso
+#### Primeiro acesso
 
 ![Tela de primeiro acesso](telas/vazio.png)
 
 Grupo recém-criado. Em vez de um painel zerado, a tela ensina a ordem: disciplina, depois conteúdo, depois atividade.
 
-### Painel
+#### Painel
 
 ![Tela de painel](telas/painel.png)
 
 Progresso por disciplina no topo, as quatro situações como filtro e a lista já filtrada. À direita, o calendário com prazos, atrasos e feriados.
 
-### Disciplinas
+#### Disciplinas
 
 ![Tela de disciplinas](telas/disciplinas.png)
 
 A disciplina abre e mostra o progresso de cada conteúdo. É onde se vê em que ponto da matéria o grupo está travado.
 
-### Nova atividade
+#### Nova atividade
 
 ![Tela de nova atividade](telas/nova-atividade.png)
 
 Erro de validação no título, escala de peso de 1 a 5 e aviso de prazo em véspera de feriado. À direita, onde a atividade se encaixa e quanto a barra vai andar.
 
-### Atividades
+#### Atividades
 
 ![Tela de atividades](telas/atividades.png)
 
 Busca, filtro por situação e painel lateral de filtros. Embaixo, o resultado: quantas atividades e o peso somado.
 
-### Detalhe e conclusão
+#### Detalhe e conclusão
 
 ![Tela de detalhe e conclusão](telas/detalhe.png)
 
 O progresso antes e depois lado a lado, a experiência creditada e a conquista desbloqueada. É a tela onde executar uma atividade vira medida de aprendizagem.
 
-### Membros
+#### Membros
 
 ![Tela de membros](telas/membros.png)
 
@@ -90,7 +284,7 @@ Cartões dos integrantes com experiência e dias seguidos, e o cadastro com sort
 
 ---
 
-## Tema claro e escuro
+### Tema claro e escuro
 
 O RF08 está no MVP e o protótipo demonstra os dois temas. O botão fica no rodapé da barra lateral, em todas as telas, e a escolha vale para a sessão inteira.
 
@@ -106,7 +300,7 @@ Todas as oito telas estão nos dois temas em [`telas/`](telas/) e [`telas/escuro
 
 ---
 
-## Protótipo navegável
+### Protótipo navegável
 
 O arquivo [`navegavel/index.html`](navegavel/index.html) abre no navegador, sem instalar nada. As telas estão ligadas entre si: a barra lateral navega, os cartões abrem o detalhe, e os botões levam aos formulários.
 
@@ -130,7 +324,7 @@ O protótipo foi escrito com os mesmos tokens de cor e tipografia do `theme.js` 
 
 ---
 
-## Decisões de interface tomadas nesta entrega
+### Decisões de interface tomadas nesta entrega
 
 | Decisão | Por quê |
 |---|---|
@@ -141,7 +335,7 @@ O protótipo foi escrito com os mesmos tokens de cor e tipografia do `theme.js` 
 | Cor própria para a gamificação | Experiência e conquistas usavam o mesmo verde de "concluída". Violeta `#7C3AED` não ocupa nenhum outro papel no sistema |
 | Tipografia em uma família | Havia três fontes simultâneas: serifada nos títulos, Space Grotesk no corpo e Space Mono em todos os rótulos. Manrope em peso variado carrega a mesma hierarquia com menos ruído |
 
-Todas essas decisões estão registradas como a tarefa **T24** do [backlog](../docs/12-backlog.md) e ainda não foram aplicadas ao código.
+Todas essas decisões foram registradas como a tarefa **T24** do [backlog](../docs/12-backlog.md) e aplicadas na construção do MVP. Na versão 2, parte delas foi revista: veja as [decisões da versão 2](#decisões-de-interface-da-versão-2).
 
 ---
 

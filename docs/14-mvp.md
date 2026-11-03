@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 19/10/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 29/10/2026
 
 ---
 
@@ -41,12 +41,20 @@ O que **não** entrou no MVP não entrou por ser menos importante, e sim por nã
 | **RF07** — Sinalizar prazo em feriado | Desejável | Não | Conveniência; a data continua visível sem isso |
 | **RF21** — Relação dos próximos feriados | Desejável | Não | Mesma razão do RF07 |
 | **RF22** — Sinalizar prazo em fim de semana | Desejável | Não | Mesma razão do RF07 |
-| Persistência em MySQL | Futura | Não | O modelo já existe; a troca da camada de acesso fica para depois do MVP |
+| **RF23** — Calendário com as entregas nas cores das disciplinas | Desejável | Não | Outra forma de ver os prazos que a lista e o painel já mostram |
+| **RF24** — Foto de perfil do membro | Desejável | Não | O avatar sorteado (RF19) já identifica cada membro |
+| **RF25** — Paleta de cores das disciplinas | Desejável | Não | A cor ajuda a reconhecer a disciplina, mas o nome já a identifica |
+| **RF26** — Páginas públicas de apresentação | Desejável | Não | Apresentam o produto e a equipe; não fazem parte do ciclo |
+| **RF27** — Acesso com conta Google ou e-mail | Desejável | Não | Depende do banco de dados; sem ele, o acesso por seleção do grupo atende ao ciclo |
+| **RF28** — Convite para o grupo por link ou código | Desejável | Não | Depende do acesso com conta (RF27) |
+| **RF29** — Foto do grupo | Desejável | Não | As iniciais do nome já identificam o grupo |
+| **RF30** — Criar conteúdo a partir do formulário de atividade | Desejável | Não | Atalho: o conteúdo pode ser cadastrado antes, na tela de disciplinas |
+| Persistência em banco de dados | Desejável | Não | O modelo lógico já existe; a troca da camada de acesso para o PostgreSQL do Supabase está planejada para 27/11 |
 | Notificações por e-mail ou push | Futura | Não | Exige servidor, que esta versão não tem |
 | Exportação de relatórios | Futura | Não | Nenhum requisito do bimestre depende disso |
 | Aplicativo móvel nativo | Futura | Não | A interface responsiva (RNF01) já cobre o uso em celular |
 
-**Resumo:** 15 requisitos no MVP, 7 desejáveis para a versão seguinte e 4 itens de escopo deixados para o futuro.
+**Resumo:** 15 requisitos no MVP, 15 requisitos desejáveis, a persistência em banco de dados e 3 itens de escopo deixados para o futuro.
 
 ---
 
@@ -88,7 +96,7 @@ O momento decisivo é a conclusão. Ali, uma ação isolada do estudante vira tr
 
 ## Situação da construção
 
-Das 24 tarefas do [backlog](12-backlog.md), 23 estão concluídas. As 6 do caminho crítico — as que separavam um gerenciador de tarefas de um sistema que mede aprendizagem — foram executadas:
+As 24 tarefas do 1º bimestre no [backlog](12-backlog.md) estão concluídas. As 6 do caminho crítico — as que separavam um gerenciador de tarefas de um sistema que mede aprendizagem — foram executadas nesta ordem:
 
 | Tarefa | O que entrou |
 |---|---|
@@ -98,9 +106,9 @@ Das 24 tarefas do [backlog](12-backlog.md), 23 estão concluídas. As 6 do camin
 | T18, T19 | Progresso por conteúdo e por disciplina, por razão de pesos somados (RN08, RN14) |
 | T21 | Crédito e estorno de experiência, `peso × 10` (RN10) |
 
-Das dezessete regras de negócio, quinze estão implementadas. As duas de fora são a **RN11** (ofensiva) e a **RN12** (conquistas), que pertencem a requisitos desejáveis e ficaram para a versão seguinte por decisão da equipe. Nenhuma das duas ficou bloqueada: a data de conclusão da atividade passou a ser gravada, e é dela que a ofensiva depende.
+As vinte regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
 
-Sobra a **T24**, parcial: a revisão visual está aplicada à tipografia, ao cartão de atividade, às situações como filtro, à casca de três colunas, ao calendário e às telas de disciplinas e membros. As telas de detalhe e de acesso continuam no desenho anterior.
+A **T24**, que estava parcial, foi absorvida pela nova identidade visual (T27), aplicada a todas as telas.
 
 ### A migração dos dados
 
@@ -108,11 +116,13 @@ A troca de formato não podia apagar o que quem já usava o sistema tinha feito.
 
 A conversão cria uma disciplina para cada nome distinto que aparecia nas atividades, um conteúdo "Geral" dentro de cada uma para recebê-las, atribui peso 1 às que não tinham (RN09) e define o perfil dos membros (RN07). Roda uma vez só, controlada por um marcador de versão gravado junto com os dados.
 
+A revisão de 28/10 acrescentou um segundo passo: a atividade sem responsável passa para o organizador do grupo (RN06), e a cor de disciplina que saiu da paleta vira a equivalente (RN18). Atividade antiga cujo grupo não existe mais não é convertida nem apagada, e a pessoa é avisada uma vez.
+
 ## Recorte da entrega de 20/10/2026
 
-O manual do 2º bimestre pede um recorte pequeno e demonstrável. Como o MVP já foi construído no fim do 1º bimestre, o recorte desta entrega é **o fluxo completo do MVP**, agora com testes executados e registrados.
+O manual do 2º bimestre pedia um recorte pequeno e demonstrável. Como o MVP já tinha sido construído no fim do 1º bimestre, o recorte daquela entrega foi **o fluxo completo do MVP**, já com testes executados e registrados.
 
-### O que funciona e será demonstrado
+### O que funcionava e foi demonstrado
 
 | Passo da demonstração | Requisitos e regras | Testes |
 |---|---|---|
@@ -124,24 +134,46 @@ O manual do 2º bimestre pede um recorte pequeno e demonstrável. Como o MVP já
 | Fechar e reabrir o navegador sem perder nada | RNF02 | CT16 |
 | Mostrar o que o participante não pode fazer | RN07 | CT17 a CT19 |
 
-Também estão funcionando e testados: encerramento de sessão (RF09), tema claro e escuro (RF08), dados de exemplo (RF20), exclusão em cascata (RN02), aviso de prazo em fim de semana (RF22) e o comportamento sem serviços externos (RNF10).
+Também estavam funcionando e testados: encerramento de sessão (RF09), tema claro e escuro (RF08), dados de exemplo (RF20), exclusão em cascata (RN02), aviso de prazo em fim de semana (RF22) e o comportamento sem serviços externos (RNF10). Os testes citados acima são os do ciclo de 20/10, resumidos no [documento de testes](15-casos-de-teste.md#ciclo-de-2010). O que ficou pendente naquela data foi feito para 06/11.
 
-### O que está implementado, mas não foi testado nesta entrega
+## Recorte da entrega de 06/11/2026
 
-Sinalização de prazo em feriado (RF07) e relação dos próximos feriados (RF21). Dependem de serviço externo que não estava acessível no ambiente de teste.
+Para 06/11 o manual pede o sistema parcialmente funcional, com fluxos integrados, regras de negócio e testes. O recorte desta entrega é **o sistema funcionando no navegador, com tudo o que não depende do banco de dados**: o fluxo do MVP, os requisitos desejáveis que ficaram de fora em 20/10, os pedidos da professora depois daquela entrega, a nova identidade visual e os ajustes de uso da revisão de 29/10. Ficam para 27/11 o banco de dados, o acesso com conta e o convite para o grupo, que dependem um do outro, e o histórico de progresso.
 
-### O que fica para as próximas entregas
+### O que funciona e será demonstrado
 
-| Até | O quê | Tarefas |
+| Passo da demonstração | Requisitos e regras | Testes |
 |---|---|---|
-| 30/10/2026 | Correção dos defeitos D01, D02 e D07 | T28, T29, T36 |
-| 06/11/2026 | Ofensiva, conquistas e tela de desempenho do grupo | T30, T31, T32 |
-| 06/11/2026 | Nova identidade visual em todas as telas | T27 |
-| 27/11/2026 | Histórico de progresso | T35 |
+| Abrir a página inicial e a página Sobre nós | RF26 | CT33 |
+| Criar o grupo, com foto: quem cria entra como organizador, e a marca do Vértice aparece enquanto o grupo abre | RF01, RF29, RN07, RN19 | CT01, CT02, CT40 e CT45 |
+| Cadastrar membros com foto de perfil, enquadrada no editor, ou com o avatar num dos cinco estilos | RF02, RF19, RF24, RN15, RN19 | CT03 a CT05, CT39 e CT47 |
+| Cadastrar disciplinas com a paleta de cores, e os conteúdos delas | RF13, RF14, RF25, RN13, RN18 | CT06 a CT08 |
+| Cadastrar atividades no formulário vazio, com o prazo no calendário do campo e o responsável obrigatório | RF03, RN04, RN06, RN09 | CT09, CT10 e CT44 |
+| Criar o conteúdo sem sair do cadastro da atividade | RF30, RN07, RN13 | CT41 |
+| Concluir a atividade — só quem é responsável: progresso, experiência e conquista | RF05, RF10, RF11, RF15, RF17, RN08, RN10, RN12, RN14, RN20 | CT11, CT12 e CT42 |
+| Ver as entregas no calendário, nas cores das disciplinas, trocar de mês com a animação e criar uma atividade a partir de um dia | RF23 | CT15 a CT17 e CT43 |
+| Ver o desempenho do grupo: experiência, ofensiva, conquistas e ranking | RF16, RF17, RF18, RN11 | CT18 |
+| Remover um membro escolhendo quem assume as atividades dele | RF02, RN02 | CT23 |
+| Filtrar a lista com a cor das disciplinas e a foto dos responsáveis, conferir o painel e os avisos de feriado e fim de semana | RF04, RF06, RF07, RF21, RF22 | CT13, CT14, CT29 e CT30 |
+
+Também estão funcionando e testados: a barra de seções no topo, que no celular vira um menu que desce (RNF01, CT34 e CT46), perfis de organizador e participante (RN07, CT20 a CT22), encerramento de sessão (RF09, CT24), tema claro e escuro em todas as telas, inclusive as públicas (RF08, CT25), exclusão em cascata de disciplina e de grupo (RN02, CT26 e CT38), edição e exclusão de atividade (RF03, CT37), comportamento sem serviços externos (RNF10, CT27), dados de exemplo (RF20, CT28), aviso de falha de gravação (RNF02, CT32), uso no celular (RNF01, CT34) e migração dos dados das versões anteriores (CT35 e CT36).
+
+O sistema está publicado na Vercel, e o endereço está no [README](../README.md).
+
+### O que fica para 27/11/2026
+
+| O quê | Requisitos | Tarefas |
+|---|---|---|
+| Banco de dados PostgreSQL no Supabase, no lugar do armazenamento do navegador | RNF02, RN01 | T46, T47 |
+| Acesso com conta Google ou e-mail | RF27 | T48 |
+| Convite para o grupo por link ou código | RF28 | T49 |
+| Fotos de perfil e dos grupos no armazenamento de arquivos | RF24, RF29 | T50 |
+| Histórico de progresso | RF12 | T35 |
+| Testes da versão final, incluindo Firefox e Edge | RNF05 | T51 |
 
 ### Em desenvolvimento
 
-As telas de **detalhe da atividade** e de **acesso** ainda estão no desenho anterior ao das outras telas (T24). Elas funcionam normalmente, mas o visual será refeito com a nova identidade (T27).
+Na página inicial, o **grupo por convite** aparece marcado como "Em breve": ele depende do acesso com conta, previsto para 27/11. Até lá, o acesso continua sendo a escolha do grupo e de quem é a pessoa dentro dele, sem senha.
 
 ---
 
