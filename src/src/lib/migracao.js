@@ -1,12 +1,15 @@
 // Migração dos dados já gravados no navegador.
 //
-// O sistema saiu com `tarefa` guardando a disciplina como texto livre. O
-// modelo alvo é outro: a atividade pertence a um conteúdo, o conteúdo a uma
-// disciplina, e a disciplina a um grupo (RN13). Trocar a estrutura sem migrar
-// apagaria o que quem já usa o sistema fez.
+// Versão 1 — o sistema saiu com `tarefa` guardando a disciplina como texto
+// livre. O modelo alvo é outro: a atividade pertence a um conteúdo, o
+// conteúdo a uma disciplina, e a disciplina a um grupo (RN13). Trocar a
+// estrutura sem migrar apagaria o que quem já usa o sistema fez.
 //
-// Roda uma vez só. O marcador de versão gravado é o que impede uma segunda
-// passada de duplicar disciplina.
+// Versão 2 — toda atividade passou a ter responsável (RN06, revisão de
+// 28/10/2026) e a paleta das disciplinas passou de 8 para 18 cores.
+//
+// Cada passo roda uma vez só. O marcador de versão gravado é o que impede uma
+// segunda passada de duplicar disciplina.
 
 import {
   CHAVES,
@@ -18,11 +21,19 @@ import {
   salvarColecao,
   salvarVersaoDados,
 } from './storage.js';
-import { COR_DISCIPLINA_PADRAO, CORES_DISCIPLINA, PERFIL, STATUS } from './constants.js';
+import {
+  COR_DISCIPLINA_PADRAO,
+  CORES_DISCIPLINA,
+  CORES_SUBSTITUIDAS,
+  corDisciplinaValida,
+  PERFIL,
+  STATUS,
+} from './constants.js';
 
-// Sobe de 1 em 1 a cada mudança de formato. A migração atual leva do formato
-// 0 (tarefa com disciplina de texto) para o 1.
-export const VERSAO_DADOS = 1;
+// Sobe de 1 em 1 a cada mudança de formato.
+//   0 -> 1: tarefa com disciplina de texto vira atividade na cadeia
+//   1 -> 2: responsável obrigatório e paleta de 18 cores
+export const VERSAO_DADOS = 2;
 
 // Nome do conteúdo que recebe as atividades que já existiam. A pessoa
 // renomeia ou divide depois; o importante é não deixar atividade solta.
@@ -136,14 +147,9 @@ function migrarGrupo({ grupo, tarefas, disciplinas, conteudos }) {
 }
 
 /**
- * Executa a migração se ela ainda não rodou. Chamada uma vez, antes de a
- * aplicação montar. Devolve um resumo do que mudou (útil em teste e no log).
+ * Passo 0 -> 1: converte as tarefas antigas. Grava a versão 1 ao terminar.
  */
-export function migrarDados() {
-  if (lerVersaoDados() >= VERSAO_DADOS) {
-    return { migrou: false, motivo: 'ja-migrado' };
-  }
-
+function migrarParaV1() {
   const grupos = lerColecao(CHAVES.grupos);
   const membros = lerColecao(CHAVES.membros);
   const disciplinas = lerColecao(CHAVES.disciplinas);
@@ -157,7 +163,7 @@ export function migrarDados() {
   // Nos dois, seguir adiante gravaria `atividades` com a lista vazia montada
   // abaixo e apagaria tudo o que a pessoa tem.
   if (tarefasAntigas.length === 0) {
-    salvarVersaoDados(VERSAO_DADOS);
+    salvarVersaoDados(1);
     return { migrou: false, motivo: 'sem-tarefas-antigas' };
   }
 
@@ -224,7 +230,7 @@ export function migrarDados() {
     removerChave(CHAVE_LEGADA_TAREFAS);
   }
 
-  salvarVersaoDados(VERSAO_DADOS);
+  salvarVersaoDados(1);
 
   return {
     migrou: true,
@@ -233,4 +239,76 @@ export function migrarDados() {
     conteudosCriados: conteudosFinais.length - conteudos.length,
     orfas: orfas.length,
   };
+}
+
+/**
+ * Passo 1 -> 2.
+ *
+ * RN06 (revisada) — toda atividade tem responsável. As que estavam sem um, ou
+ * com um que não existe mais no grupo, passam para o organizador do grupo
+ * (o primeiro, se houver mais de um), ou para o primeiro membro. Grupo sem
+ * membro nenhum não tem a quem atribuir: a atividade fica como está, e o
+ * formulário pede o responsável na próxima edição.
+ *
+ * Paleta — a cor que não existe na paleta nova vira a equivalente
+ * (`CORES_SUBSTITUIDAS`), ou a cor padrão.
+ *
+ * Só grava a coleção que de fato mudou.
+ */
+function migrarParaV2() {
+  const membros = lerColecao(CHAVES.membros);
+  const disciplinas = lerColecao(CHAVES.disciplinas);
+  const conteudos = lerColecao(CHAVES.conteudos);
+  const atividades = lerColecao(CHAVES.atividades);
+
+  const grupoDaDisciplina = new Map(disciplinas.map((d) => [d.id, d.grupoId]));
+  const grupoDoConteudo = new Map(
+    conteudos.map((c) => [c.id, grupoDaDisciplina.get(c.disciplinaId)])
+  );
+
+  const responsavelPadrao = (grupoId) => {
+    const doGrupo = membros.filter((m) => m.grupoId === grupoId);
+    return (doGrupo.find((m) => m.perfil === PERFIL.ORGANIZADOR) || doGrupo[0])?.id || '';
+  };
+
+  let responsaveisDefinidos = 0;
+  const atividadesFinais = atividades.map((a) => {
+    const grupoId = grupoDoConteudo.get(a.conteudoId);
+    const valido = membros.some((m) => m.id === a.responsavelId && m.grupoId === grupoId);
+    if (valido) return a;
+    const novo = responsavelPadrao(grupoId);
+    if (!novo) return a;
+    responsaveisDefinidos += 1;
+    return { ...a, responsavelId: novo };
+  });
+
+  let coresAjustadas = 0;
+  const disciplinasFinais = disciplinas.map((d) => {
+    if (corDisciplinaValida(d.cor)) return d;
+    coresAjustadas += 1;
+    return { ...d, cor: CORES_SUBSTITUIDAS[d.cor] ?? COR_DISCIPLINA_PADRAO };
+  });
+
+  if (responsaveisDefinidos > 0) salvarColecao(CHAVES.atividades, atividadesFinais);
+  if (coresAjustadas > 0) salvarColecao(CHAVES.disciplinas, disciplinasFinais);
+
+  return { responsaveisDefinidos, coresAjustadas };
+}
+
+/**
+ * Executa os passos que ainda não rodaram. Chamada uma vez, antes de a
+ * aplicação montar. Devolve um resumo do que mudou (útil em teste e no log):
+ * os campos do passo 1 no topo e o resumo do passo 2 em `v2`.
+ */
+export function migrarDados() {
+  const versao = lerVersaoDados();
+  if (versao >= VERSAO_DADOS) {
+    return { migrou: false, motivo: 'ja-migrado' };
+  }
+
+  const resultado = versao < 1 ? migrarParaV1() : { migrou: false, motivo: 'ja-migrado' };
+  const v2 = migrarParaV2();
+  salvarVersaoDados(VERSAO_DADOS);
+
+  return { ...resultado, v2 };
 }

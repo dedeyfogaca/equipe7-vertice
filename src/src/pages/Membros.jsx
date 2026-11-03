@@ -1,191 +1,37 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { toast } from 'sonner';
+import { Ellipsis, Lock, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
-import {
-  Avatar,
-  Button,
-  Card,
-  ConfirmDialog,
-  EmptyState,
-  Field,
-  Input,
-  Label,
-  PageHeader,
-  Select,
-} from '../components/ui';
-import { SomenteOrganizador } from '../components/SomenteOrganizador.jsx';
-import { novaSeedAvatar } from '../lib/avatar.js';
-import { PERFIL, PERFIL_OPCOES, rotuloPerfil } from '../lib/constants.js';
-import { semErros, ultimoOrganizador, validarMembro } from '../lib/validacao.js';
+import { useTitulo } from '../hooks/useTitulo.js';
+import { Avatar } from '../components/ui/avatar-membro.jsx';
+import { Aviso, Badge, Card, EmptyState, PageHeader } from '../components/ui/basicos.jsx';
+import { Button } from '../components/ui/botao.jsx';
+import { Field } from '../components/ui/campos.jsx';
+import { SelectRico } from '../components/ui/selecao.jsx';
+import { opcoesMembros } from '../components/opcoes.jsx';
+import { Confirmacao } from '../components/ui/dialogo.jsx';
+import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz } from '../components/ui/flutuantes.jsx';
+import { FormMembro } from '../components/membros/FormMembro.jsx';
+import { PERFIL, rotuloPerfil } from '../lib/constants.js';
+import { ultimoOrganizador } from '../lib/validacao.js';
+import { plural, primeiroNome } from '../lib/utils.js';
 
-// Tela de membros: onde o grupo cadastra a galera. Precisa existir antes das
-// atividades, porque o responsável de uma atividade sai daqui.
-
-const Colunas = styled.div`
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: ${({ theme }) => theme.espaco.xl};
-  align-items: start;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Formulario = styled(Card).attrs({ as: 'form' })`
-  position: sticky;
-  top: calc(${({ theme }) => theme.layout.alturaHeader} + ${({ theme }) => theme.espaco.lg});
-
-  h2 {
-    font-size: ${({ theme }) => theme.fonte.tamanho.lg};
-    margin-bottom: ${({ theme }) => theme.espaco.lg};
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    position: static;
-  }
-`;
-
-// Grade de cartões, como no protótipo: a pessoa é a unidade, e o que
-// interessa dela (perfil e experiência) cabe num cartão.
-const Lista = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 12px;
-  list-style: none;
-`;
-
-const ItemMembro = styled.li`
-  background: ${({ theme }) => theme.cores.superficie};
-  border: 1px solid ${({ theme }) => theme.cores.borda};
-  border-radius: 12px;
-  padding: 18px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Perfil = styled.span`
-  display: inline-block;
-  font-size: 10px;
-  font-weight: ${({ theme }) => theme.fonte.peso.forte};
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: ${({ theme }) => theme.raio.full};
-  margin-top: 9px;
-  background: ${({ $organizador, theme }) =>
-    $organizador ? theme.cores.primariaSuave : theme.cores.aFazerSuave};
-  color: ${({ $organizador, theme }) =>
-    $organizador ? theme.cores.primariaForte : theme.cores.aFazer};
-`;
-
-// Experiência e atividades, lado a lado no pé do cartão.
-const Numeros = styled.div`
-  display: flex;
-  width: 100%;
-  margin-top: 15px;
-  padding-top: 14px;
-  border-top: 1px solid ${({ theme }) => theme.cores.borda};
-
-  div {
-    flex: 1;
-  }
-
-  b {
-    display: block;
-    font-family: ${({ theme }) => theme.fonte.numero};
-    font-size: 16px;
-    font-weight: ${({ theme }) => theme.fonte.peso.extra};
-    color: ${({ theme }) => theme.cores.gamificacao};
-  }
-
-  span {
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: ${({ theme }) => theme.cores.textoSuave};
-    font-weight: ${({ theme }) => theme.fonte.peso.forte};
-  }
-`;
-
-const AcoesMembro = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.espaco.xs};
-  justify-content: center;
-  margin-top: ${({ theme }) => theme.espaco.md};
-  flex-wrap: wrap;
-`;
-
-const Info = styled.div`
-  min-width: 0;
-  width: 100%;
-
-  strong {
-    display: block;
-    font-size: 15px;
-    font-weight: ${({ theme }) => theme.fonte.peso.forte};
-    color: ${({ theme }) => theme.cores.textoForte};
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  small {
-    display: block;
-    font-size: 12px;
-    color: ${({ theme }) => theme.cores.textoSuave};
-    margin-top: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-`;
-
-const AcoesItem = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.espaco.xs};
-`;
-
-// Excluir o grupo mora aqui, e não na tela de acesso: é ação de
-// organizador (RN07), e lá ainda não se sabe quem é a pessoa.
-const ZonaDePerigo = styled(Card)`
-  margin-top: ${({ theme }) => theme.espaco.xxl};
-  border-color: ${({ theme }) => theme.cores.perigo};
-
-  h2 {
-    font-size: ${({ theme }) => theme.fonte.tamanho.lg};
-    color: ${({ theme }) => theme.cores.perigo};
-    margin-bottom: ${({ theme }) => theme.espaco.sm};
-  }
-
-  p {
-    color: ${({ theme }) => theme.cores.textoSuave};
-    font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-    margin-bottom: ${({ theme }) => theme.espaco.md};
-  }
-`;
-
-const CampoAvatar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.espaco.md};
-`;
-
-const BlocoAvatar = styled.div`
-  margin-bottom: ${({ theme }) => theme.espaco.lg};
-`;
-
-// Cada formulário novo já nasce com uma semente de avatar sorteada
-// (independente do nome do membro).
+function Numero({ rotulo, valor, className }) {
+  return (
+    <div className="flex flex-col-reverse items-center gap-0.5">
+      <dt className="text-[12px] text-sutil">{rotulo}</dt>
+      <dd className={className ?? 'numero text-lg font-bold text-forte'}>{valor}</dd>
+    </div>
+  );
+}
 
 export default function Membros() {
-  const { grupoAtivo, membroAtivo, identificar, sair } = useAuth();
+  useTitulo('Membros');
   const navigate = useNavigate();
+  const { grupoAtivo, membroAtivo, ehOrganizador, identificar, sair } = useAuth();
   const {
     membrosDoGrupo,
     atividadesDoGrupo,
@@ -198,324 +44,256 @@ export default function Membros() {
 
   const membros = membrosDoGrupo(grupoAtivo.id);
   const atividades = atividadesDoGrupo(grupoAtivo.id);
+  const ranking = rankingDoGrupo(grupoAtivo.id);
+  const dadosDe = useMemo(() => Object.fromEntries(ranking.map((l) => [l.membro.id, l])), [ranking]);
 
-  // Quantas atividades cada membro é responsável.
   const atividadesPorMembro = useMemo(() => {
     const mapa = {};
     atividades.forEach((a) => {
-      if (a.responsavelId) {
-        mapa[a.responsavelId] = (mapa[a.responsavelId] || 0) + 1;
-      }
+      if (a.responsavelId) mapa[a.responsavelId] = (mapa[a.responsavelId] || 0) + 1;
     });
     return mapa;
   }, [atividades]);
 
-  // RN10 — a experiência de cada membro, derivada das atividades concluídas.
-  const ranking = rankingDoGrupo(grupoAtivo.id);
-  const xpPorMembro = Object.fromEntries(ranking.map((l) => [l.membro.id, l.xp]));
-
-  // O primeiro membro do grupo nasce organizador — é ele que vai montar
-  // tudo. Os seguintes entram como participantes (RN07).
-  const novoForm = () => ({
-    nome: '',
-    funcao: '',
-    email: '',
-    avatar: novaSeedAvatar(),
-    perfil: membros.length === 0 ? PERFIL.ORGANIZADOR : PERFIL.PARTICIPANTE,
-  });
-
-  const [form, setForm] = useState(novoForm);
-  const [erros, setErros] = useState({});
-  const [editandoId, setEditandoId] = useState(null);
+  // `formulario`: null, {} (novo), { membro } (edição) ou { membro, proprio }.
+  const [formulario, setFormulario] = useState(null);
   const [removendo, setRemovendo] = useState(null);
+  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [excluindoGrupo, setExcluindoGrupo] = useState(false);
 
-  const excluirGrupo = () => {
-    const id = grupoAtivo.id;
-    setExcluindoGrupo(false);
-    sair();
-    removerGrupo(id);
-    navigate('/login', { replace: true });
-  };
-
-  const atualizarCampo = (campo) => (evento) => {
-    setForm((atual) => ({ ...atual, [campo]: evento.target.value }));
-  };
-
-  const sortearAvatar = () => {
-    setForm((atual) => ({ ...atual, avatar: novaSeedAvatar() }));
-  };
-
-  const resetar = () => {
-    setForm(novoForm());
-    setErros({});
-    setEditandoId(null);
-  };
-
-  const aoEnviar = (evento) => {
-    evento.preventDefault();
-    const novosErros = validarMembro(form, { membros, ignorarId: editandoId });
-    setErros(novosErros);
-    if (!semErros(novosErros)) return;
-
-    if (editandoId) {
-      atualizarMembro(editandoId, {
-        nome: form.nome.trim(),
-        funcao: form.funcao.trim(),
-        email: form.email.trim(),
-        avatar: form.avatar,
-        perfil: form.perfil,
-      });
+  const salvar = (dados) => {
+    if (formulario?.membro) {
+      atualizarMembro(formulario.membro.id, dados);
+      toast.success(formulario.proprio ? 'Perfil atualizado' : 'Membro atualizado', { description: dados.nome });
     } else {
-      const criado = criarMembro({ ...form, grupoId: grupoAtivo.id });
-
-      // Grupo recém-criado: quem está montando ainda não se identificou,
-      // porque não havia ninguém para escolher. O primeiro membro que ela
-      // cadastra é ela — mesma suposição que a migração faz. Sem isto a
-      // pessoa seria mandada para "quem é você?" no meio da configuração.
-      if (!membroAtivo && membros.length === 0) {
-        identificar(criado.id);
-      }
+      const criado = criarMembro({ ...dados, grupoId: grupoAtivo.id });
+      toast.success('Membro adicionado', { description: criado.nome });
+      // Grupo antigo, ainda vazio: quem está montando é o primeiro membro.
+      if (!membroAtivo && membros.length === 0) identificar(criado.id);
     }
-    resetar();
+    setFormulario(null);
   };
 
-  const iniciarEdicao = (membro) => {
-    setEditandoId(membro.id);
-    setErros({});
-    setForm({
-      nome: membro.nome || '',
-      funcao: membro.funcao || '',
-      email: membro.email || '',
-      // Membros antigos sem semente continuam com o avatar do nome até a
-      // pessoa sortear um novo.
-      avatar: membro.avatar || membro.nome || novaSeedAvatar(),
-      perfil: membro.perfil || PERFIL.PARTICIPANTE,
-    });
+  const pedirRemocao = (membro) => {
+    setNovoResponsavel('');
+    setRemovendo(membro);
   };
 
+  const qtdRemovendo = removendo ? atividadesPorMembro[removendo.id] || 0 : 0;
+  const quemAssume = membros.filter((m) => m.id !== removendo?.id);
+
+  // RN02 + RN06 — as atividades do membro removido passam para quem a pessoa
+  // escolher: nenhuma atividade fica sem responsável.
   const confirmarRemocao = () => {
-    if (removendo) {
-      removerMembro(removendo.id);
-      if (editandoId === removendo.id) resetar();
-    }
+    const assume = membros.find((m) => m.id === novoResponsavel);
+    removerMembro(removendo.id, qtdRemovendo > 0 ? novoResponsavel : '');
+    toast('Membro removido', {
+      description:
+        qtdRemovendo > 0 && assume
+          ? `${plural(qtdRemovendo, 'atividade')} de ${primeiroNome(removendo.nome)} ${qtdRemovendo === 1 ? 'passou' : 'passaram'} para ${primeiroNome(assume.nome)}.`
+          : removendo.nome,
+    });
     setRemovendo(null);
   };
 
-  const qtdAtividadesRemovendo = removendo ? atividadesPorMembro[removendo.id] || 0 : 0;
+  // RN07 + RN02 — só o organizador exclui o grupo, e o grupo leva tudo junto.
+  const excluirGrupo = () => {
+    const id = grupoAtivo.id;
+    const nome = grupoAtivo.nome;
+    setExcluindoGrupo(false);
+    sair();
+    removerGrupo(id);
+    toast('Grupo excluído', { description: nome });
+    navigate('/entrar', { replace: true });
+  };
 
+  // A página ocupa a altura toda da tela, para a exclusão do grupo ficar
+  // sempre no pé dela, longe das ações do dia a dia.
   return (
-    <>
+    <div className="flex flex-1 flex-col">
       <PageHeader
         titulo="Membros"
-        subtitulo={`${membros.length} ${
-          membros.length === 1 ? 'pessoa no grupo' : 'pessoas no grupo'
-        }`}
+        subtitulo={`${plural(membros.length, 'pessoa')} no grupo`}
+        acoes={
+          ehOrganizador && (
+            <Button onClick={() => setFormulario({})}>
+              <UserPlus aria-hidden="true" />
+              Adicionar membro
+            </Button>
+          )
+        }
       />
 
-      <Colunas>
-        {/* RN07 — quem gerencia membros é o organizador. */}
-        <SomenteOrganizador aviso="Só o organizador do grupo cadastra e edita membros.">
-        <Formulario onSubmit={aoEnviar} noValidate>
-          <h2>{editandoId ? 'Editar membro' : 'Adicionar membro'}</h2>
+      {!ehOrganizador && (
+        <Aviso icone={Lock} className="mb-5">
+          Só o organizador do grupo cadastra e edita membros. Você pode editar o seu próprio perfil.
+        </Aviso>
+      )}
 
-          <BlocoAvatar>
-            <Label as="span">Avatar</Label>
-            <CampoAvatar>
-              <Avatar seed={form.avatar} nome={form.nome} tamanho={56} />
-              <Button
-                type="button"
-                $variante="secundario"
-                $tamanho="sm"
-                title="Sortear outro avatar"
-                onClick={sortearAvatar}
-              >
-                🎲 Trocar avatar
-              </Button>
-            </CampoAvatar>
-          </BlocoAvatar>
-
-          <Field id="nome" label="Nome" obrigatorio erro={erros.nome}>
-            <Input
-              id="nome"
-              value={form.nome}
-              onChange={atualizarCampo('nome')}
-              placeholder="Ex.: Ana Souza"
-              $erro={Boolean(erros.nome)}
-            />
-          </Field>
-
-          <Field id="funcao" label="Função no grupo" dica="Opcional.">
-            <Input
-              id="funcao"
-              value={form.funcao}
-              onChange={atualizarCampo('funcao')}
-              placeholder="Ex.: responsável pela introdução"
-            />
-          </Field>
-
-          <Field id="email" label="E-mail" dica="Opcional." erro={erros.email}>
-            <Input
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={atualizarCampo('email')}
-              placeholder="ana@exemplo.com"
-              $erro={Boolean(erros.email)}
-            />
-          </Field>
-
-          {/* RN07 — o perfil decide quem gerencia membros, disciplinas e
-              conteúdos. Participante cadastra e edita atividades. */}
-          <Field
-            id="perfil"
-            label="Perfil"
-            erro={erros.perfil}
-            dica="O organizador gerencia membros, disciplinas e conteúdos."
+      {membros.length === 0 ? (
+        <Card>
+          <EmptyState
+            icone={Users}
+            titulo="Nenhum membro ainda"
+            descricao="Cadastre as pessoas do grupo. Depois elas poderão ser responsáveis pelas atividades."
           >
-            <Select
-              id="perfil"
-              value={form.perfil}
-              onChange={atualizarCampo('perfil')}
-              $erro={Boolean(erros.perfil)}
-            >
-              {PERFIL_OPCOES.map((o) => (
-                <option key={o.valor} value={o.valor}>
-                  {o.rotulo}
-                </option>
-              ))}
-            </Select>
-          </Field>
-
-          <AcoesItem>
-            <Button type="submit" $bloco>
-              {editandoId ? 'Salvar' : 'Adicionar'}
-            </Button>
-            {editandoId && (
-              <Button type="button" $variante="secundario" onClick={resetar}>
-                Cancelar
+            {ehOrganizador && (
+              <Button onClick={() => setFormulario({})}>
+                <UserPlus aria-hidden="true" />
+                Adicionar membro
               </Button>
             )}
-          </AcoesItem>
-        </Formulario>
-        </SomenteOrganizador>
-
-        <div>
-          {membros.length === 0 ? (
-            <Card>
-              <EmptyState
-                icone="👥"
-                titulo="Nenhum membro ainda"
-                descricao="Cadastre as pessoas do grupo no formulário ao lado. Depois elas poderão ser responsáveis pelas atividades."
-              />
-            </Card>
-          ) : (
-            <Lista>
-              {membros.map((membro) => {
-                const qtd = atividadesPorMembro[membro.id] || 0;
-                return (
-                  <ItemMembro key={membro.id}>
-                    <Avatar seed={membro.avatar} nome={membro.nome} tamanho={58} />
-                    <Info>
-                      <strong>{membro.nome}</strong>
-                      {membro.funcao && <small>{membro.funcao}</small>}
-                      {membro.email && <small>{membro.email}</small>}
-                    </Info>
-                    <Perfil $organizador={membro.perfil === PERFIL.ORGANIZADOR}>
-                      {rotuloPerfil(membro.perfil)}
-                    </Perfil>
-
-                    {/* RN10 — a experiência sai das atividades concluídas. */}
-                    <Numeros>
-                      <div>
-                        <b>{xpPorMembro[membro.id] ?? 0}</b>
-                        <span>XP</span>
-                      </div>
-                      <div>
-                        <b>{qtd}</b>
-                        <span>{qtd === 1 ? 'atividade' : 'atividades'}</span>
-                      </div>
-                    </Numeros>
-
-                    <AcoesMembro>
-                      <SomenteOrganizador>
-                        <Button
-                          type="button"
-                          $variante="secundario"
-                          $tamanho="sm"
-                          onClick={() => iniciarEdicao(membro)}
-                        >
-                          Editar
+          </EmptyState>
+        </Card>
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+          {membros.map((membro) => {
+            const eu = membro.id === membroAtivo?.id;
+            const dados = dadosDe[membro.id];
+            const travado = ultimoOrganizador(membro.id, membros);
+            const podeEditar = ehOrganizador || eu;
+            return (
+              <Card as="li" key={membro.id} className="flex flex-col gap-4 p-5">
+                <div className="flex items-start gap-3.5">
+                  <Avatar membro={membro} tamanho={56} />
+                  <div className="min-w-0 flex-1">
+                    <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="truncate text-base font-semibold text-forte">{membro.nome}</span>
+                      {eu && <Badge tom="contorno">Você</Badge>}
+                    </p>
+                    <p className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-sutil">
+                      <Badge tom={membro.perfil === PERFIL.ORGANIZADOR ? 'primaria' : 'neutro'}>
+                        {rotuloPerfil(membro.perfil)}
+                      </Badge>
+                      {membro.funcao && <span className="truncate">{membro.funcao}</span>}
+                    </p>
+                    {membro.email && <p className="mt-1 truncate text-[13px] text-sutil">{membro.email}</p>}
+                  </div>
+                  {podeEditar && (
+                    <MenuRaiz>
+                      <MenuGatilho asChild>
+                        <Button variante="fantasma" tamanho="icone-sm" aria-label={`Ações de ${membro.nome}`}>
+                          <Ellipsis />
                         </Button>
-                      </SomenteOrganizador>
-                      <SomenteOrganizador>
-                        <Button
-                          type="button"
-                          $variante="fantasma"
-                          $tamanho="sm"
-                          disabled={ultimoOrganizador(membro.id, membros)}
-                          title={
-                            ultimoOrganizador(membro.id, membros)
-                              ? 'O grupo precisa de pelo menos um organizador.'
-                              : undefined
+                      </MenuGatilho>
+                      <MenuConteudo align="end" className="min-w-[200px]">
+                        <MenuItem
+                          onSelect={() =>
+                            setFormulario({ membro, proprio: eu && !ehOrganizador })
                           }
-                          onClick={() => setRemovendo(membro)}
                         >
-                          Remover
-                        </Button>
-                      </SomenteOrganizador>
-                    </AcoesMembro>
-                  </ItemMembro>
-                );
-              })}
-            </Lista>
-          )}
-        </div>
-      </Colunas>
+                          <Pencil aria-hidden="true" />
+                          {eu && !ehOrganizador ? 'Editar meu perfil' : 'Editar'}
+                        </MenuItem>
+                        {ehOrganizador && (
+                          // RN07 — o último organizador não sai: o grupo
+                          // ficaria sem ninguém para geri-lo.
+                          <MenuItem
+                            perigo
+                            disabled={travado}
+                            onSelect={() => pedirRemocao(membro)}
+                            className="data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
+                          >
+                            <Trash2 aria-hidden="true" />
+                            <span className="flex flex-col">
+                              Remover
+                              {travado && (
+                                <span className="text-[12px] font-normal text-sutil">
+                                  O grupo precisa de um organizador
+                                </span>
+                              )}
+                            </span>
+                          </MenuItem>
+                        )}
+                      </MenuConteudo>
+                    </MenuRaiz>
+                  )}
+                </div>
+                <dl className="mt-auto grid grid-cols-3 gap-2 rounded-2xl bg-superficie-2 px-2 py-3">
+                  <Numero rotulo="experiência" valor={`${dados?.xp ?? 0} XP`} className="numero text-lg font-bold text-gam-texto" />
+                  <Numero
+                    rotulo={(atividadesPorMembro[membro.id] || 0) === 1 ? 'atividade' : 'atividades'}
+                    valor={atividadesPorMembro[membro.id] || 0}
+                  />
+                  <Numero rotulo="de ofensiva" valor={plural(dados?.ofensiva ?? 0, 'dia')} />
+                </dl>
+              </Card>
+            );
+          })}
+        </ul>
+      )}
 
-      {/* RN07 + RN02 — só o organizador exclui o grupo, e o grupo leva tudo
-          junto. */}
-      <SomenteOrganizador>
-        <ZonaDePerigo>
-          <h2>Excluir o grupo</h2>
-          <p>
-            O grupo <strong>{grupoAtivo.nome}</strong> sai com todos os seus membros,
-            disciplinas, conteúdos e atividades. Não dá para desfazer.
-          </p>
-          <Button type="button" $variante="perigo" onClick={() => setExcluindoGrupo(true)}>
+      {/* RN07 — só o organizador exclui o grupo. Fica no pé da página. */}
+      {ehOrganizador && (
+        <div className="mt-auto pt-10">
+        <section
+          aria-labelledby="t-perigo"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-perigo/30 p-5 sm:p-6"
+        >
+          <div className="max-w-xl">
+            <h2 id="t-perigo" className="text-[17px] font-semibold tracking-[-0.02em] text-forte">
+              Excluir o grupo
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-sutil">
+              O grupo <strong className="font-semibold text-texto">{grupoAtivo.nome}</strong> sai com todos os
+              seus membros, disciplinas, conteúdos e atividades. Não dá para desfazer.
+            </p>
+          </div>
+          <Button variante="perigo-contorno" onClick={() => setExcluindoGrupo(true)}>
+            <Trash2 aria-hidden="true" />
             Excluir grupo
           </Button>
-        </ZonaDePerigo>
-      </SomenteOrganizador>
+        </section>
+        </div>
+      )}
 
-      <ConfirmDialog
-        aberto={excluindoGrupo}
-        titulo="Confirmar exclusão"
-        mensagem={`O grupo "${grupoAtivo.nome}" será excluído com todos os seus membros, disciplinas, conteúdos e atividades. Essa ação não pode ser desfeita.`}
-        textoConfirmar="Confirmar exclusão"
-        textoCancelar="Cancelar"
-        perigo
-        onConfirmar={excluirGrupo}
-        onCancelar={() => setExcluindoGrupo(false)}
-      />
+      {formulario && (
+        <FormMembro
+          key={formulario.membro?.id ?? 'novo'}
+          aberto
+          aoMudar={(abrir) => !abrir && setFormulario(null)}
+          membro={formulario.membro}
+          membros={membros}
+          proprioPerfil={Boolean(formulario.proprio)}
+          aoSalvar={salvar}
+        />
+      )}
 
-      <ConfirmDialog
+      <Confirmacao
         aberto={Boolean(removendo)}
         titulo="Remover membro?"
         mensagem={
-          qtdAtividadesRemovendo > 0
-            ? `${removendo?.nome} é responsável por ${qtdAtividadesRemovendo} ${
-                qtdAtividadesRemovendo === 1 ? 'atividade' : 'atividades'
-              }. Ao remover, ${
-                qtdAtividadesRemovendo === 1 ? 'ela ficará' : 'elas ficarão'
-              } sem responsável.`
+          qtdRemovendo > 0
+            ? `${removendo?.nome} é responsável por ${plural(qtdRemovendo, 'atividade')}. Toda atividade precisa de um responsável: escolha quem assume antes de remover.`
             : `${removendo?.nome} será removido do grupo.`
         }
         textoConfirmar="Remover"
         perigo
+        podeConfirmar={qtdRemovendo === 0 || Boolean(novoResponsavel)}
         onConfirmar={confirmarRemocao}
         onCancelar={() => setRemovendo(null)}
+      >
+        {qtdRemovendo > 0 && (
+          <Field id="novo-responsavel" label="Quem assume as atividades?" obrigatorio>
+            <SelectRico
+              valor={novoResponsavel}
+              aoMudar={setNovoResponsavel}
+              opcoes={opcoesMembros(quemAssume, { voceId: membroAtivo?.id })}
+              placeholder="Selecione um membro"
+            />
+          </Field>
+        )}
+      </Confirmacao>
+
+      <Confirmacao
+        aberto={excluindoGrupo}
+        titulo="Excluir o grupo?"
+        mensagem={`O grupo "${grupoAtivo.nome}" será excluído com todos os seus membros, disciplinas, conteúdos e atividades. Essa ação não pode ser desfeita.`}
+        textoConfirmar="Confirmar exclusão"
+        perigo
+        onConfirmar={excluirGrupo}
+        onCancelar={() => setExcluindoGrupo(false)}
       />
-    </>
+    </div>
   );
 }

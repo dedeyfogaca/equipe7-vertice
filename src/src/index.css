@@ -1,0 +1,263 @@
+@import 'tailwindcss';
+
+/* O tema escuro é ligado pela classe `dark` no <html>. Sem ela, vale o
+   claro — nas telas internas e nas públicas. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Os tokens de cor moram em variáveis CSS, para o mesmo nome valer nos dois
+   temas. O Tailwind gera as classes a partir daqui: `bg-superficie`,
+   `text-sutil`, `border-borda`, `bg-primaria/10`... */
+@theme inline {
+  --font-sans: 'Inter Tight Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+
+  --color-fundo: var(--fundo);
+  --color-lateral: var(--lateral);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-superficie-3: var(--superficie-3);
+  --color-borda: var(--borda);
+  --color-borda-forte: var(--borda-forte);
+  --color-divisor: var(--divisor);
+
+  --color-texto: var(--texto);
+  --color-forte: var(--forte);
+  --color-suave: var(--suave);
+  --color-sutil: var(--sutil);
+  --color-apagado: var(--apagado);
+
+  --color-primaria: var(--primaria);
+  --color-primaria-fg: var(--primaria-fg);
+  --color-primaria-texto: var(--primaria-texto);
+  --color-primaria-barra: var(--primaria-barra);
+
+  --color-gam: var(--gam);
+  --color-gam-texto: var(--gam-texto);
+
+  --color-afazer: var(--st-afazer);
+  --color-afazer-bg: var(--st-afazer-bg);
+  --color-fazendo: var(--st-fazendo);
+  --color-fazendo-bg: var(--st-fazendo-bg);
+  --color-concluido: var(--st-concluido);
+  --color-concluido-bg: var(--st-concluido-bg);
+  --color-atrasada: var(--st-atrasada);
+  --color-atrasada-bg: var(--st-atrasada-bg);
+
+  --color-perigo: var(--perigo);
+  --color-perigo-fg: var(--perigo-fg);
+  --color-feriado: var(--feriado);
+
+  --shadow-botao: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 1px 2px rgb(0 0 0 / 0.35),
+    0 8px 24px -10px var(--primaria-brilho);
+  --shadow-cartao: var(--sombra-cartao);
+  --shadow-flutuante: 0 24px 64px -24px rgb(0 0 0 / 0.55), 0 2px 8px rgb(0 0 0 / 0.18);
+
+  --animate-surgir: surgir 160ms ease-out;
+  --animate-sumir: sumir 120ms ease-in;
+  --animate-subir: subir 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-menu-desce: menu-desce 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-menu-sobe: menu-sobe 160ms ease-in;
+  /* Troca de mês (ou de semana) no calendário: a página nova entra pelo lado
+     para onde a pessoa andou. */
+  --animate-mes-proximo: mes-proximo 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-mes-anterior: mes-anterior 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes mes-proximo {
+  from {
+    opacity: 0;
+    translate: 36px 0;
+  }
+}
+@keyframes mes-anterior {
+  from {
+    opacity: 0;
+    translate: -36px 0;
+  }
+}
+
+@keyframes menu-desce {
+  from {
+    translate: 0 -100%;
+  }
+}
+@keyframes menu-sobe {
+  to {
+    translate: 0 -100%;
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sumir {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes subir {
+  from {
+    opacity: 0;
+    translate: -50% -46%;
+    scale: 0.98;
+  }
+}
+
+@layer base {
+  /* Tema claro */
+  :root {
+    --fundo: #f5f7fb;
+    --lateral: #ffffff;
+    --superficie: #ffffff;
+    --superficie-2: #f3f5f9;
+    --superficie-3: #edf1f7;
+    --borda: #e2e7ef;
+    --borda-forte: #cdd5e1;
+    --divisor: #edf0f5;
+
+    --texto: #1a2233;
+    --forte: #0b1220;
+    --suave: #475467;
+    --sutil: #5b6678;
+    --apagado: #636e80;
+
+    --primaria: #0e7490;
+    --primaria-fg: #ffffff;
+    --primaria-texto: #0e7490;
+    --primaria-barra: #0891b2;
+    --primaria-brilho: rgb(8 145 178 / 0.45);
+
+    --gam: #7c3aed;
+    --gam-texto: #6d28d9;
+
+    --st-afazer: #475467;
+    --st-afazer-bg: #eef2f7;
+    --st-fazendo: #b45309;
+    --st-fazendo-bg: #fef3c7;
+    --st-concluido: #047857;
+    --st-concluido-bg: #d1fae5;
+    --st-atrasada: #be123c;
+    --st-atrasada-bg: #ffe4e6;
+
+    --perigo: #be123c;
+    --perigo-fg: #ffffff;
+    --feriado: #15803d;
+
+    --sombra-cartao: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+
+    /* Opacidade do fundo das etiquetas do calendário, na cor da disciplina. */
+    --alfa-etiqueta: 0.14;
+
+    color-scheme: light;
+  }
+
+  /* Tema escuro */
+  .dark {
+    --fundo: #07090f;
+    --lateral: #0a0e17;
+    --superficie: #0c111c;
+    --superficie-2: #111827;
+    --superficie-3: #161f30;
+    --borda: #1c2538;
+    --borda-forte: #263149;
+    --divisor: #151d2d;
+
+    --texto: #e6edf7;
+    --forte: #ffffff;
+    --suave: #a9b4c7;
+    --sutil: #8b97ad;
+    --apagado: #7a869b;
+
+    --primaria: #22d3ee;
+    --primaria-fg: #04121a;
+    --primaria-texto: #22d3ee;
+    --primaria-barra: #22d3ee;
+    --primaria-brilho: rgb(34 211 238 / 0.55);
+
+    --gam: #a78bfa;
+    --gam-texto: #c4b5fd;
+
+    --st-afazer: #a9b4c7;
+    --st-afazer-bg: #141c2c;
+    --st-fazendo: #fcd34d;
+    --st-fazendo-bg: rgb(251 191 36 / 0.12);
+    --st-concluido: #6ee7b7;
+    --st-concluido-bg: rgb(52 211 153 / 0.12);
+    --st-atrasada: #fda4af;
+    --st-atrasada-bg: rgb(251 113 133 / 0.14);
+
+    --perigo: #fb7185;
+    --perigo-fg: #2a0710;
+    --feriado: #4ade80;
+
+    --sombra-cartao: 0 1px 0 rgb(255 255 255 / 0.02) inset;
+
+    --alfa-etiqueta: 0.2;
+
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--fundo);
+    color: var(--texto);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(34 211 238 / 0.28);
+  }
+
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primaria-barra);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility numero {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Marca do Vértice: dá uma volta rápida ao passar o mouse. Quem pede menos
+   movimento não vê o giro. */
+@keyframes girar {
+  to {
+    rotate: 360deg;
+  }
+}
+@layer components {
+  @media (hover: hover) {
+    .marca-giro:hover .simbolo-vertice {
+      animation: girar 0.6s cubic-bezier(0.45, 0, 0.2, 1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .simbolo-vertice {
+      animation: none !important;
+    }
+  }
+}

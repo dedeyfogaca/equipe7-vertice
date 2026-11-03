@@ -21,7 +21,7 @@ globalThis.localStorage = {
   clear: () => memoria.clear(),
 };
 
-const { migrarDados } = await import('../src/lib/migracao.js');
+const { migrarDados, VERSAO_DADOS } = await import('../src/lib/migracao.js');
 
 let falhas = 0;
 
@@ -88,7 +88,7 @@ const semMarcador = migrarDados();
 checar('não tenta migrar', semMarcador.migrou, false);
 checar('e diz por quê', semMarcador.motivo, 'sem-tarefas-antigas');
 checar('as atividades continuam lá', (ler('atividades') || []).length, 3);
-checar('o marcador é gravado, para não repetir', ler('versaoDados'), 1);
+checar('o marcador é gravado, para não repetir', ler('versaoDados'), VERSAO_DADOS);
 
 console.log('\nCaminho normal: dados no formato antigo\n');
 
@@ -177,8 +177,86 @@ console.log('\nInstalação nova: nada gravado\n');
 memoria.clear();
 const zerado = migrarDados();
 checar('não migra', zerado.migrou, false);
-checar('marca a versão mesmo assim', ler('versaoDados'), 1);
+checar('marca a versão mesmo assim', ler('versaoDados'), VERSAO_DADOS);
 checar('e não inventa coleção', ler('atividades'), null);
+
+// ---------------------------------------------------------------------------
+// Versão 2 — responsável obrigatório (RN06) e paleta de 18 cores
+// ---------------------------------------------------------------------------
+
+console.log('\nVersão 2: atividade sem responsável ganha um\n');
+
+function montarVersao1() {
+  memoria.clear();
+  gravar('versaoDados', 1);
+  gravar('grupos', [GRUPO, { ...GRUPO, id: 'g2', nome: 'Outro' }]);
+  gravar('membros', [
+    { id: 'm1', nome: 'Participante', grupoId: 'g1', perfil: 'participante' },
+    { id: 'm2', nome: 'Organizadora', grupoId: 'g1', perfil: 'organizador' },
+    { id: 'm9', nome: 'De outro grupo', grupoId: 'g2', perfil: 'organizador' },
+  ]);
+  gravar('disciplinas', [
+    { id: 'd1', nome: 'Cálculo', cor: '#78716c', grupoId: 'g1' },
+    { id: 'd2', nome: 'Física', cor: '#0ea5e9', grupoId: 'g1' },
+    { id: 'd3', nome: 'Química', cor: 'vermelho', grupoId: 'g1' },
+  ]);
+  gravar('conteudos', [{ id: 'c1', nome: 'Geral', descricao: '', disciplinaId: 'd1', ordem: 0 }]);
+  gravar('atividades', [
+    { ...atividadeNova('a1'), responsavelId: '' },
+    { ...atividadeNova('a2'), responsavelId: 'm1' },
+    { ...atividadeNova('a3'), responsavelId: 'm9' },
+    { ...atividadeNova('a4'), responsavelId: 'membro-removido' },
+  ]);
+}
+
+montarVersao1();
+const v2 = migrarDados();
+const responsaveis = (ler('atividades') || []).map((a) => a.responsavelId);
+
+checar('o passo 1 não roda de novo', v2.migrou, false);
+checar('sem responsável vai para o organizador do grupo', responsaveis[0], 'm2');
+checar('responsável válido continua o mesmo', responsaveis[1], 'm1');
+checar('responsável de outro grupo é trocado (RN03)', responsaveis[2], 'm2');
+checar('responsável que não existe mais é trocado', responsaveis[3], 'm2');
+checar('conta quantas recebeu', v2.v2.responsaveisDefinidos, 3);
+checar('nenhuma atividade fica sem responsável', responsaveis.every(Boolean), true);
+checar('o marcador vai para 2', ler('versaoDados'), 2);
+
+console.log('\nVersão 2: cores fora da paleta nova\n');
+
+const cores = (ler('disciplinas') || []).map((d) => d.cor);
+checar('a cor que saiu da paleta vira a equivalente', cores[0], '#a8a29e');
+checar('cor da paleta continua a mesma', cores[1], '#0ea5e9');
+checar('cor inválida vira a padrão', cores[2], '#3b82f6');
+checar('conta quantas mudaram', v2.v2.coresAjustadas, 2);
+
+console.log('\nVersão 2: grupo sem membro nenhum\n');
+
+memoria.clear();
+gravar('versaoDados', 1);
+gravar('grupos', [GRUPO]);
+gravar('membros', []);
+gravar('disciplinas', [{ id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' }]);
+gravar('conteudos', [{ id: 'c1', nome: 'Geral', descricao: '', disciplinaId: 'd1', ordem: 0 }]);
+gravar('atividades', [{ ...atividadeNova('a1'), responsavelId: '' }]);
+const semMembros = migrarDados();
+checar('não inventa responsável', (ler('atividades') || [])[0].responsavelId, '');
+checar('e não conta como definido', semMembros.v2.responsaveisDefinidos, 0);
+
+console.log('\nVersão 2: nada a mudar, nada é regravado\n');
+
+memoria.clear();
+gravar('versaoDados', 1);
+gravar('grupos', [GRUPO]);
+gravar('membros', [{ id: 'm1', nome: 'Alguém', grupoId: 'g1', perfil: 'organizador' }]);
+gravar('disciplinas', [{ id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' }]);
+gravar('conteudos', [{ id: 'c1', nome: 'Geral', descricao: '', disciplinaId: 'd1', ordem: 0 }]);
+gravar('atividades', [atividadeNova('a1')]);
+const antes = memoria.get('atividades');
+const limpo = migrarDados();
+checar('resumo zerado', limpo.v2, { responsaveisDefinidos: 0, coresAjustadas: 0 });
+checar('a coleção fica exatamente como estava', memoria.get('atividades') === antes, true);
+checar('e a terceira passada nem roda', migrarDados().motivo, 'ja-migrado');
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

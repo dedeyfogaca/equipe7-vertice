@@ -1,5 +1,5 @@
 // Utilitários de data. O prazo das atividades é guardado como 'AAAA-MM-DD'
-// (o formato que o <input type="date"> entrega), e tratamos tudo no fuso local
+// (o formato que o campo de data entrega), e tratamos tudo no fuso local
 // para evitar o clássico "pulo de um dia" causado pelo UTC.
 
 export function paraISO(date) {
@@ -14,6 +14,10 @@ export function hojeISO() {
 }
 
 // Converte 'AAAA-MM-DD' em Date no fuso local.
+//
+// Data que não existe ('2026-02-31') é recusada: o Date do JavaScript
+// "transborda" para o mês seguinte em silêncio, e um prazo vindo pelo
+// endereço (?prazo=) cairia num dia que ninguém escolheu.
 export function dataLocal(iso) {
   if (!iso || typeof iso !== 'string') return null;
   const partes = iso.split('-').map(Number);
@@ -21,7 +25,9 @@ export function dataLocal(iso) {
   const [ano, mes, dia] = partes;
   if (!ano || !mes || !dia) return null;
   const d = new Date(ano, mes - 1, dia);
-  return Number.isNaN(d.getTime()) ? null : d;
+  if (Number.isNaN(d.getTime())) return null;
+  if (d.getFullYear() !== ano || d.getMonth() !== mes - 1 || d.getDate() !== dia) return null;
+  return d;
 }
 
 export function dataValida(iso) {

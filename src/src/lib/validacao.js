@@ -21,18 +21,14 @@ export function validarAtividade(dados, { membros = [], conteudos = [] } = {}) {
     erros.prazo = 'O prazo informado não é uma data válida.';
   }
 
-  // RN06 — responsável NÃO é obrigatório. Atividade sem responsável é um
-  // caso previsto (UC05-5A), e o RN10 diz que ela simplesmente não gera
-  // experiência.
+  // RN06 — toda atividade tem um responsável (revisão de 28/10/2026, a
+  // pedido da professora). É ele quem recebe a experiência na conclusão
+  // (RN10).
   //
-  // RN03 — mas, havendo um, ele tem de ser membro do grupo da atividade.
-  // Esta checagem era o `else` da obrigatoriedade que o T14 removeu: apagar
-  // o bloco inteiro teria levado o RN03 junto.
-  if (
-    dados.responsavelId &&
-    membros.length > 0 &&
-    !membros.some((m) => m.id === dados.responsavelId)
-  ) {
+  // RN03 — e ele tem de ser membro do grupo da atividade.
+  if (!dados.responsavelId) {
+    erros.responsavelId = 'Escolha o responsável pela atividade.';
+  } else if (membros.length > 0 && !membros.some((m) => m.id === dados.responsavelId)) {
     erros.responsavelId = 'O responsável escolhido não pertence ao grupo.';
   }
 
@@ -64,8 +60,11 @@ export function validarAtividade(dados, { membros = [], conteudos = [] } = {}) {
 export function validarMembro(dados, { membros = [], ignorarId = null } = {}) {
   const erros = {};
 
-  if (!dados.nome || !dados.nome.trim()) {
+  const nome = (dados.nome || '').trim();
+  if (!nome) {
     erros.nome = 'O nome do membro é obrigatório.';
+  } else if (nome.length > 80) {
+    erros.nome = 'O nome pode ter no máximo 80 caracteres.';
   }
 
   const email = (dados.email || '').trim();
@@ -79,6 +78,13 @@ export function validarMembro(dados, { membros = [], ignorarId = null } = {}) {
     if (ultimoOrganizador(ignorarId, membros)) {
       erros.perfil = 'O grupo precisa de pelo menos um organizador.';
     }
+  }
+
+  // RN07 — o primeiro membro de um grupo vazio é o organizador (defeito D01:
+  // cadastrá-lo como participante deixava o grupo sem ninguém para gerenciar).
+  const grupoVazio = membros.filter((m) => m.id !== ignorarId).length === 0;
+  if (!ignorarId && grupoVazio && dados.perfil && dados.perfil !== PERFIL.ORGANIZADOR) {
+    erros.perfil = 'O primeiro membro do grupo precisa ser o organizador.';
   }
 
   return erros;
@@ -149,10 +155,16 @@ export function validarConteudo(dados, { conteudos = [], ignorarId = null } = {}
   return erros;
 }
 
-export function validarGrupo(dados) {
+// RF01 — criar o grupo pede também o nome de quem cria: essa pessoa é o
+// primeiro membro e o organizador (RN07). Assim o grupo nunca nasce sem
+// ninguém para gerenciá-lo.
+export function validarGrupo(dados, { exigirCriador = true } = {}) {
   const erros = {};
   if (!dados.nome || !dados.nome.trim()) {
     erros.nome = 'Dê um nome ao grupo.';
+  }
+  if (exigirCriador && (!dados.criador || !dados.criador.trim())) {
+    erros.criador = 'Informe o seu nome.';
   }
   return erros;
 }

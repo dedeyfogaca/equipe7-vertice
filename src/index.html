@@ -1,22 +1,30 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Vértice - acompanhe o quanto você avançou em cada disciplina: conteúdos, atividades com peso e progresso."
+      content="Vértice — plataforma para grupos de estudo acompanharem o quanto já avançaram em cada disciplina."
     />
-    <meta name="theme-color" content="#0a0e17" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Uma família só: Manrope, em pesos variados. JetBrains Mono entra
-         apenas nos números. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"
-      rel="stylesheet"
+    <meta name="theme-color" content="#07090f" />
+    <meta property="og:title" content="Vértice" />
+    <meta
+      property="og:description"
+      content="Veja o quanto você já avançou em cada matéria. Plataforma de acompanhamento de aprendizagem para grupos de estudo."
     />
+    <meta property="og:locale" content="pt_BR" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Vértice</title>
+    <script>
+      // Aplica o tema salvo antes de a página desenhar, para não piscar.
+      try {
+        if (localStorage.getItem('tema') === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f5f7fb');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

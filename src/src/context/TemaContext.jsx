@@ -1,20 +1,12 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { ThemeProvider } from 'styled-components';
-import { temaClaro, temaEscuro } from '../styles/theme.js';
-import { GlobalStyle } from '../styles/GlobalStyle.js';
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
-// Controla o modo de cor (escuro/claro). Guarda a escolha no LocalStorage e
-// entrega o tema correspondente ao styled-components. O botão de alternar lê
-// daqui via useTema().
+// Modo de cor do sistema (escuro ou claro). A escolha fica gravada no
+// navegador e vale para todas as telas, públicas e internas. É aplicada pela
+// classe `dark` no <html> — é dela que saem as variáveis de cor de
+// `index.css`.
 const TemaContext = createContext(null);
 const CHAVE = 'tema';
+const COR_DA_BARRA = { dark: '#07090f', light: '#f5f7fb' };
 
 function lerModoSalvo() {
   try {
@@ -28,11 +20,17 @@ function lerModoSalvo() {
 export function TemaProvider({ children }) {
   const [modo, setModo] = useState(lerModoSalvo);
 
+  // Antes de pintar, para a tela não piscar no tema errado.
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle('dark', modo === 'dark');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', COR_DA_BARRA[modo]);
+  }, [modo]);
+
   useEffect(() => {
     try {
       localStorage.setItem(CHAVE, modo);
     } catch {
-      /* armazenamento indisponível */
+      /* armazenamento indisponível: o tema só não fica lembrado */
     }
   }, [modo]);
 
@@ -40,18 +38,9 @@ export function TemaProvider({ children }) {
     setModo((atual) => (atual === 'dark' ? 'light' : 'dark'));
   }, []);
 
-  const tema = modo === 'dark' ? temaEscuro : temaClaro;
-
   const valor = useMemo(() => ({ modo, alternarTema }), [modo, alternarTema]);
 
-  return (
-    <TemaContext.Provider value={valor}>
-      <ThemeProvider theme={tema}>
-        <GlobalStyle />
-        {children}
-      </ThemeProvider>
-    </TemaContext.Provider>
-  );
+  return <TemaContext.Provider value={valor}>{children}</TemaContext.Provider>;
 }
 
 export function useTema() {

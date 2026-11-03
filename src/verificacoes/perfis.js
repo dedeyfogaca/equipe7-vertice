@@ -8,7 +8,7 @@
 // pela interface.
 
 import { PERFIL } from '../src/lib/constants.js';
-import { ultimoOrganizador, validarMembro } from '../src/lib/validacao.js';
+import { ultimoOrganizador, validarGrupo, validarMembro } from '../src/lib/validacao.js';
 
 let falhas = 0;
 
@@ -85,6 +85,39 @@ checar(
   validarMembro({ nome: 'Novo', perfil: PERFIL.PARTICIPANTE }, { membros: soUm }).perfil,
   undefined
 );
+
+checar(
+  'nome com mais de 80 caracteres é barrado',
+  validarMembro({ nome: 'A'.repeat(81), perfil: PERFIL.PARTICIPANTE }, { membros: soUm }).nome,
+  'O nome pode ter no máximo 80 caracteres.'
+);
+
+console.log('\nD01 — o primeiro membro de um grupo vazio é o organizador\n');
+
+checar(
+  'grupo vazio não aceita participante como primeiro',
+  validarMembro({ nome: 'Ana', perfil: PERFIL.PARTICIPANTE }, { membros: [] }).perfil,
+  'O primeiro membro do grupo precisa ser o organizador.'
+);
+checar(
+  'grupo vazio aceita o organizador',
+  validarMembro({ nome: 'Ana', perfil: PERFIL.ORGANIZADOR }, { membros: [] }).perfil,
+  undefined
+);
+
+console.log('\nRF01 — quem cria o grupo informa o próprio nome\n');
+
+checar(
+  'sem nome do grupo',
+  validarGrupo({ nome: '', criador: 'Ana' }).nome,
+  'Dê um nome ao grupo.'
+);
+checar(
+  'sem o nome de quem cria',
+  validarGrupo({ nome: 'Trio do TCC', criador: '  ' }).criador,
+  'Informe o seu nome.'
+);
+checar('com os dois, passa', validarGrupo({ nome: 'Trio do TCC', criador: 'Ana' }), {});
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

@@ -1,195 +1,91 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { toast } from 'sonner';
+import { ArrowLeft, CalendarDays, Check, CircleHelp, Lock, Pencil, Trash2 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import { useFeriados } from '../hooks/useFeriados.js';
+import { usePermissoes } from '../hooks/usePermissoes.js';
+import { useTitulo } from '../hooks/useTitulo.js';
+import { Avatar } from '../components/ui/avatar-membro.jsx';
+import { Badge, Card, EmptyState, Rotulo, TituloCartao } from '../components/ui/basicos.jsx';
+import { Button } from '../components/ui/botao.jsx';
+import { Confirmacao } from '../components/ui/dialogo.jsx';
+import { SelectRico } from '../components/ui/selecao.jsx';
+import { OPCOES_STATUS } from '../components/opcoes.jsx';
+import { AnelPeso, BarraProgresso } from '../components/ui/progresso.jsx';
+import { RetornoConclusao } from '../components/atividades/RetornoConclusao.jsx';
 import {
-  Avatar,
-  Button,
-  Card,
-  ConfirmDialog,
-  EmptyState,
-  Select,
-} from '../components/ui';
-import { PrioridadeBadge, StatusBadge } from '../components/Badges.jsx';
-import { AnelPeso } from '../components/AnelPeso.jsx';
-import { SeloXp } from '../components/SeloXp.jsx';
-import { RetornoConclusao } from '../components/RetornoConclusao.jsx';
-import { normalizarPeso, PESO, STATUS, STATUS_OPCOES } from '../lib/constants.js';
-import { xpPotencial } from '../lib/gamificacao.js';
-import {
-  anoDaData,
-  ehFimDeSemana,
-  formatarDataExtensa,
-  rotuloPrazo,
-} from '../lib/datas.js';
+  normalizarPeso,
+  PESO,
+  rotuloPerfil,
+  rotuloPrioridade,
+  STATUS,
+} from '../lib/constants.js';
+import { anoDaData, ehFimDeSemana, formatarDataExtensa, rotuloPrazo } from '../lib/datas.js';
+import { diaLocal, xpPotencial } from '../lib/gamificacao.js';
+import { capitalizar, rotuloSituacao, tomDaAtividade } from '../lib/formatos.js';
+import { cn, primeiroNome } from '../lib/utils.js';
 
-// Detalhe da atividade (rota dinâmica /atividade/:id). Mostra tudo da atividade e
-// permite mudar o status rapidamente, editar ou excluir.
+const COR_DO_TOM = {
+  sucesso: 'text-concluido',
+  alerta: 'text-fazendo',
+  perigo: 'text-atrasada',
+  neutro: 'text-sutil',
+};
 
-// Cor do texto do prazo conforme o setor (verde/amarelo/vermelho).
-function corDoTom(theme, tom) {
+function Dado({ rotulo, children }) {
   return (
-    {
-      neutro: theme.cores.textoSuave,
-      sucesso: theme.cores.sucesso,
-      alerta: theme.cores.alerta,
-      perigo: theme.cores.perigo,
-    }[tom] || theme.cores.textoSuave
+    <div className="flex flex-col gap-1.5">
+      <dt>
+        <Rotulo>{rotulo}</Rotulo>
+      </dt>
+      <dd className="text-[15px] text-texto">{children}</dd>
+    </div>
   );
 }
-
-const Voltar = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: ${({ theme }) => theme.cores.textoSuave};
-  font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-  margin-bottom: ${({ theme }) => theme.espaco.lg};
-
-  &:hover {
-    color: ${({ theme }) => theme.cores.primaria};
-  }
-`;
-
-const Observacao = styled.span`
-  color: ${({ theme }) => theme.cores.textoSuave};
-  font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-`;
-
-const ComAnel = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.espaco.sm};
-`;
-
-const Cabecalho = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: ${({ theme }) => theme.espaco.lg};
-  flex-wrap: wrap;
-  margin-bottom: ${({ theme }) => theme.espaco.md};
-`;
-
-const Titulo = styled.h1`
-  font-weight: ${({ theme }) => theme.fonte.peso.negrito};
-  font-size: ${({ theme }) => theme.fonte.tamanho.xxl};
-`;
-
-const Badges = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.espaco.sm};
-  flex-wrap: wrap;
-  margin-bottom: ${({ theme }) => theme.espaco.xl};
-`;
-
-const Colunas = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: ${({ theme }) => theme.espaco.xl};
-  align-items: start;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Descricao = styled.p`
-  white-space: pre-wrap;
-  line-height: 1.7;
-  color: ${({ theme }) => theme.cores.texto};
-`;
-
-const SemDescricao = styled.p`
-  color: ${({ theme }) => theme.cores.textoSuave};
-  font-style: italic;
-`;
-
-const Lateral = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.espaco.lg};
-`;
-
-const Dado = styled.dl`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  dt {
-    font-size: ${({ theme }) => theme.fonte.tamanho.xs};
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: ${({ theme }) => theme.cores.textoSuave};
-  }
-
-  dd {
-    font-weight: ${({ theme }) => theme.fonte.peso.medio};
-  }
-`;
-
-const Responsavel = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.espaco.sm};
-`;
-
-const AvisoPrazo = styled.span`
-  display: block;
-  font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-  color: ${({ theme, $tom }) =>
-    $tom ? corDoTom(theme, $tom) : theme.cores.alerta};
-  margin-top: 2px;
-`;
-
-const Acoes = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.espaco.sm};
-`;
 
 export default function AtividadeDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { grupoAtivo } = useAuth();
+  const { podeMudarStatus, podeEditar, podeExcluir: podeExcluirAtividade } = usePermissoes();
   const {
     obterAtividade,
     atualizarAtividade,
     removerAtividade,
     membrosDoGrupo,
+    conteudosDoGrupo,
     trilhaDaAtividade,
     progressoDoConteudo,
     progressoAntesDe,
   } = useData();
 
-  const atividade = obterAtividade(id);
-  const membros = membrosDoGrupo(grupoAtivo.id);
-  const responsavel = useMemo(
-    () => membros.find((m) => m.id === atividade?.responsavelId) || null,
-    [membros, atividade]
-  );
+  const existente = obterAtividade(id);
+  // RN01 — atividade de outro grupo é tratada como inexistente.
+  const atividade =
+    existente && conteudosDoGrupo(grupoAtivo.id).some((c) => c.id === existente.conteudoId) ? existente : null;
+  useTitulo(atividade?.titulo ?? 'Atividade');
 
+  const membros = membrosDoGrupo(grupoAtivo.id);
   const anos = useMemo(
     () => Array.from(new Set([new Date().getFullYear(), anoDaData(atividade?.prazo)].filter(Boolean))),
-    [atividade]
+    [atividade?.prazo]
   );
   const { feriadoEm } = useFeriados(anos);
-
   const [confirmando, setConfirmando] = useState(false);
 
-  // Atividade inexistente (link velho, id errado).
   if (!atividade) {
     return (
       <Card>
         <EmptyState
-          icone="❓"
+          icone={CircleHelp}
           titulo="Atividade não encontrada"
           descricao="Essa atividade não existe mais ou o endereço está errado."
         >
-          <Button as={Link} to="/atividades">
-            Voltar para as atividades
+          <Button asChild>
+            <Link to="/atividades">Voltar para as atividades</Link>
           </Button>
         </EmptyState>
       </Card>
@@ -197,159 +93,214 @@ export default function AtividadeDetalhe() {
   }
 
   const { conteudo, disciplina } = trilhaDaAtividade(atividade);
+  const responsavel = membros.find((m) => m.id === atividade.responsavelId) || null;
+  const concluida = atividade.status === STATUS.CONCLUIDO;
+  // RN20 — só o responsável conclui e muda o status. RN07 — o organizador
+  // edita e exclui qualquer atividade; o participante, só as dele.
+  const podeStatus = podeMudarStatus(atividade);
+  const podeEditarEsta = podeEditar(atividade);
+  const podeExcluir = podeExcluirAtividade(atividade);
+  const nomeResponsavel = responsavel ? primeiroNome(responsavel.nome) : 'o responsável';
 
   // RF15 — o que a conclusão desta atividade fez com o conteúdo.
-  const concluida = atividade.status === STATUS.CONCLUIDO;
   const depois = concluida ? progressoDoConteudo(atividade.conteudoId) : null;
   const antes = concluida ? progressoAntesDe(atividade) : null;
+
   const prazo = rotuloPrazo(atividade.prazo);
   const feriado = feriadoEm(atividade.prazo);
   const fimDeSemana = ehFimDeSemana(atividade.prazo);
+  const xp = xpPotencial(atividade);
+
+  const mudarStatus = (status) => atualizarAtividade(atividade.id, { status });
 
   const excluir = () => {
     removerAtividade(atividade.id);
-    navigate('/atividades');
+    toast('Atividade excluída', { description: atividade.titulo });
+    navigate('/atividades', { replace: true });
   };
 
   return (
     <>
-      <Voltar to="/atividades">← Voltar para as atividades</Voltar>
+      <Link
+        to="/atividades"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-sutil hover:text-primaria-texto"
+      >
+        <ArrowLeft className="size-4" aria-hidden="true" />
+        Atividades
+      </Link>
 
-      {/* T22 — concluir não risca um item: move a barra e credita
-          experiência. Sem isto a pessoa conclui e não vê nada acontecer. */}
       {concluida && (
         <RetornoConclusao
           atividade={atividade}
           conteudo={conteudo}
+          disciplina={disciplina}
           antes={antes}
           depois={depois}
         />
       )}
 
-      <Cabecalho>
-        <Titulo>{atividade.titulo}</Titulo>
-        <Acoes>
-          <Button as={Link} to={`/atividade/${atividade.id}/editar`} $variante="secundario">
-            Editar
-          </Button>
-          <Button
-            type="button"
-            $variante="perigo"
-            onClick={() => setConfirmando(true)}
-          >
-            Excluir
-          </Button>
-        </Acoes>
-      </Cabecalho>
+      <header className="mb-4 flex flex-wrap items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-2">
+          <p className="flex flex-wrap items-center gap-2 text-sm text-sutil">
+            {disciplina && (
+              <>
+                <span aria-hidden="true" className="size-2.5 rounded-[3px]" style={{ background: disciplina.cor }} />
+                <Link to={`/disciplina/${disciplina.id}`} className="font-medium hover:text-primaria-texto">
+                  {disciplina.nome}
+                </Link>
+                <span aria-hidden="true">›</span>
+              </>
+            )}
+            <span>{conteudo?.nome}</span>
+          </p>
+          <h1 className="text-[clamp(26px,3vw,36px)] font-semibold leading-[1.1] tracking-[-0.04em] text-forte">
+            {atividade.titulo}
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-2.5">
+          {!concluida && podeStatus && (
+            <Button onClick={() => mudarStatus(STATUS.CONCLUIDO)}>
+              <Check aria-hidden="true" />
+              Concluir
+            </Button>
+          )}
+          {podeEditarEsta && (
+            <Button variante="secundaria" asChild>
+              <Link to={`/atividade/${atividade.id}/editar`}>
+                <Pencil aria-hidden="true" />
+                Editar
+              </Link>
+            </Button>
+          )}
+          {podeExcluir && (
+            <Button variante="perigo-contorno" onClick={() => setConfirmando(true)}>
+              <Trash2 aria-hidden="true" />
+              Excluir
+            </Button>
+          )}
+        </div>
+      </header>
 
-      <Badges>
-        <StatusBadge status={atividade.status} />
-        <PrioridadeBadge prioridade={atividade.prioridade} />
-      </Badges>
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Badge tom={tomDaAtividade(atividade)}>{rotuloSituacao(atividade)}</Badge>
+        {atividade.prioridade && (
+          <Badge tom="contorno">Prioridade {rotuloPrioridade(atividade.prioridade).toLowerCase()}</Badge>
+        )}
+      </div>
 
-      <Colunas>
-        <Card as="section">
-          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Descrição</h2>
-          {atividade.descricao ? (
-            <Descricao>{atividade.descricao}</Descricao>
-          ) : (
-            <SemDescricao>Sem descrição.</SemDescricao>
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          <Card as="section" aria-labelledby="t-descricao" className="p-6">
+            <TituloCartao id="t-descricao" className="mb-3">
+              Descrição
+            </TituloCartao>
+            {atividade.descricao ? (
+              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-texto">{atividade.descricao}</p>
+            ) : (
+              <p className="text-[15px] italic text-sutil">Sem descrição.</p>
+            )}
+          </Card>
+
+          {/* Concluída, o retorno no topo já mostra a barra do conteúdo. */}
+          {conteudo && !concluida && (
+            <Card as="section" aria-labelledby="t-conteudo" className="p-6">
+              <TituloCartao id="t-conteudo" className="mb-4">
+                Progresso de {conteudo.nome}
+              </TituloCartao>
+              <BarraProgresso progresso={progressoDoConteudo(conteudo.id)} cor={disciplina?.cor} />
+            </Card>
+          )}
+        </div>
+
+        <Card as="aside" aria-label="Dados da atividade" className="p-5">
+          <dl className="flex flex-col gap-5">
+            <Dado rotulo="Status">
+              {podeStatus ? (
+                <SelectRico
+                  aria-label="Mudar status"
+                  valor={atividade.status}
+                  aoMudar={mudarStatus}
+                  opcoes={OPCOES_STATUS}
+                />
+              ) : (
+                <span className="flex flex-col gap-1.5">
+                  <span className="flex items-center gap-2.5 font-medium text-forte">
+                    {OPCOES_STATUS.find((o) => o.valor === atividade.status)?.icone}
+                    {OPCOES_STATUS.find((o) => o.valor === atividade.status)?.rotulo ?? atividade.status}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-[13px] text-sutil">
+                    <Lock className="size-3.5" aria-hidden="true" />
+                    Só {nomeResponsavel} muda o status.
+                  </span>
+                </span>
+              )}
+            </Dado>
+
+            <Dado rotulo="Responsável">
+              <span className="flex items-center gap-2.5">
+                <Avatar membro={responsavel} tamanho={34} decorativo />
+                <span className="flex flex-col">
+                  <span className="font-medium text-forte">{responsavel?.nome ?? 'Sem responsável'}</span>
+                  {responsavel && (
+                    <span className="text-[13px] text-sutil">{rotuloPerfil(responsavel.perfil)}</span>
+                  )}
+                </span>
+              </span>
+            </Dado>
+
+            <Dado rotulo="Prazo">
+              <span className="flex flex-col gap-1">
+                <span>{capitalizar(formatarDataExtensa(atividade.prazo))}</span>
+                {!concluida && atividade.prazo && (
+                  <span className={cn('text-[13px] font-medium', COR_DO_TOM[prazo.tom])}>{prazo.texto}</span>
+                )}
+                {feriado && (
+                  <span className="inline-flex items-center gap-1.5 text-[13px] text-feriado">
+                    <CalendarDays className="size-3.5" aria-hidden="true" />
+                    Feriado: {feriado.name}
+                  </span>
+                )}
+                {!feriado && fimDeSemana && (
+                  <span className="inline-flex items-center gap-1.5 text-[13px] text-sutil">
+                    <CalendarDays className="size-3.5" aria-hidden="true" />
+                    Cai num fim de semana
+                  </span>
+                )}
+              </span>
+            </Dado>
+
+            {/* RN09 — o peso é o que a atividade vale no progresso do conteúdo. */}
+            <Dado rotulo="Peso">
+              <span className="flex items-center gap-2.5">
+                <AnelPeso peso={atividade.peso} tamanho={28} />
+                <span>
+                  {normalizarPeso(atividade.peso)} de {PESO.MAXIMO}
+                </span>
+              </span>
+            </Dado>
+
+            {/* RN10 — xp = peso × 10, para o responsável, enquanto concluída. */}
+            <Dado rotulo="Experiência">
+              <span className="flex flex-wrap items-baseline gap-x-2">
+                <span className="numero font-bold text-gam-texto">{xp} XP</span>
+                <span className="text-[13px] text-sutil">
+                  {concluida
+                    ? `creditados a ${responsavel ? primeiroNome(responsavel.nome) : 'quem é responsável'}`
+                    : 'ao concluir'}
+                </span>
+              </span>
+            </Dado>
+
+          </dl>
+          {concluida && atividade.dataConclusao && (
+            <p className="mt-5 border-t border-divisor pt-4 text-[13px] text-sutil">
+              Concluída em {formatarDataExtensa(diaLocal(atividade.dataConclusao))}.
+            </p>
           )}
         </Card>
+      </div>
 
-        <Lateral as="aside">
-          <Dado>
-            <dt>Status</dt>
-            <dd>
-              <Select
-                aria-label="Mudar status"
-                value={atividade.status}
-                onChange={(e) => atualizarAtividade(atividade.id, { status: e.target.value })}
-              >
-                {STATUS_OPCOES.map((o) => (
-                  <option key={o.valor} value={o.valor}>
-                    {o.rotulo}
-                  </option>
-                ))}
-              </Select>
-            </dd>
-          </Dado>
-
-          <Dado>
-            <dt>Responsável</dt>
-            <dd>
-              <Responsavel>
-                <Avatar seed={responsavel?.avatar} nome={responsavel?.nome} tamanho={32} />
-                <span>{responsavel?.nome || 'Sem responsável'}</span>
-              </Responsavel>
-            </dd>
-          </Dado>
-
-          {disciplina && (
-            <Dado>
-              <dt>Disciplina</dt>
-              <dd>
-                <Link to={`/disciplina/${disciplina.id}`}>{disciplina.nome}</Link>
-              </dd>
-            </Dado>
-          )}
-
-          {conteudo && (
-            <Dado>
-              <dt>Conteúdo</dt>
-              <dd>{conteudo.nome}</dd>
-            </Dado>
-          )}
-
-          {/* RN09 — o peso é o que a atividade vale no progresso do conteúdo. */}
-          <Dado>
-            <dt>Peso</dt>
-            <dd>
-              <ComAnel>
-                <AnelPeso peso={atividade.peso} />
-                <span>{`${normalizarPeso(atividade.peso)} de ${PESO.MAXIMO}`}</span>
-              </ComAnel>
-            </dd>
-          </Dado>
-
-          {/* RN10 — xp = peso x 10, para o responsável, enquanto concluída. */}
-          <Dado>
-            <dt>Experiência</dt>
-            <dd>
-              {!atividade.responsavelId ? (
-                <Observacao>Sem responsável — não gera experiência.</Observacao>
-              ) : (
-                <ComAnel>
-                  <SeloXp xp={xpPotencial(atividade)} />
-                  <Observacao>
-                    {atividade.status === STATUS.CONCLUIDO
-                      ? `creditados a ${responsavel?.nome ?? 'quem é responsável'}`
-                      : 'ao concluir'}
-                  </Observacao>
-                </ComAnel>
-              )}
-            </dd>
-          </Dado>
-
-          <Dado>
-            <dt>Prazo</dt>
-            <dd>
-              {formatarDataExtensa(atividade.prazo)}
-              {atividade.prazo && (
-                <AvisoPrazo as="span" $tom={prazo.tom}>
-                  ● {prazo.texto}
-                </AvisoPrazo>
-              )}
-              {feriado && <AvisoPrazo>📅 Feriado: {feriado.name}</AvisoPrazo>}
-              {!feriado && fimDeSemana && (
-                <AvisoPrazo>📅 Cai num fim de semana</AvisoPrazo>
-              )}
-            </dd>
-          </Dado>
-        </Lateral>
-      </Colunas>
-
-      <ConfirmDialog
+      <Confirmacao
         aberto={confirmando}
         titulo="Excluir atividade?"
         mensagem={`A atividade "${atividade.titulo}" será removida permanentemente. Essa ação não pode ser desfeita.`}

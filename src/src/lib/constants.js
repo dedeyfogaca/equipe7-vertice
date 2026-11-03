@@ -34,23 +34,39 @@ export function rotuloPrioridade(valor) {
   return PRIORIDADE_OPCOES.find((o) => o.valor === valor)?.rotulo ?? valor;
 }
 
-// Paleta das disciplinas (RF/RN06 do modelo: `disciplina.cor`).
-// A cor é só identidade visual da disciplina — serve para bater o olho e
-// reconhecer na lista, no painel e, depois, nos conteúdos.
+// Paleta das disciplinas (`disciplina.cor`). São 18 cores escolhidas para
+// continuar legíveis nos dois temas, como barra, ponto e etiqueta do
+// calendário. A pessoa escolhe da paleta, e não de um seletor livre: assim
+// nenhuma disciplina nasce com uma cor que some no fundo.
 //
 // O violeta da gamificação (#7c3aed / #a78bfa) NÃO entra aqui: aquela cor é
-// exclusiva de experiência, conquistas e anel de peso.
-// Os valores foram escolhidos para continuar legíveis nos dois temas.
+// exclusiva de experiência, ofensiva e conquistas.
 export const CORES_DISCIPLINA = [
-  { valor: '#0ea5e9', rotulo: 'Azul' },
+  { valor: '#3b82f6', rotulo: 'Azul' },
+  { valor: '#0ea5e9', rotulo: 'Céu' },
+  { valor: '#06b6d4', rotulo: 'Ciano' },
   { valor: '#14b8a6', rotulo: 'Turquesa' },
+  { valor: '#10b981', rotulo: 'Esmeralda' },
   { valor: '#22c55e', rotulo: 'Verde' },
+  { valor: '#84cc16', rotulo: 'Lima' },
   { valor: '#eab308', rotulo: 'Amarelo' },
+  { valor: '#f59e0b', rotulo: 'Âmbar' },
   { valor: '#f97316', rotulo: 'Laranja' },
   { valor: '#ef4444', rotulo: 'Vermelho' },
+  { valor: '#fb7185', rotulo: 'Coral' },
   { valor: '#ec4899', rotulo: 'Rosa' },
-  { valor: '#78716c', rotulo: 'Pedra' },
+  { valor: '#d946ef', rotulo: 'Fúcsia' },
+  { valor: '#a855f7', rotulo: 'Roxo' },
+  { valor: '#6366f1', rotulo: 'Índigo' },
+  { valor: '#64748b', rotulo: 'Ardósia' },
+  { valor: '#a8a29e', rotulo: 'Pedra' },
 ];
+
+// Cores da paleta anterior (8 cores) que não existem na nova. A migração
+// troca pela equivalente.
+export const CORES_SUBSTITUIDAS = {
+  '#78716c': '#a8a29e',
+};
 
 export const COR_DISCIPLINA_PADRAO = CORES_DISCIPLINA[0].valor;
 
@@ -58,16 +74,27 @@ export function corDisciplinaValida(valor) {
   return CORES_DISCIPLINA.some((c) => c.valor === valor);
 }
 
+export function rotuloCor(valor) {
+  return CORES_DISCIPLINA.find((c) => c.valor === valor)?.rotulo ?? 'Cor';
+}
+
 // Sugere uma cor ainda não usada pelo grupo, para duas disciplinas novas não
-// nascerem iguais. Se todas já estiverem em uso, volta para a primeira.
+// nascerem iguais. A ordem alterna famílias de cor (azul, laranja,
+// turquesa...), para disciplinas cadastradas em sequência não ficarem todas
+// azuladas. Se todas já estiverem em uso, volta para a primeira.
+const ORDEM_SUGESTAO = [
+  '#3b82f6', '#f97316', '#14b8a6', '#ec4899', '#eab308', '#a855f7',
+  '#22c55e', '#ef4444', '#06b6d4', '#d946ef', '#84cc16', '#6366f1',
+  '#f59e0b', '#0ea5e9', '#fb7185', '#10b981', '#64748b', '#a8a29e',
+];
+
 export function sugerirCorDisciplina(coresEmUso = []) {
-  const livre = CORES_DISCIPLINA.find((c) => !coresEmUso.includes(c.valor));
-  return (livre ?? CORES_DISCIPLINA[0]).valor;
+  return ORDEM_SUGESTAO.find((c) => !coresEmUso.includes(c)) ?? ORDEM_SUGESTAO[0];
 }
 
 // RN07 — perfis dentro do grupo. Só o organizador gerencia membros,
 // disciplinas e conteúdos e exclui o grupo; o participante cadastra e edita
-// atividades. O campo nasce na migração; a checagem em si ainda não é feita.
+// atividades.
 export const PERFIL = {
   ORGANIZADOR: 'organizador',
   PARTICIPANTE: 'participante',

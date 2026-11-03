@@ -1,189 +1,27 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { toast } from 'sonner';
+import { ArrowRight, BookOpen, Ellipsis, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
-import {
-  BarraProgresso,
-  Button,
-  Card,
-  ConfirmDialog,
-  EmptyState,
-  Field,
-  Input,
-  Label,
-  PageHeader,
-} from '../components/ui';
-import { SomenteOrganizador } from '../components/SomenteOrganizador.jsx';
-import { CORES_DISCIPLINA, sugerirCorDisciplina } from '../lib/constants.js';
-import { semErros, validarDisciplina } from '../lib/validacao.js';
-
-// T06 — tela de disciplinas.
-// A disciplina é o topo da hierarquia do Vértice: disciplina -> conteúdo ->
-// atividade. Sem ela não dá para calcular progresso (RN08/RN14), porque é ela
-// que agrega os pesos dos conteúdos.
-//
-// Só o organizador deveria gerenciar disciplinas (RN07), mas `membro.perfil`
-// ainda não existe no modelo salvo — a checagem entra junto com a migração.
-
-const Colunas = styled.div`
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: ${({ theme }) => theme.espaco.xl};
-  align-items: start;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Formulario = styled(Card).attrs({ as: 'form' })`
-  position: sticky;
-  top: calc(${({ theme }) => theme.layout.alturaHeader} + ${({ theme }) => theme.espaco.lg});
-
-  h2 {
-    font-size: ${({ theme }) => theme.fonte.tamanho.lg};
-    margin-bottom: ${({ theme }) => theme.espaco.lg};
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    position: static;
-  }
-`;
-
-const BlocoCor = styled.div`
-  margin-bottom: ${({ theme }) => theme.espaco.lg};
-`;
-
-const Paleta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.espaco.sm};
-`;
-
-const Amostra = styled.button`
-  width: 30px;
-  height: 30px;
-  border-radius: ${({ theme }) => theme.raio.full};
-  background: ${({ $cor }) => $cor};
-  border: 2px solid transparent;
-  box-shadow: 0 0 0 2px ${({ theme }) => theme.cores.superficie},
-    0 0 0 3px ${({ $ativa, $cor, theme }) => ($ativa ? $cor : theme.cores.borda)};
-  transition: transform 0.15s ease;
-
-  &:hover {
-    transform: scale(1.08);
-  }
-`;
-
-const Lista = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.espaco.md};
-`;
-
-// A disciplina é um cartão fechado: cabeçalho, barra e, dentro dele, os
-// conteúdos. Ver a estrutura inteira de uma vez é o ponto da tela.
-const ItemDisciplina = styled.li`
-  background: ${({ theme }) => theme.cores.superficie};
-  border: 1px solid ${({ theme }) => theme.cores.borda};
-  border-left: 3px solid ${({ $cor }) => $cor};
-  border-radius: 12px;
-  overflow: hidden;
-`;
-
-const TopoDisciplina = styled.div`
-  padding: 15px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-`;
-
-const BarraDisciplina = styled.div`
-  padding: 0 18px 14px;
-`;
-
-const Conteudos = styled.ul`
-  border-top: 1px solid ${({ theme }) => theme.cores.borda};
-  background: ${({ theme }) => theme.cores.superficieAlt};
-  list-style: none;
-`;
-
-const ItemConteudo = styled.li`
-  padding: 11px 18px 11px 34px;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  border-bottom: 1px solid ${({ theme }) => theme.cores.borda};
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const NomeConteudo = styled.span`
-  font-size: 13.5px;
-  color: ${({ theme }) => theme.cores.texto};
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const QuantidadeConteudo = styled.span`
-  font-size: 11.5px;
-  color: ${({ theme }) => theme.cores.textoSuave};
-  flex: none;
-`;
-
-const MiniBarra = styled.div`
-  width: 74px;
-  flex: none;
-`;
-
-const Ponto = styled.span`
-  width: 14px;
-  height: 14px;
-  border-radius: ${({ theme }) => theme.raio.full};
-  background: ${({ $cor }) => $cor};
-  flex-shrink: 0;
-  margin-top: 4px;
-`;
-
-const Info = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const Nome = styled(Link)`
-  display: block;
-  font-weight: ${({ theme }) => theme.fonte.peso.forte};
-  color: ${({ theme }) => theme.cores.texto};
-
-  &:hover {
-    color: ${({ theme }) => theme.cores.primaria};
-  }
-`;
-
-const Contador = styled.span`
-  font-size: ${({ theme }) => theme.fonte.tamanho.xs};
-  color: ${({ theme }) => theme.cores.textoSuave};
-`;
-
-const Acoes = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.espaco.xs};
-`;
+import { useTitulo } from '../hooks/useTitulo.js';
+import { Button } from '../components/ui/botao.jsx';
+import { Aviso, Card, EmptyState, PageHeader } from '../components/ui/basicos.jsx';
+import { Confirmacao } from '../components/ui/dialogo.jsx';
+import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz } from '../components/ui/flutuantes.jsx';
+import { BarraProgresso } from '../components/ui/progresso.jsx';
+import { FormDisciplina } from '../components/disciplinas/FormDisciplina.jsx';
+import { plural } from '../lib/utils.js';
 
 export default function Disciplinas() {
-  const { grupoAtivo } = useAuth();
+  useTitulo('Disciplinas');
+  const { grupoAtivo, ehOrganizador } = useAuth();
   const {
     disciplinasDoGrupo,
     conteudosDaDisciplina,
+    conteudosDoGrupo,
     atividadesDaDisciplina,
-    atividadesDoConteudo,
     progressoDaDisciplina,
     progressoDoConteudo,
     criarDisciplina,
@@ -192,219 +30,179 @@ export default function Disciplinas() {
   } = useData();
 
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
+  const totalConteudos = conteudosDoGrupo(grupoAtivo.id).length;
 
-  const coresEmUso = disciplinas.map((d) => d.cor);
-
-  const novoForm = () => ({ nome: '', cor: null });
-
-  const [form, setForm] = useState(novoForm);
-  const [erros, setErros] = useState({});
-  const [editandoId, setEditandoId] = useState(null);
+  // `formulario`: null (fechado), {} (nova) ou { disciplina } (edição).
+  const [formulario, setFormulario] = useState(null);
   const [removendo, setRemovendo] = useState(null);
 
-  // `form.cor` nulo quer dizer "escolhe por mim": a sugestão é resolvida aqui,
-  // no render, a partir das cores em uso agora. Guardá-la no estado deixaria a
-  // sugestão um render atrasada e ela poderia cair numa cor recém-ocupada.
-  const cor = form.cor ?? sugerirCorDisciplina(coresEmUso);
-
-  const atualizarCampo = (campo) => (evento) => {
-    setForm((atual) => ({ ...atual, [campo]: evento.target.value }));
-  };
-
-  const escolherCor = (escolhida) => setForm((atual) => ({ ...atual, cor: escolhida }));
-
-  const resetar = () => {
-    setForm(novoForm());
-    setErros({});
-    setEditandoId(null);
-  };
-
-  const aoEnviar = (evento) => {
-    evento.preventDefault();
-    const novosErros = validarDisciplina({ ...form, cor }, { disciplinas, ignorarId: editandoId });
-    setErros(novosErros);
-    if (!semErros(novosErros)) return;
-
-    if (editandoId) {
-      atualizarDisciplina(editandoId, { nome: form.nome.trim(), cor });
+  const salvar = (dados) => {
+    if (formulario?.disciplina) {
+      atualizarDisciplina(formulario.disciplina.id, dados);
+      toast.success('Disciplina atualizada', { description: dados.nome });
     } else {
-      criarDisciplina({ nome: form.nome, cor, grupoId: grupoAtivo.id });
+      criarDisciplina({ ...dados, grupoId: grupoAtivo.id });
+      toast.success('Disciplina cadastrada', { description: dados.nome });
     }
-    resetar();
-  };
-
-  const iniciarEdicao = (disciplina) => {
-    setEditandoId(disciplina.id);
-    setErros({});
-    setForm({ nome: disciplina.nome || '', cor: disciplina.cor });
+    setFormulario(null);
   };
 
   const confirmarRemocao = () => {
-    if (removendo) {
-      removerDisciplina(removendo.id);
-      if (editandoId === removendo.id) resetar();
-    }
+    removerDisciplina(removendo.id);
+    toast('Disciplina removida', { description: removendo.nome });
     setRemovendo(null);
   };
 
-  // RN02 — avisa quantos conteúdos vão junto antes de confirmar.
+  // RN02 — avisa quantos conteúdos e atividades vão junto antes de confirmar.
   const conteudosRemovendo = removendo ? conteudosDaDisciplina(removendo.id).length : 0;
+  const atividadesRemovendo = removendo ? atividadesDaDisciplina(removendo.id).length : 0;
   const mensagemRemocao = !removendo
     ? ''
     : conteudosRemovendo === 0
       ? `${removendo.nome} será removida do grupo.`
-      : `${removendo.nome} será removida do grupo, junto com ${conteudosRemovendo} ${
-          conteudosRemovendo === 1 ? 'conteúdo' : 'conteúdos'
-        } e as atividades ${conteudosRemovendo === 1 ? 'dele' : 'deles'}.`;
+      : `${removendo.nome} será removida do grupo, junto com ${plural(conteudosRemovendo, 'conteúdo')} e ${plural(atividadesRemovendo, 'atividade')}. Não dá para desfazer.`;
 
   return (
     <>
       <PageHeader
         titulo="Disciplinas"
-        subtitulo={`${disciplinas.length} ${
-          disciplinas.length === 1 ? 'disciplina cadastrada' : 'disciplinas cadastradas'
-        }`}
+        subtitulo={`${plural(disciplinas.length, 'disciplina')} · ${plural(totalConteudos, 'conteúdo')}`}
+        acoes={
+          ehOrganizador && (
+            <Button onClick={() => setFormulario({})}>
+              <Plus aria-hidden="true" />
+              Nova disciplina
+            </Button>
+          )
+        }
       />
 
-      <Colunas>
-        {/* RN07 — quem gerencia disciplina é o organizador. */}
-        <SomenteOrganizador aviso="Só o organizador do grupo cadastra e edita disciplinas.">
-        <Formulario onSubmit={aoEnviar} noValidate>
-          <h2>{editandoId ? 'Editar disciplina' : 'Nova disciplina'}</h2>
+      {/* RN07 — quem gerencia disciplina é o organizador. */}
+      {!ehOrganizador && (
+        <Aviso icone={Lock}>
+          Só o organizador do grupo cadastra e edita disciplinas e conteúdos. Você pode cadastrar
+          atividades em qualquer uma delas.
+        </Aviso>
+      )}
 
-          <Field id="nome" label="Nome" obrigatorio erro={erros.nome}>
-            <Input
-              id="nome"
-              value={form.nome}
-              onChange={atualizarCampo('nome')}
-              placeholder="Ex.: Banco de Dados"
-              $erro={Boolean(erros.nome)}
-            />
-          </Field>
-
-          <BlocoCor>
-            <Label as="span">Cor</Label>
-            <Paleta role="radiogroup" aria-label="Cor da disciplina">
-              {CORES_DISCIPLINA.map(({ valor, rotulo }) => (
-                <Amostra
-                  key={valor}
-                  type="button"
-                  role="radio"
-                  aria-checked={cor === valor}
-                  aria-label={rotulo}
-                  title={rotulo}
-                  $cor={valor}
-                  $ativa={cor === valor}
-                  onClick={() => escolherCor(valor)}
-                />
-              ))}
-            </Paleta>
-          </BlocoCor>
-
-          <Acoes>
-            <Button type="submit" $bloco>
-              {editandoId ? 'Salvar' : 'Cadastrar'}
-            </Button>
-            {editandoId && (
-              <Button type="button" $variante="secundario" onClick={resetar}>
-                Cancelar
+      {disciplinas.length === 0 ? (
+        <Card className="mt-4">
+          <EmptyState
+            icone={BookOpen}
+            titulo="Nenhuma disciplina ainda"
+            descricao="Cadastre as disciplinas do semestre. Elas organizam os conteúdos e são a base do cálculo de progresso."
+          >
+            {ehOrganizador && (
+              <Button onClick={() => setFormulario({})}>
+                <Plus aria-hidden="true" />
+                Nova disciplina
               </Button>
             )}
-          </Acoes>
-        </Formulario>
-        </SomenteOrganizador>
-
-        <div>
-          {disciplinas.length === 0 ? (
-            <Card>
-              <EmptyState
-                icone="📚"
-                titulo="Nenhuma disciplina ainda"
-                descricao="Cadastre as disciplinas do semestre ao lado. Elas organizam os conteúdos e são a base do cálculo de progresso."
-              />
-            </Card>
-          ) : (
-            <Lista>
-              {disciplinas.map((disciplina) => {
-                const qtd = atividadesDaDisciplina(disciplina.id).length;
-                const qtdConteudos = conteudosDaDisciplina(disciplina.id).length;
-                return (
-                  <ItemDisciplina key={disciplina.id} $cor={disciplina.cor}>
-                    <TopoDisciplina>
-                    <Ponto $cor={disciplina.cor} aria-hidden="true" />
-                    <Info>
-                      <Nome to={`/disciplina/${disciplina.id}`}>{disciplina.nome}</Nome>
-                      <Contador>
-                        {qtdConteudos} {qtdConteudos === 1 ? 'conteúdo' : 'conteúdos'} · {qtd}{' '}
-                        {qtd === 1 ? 'atividade' : 'atividades'}
-                      </Contador>
-                    </Info>
-                    <Acoes>
-                      <Button as={Link} to={`/disciplina/${disciplina.id}`} $tamanho="sm">
-                        Conteúdos
-                      </Button>
-                      <SomenteOrganizador>
-                        <Button
-                          type="button"
-                          $variante="secundario"
-                          $tamanho="sm"
-                          onClick={() => iniciarEdicao(disciplina)}
-                        >
-                          Editar
-                        </Button>
-                      </SomenteOrganizador>
-                      <SomenteOrganizador>
-                        <Button
-                          type="button"
-                          $variante="fantasma"
-                          $tamanho="sm"
-                          onClick={() => setRemovendo(disciplina)}
-                        >
-                          Remover
-                        </Button>
-                      </SomenteOrganizador>
-                    </Acoes>
-                    </TopoDisciplina>
-
-                    <BarraDisciplina>
-                      <BarraProgresso
-                        progresso={progressoDaDisciplina(disciplina.id)}
-                        meta={false}
-                      />
-                    </BarraDisciplina>
-
-                    {/* Os conteúdos aparecem aqui dentro: a tela mostra a
-                        estrutura inteira, não só a lista de disciplinas. */}
-                    {qtdConteudos > 0 && (
-                      <Conteudos>
-                        {conteudosDaDisciplina(disciplina.id).map((conteudo) => {
-                          const doConteudo = atividadesDoConteudo(conteudo.id).length;
-                          return (
-                            <ItemConteudo key={conteudo.id}>
-                              <NomeConteudo>{conteudo.nome}</NomeConteudo>
-                              <QuantidadeConteudo>
-                                {doConteudo} {doConteudo === 1 ? 'atividade' : 'atividades'}
-                              </QuantidadeConteudo>
-                              <MiniBarra>
-                                <BarraProgresso
-                                  progresso={progressoDoConteudo(conteudo.id)}
-                                  meta={false}
-                                />
-                              </MiniBarra>
-                            </ItemConteudo>
-                          );
-                        })}
-                      </Conteudos>
+          </EmptyState>
+        </Card>
+      ) : (
+        <ul className="mt-4 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+          {disciplinas.map((disciplina) => {
+            const conteudos = conteudosDaDisciplina(disciplina.id);
+            const qtdAtividades = atividadesDaDisciplina(disciplina.id).length;
+            return (
+              <Card as="li" key={disciplina.id} className="flex flex-col overflow-hidden">
+                <div className="flex flex-1 flex-col gap-4 p-5">
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="mt-1.5 size-3 shrink-0 rounded-[4px]"
+                      style={{ background: disciplina.cor }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-forte">
+                        <Link to={`/disciplina/${disciplina.id}`} className="hover:text-primaria-texto">
+                          {disciplina.nome}
+                        </Link>
+                      </h2>
+                      <p className="text-[13px] text-sutil">
+                        {plural(conteudos.length, 'conteúdo')} · {plural(qtdAtividades, 'atividade')}
+                      </p>
+                    </div>
+                    {ehOrganizador && (
+                      <MenuRaiz>
+                        <MenuGatilho asChild>
+                          <Button variante="fantasma" tamanho="icone-sm" aria-label={`Ações de ${disciplina.nome}`}>
+                            <Ellipsis />
+                          </Button>
+                        </MenuGatilho>
+                        <MenuConteudo align="end" className="min-w-[180px]">
+                          <MenuItem onSelect={() => setFormulario({ disciplina })}>
+                            <Pencil aria-hidden="true" />
+                            Editar
+                          </MenuItem>
+                          <MenuItem perigo onSelect={() => setRemovendo(disciplina)}>
+                            <Trash2 aria-hidden="true" />
+                            Remover
+                          </MenuItem>
+                        </MenuConteudo>
+                      </MenuRaiz>
                     )}
-                  </ItemDisciplina>
-                );
-              })}
-            </Lista>
-          )}
-        </div>
-      </Colunas>
+                  </div>
 
-      <ConfirmDialog
+                  <BarraProgresso progresso={progressoDaDisciplina(disciplina.id)} cor={disciplina.cor} />
+
+                  {conteudos.length > 0 ? (
+                    <ul className="flex flex-col gap-2.5 border-t border-divisor pt-4">
+                      {conteudos.map((conteudo) => {
+                        const progresso = progressoDoConteudo(conteudo.id);
+                        return (
+                          <li key={conteudo.id} className="flex flex-col gap-1.5">
+                            <span className="flex items-baseline justify-between gap-3 text-sm">
+                              <span className="min-w-0 truncate text-texto">{conteudo.nome}</span>
+                              <span className="numero shrink-0 text-[13px] text-sutil">
+                                {progresso ? `${progresso.percentual}%` : '—'}
+                              </span>
+                            </span>
+                            <span aria-hidden="true" className="h-1 overflow-hidden rounded-full bg-superficie-3">
+                              <span
+                                className="block h-full rounded-full"
+                                style={{
+                                  width: `${progresso ? Math.round(progresso.fracao * 1000) / 10 : 0}%`,
+                                  background: disciplina.cor,
+                                }}
+                              />
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="border-t border-divisor pt-4 text-sm text-sutil">Nenhum conteúdo ainda.</p>
+                  )}
+                </div>
+                <div className="border-t border-divisor px-5 py-3">
+                  <Link
+                    to={`/disciplina/${disciplina.id}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-primaria-texto hover:underline"
+                  >
+                    {conteudos.length === 0 && ehOrganizador ? 'Adicionar conteúdos' : 'Abrir disciplina'}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
+        </ul>
+      )}
+
+      {formulario && (
+        <FormDisciplina
+          key={formulario.disciplina?.id ?? 'nova'}
+          aberto
+          aoMudar={(abrir) => !abrir && setFormulario(null)}
+          disciplina={formulario.disciplina}
+          disciplinas={disciplinas}
+          aoSalvar={salvar}
+        />
+      )}
+
+      <Confirmacao
         aberto={Boolean(removendo)}
         titulo="Remover disciplina?"
         mensagem={mensagemRemocao}

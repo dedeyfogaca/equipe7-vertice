@@ -1,230 +1,266 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { BookOpen, CalendarDays, Layers, ListPlus, Plus, Search } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import { useFeriados } from '../hooks/useFeriados.js';
-import { BarraProgresso, Button, Card, EmptyState, PageHeader, Spinner } from '../components/ui';
-import { AtividadeCard } from '../components/AtividadeCard.jsx';
-import { CalendarioMes } from '../components/CalendarioMes.jsx';
-import { FiltrosSituacao } from '../components/FiltrosSituacao.jsx';
-import { Lateral } from '../components/layout/Lateral.jsx';
+import { useTitulo } from '../hooks/useTitulo.js';
+import { Button } from '../components/ui/botao.jsx';
+import { Aviso, Card, EmptyState, TituloCartao } from '../components/ui/basicos.jsx';
+import { BarraProgresso } from '../components/ui/progresso.jsx';
+import { CartoesSituacao } from '../components/atividades/CartoesSituacao.jsx';
+import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
+import { SeuRitmo } from '../components/gamificacao/SeuRitmo.jsx';
+import { ProximosFeriados } from '../components/ProximosFeriados.jsx';
 import { STATUS } from '../lib/constants.js';
-import { contarPorSituacao, situacaoDaAtividade } from '../lib/situacoes.js';
 import { anoDaData, formatarData } from '../lib/datas.js';
+import { diaPorExtenso, porPrazo, saudacao } from '../lib/formatos.js';
+import { contarPorSituacao, naSituacao, SITUACAO } from '../lib/situacoes.js';
+import { primeiroNome } from '../lib/utils.js';
 
-// Painel / visão geral: o grupo bate o olho e entende como está.
-// Quantas atividades em cada status, o que está vencendo e os próximos feriados.
+const TITULOS = {
+  [SITUACAO.A_FAZER]: 'A fazer',
+  [SITUACAO.FAZENDO]: 'Fazendo',
+  [SITUACAO.CONCLUIDAS]: 'Concluídas',
+  [SITUACAO.ATRASADAS]: 'Atrasadas',
+};
 
-const Bloco = styled.div`
-  h2 {
-    font-size: ${({ theme }) => theme.fonte.tamanho.xl};
-    margin-bottom: ${({ theme }) => theme.espaco.md};
+const LIMITE_LISTA = 8;
+
+// Primeiros passos, na ordem da cadeia: disciplina -> conteúdo -> atividade.
+function PrimeirosPassos({ temDisciplinas, temConteudos }) {
+  if (!temDisciplinas) {
+    return (
+      <EmptyState
+        icone={BookOpen}
+        titulo="Comece pelas disciplinas"
+        descricao="No Vértice a atividade pertence a um conteúdo, e o conteúdo a uma disciplina. É essa cadeia que permite medir o quanto o grupo avançou, em vez de só contar itens feitos."
+      >
+        <Button asChild>
+          <Link to="/disciplinas">Cadastrar disciplinas</Link>
+        </Button>
+      </EmptyState>
+    );
   }
-`;
-
-const CardsAtividade = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-`;
-
-// T20 — o progresso de cada disciplina, na coluna de contexto. É o número
-// que o Vértice existe para mostrar; ele tem de estar na primeira tela.
-const BlocoLateral = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-`;
-
-const TituloLateral = styled.h2`
-  font-size: 10.5px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.cores.textoSuave};
-  font-weight: ${({ theme }) => theme.fonte.peso.forte};
-`;
-
-const AvisoLateral = styled.p`
-  font-size: ${({ theme }) => theme.fonte.tamanho.xs};
-  color: ${({ theme }) => theme.cores.textoSuave};
-  text-align: center;
-`;
-
-const AvisoFeriado = styled(Card)`
-  background: ${({ theme }) => theme.cores.alertaSuave};
-  border-color: ${({ theme }) => theme.cores.alerta};
-  padding: ${({ theme }) => theme.espaco.md} ${({ theme }) => theme.espaco.lg};
-  margin-bottom: ${({ theme }) => theme.espaco.lg};
-  font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-
-  h3 {
-    font-size: ${({ theme }) => theme.fonte.tamanho.sm};
-    margin-bottom: 6px;
+  if (!temConteudos) {
+    return (
+      <EmptyState
+        icone={Layers}
+        titulo="Divida as disciplinas em conteúdos"
+        descricao="Cada conteúdo reúne as atividades de um assunto. É nele que o peso das atividades vira progresso."
+      >
+        <Button asChild>
+          <Link to="/disciplinas">Abrir disciplinas</Link>
+        </Button>
+      </EmptyState>
+    );
   }
-
-  a {
-    color: ${({ theme }) => theme.cores.primariaForte};
-    font-weight: ${({ theme }) => theme.fonte.peso.forte};
-    text-decoration: underline;
-  }
-
-  li + li {
-    margin-top: 4px;
-  }
-`;
+  return (
+    <EmptyState
+      icone={ListPlus}
+      titulo="Nenhuma atividade ainda"
+      descricao="As disciplinas e os conteúdos estão prontos. Agora é cadastrar a primeira atividade num deles."
+    >
+      <Button asChild>
+        <Link to="/atividade/nova">
+          <Plus aria-hidden="true" />
+          Nova atividade
+        </Link>
+      </Button>
+    </EmptyState>
+  );
+}
 
 export default function Painel() {
-  const { grupoAtivo } = useAuth();
+  useTitulo('Painel');
   const navigate = useNavigate();
-  const { atividadesDoGrupo, membrosDoGrupo, disciplinasDoGrupo, progressoDaDisciplina } =
-    useData();
+  const { grupoAtivo, membroAtivo } = useAuth();
+  const { atividadesDoGrupo, disciplinasDoGrupo, conteudosDoGrupo, progressoDaDisciplina } = useData();
 
   const atividades = atividadesDoGrupo(grupoAtivo.id);
-  const membros = membrosDoGrupo(grupoAtivo.id);
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
-  const membroPorId = useMemo(() => {
-    const mapa = {};
-    membros.forEach((m) => {
-      mapa[m.id] = m;
-    });
-    return mapa;
-  }, [membros]);
+  const temConteudos = conteudosDoGrupo(grupoAtivo.id).length > 0;
 
-  // Anos que precisamos consultar na BrasilAPI: o atual + os anos dos prazos.
+  // As situações filtram a lista aqui mesmo. Sem filtro, a lista mostra as
+  // próximas entregas (o que ainda não foi concluído, por prazo).
+  const [filtro, setFiltro] = useState(null);
+  const contagem = useMemo(() => contarPorSituacao(atividades), [atividades]);
+
+  const { lista, total } = useMemo(() => {
+    if (!filtro) {
+      const pendentes = atividades.filter((a) => a.status !== STATUS.CONCLUIDO).sort(porPrazo);
+      return { lista: pendentes.slice(0, LIMITE_LISTA), total: pendentes.length };
+    }
+    const daSituacao = atividades.filter((a) => naSituacao(a, filtro));
+    if (filtro === SITUACAO.CONCLUIDAS) {
+      daSituacao.sort((a, b) => String(b.dataConclusao || '').localeCompare(String(a.dataConclusao || '')));
+    } else {
+      daSituacao.sort(porPrazo);
+    }
+    return { lista: daSituacao.slice(0, LIMITE_LISTA), total: daSituacao.length };
+  }, [atividades, filtro]);
+
+  // Feriados do ano atual, do próximo e dos anos dos prazos (RF21).
   const anos = useMemo(() => {
-    const conjunto = new Set([new Date().getFullYear()]);
+    const atual = new Date().getFullYear();
+    const conjunto = new Set([atual, atual + 1]);
     atividades.forEach((a) => {
       const ano = anoDaData(a.prazo);
       if (ano) conjunto.add(ano);
     });
     return Array.from(conjunto);
   }, [atividades]);
-
   const { feriados, carregando, erro, feriadoEm } = useFeriados(anos);
 
-  // A contagem sai do mesmo módulo que a lista usa para filtrar, para os
-  // dois números nunca discordarem.
-  const contagem = useMemo(() => contarPorSituacao(atividades), [atividades]);
-
-  // Próximas entregas: não concluídas, ordenadas por prazo (sem prazo no fim).
-  const proximas = useMemo(() => {
-    return atividades
-      .filter((a) => a.status !== STATUS.CONCLUIDO)
-      .sort((a, b) => {
-        if (!a.prazo && !b.prazo) return 0;
-        if (!a.prazo) return 1;
-        if (!b.prazo) return -1;
-        return a.prazo.localeCompare(b.prazo);
-      })
-      .slice(0, 6);
-  }, [atividades]);
-
-  // Prazos que o calendário marca com ponto.
-  const prazos = useMemo(
+  // Entregas que caem em feriado e ainda não foram feitas.
+  const emFeriado = useMemo(
     () =>
-      atividades.map((a) => ({
-        prazo: a.prazo,
-        titulo: a.titulo,
-        situacao: situacaoDaAtividade(a),
-      })),
-    [atividades]
+      atividades
+        .filter((a) => a.status !== STATUS.CONCLUIDO && feriadoEm(a.prazo))
+        .sort(porPrazo)
+        .map((a) => ({ atividade: a, feriado: feriadoEm(a.prazo) })),
+    [atividades, feriadoEm]
   );
 
-  // Cruzamento: atividades (não concluídas) cujo prazo cai num feriado.
-  const atividadesEmFeriado = useMemo(() => {
-    return atividades
-      .filter((a) => a.status !== STATUS.CONCLUIDO && feriadoEm(a.prazo))
-      .map((a) => ({ atividade: a, feriado: feriadoEm(a.prazo) }));
-  }, [atividades, feriadoEm]);
+  const [busca, setBusca] = useState('');
+  const buscar = (evento) => {
+    evento.preventDefault();
+    const termo = busca.trim();
+    navigate(termo ? `/atividades?busca=${encodeURIComponent(termo)}` : '/atividades');
+  };
+
+  const escolherSituacao = (valor) => setFiltro((atual) => (atual === valor ? null : valor));
+  const tituloLista = filtro ? TITULOS[filtro] : 'Próximas entregas';
 
   return (
-    <>
-      <PageHeader
-        titulo="Painel"
-        subtitulo={`${grupoAtivo.nome} · ${atividades.length} ${
-          atividades.length === 1 ? 'atividade' : 'atividades'
-        }`}
-        acoes={
-          <Button as={Link} to="/atividade/nova">
-            + Nova atividade
+    <div className="flex flex-col gap-7">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm text-sutil">{diaPorExtenso()}</span>
+          <h1 className="text-[clamp(28px,3vw,40px)] font-semibold leading-[1.08] tracking-[-0.04em] text-forte">
+            {saudacao()}
+            {membroAtivo ? `, ${primeiroNome(membroAtivo.nome)}` : ''}
+          </h1>
+        </div>
+        <div className="flex w-full flex-wrap items-center gap-2.5 sm:w-auto">
+          <form role="search" onSubmit={buscar} className="flex-1 sm:flex-none">
+            <label className="flex h-11 items-center gap-2 rounded-full border border-borda bg-superficie px-3.5 text-sutil shadow-cartao transition-[border-color,box-shadow] focus-within:border-primaria-barra focus-within:ring-4 focus-within:ring-primaria-barra/15 sm:w-[280px]">
+              <Search className="size-4 shrink-0" aria-hidden="true" />
+              <span className="sr-only">Buscar atividades</span>
+              <input
+                type="search"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar atividade, disciplina..."
+                className="min-w-0 flex-1 bg-transparent text-sm text-texto outline-none placeholder:text-apagado"
+              />
+            </label>
+          </form>
+          <Button asChild>
+            <Link to="/atividade/nova">
+              <Plus aria-hidden="true" />
+              Nova atividade
+            </Link>
           </Button>
-        }
-      />
+        </div>
+      </header>
 
-      {/* Mesma peça da lista de Atividades: clicar leva para lá, já
-          filtrado por aquela situação. */}
-      <FiltrosSituacao
-        contagem={contagem}
-        aoEscolher={(valor) => navigate(`/atividades?situacao=${valor}`)}
-      />
+      <CartoesSituacao contagem={contagem} ativa={filtro} aoEscolher={escolherSituacao} />
 
-      {atividadesEmFeriado.length > 0 && (
-        <AvisoFeriado as="aside">
-          <h3>⚠️ Atenção aos feriados</h3>
-          <ul>
-            {atividadesEmFeriado.map(({ atividade, feriado }) => (
-              <li key={atividade.id}>
-                <Link to={`/atividade/${atividade.id}`}>{atividade.titulo}</Link> vence em{' '}
-                {formatarData(atividade.prazo)}, feriado de {feriado.name}.
-              </li>
-            ))}
-          </ul>
-        </AvisoFeriado>
+      {emFeriado.length > 0 && (
+        <Aviso icone={CalendarDays} tom="alerta">
+          <strong className="font-semibold">Atenção aos feriados.</strong>{' '}
+          {emFeriado.map(({ atividade, feriado }, i) => (
+            <span key={atividade.id}>
+              {i > 0 && ' '}
+              <Link to={`/atividade/${atividade.id}`} className="font-medium underline underline-offset-2">
+                {atividade.titulo}
+              </Link>{' '}
+              vence em {formatarData(atividade.prazo)}, feriado de {feriado.name}.
+            </span>
+          ))}
+        </Aviso>
       )}
 
-      {/* O calendário é o contexto do Painel: o feriado vira ponto no dia,
-          em vez de uma lista de datas à parte. */}
-      <Lateral>
-        <CalendarioMes feriadoEm={feriadoEm} prazos={prazos} />
-
-        {disciplinas.length > 0 && (
-          <BlocoLateral>
-            <TituloLateral>Progresso por disciplina</TituloLateral>
-            {disciplinas.map((disciplina) => (
-              <BarraProgresso
-                key={disciplina.id}
-                rotulo={disciplina.nome}
-                progresso={progressoDaDisciplina(disciplina.id)}
-              />
-            ))}
-          </BlocoLateral>
-        )}
-
-        {carregando && <Spinner $tamanho={24} />}
-        {!carregando && erro && (
-          <AvisoLateral>Não foi possível carregar os feriados agora.</AvisoLateral>
-        )}
-      </Lateral>
-
-      <Bloco>
-          <h2>Próximas entregas</h2>
-          {proximas.length === 0 ? (
-            <Card>
-              <EmptyState
-                icone="🎉"
-                titulo="Nada pendente por aqui"
-                descricao="Todas as atividades estão concluídas ou ainda não há atividades cadastradas."
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <Card as="section" aria-labelledby="t-entregas" className="overflow-hidden">
+          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-5 sm:px-[22px]">
+            <TituloCartao id="t-entregas">{tituloLista}</TituloCartao>
+            {filtro ? (
+              <Link
+                to={`/atividades?situacao=${filtro}`}
+                className="text-sm font-medium text-primaria-texto hover:underline"
               >
-                <Button as={Link} to="/atividade/nova" $variante="secundario">
-                  Criar uma atividade
-                </Button>
-              </EmptyState>
-            </Card>
+                Ver {total > LIMITE_LISTA ? `todas (${total})` : 'na lista'}
+              </Link>
+            ) : (
+              <Link to="/calendario" className="text-sm font-medium text-primaria-texto hover:underline">
+                Ver no calendário
+              </Link>
+            )}
+          </div>
+
+          {atividades.length === 0 ? (
+            <PrimeirosPassos temDisciplinas={disciplinas.length > 0} temConteudos={temConteudos} />
+          ) : lista.length === 0 ? (
+            <p className="px-5 pb-6 pt-2 text-[15px] text-sutil sm:px-[22px]">
+              {filtro
+                ? 'Nenhuma atividade nesta situação.'
+                : 'Nada pendente. Todas as atividades do grupo estão concluídas.'}
+            </p>
           ) : (
-            <CardsAtividade>
-              {proximas.map((atividade) => (
-                <AtividadeCard
-                  key={atividade.id}
-                  atividade={atividade}
-                  responsavel={membroPorId[atividade.responsavelId]}
-                  feriado={feriadoEm(atividade.prazo)}
-                />
+            <ul className="divide-y divide-divisor border-t border-divisor">
+              {lista.map((atividade) => (
+                <LinhaAtividade key={atividade.id} atividade={atividade} feriado={feriadoEm(atividade.prazo)} />
               ))}
-            </CardsAtividade>
+            </ul>
           )}
-      </Bloco>
-    </>
+          {!filtro && total > LIMITE_LISTA && (
+            <div className="border-t border-divisor px-5 py-3 text-center sm:px-[22px]">
+              <Link to="/atividades" className="text-sm font-medium text-primaria-texto hover:underline">
+                Ver as {total} pendentes
+              </Link>
+            </div>
+          )}
+        </Card>
+
+        <div className="flex min-w-0 flex-col gap-5">
+          <Card as="section" aria-labelledby="t-progresso" className="flex flex-col gap-4 p-[22px]">
+            <TituloCartao id="t-progresso">Progresso por disciplina</TituloCartao>
+            {disciplinas.length === 0 ? (
+              <p className="text-sm text-sutil">
+                Nenhuma disciplina ainda.{' '}
+                <Link to="/disciplinas" className="font-medium text-primaria-texto hover:underline">
+                  Cadastrar
+                </Link>
+              </p>
+            ) : (
+              disciplinas.map((disciplina) => (
+                <Link
+                  key={disciplina.id}
+                  to={`/disciplina/${disciplina.id}`}
+                  className="-mx-2 rounded-xl px-2 py-1 transition-colors hover:bg-superficie-2"
+                >
+                  <BarraProgresso
+                    rotulo={disciplina.nome}
+                    marcador
+                    cor={disciplina.cor}
+                    tamanho="sm"
+                    progresso={progressoDaDisciplina(disciplina.id)}
+                  />
+                </Link>
+              ))
+            )}
+          </Card>
+
+          {membroAtivo && <SeuRitmo membroId={membroAtivo.id} />}
+
+          <Card as="section" aria-label="Feriados" className="p-[22px]">
+            <ProximosFeriados feriados={feriados} carregando={carregando} erro={erro} />
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }

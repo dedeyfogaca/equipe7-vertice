@@ -1,4 +1,4 @@
-// Camada fininha em cima do LocalStorage.
+// Camada fininha em cima do armazenamento do navegador (localStorage).
 // A documentação pede para separar os dados por tipo (uma chave por coleção),
 // em vez de jogar tudo num objeto só. Fica mais fácil de filtrar e atualizar.
 
@@ -8,6 +8,9 @@ export const CHAVES = {
   disciplinas: 'disciplinas',
   conteudos: 'conteudos',
   atividades: 'atividades',
+  // RN12 — conquistas já concedidas ({ membroId, codigo, obtidaEm }). Espelha
+  // a tabela `membro_conquista` do modelo lógico.
+  conquistas: 'conquistasMembro',
   sessao: 'sessao',
   versao: 'versaoDados',
 };
@@ -28,11 +31,15 @@ export function lerColecao(chave) {
   }
 }
 
+// Devolve `true` quando gravou. Armazenamento cheio ou bloqueado não derruba
+// a aplicação, mas também não pode passar em silêncio (defeito D02): quem
+// chama recebe `false` e avisa a pessoa de que o cadastro pode se perder.
 export function salvarColecao(chave, valor) {
   try {
     localStorage.setItem(chave, JSON.stringify(valor));
+    return true;
   } catch {
-    // Se o LocalStorage estiver cheio/indisponível, não derrubamos a aplicação.
+    return false;
   }
 }
 
