@@ -1,7 +1,7 @@
 # Diagrama de Classes
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 29/10/2026
 
 ---
 
@@ -16,6 +16,7 @@ classDiagram
         +String id
         +String nome
         +String descricao
+        +String foto
         +Date criadoEm
         +progressoGeral() Decimal
     }
@@ -26,6 +27,8 @@ classDiagram
         +String funcao
         +String email
         +String avatar
+        +String estiloAvatar
+        +String foto
         +PerfilUsuario perfil
         +experienciaAcumulada() Integer
         +ofensivaAtual() Integer
@@ -64,6 +67,7 @@ classDiagram
         +Date concluidaEm
         +concluir() void
         +reabrir() void
+        +podeMudarStatus(Membro) Boolean
         +estaAtrasada() Boolean
         +experienciaGerada() Integer
     }
@@ -123,7 +127,7 @@ classDiagram
     Disciplina "1" *-- "0..*" Conteudo : divide-se em
     Conteudo "1" *-- "0..*" Atividade : agrupa
     Disciplina "1" *-- "0..*" ProgressoHistorico : registra
-    Membro "0..1" --> "0..*" Atividade : responsavel por
+    Membro "1" --> "0..*" Atividade : responsavel por
     Membro "1" -- "0..*" MembroConquista
     Conquista "1" -- "0..*" MembroConquista
 
@@ -171,7 +175,7 @@ classDiagram
 | Grupo — Disciplina | 1 : 0..N | Um grupo organiza várias disciplinas; cada disciplina pertence a um único grupo |
 | Disciplina — Conteúdo | 1 : 0..N | Uma disciplina divide-se em vários conteúdos; cada conteúdo pertence a uma única disciplina (RN13) |
 | Conteúdo — Atividade | 1 : 0..N | Um conteúdo agrupa várias atividades; cada atividade pertence a exatamente um conteúdo (RN13) |
-| Membro — Atividade | 0..1 : 0..N | Um membro pode ser responsável por várias atividades; uma atividade tem no máximo um responsável e pode ficar sem nenhum (RN02) |
+| Membro — Atividade | 1 : 0..N | Um membro pode ser responsável por várias atividades; toda atividade tem exatamente um responsável (RN06). Antes de um membro ser removido, as atividades dele passam para outro membro do grupo (RN02) |
 | Disciplina — ProgressoHistorico | 1 : 0..N | Uma disciplina acumula vários registros de progresso ao longo do tempo (RF12) |
 | Membro — Conquista | 0..N : 0..N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros. A associação é resolvida pela classe associativa **MembroConquista**, que guarda a data de obtenção (RN12) |
 
@@ -184,6 +188,12 @@ classDiagram
 **O progresso também é calculado.** `Conteudo.progresso()` e `Disciplina.progresso()` aplicam diretamente as fórmulas da RN08 e da RN14. A classe **ProgressoHistorico** não duplica esse cálculo: ela guarda o resultado de um dia específico, porque a evolução ao longo do tempo (RF12) não pode ser reconstruída a partir do estado atual.
 
 **A Conquista é um catálogo.** Ela não pertence a nenhum grupo: descreve o marco e o critério de avaliação. Quem liga o marco ao estudante é a classe associativa MembroConquista.
+
+**A foto e o avatar convivem no Membro.** `foto` guarda a foto de perfil enviada pela pessoa e enquadrada no editor (RF24, RN19) e, quando existe, é ela que aparece; `avatar` guarda a semente do avatar sorteado e `estiloAvatar`, qual dos cinco estilos de desenho a pessoa escolheu; o avatar é usado quando não há foto e é desenhado pelo próprio sistema a partir dos dois (RF19, RN15).
+
+**O grupo também tem foto.** `Grupo.foto` guarda a foto do grupo, enquadrada do mesmo jeito (RF29, RN19); sem ela, as telas mostram as iniciais do nome do grupo.
+
+**Só o responsável muda o status.** `Atividade.podeMudarStatus(Membro)` só é verdadeiro para o membro responsável pela atividade (RN20): é a ele que `concluir()` e `reabrir()` são oferecidos, porque é ele quem recebe a experiência (RN10).
 
 ---
 

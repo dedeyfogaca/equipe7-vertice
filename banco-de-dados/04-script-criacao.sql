@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Vértice — Plataforma de Acompanhamento de Aprendizagem
 -- Script de criação do banco de dados
--- Entrega 2 · Modelagem do Banco de Dados · Equipe 7
+-- Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 29/10/2026
 --
 -- Dialeto: MySQL 8. As restrições CHECK são suportadas a partir do 8.0.16.
 -- A ordem de criação respeita as dependências de chave estrangeira.
@@ -20,6 +20,7 @@ CREATE TABLE grupo (
     id_grupo      INT           NOT NULL AUTO_INCREMENT,
     nome          VARCHAR(80)   NOT NULL,
     descricao     VARCHAR(255)  NULL,
+    foto          VARCHAR(255)  NULL,      -- endereço da foto do grupo (RF29)
     data_criacao  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_grupo PRIMARY KEY (id_grupo)
 );
@@ -35,12 +36,16 @@ CREATE TABLE membro (
     funcao     VARCHAR(60)  NULL,
     email      VARCHAR(120) NULL,
     avatar     VARCHAR(60)  NULL,
+    estilo_avatar VARCHAR(20) NOT NULL DEFAULT 'croodles-neutral',
+    foto       VARCHAR(255) NULL,
     perfil     VARCHAR(15)  NOT NULL DEFAULT 'participante',
     CONSTRAINT pk_membro     PRIMARY KEY (id_membro),
     CONSTRAINT fk_membro_grupo FOREIGN KEY (id_grupo)
         REFERENCES grupo (id_grupo) ON DELETE CASCADE,
     CONSTRAINT ck_membro_perfil
-        CHECK (perfil IN ('organizador', 'participante'))
+        CHECK (perfil IN ('organizador', 'participante')),
+    CONSTRAINT ck_membro_estilo_avatar
+        CHECK (estilo_avatar IN ('croodles-neutral', 'adventurer', 'big-smile', 'fun-emoji', 'pixel-art'))
 );
 
 -- ---------------------------------------------------------------------
@@ -50,7 +55,7 @@ CREATE TABLE disciplina (
     id_disciplina INT         NOT NULL AUTO_INCREMENT,
     id_grupo      INT         NOT NULL,
     nome          VARCHAR(80) NOT NULL,
-    cor           CHAR(7)     NULL,
+    cor           CHAR(7)     NOT NULL DEFAULT '#3b82f6',
     data_criacao  DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_disciplina PRIMARY KEY (id_disciplina),
     CONSTRAINT fk_disciplina_grupo FOREIGN KEY (id_grupo)
@@ -77,11 +82,13 @@ CREATE TABLE conteudo (
 -- ---------------------------------------------------------------------
 -- atividade — unidade de execução (RF03)
 -- Alimenta progresso (RN08), experiência (RN10) e ofensiva (RN11)
+-- Toda atividade tem responsável (RN06); o membro só pode ser excluído
+-- depois que as atividades dele passam para outro membro (RN02)
 -- ---------------------------------------------------------------------
 CREATE TABLE atividade (
     id_atividade    INT          NOT NULL AUTO_INCREMENT,
     id_conteudo     INT          NOT NULL,
-    id_responsavel  INT          NULL,
+    id_responsavel  INT          NOT NULL,
     titulo          VARCHAR(120) NOT NULL,
     descricao       TEXT         NULL,
     prazo           DATE         NOT NULL,
@@ -94,7 +101,7 @@ CREATE TABLE atividade (
     CONSTRAINT fk_atividade_conteudo FOREIGN KEY (id_conteudo)
         REFERENCES conteudo (id_conteudo) ON DELETE CASCADE,
     CONSTRAINT fk_atividade_responsavel FOREIGN KEY (id_responsavel)
-        REFERENCES membro (id_membro) ON DELETE SET NULL,
+        REFERENCES membro (id_membro) ON DELETE RESTRICT,
     CONSTRAINT ck_atividade_titulo     CHECK (CHAR_LENGTH(titulo) >= 3),
     CONSTRAINT ck_atividade_peso       CHECK (peso BETWEEN 1 AND 5),
     CONSTRAINT ck_atividade_prioridade CHECK (prioridade IN ('baixa', 'media', 'alta')),
@@ -204,3 +211,19 @@ INSERT INTO conquista (codigo, nome, descricao, icone, criterio_tipo, criterio_v
 -- RN05 — atividades atrasadas
 -- SELECT * FROM atividade
 -- WHERE prazo < CURRENT_DATE AND status <> 'concluido';
+
+-- RN02 — remover um membro: as atividades dele passam para quem assume
+-- START TRANSACTION;
+-- UPDATE atividade SET id_responsavel = :quem_assume
+--  WHERE id_responsavel = :membro_removido;
+-- DELETE FROM membro WHERE id_membro = :membro_removido;
+-- COMMIT;
+
+-- RN02 — excluir um grupo: primeiro as disciplinas, que levam em cascata
+-- os conteúdos e as atividades; depois o grupo, que leva os membros e as
+-- conquistas deles. Nessa ordem, a restrição do responsável não barra a
+-- exclusão.
+-- START TRANSACTION;
+-- DELETE FROM disciplina WHERE id_grupo = :grupo;
+-- DELETE FROM grupo WHERE id_grupo = :grupo;
+-- COMMIT;

@@ -13,6 +13,7 @@
 | **Tema** | Plataforma de acompanhamento de aprendizagem |
 | **Integrantes** | Andrey Fogaça / Matheus Saraiva Faustin |
 | **Equipe** | Equipe 7 |
+| **Instagram** | [@go.vertice](https://www.instagram.com/go.vertice/) |
 
 ---
 

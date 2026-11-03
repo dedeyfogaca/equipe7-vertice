@@ -1,7 +1,7 @@
 # Modelo Conceitual do Banco de Dados
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 29/10/2026
 
 ---
 
@@ -18,7 +18,7 @@ erDiagram
     GRUPO ||--o{ DISCIPLINA : "organiza"
     DISCIPLINA ||--o{ CONTEUDO : "divide-se em"
     CONTEUDO ||--o{ ATIVIDADE : "agrupa"
-    MEMBRO |o--o{ ATIVIDADE : "e responsavel por"
+    MEMBRO ||--o{ ATIVIDADE : "e responsavel por"
     DISCIPLINA ||--o{ PROGRESSO_HISTORICO : "registra"
     MEMBRO ||--o{ MEMBRO_CONQUISTA : "obtem"
     CONQUISTA ||--o{ MEMBRO_CONQUISTA : "e obtida em"
@@ -33,8 +33,8 @@ erDiagram
 
 | Entidade | Atributos | Origem |
 |---|---|---|
-| **GRUPO** | identificador, nome, descrição, data de criação | RF01 |
-| **MEMBRO** | identificador, nome, função, e-mail, avatar, perfil | RF02 |
+| **GRUPO** | identificador, nome, descrição, foto do grupo, data de criação | RF01, RF29 |
+| **MEMBRO** | identificador, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil | RF02, RF19, RF24 |
 | **DISCIPLINA** | identificador, nome, cor de identificação, data de criação | RF13 |
 | **CONTEUDO** | identificador, nome, descrição, ordem de apresentação | RF14 |
 | **ATIVIDADE** | identificador, título, descrição, prazo, peso, prioridade, status, data de criação, data de conclusão | RF03, RN09 |
@@ -52,7 +52,7 @@ erDiagram
 | GRUPO **organiza** DISCIPLINA | 1 : N | Um grupo organiza zero ou muitas disciplinas; cada disciplina pertence a exatamente um grupo |
 | DISCIPLINA **divide-se em** CONTEUDO | 1 : N | Uma disciplina divide-se em zero ou muitos conteúdos; cada conteúdo pertence a exatamente uma disciplina |
 | CONTEUDO **agrupa** ATIVIDADE | 1 : N | Um conteúdo agrupa zero ou muitas atividades; cada atividade pertence a exatamente um conteúdo |
-| MEMBRO **é responsável por** ATIVIDADE | 0..1 : N | Um membro é responsável por zero ou muitas atividades; uma atividade tem no máximo um responsável e pode ficar sem nenhum |
+| MEMBRO **é responsável por** ATIVIDADE | 1 : N | Um membro é responsável por zero ou muitas atividades; cada atividade tem exatamente um responsável (RN06) |
 | DISCIPLINA **registra** PROGRESSO_HISTORICO | 1 : N | Uma disciplina acumula zero ou muitos registros de progresso; cada registro pertence a uma única disciplina |
 | MEMBRO **obtém** CONQUISTA | N : N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros |
 

@@ -1,11 +1,11 @@
 # 09 · Histórico de Alterações
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 19/10/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 29/10/2026
 
 ---
 
-Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026) e a revisão do início do 2º bimestre (19/10/2026). A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
+Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, e a de 29/10/2026, com os ajustes que a equipe pediu ao revisar a versão 2. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
 
 ---
 
@@ -164,11 +164,71 @@ A equipe releu problema, objetivos, perfis, escopo, requisitos, regras, casos de
 
 ---
 
+## 2º bimestre — revisão de 28/10/2026
+
+Depois da entrega de 20/10, a professora pediu que toda atividade tivesse um responsável, um calendário com as entregas nas cores das disciplinas, mais cores para as disciplinas, um visual mais profissional mantendo as cores atuais, foto de perfil no cadastro, banco de dados, hospedagem e login com conta Google. A equipe incluiu esses pedidos no escopo e revisou os documentos afetados. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 28/10/2026 | RF03, RN06, RN10 | O responsável passou a ser obrigatório na atividade, a pedido da professora. O RN10 deixou de tratar a atividade sem responsável, que não existe mais | Casos de uso UC05 e UC07, fluxos de atividade, modelo de dados, migração dos dados e testes |
+| 28/10/2026 | RF02, RN02 | Ao remover um membro com atividades, o organizador escolhe quem as assume. Antes, as atividades ficavam sem responsável, o que a nova RN06 não permite | UC02, modelo lógico (`ON DELETE RESTRICT`) e testes |
+| 28/10/2026 | RF01, RN07 | Quem cria o grupo informa o próprio nome e entra como organizador; o primeiro membro de um grupo sem membros é sempre organizador; o último organizador não pode ser rebaixado nem removido. Corrige o defeito D01 e escreve uma regra que o código já aplicava. A RN07 também passou a dizer que o participante exclui só as atividades sob sua responsabilidade, como o Doc. 04 já previa (defeito D10) | UC01, UC02 e Doc. 04 |
+| 28/10/2026 | RF23 | Requisito novo: calendário com as entregas de cada dia nas cores das disciplinas, a pedido da professora | Caso de uso novo UC13, tela e testes |
+| 28/10/2026 | RF24, RN19 | Requisito e regra novos: foto de perfil enviada pelo membro, a pedido da professora | UC02, classes, modelo de dados (`membro.foto`) e testes |
+| 28/10/2026 | RF25, RN18 | Requisito e regra novos: paleta de 18 cores para as disciplinas, a pedido da professora por mais cores e variações | UC03, dicionário de dados e migração das cores que saíram da paleta |
+| 28/10/2026 | RF26 | Requisito novo: páginas públicas de apresentação, com a página inicial e a página Sobre nós | UC01, protótipos e mapa de navegação |
+| 28/10/2026 | RF27, RF28 | Requisitos novos: acesso com conta Google ou e-mail e convite para o grupo por link ou código, a pedido da professora por banco de dados e login com Google | Planejados para 27/11 (T46 a T49) |
+| 28/10/2026 | RN11 | Redação completada: o dia atual fica em aberto até terminar. Descreve o comportamento implementado, em que a ofensiva não zera de manhã só porque ainda não houve conclusão no dia | Regra |
+| 28/10/2026 | Doc. 05 — Escopo e restrições | Entraram foto de perfil, paleta, calendário, páginas públicas, acesso com conta e convite; o acesso por senha saiu de "não incluído"; as restrições ganharam os prazos do 2º bimestre, o banco e a hospedagem, e o Google Fonts deixou de ser dependência | Escopo |
+| 28/10/2026 | Doc. 13 — Arquitetura | O estilo passou de Styled Components para Tailwind CSS e Radix UI, na nova identidade visual; a tipografia passou a Inter Tight e JetBrains Mono, servidas junto com o sistema; a hospedagem passou a ser a Vercel; o banco escolhido para 27/11 é o PostgreSQL do Supabase; Vite e React Router foram atualizados para eliminar as vulnerabilidades apontadas pelo `npm audit` | Diagrama de arquitetura e README |
+| 28/10/2026 | Diagramas e modelo de dados | Diagrama de casos de uso com o UC13; classes e modelos com `membro.foto` e o responsável obrigatório; fluxos de atividade sem a decisão "a atividade tem responsável?"; script de criação com as restrições novas | Imagens regeneradas |
+| 28/10/2026 | Protótipos | Acrescentadas as telas da versão 2 e o mapa de navegação com as telas novas | — |
+| 28/10/2026 | Docs. 11, 12, 14, 15 e 16 | Matriz, backlog, recorte, casos de teste e defeitos da entrega de 06/11 | Exigência do manual |
+
+---
+
+## 2º bimestre — revisão de 29/10/2026
+
+Ao revisar a versão 2, a equipe pediu ajustes de uso: o tema claro também nas páginas públicas, listas de escolha e campo de data com a identidade visual, um editor para enquadrar a foto, foto do grupo, criar o conteúdo sem sair do cadastro de atividade, o formulário de atividade sem valores pré-escolhidos, animação no calendário, a exclusão do grupo no pé da tela de Membros e cada pessoa concluindo só as próprias atividades. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 29/10/2026 | RN20, RF05 | Regra nova: só o responsável altera o status da atividade, inclusive para concluí-la; nem o organizador conclui pelos outros. A experiência e a ofensiva são de quem fez a atividade (RN10, RN11), e concluir pelo colega dava a ele um crédito que não era dele | UC05 e UC07, Doc. 04, fluxo "concluir atividade" e testes (CT42) |
+| 29/10/2026 | RN07 | O participante passou a editar só as atividades sob sua responsabilidade, como já acontecia com a exclusão; o organizador edita e exclui qualquer uma, e passa a editar o grupo | UC01, UC05 e Doc. 04 |
+| 29/10/2026 | RF01, RF29, RN19 | Requisito novo: foto do grupo, na criação ou em "Editar grupo"; sem foto, ficam as iniciais. A RN19 passou a valer também para ela | UC01, classes, modelo de dados (`grupo.foto`) e testes (CT40) |
+| 29/10/2026 | RF24, RN19 | A foto de perfil passa por um editor em que a pessoa arrasta e dá zoom antes de salvar, no lugar do recorte automático do centro | UC02 e testes (CT04 e CT39) |
+| 29/10/2026 | RF30 | Requisito novo: criar o conteúdo a partir do formulário de atividade, sem perder o que já foi preenchido | UC05, fluxo "cadastrar atividade" e testes (CT41) |
+| 29/10/2026 | RF03 | O formulário de atividade começa vazio — antes, responsável, status e peso vinham escolhidos — e o prazo é escolhido no calendário do próprio sistema. O que fica em branco assume o padrão das RN04 e RN09 | UC05 e testes (CT09, CT10 e CT44) |
+| 29/10/2026 | RF04 | Os filtros mostram a cor da disciplina, a foto do responsável e o símbolo de cada ordem | Testes (CT13) |
+| 29/10/2026 | RF08 | O tema claro passou a valer também nas páginas públicas, que antes eram sempre escuras | Testes (CT25) |
+| 29/10/2026 | RF23 | A troca de mês e de semana do calendário ganhou transição animada, também pelo gesto de deslizar no celular, respeitando quem pede menos movimento no sistema | UC13 e testes (CT43) |
+| 29/10/2026 | Tela de Membros | A exclusão do grupo passou para o pé da tela, longe das ações do dia a dia | Testes (CT38) |
+| 29/10/2026 | Páginas públicas | O rodapé ganhou o Instagram do projeto, @go.vertice | Doc. 01 e testes (CT33) |
+| 29/10/2026 | Diagramas, modelo de dados e protótipos | Classes e modelos com `grupo.foto`; fluxos de concluir e de cadastrar atividade com as decisões novas; telas da versão 2 capturadas de novo | Imagens regeneradas |
+| 29/10/2026 | Docs. 11, 12, 13, 14, 15 e 16 | Matriz com RF29, RF30 e RN20; tarefas T52 a T61 no backlog; componentes novos na arquitetura; recorte de 06/11 e casos de teste CT39 a CT44 | Exigência do manual |
+
+---
+
+## 2º bimestre — revisão de 01/11/2026
+
+Na revisão seguinte, a equipe pediu a marca nova do Vértice, as seções no topo da tela, avatares que funcionem em qualquer lugar e com estilos para escolher, e as fotos dos integrantes sem a cabeça cortada na página inicial. **Nenhum requisito ou regra foi removido ou renumerado.**
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 01/11/2026 | RF19, RN15 | O avatar passou a ser desenhado pelo próprio sistema, com a biblioteca da DiceBear, em um entre cinco estilos escolhido pelo membro. Antes ele vinha do serviço da DiceBear pela internet, e onde a imagem externa era bloqueada — como na versão de demonstração — o sorteio não mudava nada na tela | UC02 sem ator secundário e sem o fluxo 4A; DiceBear fora dos diagramas de casos de uso e de arquitetura; `membro.estilo_avatar` no modelo de dados; testes (CT27 e CT47) |
+| 01/11/2026 | RNF10 | Deixa de depender do RF19: os avatares não usam mais serviço externo | Doc. 05 e Doc. 13 |
+| 01/11/2026 | Interface do sistema | As seções saíram da barra lateral e foram para uma barra no topo, com a marca, o grupo, o tema e a conta; no celular, o menu desce do topo | Matriz, casos de uso, protótipos e testes (CT46) |
+| 01/11/2026 | Marca | Marca nova do Vértice, a partir da arte da equipe. Ao abrir o grupo, aparece no centro com o nome dele e dá um terço de volta, e a tela se dissolve no painel; dá uma volta ao passar o mouse | Protótipos e testes (CT45) |
+| 01/11/2026 | Página inicial | As fotos dos integrantes aparecem nos círculos enquadradas pela cabeça | Testes (CT33) |
+| 01/11/2026 | Docs. 11 a 16 | Matriz, tarefas T62 a T65, arquitetura sem a DiceBear como serviço, recorte de 06/11 e casos de teste CT45 a CT47 | Exigência do manual |
+
+---
+
 ## Pendência registrada
 
 | Item | Situação |
 |---|---|
-| Persistência em banco de dados relacional | A Entrega 2 apresenta o modelo conceitual, o modelo lógico e o dicionário de dados completos. A implementação da primeira versão mantém a persistência no navegador, replicando a estrutura definida no modelo lógico, conforme a restrição do Doc. 05. A migração para um servidor de banco de dados fica prevista para uma versão futura. |
+| Persistência em banco de dados relacional | A Entrega 2 apresenta o modelo conceitual, o modelo lógico e o dicionário de dados completos. A implementação da primeira versão mantém a persistência no navegador, replicando a estrutura definida no modelo lógico, conforme a restrição do Doc. 05. A troca para o banco de dados está prevista para a entrega de 27/11, no PostgreSQL do Supabase (T46 e T47). |
 
 ---
 

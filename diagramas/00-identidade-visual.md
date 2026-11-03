@@ -1,11 +1,13 @@
 # Identidade visual dos diagramas
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 28/10/2026
 
 ---
 
-Os diagramas deste repositório usam o mesmo sistema de cores e a mesma tipografia da aplicação, definidos em `src/styles/theme.js`. A intenção é que documento, modelos e telas sejam lidos como o mesmo produto, e não como artefatos produzidos em ferramentas diferentes.
+Os diagramas deste repositório foram desenhados com o sistema de cores e a tipografia da primeira versão da aplicação. A intenção é que documento, modelos e telas sejam lidos como o mesmo produto, e não como artefatos produzidos em ferramentas diferentes.
+
+Na versão 2 do sistema (28/10/2026), a interface ganhou uma nova identidade visual, manteve o ciano da marca e o violeta da gamificação e passou a usar as fontes Inter Tight e JetBrains Mono, servidas junto com o próprio sistema. Os diagramas mantêm a paleta e a tipografia em que foram desenhados: as cores da marca continuam as mesmas, e trocar a fonte de todos eles não mudaria o que comunicam.
 
 ---
 
@@ -20,7 +22,7 @@ Os diagramas deste repositório usam o mesmo sistema de cores e a mesma tipograf
 | Rosa — perigo | `#DC2626` | Erros de validação e estorno de experiência |
 | Cinza-azulado — neutro | `#64748B` | Sistemas externos, enumerações e ações sem efeito no progresso |
 
-As cores são as da paleta `coresClaras` do arquivo de tema, escolhida por atravessar bem os três meios em que os diagramas serão vistos: o documento entregue, a impressão e a leitura no GitHub. Nenhuma cor foi inventada para os diagramas.
+As cores são as do tema claro da primeira versão, escolhidas por atravessar bem os três meios em que os diagramas são vistos: o documento entregue, a impressão e a leitura no GitHub. Nenhuma cor foi inventada para os diagramas.
 
 ---
 
@@ -28,10 +30,10 @@ As cores são as da paleta `coresClaras` do arquivo de tema, escolhida por atrav
 
 | Uso | Fonte |
 |---|---|
-| Rótulos de nós, entidades e classes | **Space Grotesk** — a mesma do corpo de texto da aplicação |
-| Rótulos de transição e de relacionamento | **Space Mono** — a mesma dos rótulos de dados da interface |
+| Rótulos de nós, entidades e classes | **Space Grotesk** — a do corpo de texto da primeira versão da aplicação |
+| Rótulos de transição e de relacionamento | **Space Mono** — a dos rótulos de dados da primeira versão |
 
-Ambas são servidas pelo Google Fonts, que por isso conta como dependência externa da aplicação (Doc. 05 — Restrições). Não deixam de ser lidas quando o serviço está fora do ar: o navegador recai na fonte sem serifa do sistema, e só a tipografia muda.
+As imagens em `png/` são geradas com as fontes embutidas. Aberto direto no navegador, o SVG usa a fonte instalada no computador ou recai na fonte sem serifa do sistema, e só a tipografia muda.
 
 ---
 
@@ -63,7 +65,7 @@ Todos os diagramas são mantidos como texto, não como arquivos de ferramenta de
 | Diagrama | Fonte | Por quê |
 |---|---|---|
 | Classes, atividades, modelo conceitual, modelo lógico | Mermaid, dentro do próprio `.md` | O GitHub renderiza automaticamente |
-| Casos de uso e esta legenda | SVG, em `diagramas/svg/` | O Mermaid não tem a forma de ator da UML, o boneco palito |
+| Casos de uso, arquitetura, mapa de navegação e esta legenda | SVG, em `diagramas/svg/` | O Mermaid não tem a forma de ator da UML, o boneco palito, nem permite controlar a posição de cada elemento nesses desenhos |
 
 As imagens em `diagramas/png/` são a exportação dessas fontes, para inserir no documento entregue.
 

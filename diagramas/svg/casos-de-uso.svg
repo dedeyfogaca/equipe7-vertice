@@ -1,27 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 1010" width="2730" height="3030">
-<rect width="910" height="1010" fill="#FFFFFF"/>
-<rect x="250" y="30" width="460" height="925" rx="6" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 1080" width="2730" height="3240">
+<rect width="910" height="1080" fill="#FFFFFF"/>
+<rect x="250" y="30" width="460" height="995" rx="6" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
 <text x="480" y="60" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0E7490" font-weight="700" text-anchor="middle" letter-spacing="2.4">SISTEMA VÉRTICE</text>
 <line x1="141" y1="238" x2="300" y2="105" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="238" x2="300" y2="175" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="238" x2="300" y2="245" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="238" x2="300" y2="315" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="238" x2="300" y2="385" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="470" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="610" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="695" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="765" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="835" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="141" y1="648" x2="300" y2="905" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="765" y1="168" x2="660" y2="175" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="470" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="610" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="695" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="765" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="835" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="905" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="975" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="518" x2="660" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="518" x2="660" y2="695" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="798" x2="660" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="798" x2="660" y2="695" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<line x1="120" y1="348" x2="120" y2="578" stroke="#5B6678" stroke-width="1.6" fill="none"/>
-<polygon points="120,594 111,576 129,576" fill="#FFFFFF" stroke="#5B6678" stroke-width="1.6"/>
-<text x="134" y="470" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">herda de</text>
+<line x1="765" y1="518" x2="660" y2="765" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="765" y1="798" x2="660" y2="765" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="120" y1="348" x2="120" y2="613" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<polygon points="120,629 111,611 129,611" fill="#FFFFFF" stroke="#5B6678" stroke-width="1.6"/>
+<text x="134" y="487" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">herda de</text>
 <line x1="480" y1="637" x2="480" y2="662" stroke="#5B6678" stroke-width="1.6" stroke-dasharray="5 4"/>
 <polygon points="480,670 475,660 485,660" fill="#5B6678"/>
 <text x="494" y="655" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">«include»</text>
@@ -44,11 +46,13 @@
 <ellipse cx="480" cy="695" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
 <text x="480" y="700" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC08 · Acompanhar progresso</text>
 <ellipse cx="480" cy="765" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="770" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC09 · Consultar painel de desempenho</text>
+<text x="480" y="770" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC13 · Consultar calendário</text>
 <ellipse cx="480" cy="835" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="840" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC10 · Alternar tema</text>
+<text x="480" y="840" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC09 · Consultar painel de desempenho</text>
 <ellipse cx="480" cy="905" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="910" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC11 · Encerrar sessão</text>
+<text x="480" y="910" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC10 · Alternar tema</text>
+<ellipse cx="480" cy="975" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
+<text x="480" y="980" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC11 · Encerrar sessão</text>
 
     <circle cx="120" cy="213.0" r="13.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
     <line x1="120" y1="226.0" x2="120" y2="260.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
@@ -58,16 +62,13 @@
 <text x="120" y="312" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Estudante</text>
 <text x="120" y="331" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Organizador</text>
 
-    <circle cx="120" cy="623.0" r="13.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <line x1="120" y1="636.0" x2="120" y2="670.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <line x1="100.0" y1="648.0" x2="140.0" y2="648.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <line x1="120" y1="670.0" x2="104.0" y2="696.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <line x1="120" y1="670.0" x2="136.0" y2="696.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
-<text x="120" y="722" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Estudante</text>
-<text x="120" y="741" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Participante</text>
-<circle cx="815" cy="168" r="50" fill="#EEF1F6" stroke="#64748B" stroke-width="2" stroke-dasharray="5 4"/>
-<text x="815" y="173" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">DiceBear</text>
-<text x="815" y="239" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">«sistema externo»</text>
+    <circle cx="120" cy="658.0" r="13.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <line x1="120" y1="671.0" x2="120" y2="705.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <line x1="100.0" y1="683.0" x2="140.0" y2="683.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <line x1="120" y1="705.0" x2="104.0" y2="731.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <line x1="120" y1="705.0" x2="136.0" y2="731.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
+<text x="120" y="757" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Estudante</text>
+<text x="120" y="776" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Participante</text>
 <circle cx="815" cy="518" r="50" fill="#EEF1F6" stroke="#64748B" stroke-width="2" stroke-dasharray="5 4"/>
 <text x="815" y="523" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">BrasilAPI</text>
 <text x="815" y="589" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">«sistema externo»</text>

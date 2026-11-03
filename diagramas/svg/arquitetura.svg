@@ -15,7 +15,7 @@
 <text x="400.0" y="174.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">React Router</text>
 <rect x="505" y="130" width="150" height="58" rx="10" fill="#FFFFFF" stroke="#CDD4E1" stroke-width="1.6"/>
 <text x="580.0" y="156.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Componentes</text>
-<text x="580.0" y="174.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Styled Components</text>
+<text x="580.0" y="174.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Tailwind CSS e Radix UI</text>
 <rect x="325" y="210" width="330" height="58" rx="10" fill="#E0F7FC" stroke="#0891B2" stroke-width="1.8"/>
 <text x="490.0" y="236.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Estado da aplicação</text>
 <text x="490.0" y="254.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Context API</text>
@@ -25,27 +25,25 @@
 <rect x="300" y="450" width="380" height="76" rx="10" fill="#EEF7DD" stroke="#4D7C0F" stroke-width="2"/>
 <text x="490.0" y="485.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#3F6212" font-weight="700" text-anchor="middle" letter-spacing="0">Armazenamento do navegador</text>
 <text x="490.0" y="503.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">estrutura igual à do modelo lógico relacional</text>
-<rect x="740" y="80" width="200" height="330" rx="12" fill="#FFFFFF" stroke="#CDD4E1" stroke-width="1.4" stroke-dasharray="7 5"/>
+<rect x="740" y="80" width="200" height="230" rx="12" fill="#FFFFFF" stroke="#CDD4E1" stroke-width="1.4" stroke-dasharray="7 5"/>
 <text x="840" y="108" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="700" text-anchor="middle" letter-spacing="1.4">SERVIÇOS EXTERNOS</text>
-<rect x="765" y="130" width="150" height="54" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
-<text x="840.0" y="154.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">BrasilAPI</text>
-<text x="840.0" y="172.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">feriados</text>
-<rect x="765" y="200" width="150" height="54" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
-<text x="840.0" y="224.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Nager.Date</text>
-<text x="840.0" y="242.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">reserva</text>
-<rect x="765" y="270" width="150" height="54" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
-<text x="840.0" y="294.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">DiceBear</text>
-<text x="840.0" y="312.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">avatares</text>
-<rect x="765" y="340" width="150" height="50" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
-<text x="840.0" y="362.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Google Fonts</text>
-<text x="840.0" y="380.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">tipografia</text>
+<rect x="765" y="150" width="150" height="54" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
+<text x="840.0" y="174.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">BrasilAPI</text>
+<text x="840.0" y="192.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">feriados</text>
+<rect x="765" y="220" width="150" height="54" rx="10" fill="#EEF1F6" stroke="#64748B" stroke-width="1.6"/>
+<text x="840.0" y="244.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="13" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Nager.Date</text>
+<text x="840.0" y="262.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">reserva</text>
+<rect x="60" y="300" width="170" height="70" rx="10" fill="#FFFFFF" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="145.0" y="332.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Vercel</text>
+<text x="145.0" y="350.0" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">hospedagem do site</text>
+<line x1="145" y1="300" x2="145" y2="162" stroke="#5B6678" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
+<text x="157" y="236" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">entrega o</text>
+<text x="157" y="251" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">sistema</text>
 <line x1="230" y1="125" x2="300" y2="125" stroke="#0891B2" stroke-width="2" marker-end="url(#c)"/>
 <text x="265" y="115" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">usa</text>
 <line x1="490" y1="348" x2="490" y2="450" stroke="#0891B2" stroke-width="2" marker-end="url(#c)"/>
 <text x="503" y="405" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#5B6678" font-weight="400" text-anchor="start" letter-spacing="0">lê e grava</text>
-<path d="M680 260 L720 260 L720 157 L765 157" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
-<path d="M680 260 L720 260 L720 227 L765 227" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
-<path d="M680 260 L720 260 L720 297 L765 297" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
-<path d="M680 260 L720 260 L720 365 L765 365" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
+<path d="M680 260 L720 260 L720 177 L765 177" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
+<path d="M680 260 L720 260 L720 247 L765 247" fill="none" stroke="#CDD4E1" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#p)"/>
 <text x="710" y="100" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">consulta</text>
 </svg>

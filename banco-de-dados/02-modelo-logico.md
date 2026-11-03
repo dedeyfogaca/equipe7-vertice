@@ -1,7 +1,7 @@
 # Modelo Lógico do Banco de Dados
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 29/10/2026
 
 ---
 
@@ -18,6 +18,7 @@ erDiagram
         INT id_grupo PK
         VARCHAR nome
         VARCHAR descricao
+        VARCHAR foto
         DATETIME data_criacao
     }
 
@@ -28,6 +29,8 @@ erDiagram
         VARCHAR funcao
         VARCHAR email
         VARCHAR avatar
+        VARCHAR estilo_avatar
+        VARCHAR foto
         VARCHAR perfil
     }
 
@@ -88,7 +91,7 @@ erDiagram
     grupo ||--o{ disciplina : ""
     disciplina ||--o{ conteudo : ""
     conteudo ||--o{ atividade : ""
-    membro |o--o{ atividade : ""
+    membro ||--o{ atividade : ""
     disciplina ||--o{ progresso_historico : ""
     membro ||--o{ membro_conquista : ""
     conquista ||--o{ membro_conquista : ""
@@ -108,6 +111,7 @@ erDiagram
 | id_grupo | INT | PK | Não | Auto incremento |
 | nome | VARCHAR(80) | — | Não | — |
 | descricao | VARCHAR(255) | — | Sim | — |
+| foto | VARCHAR(255) | — | Sim | Endereço da foto do grupo no armazenamento de arquivos (RF29, RN19) |
 | data_criacao | DATETIME | — | Não | Padrão: data e hora atuais |
 
 ### membro
@@ -120,6 +124,8 @@ erDiagram
 | funcao | VARCHAR(60) | — | Sim | — |
 | email | VARCHAR(120) | — | Sim | — |
 | avatar | VARCHAR(60) | — | Sim | Semente do avatar gerado |
+| estilo_avatar | VARCHAR(20) | — | Não | `DEFAULT 'croodles-neutral'`; `CHECK IN ('croodles-neutral', 'adventurer', 'big-smile', 'fun-emoji', 'pixel-art')` (RF19) |
+| foto | VARCHAR(255) | — | Sim | Endereço da foto de perfil no armazenamento de arquivos (RF24, RN19) |
 | perfil | VARCHAR(15) | — | Não | `CHECK IN ('organizador', 'participante')` (RN07) |
 
 ### disciplina
@@ -129,7 +135,7 @@ erDiagram
 | id_disciplina | INT | PK | Não | Auto incremento |
 | id_grupo | INT | FK → grupo | Não | `ON DELETE CASCADE` (RN02) |
 | nome | VARCHAR(80) | — | Não | `UNIQUE (id_grupo, nome)` |
-| cor | CHAR(7) | — | Sim | Formato hexadecimal, ex.: `#22D3EE` |
+| cor | CHAR(7) | — | Não | Uma das cores da paleta, em hexadecimal; padrão `#3b82f6` (RN18) |
 | data_criacao | DATETIME | — | Não | Padrão: data e hora atuais |
 
 ### conteudo
@@ -148,7 +154,7 @@ erDiagram
 |---|---|---|---|---|
 | id_atividade | INT | PK | Não | Auto incremento |
 | id_conteudo | INT | FK → conteudo | Não | `ON DELETE CASCADE` (RN13) |
-| id_responsavel | INT | FK → membro | Sim | `ON DELETE SET NULL` (RN02) |
+| id_responsavel | INT | FK → membro | Não | `ON DELETE RESTRICT` (RN02, RN06) |
 | titulo | VARCHAR(120) | — | Não | `CHECK (LENGTH(titulo) >= 3)` (RN06) |
 | descricao | TEXT | — | Sim | — |
 | prazo | DATE | — | Não | (RN06) |
@@ -195,9 +201,9 @@ A chave primária composta por `id_membro` e `id_conquista` é o que garante a R
 
 | Regra | Implementação no modelo lógico |
 |---|---|
-| RN02 — exclusão em cascata | `ON DELETE CASCADE` nas chaves estrangeiras de `membro`, `disciplina`, `conteudo` e `atividade`; `ON DELETE SET NULL` em `atividade.id_responsavel` |
+| RN02 — exclusão em cascata e troca de responsável | `ON DELETE CASCADE` nas chaves estrangeiras de `membro`, `disciplina`, `conteudo` e `atividade`; `ON DELETE RESTRICT` em `atividade.id_responsavel`, que recusa excluir um membro enquanto ele for responsável por alguma atividade |
 | RN04 — status válido e padrão | `CHECK` na coluna `status` mais valor padrão `'a fazer'` |
-| RN06 — título e prazo obrigatórios | `NOT NULL` em `titulo` e `prazo`, mais `CHECK` de comprimento mínimo do título |
+| RN06 — título, prazo e responsável obrigatórios | `NOT NULL` em `titulo`, `prazo` e `id_responsavel`, mais `CHECK` de comprimento mínimo do título |
 | RN07 — perfis de usuário | `CHECK` na coluna `perfil` |
 | RN09 — faixa e padrão do peso | `CHECK (peso BETWEEN 1 AND 5)` mais valor padrão 1 |
 | RN12 — conquista concedida uma única vez | Chave primária composta em `membro_conquista` |
@@ -210,12 +216,20 @@ A chave primária composta por `id_membro` e `id_conquista` é o que garante a R
 | RN03 — o responsável deve ser membro do mesmo grupo da atividade | A chave estrangeira garante que o responsável é um membro **existente**, mas não que ele pertence ao grupo alcançado por `atividade → conteudo → disciplina → grupo` | Validação na aplicação, no momento do cadastro, oferecendo na lista apenas os membros do grupo ativo |
 | RN08, RN14 — cálculo do progresso | São fórmulas de agregação, não restrições de integridade | Consulta com `SUM` sobre o peso das atividades, executada na aplicação |
 | RN10, RN11 — experiência e ofensiva | Valores derivados de `peso` e de `data_conclusao` | Cálculo na aplicação a partir das atividades concluídas |
+| RN02 — quem assume as atividades de um membro removido | A restrição impede a exclusão, mas a escolha de quem assume é da pessoa | A aplicação pede quem assume, transfere as atividades e só então exclui o membro |
+| RN18 — cor da paleta | A paleta é da interface e pode mudar entre versões, como mudou em 28/10; prendê-la numa restrição exigiria alterar a tabela a cada mudança | Validação na aplicação e migração dos dados quando uma cor sai da paleta |
+| RN19 — formato e tamanho da foto | O banco guarda só o endereço; a imagem é enquadrada, recortada e reduzida antes de ser enviada | Validação na aplicação, antes do envio |
+| RN07, RN20 — quem edita a atividade e quem muda o status | O banco não sabe quem está fazendo a alteração; nenhuma restrição de tabela compara o membro da sessão com o responsável | Hoje, na aplicação (`lib/permissoes.js`). Com o login de 27/11, em políticas de acesso do Supabase: a alteração de `status` só é aceita quando quem está conectado é o responsável |
 
 ---
 
 ## Nota sobre a implementação da primeira versão
 
-Conforme a restrição de persistência registrada no [Escopo](../docs/05-escopo.md), a primeira versão do sistema guarda os dados no navegador. A estrutura utilizada reproduz este modelo lógico: uma coleção por tabela, com os mesmos nomes de campo, os mesmos identificadores e as mesmas chaves estrangeiras. As restrições `CHECK`, `NOT NULL` e a unicidade são aplicadas por validação na aplicação. A migração para um servidor de banco de dados relacional consiste em criar as tabelas descritas acima e substituir a camada de acesso, sem alterar o modelo.
+Conforme a restrição de persistência registrada no [Escopo](../docs/05-escopo.md), até a entrega de 06/11 o sistema guarda os dados no navegador. A estrutura utilizada reproduz este modelo lógico: uma coleção por tabela, com os mesmos nomes de campo, os mesmos identificadores e as mesmas chaves estrangeiras. As restrições `CHECK`, `NOT NULL` e a unicidade são aplicadas por validação na aplicação. Enquanto não há armazenamento de arquivos, os campos `membro.foto` e `grupo.foto` guardam a própria imagem reduzida, e não o endereço dela.
+
+A troca para o banco de dados relacional — o PostgreSQL do Supabase, planejado para 27/11 (T46 e T47) — consiste em criar as tabelas descritas acima e substituir a camada de acesso, sem alterar o modelo. O [script de criação](04-script-criacao.sql) foi escrito para o MySQL 8 na Entrega 2; a versão para o PostgreSQL entra com a T46.
+
+**Exclusão de um grupo.** Com `ON DELETE RESTRICT` no responsável, o grupo é excluído em dois passos, na mesma transação: primeiro as disciplinas, que levam em cascata os conteúdos e as atividades; depois o grupo, que leva os membros e as conquistas deles. Nessa ordem, nenhum membro sai enquanto ainda é responsável por alguma atividade. O procedimento está no fim do script de criação.
 
 ---
 

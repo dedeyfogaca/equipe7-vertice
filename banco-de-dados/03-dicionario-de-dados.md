@@ -1,7 +1,7 @@
 # Dicionário de Dados
 
 > **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 29/10/2026
 
 ---
 
@@ -18,6 +18,7 @@ Guarda cada grupo de estudo cadastrado. É a raiz de toda a estrutura: membros, 
 | id_grupo | INT | — | Sim | PK | Identificador único do grupo |
 | nome | VARCHAR | 80 | Sim | — | Nome do grupo de estudo exibido na tela de acesso |
 | descricao | VARCHAR | 255 | Não | — | Texto livre com a finalidade do grupo |
+| foto | VARCHAR | 255 | Não | — | Endereço da foto do grupo no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Vazia, o grupo aparece com as iniciais do nome (RF29, RN19) |
 | data_criacao | DATETIME | — | Sim | — | Data e hora em que o grupo foi criado |
 
 ---
@@ -33,7 +34,9 @@ Guarda os integrantes de um grupo. O perfil determina o que o integrante pode fa
 | nome | VARCHAR | 80 | Sim | — | Nome do integrante |
 | funcao | VARCHAR | 60 | Não | — | Papel do integrante no grupo, ex.: "Revisão e slides" |
 | email | VARCHAR | 120 | Não | — | Endereço de e-mail para contato |
-| avatar | VARCHAR | 60 | Não | — | Semente usada para gerar a imagem do avatar em serviço externo. A imagem não é armazenada; o que se guarda é a semente que a reproduz (RF19, RN15) |
+| avatar | VARCHAR | 60 | Não | — | Semente usada para desenhar o avatar. A imagem não é armazenada; o que se guarda é a semente que, com o estilo, a reproduz (RF19, RN15) |
+| estilo_avatar | VARCHAR | 20 | Sim | — | Estilo de desenho do avatar, entre cinco: `croodles-neutral` (Rabisco, o padrão), `adventurer` (Aventura), `big-smile` (Sorriso), `fun-emoji` (Emoji) e `pixel-art` (Pixel) (RF19) |
+| foto | VARCHAR | 255 | Não | — | Endereço da foto de perfil enviada pelo membro, no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Quando existe, aparece no lugar do avatar; vazia, vale o avatar (RF24, RN15, RN19) |
 | perfil | VARCHAR | 15 | Sim | — | Perfil de permissão: `organizador` ou `participante` |
 
 ---
@@ -47,7 +50,7 @@ Guarda as disciplinas acompanhadas pelo grupo. É o nível mais alto de agrupame
 | id_disciplina | INT | — | Sim | PK | Identificador único da disciplina |
 | id_grupo | INT | — | Sim | FK | Grupo dono da disciplina. Referencia `grupo.id_grupo` |
 | nome | VARCHAR | 80 | Sim | — | Nome da disciplina. Não pode se repetir dentro do mesmo grupo |
-| cor | CHAR | 7 | Não | — | Cor de identificação em hexadecimal, ex.: `#22D3EE` |
+| cor | CHAR | 7 | Sim | — | Cor de identificação, uma das 18 cores da paleta do sistema, em hexadecimal. Padrão: `#3b82f6` (RF25, RN18) |
 | data_criacao | DATETIME | — | Sim | — | Data e hora do cadastro da disciplina |
 
 ---
@@ -74,13 +77,13 @@ Guarda cada atividade de estudo. É a tabela que alimenta todos os cálculos do 
 |---|---|---|---|---|---|
 | id_atividade | INT | — | Sim | PK | Identificador único da atividade |
 | id_conteudo | INT | — | Sim | FK | Conteúdo ao qual a atividade pertence. Referencia `conteudo.id_conteudo` |
-| id_responsavel | INT | — | Não | FK | Membro responsável pela execução. Referencia `membro.id_membro`. Fica vazio quando o responsável é excluído |
+| id_responsavel | INT | — | Sim | FK | Membro responsável pela execução, que recebe a experiência na conclusão. Referencia `membro.id_membro`. Antes de um membro ser excluído, as atividades dele passam para outro membro do grupo (RN02, RN06) |
 | titulo | VARCHAR | 120 | Sim | — | Título da atividade. Mínimo de 3 caracteres |
 | descricao | TEXT | — | Não | — | Detalhamento do que precisa ser feito |
 | prazo | DATE | — | Sim | — | Data limite para a conclusão |
 | peso | INT | — | Sim | — | Esforço relativo da atividade, de 1 a 5. Base do cálculo de progresso e de experiência. Padrão: 1 |
 | prioridade | VARCHAR | 10 | Não | — | Urgência informada pelo usuário: `baixa`, `media` ou `alta` |
-| status | VARCHAR | 12 | Sim | — | Situação atual: `a fazer`, `fazendo` ou `concluido`. Padrão: `a fazer` |
+| status | VARCHAR | 12 | Sim | — | Situação atual: `a fazer`, `fazendo` ou `concluido`. Padrão: `a fazer`. Só o responsável altera (RN20) |
 | data_criacao | DATETIME | — | Sim | — | Data e hora do cadastro da atividade |
 | data_conclusao | DATE | — | Não | — | Data em que a atividade passou para `concluido`. Base do cálculo da ofensiva. Fica vazia se a conclusão for revertida |
 

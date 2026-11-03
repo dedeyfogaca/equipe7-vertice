@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 610" width="3450" height="1830">
+<rect width="1150" height="610" fill="#FFFFFF"/>
+<defs>
+<marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5B6678"/></marker>
+<marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0891B2"/></marker>
+<marker id="v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7C3AED"/></marker>
+</defs>
+<text x="575.0" y="38" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0E7490" font-weight="700" text-anchor="middle" letter-spacing="2.2">MAPA DE NAVEGAÇÃO — VERSÃO 2</text>
+<rect x="26" y="70" width="210" height="470" rx="12" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="131" y="94" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#5B6678" font-weight="700" text-anchor="middle" letter-spacing="1.5">PÁGINAS PÚBLICAS</text>
+<rect x="45" y="112" width="172" height="58" rx="10" fill="#E0F7FC" stroke="#0891B2" stroke-width="2.2"/>
+<text x="131.0" y="138" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Início</text>
+<text x="131.0" y="156" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">apresentação</text>
+<rect x="45" y="200" width="172" height="58" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="131.0" y="226" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Sobre nós</text>
+<text x="131.0" y="244" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">a equipe</text>
+<rect x="45" y="288" width="172" height="58" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="131.0" y="314" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Entrar</text>
+<text x="131.0" y="332" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">grupo e quem é você</text>
+<line x1="131" y1="170" x2="131" y2="200" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<line x1="131" y1="258" x2="131" y2="288" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<text x="131" y="382" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Tema claro ou escuro.</text>
+<text x="131" y="400" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Sem senha: o acesso é a</text>
+<text x="131" y="416" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">escolha do grupo e de</text>
+<text x="131" y="432" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">quem você é nele.</text>
+<text x="131" y="470" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Endereço inexistente</text>
+<text x="131" y="486" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">abre a página 404.</text>
+<rect x="254" y="70" width="876" height="470" rx="12" fill="#FFFFFF" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="692" y="94" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#0E7490" font-weight="700" text-anchor="middle" letter-spacing="1.5">DENTRO DA SESSÃO</text>
+<rect x="272" y="262" width="172" height="58" rx="10" fill="#E0F7FC" stroke="#0891B2" stroke-width="2.2"/>
+<text x="358.0" y="288" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Painel</text>
+<text x="358.0" y="306" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">entra por aqui</text>
+<path d="M217 317 L245 317 L245 291 L272 291" fill="none" stroke="#0891B2" stroke-width="2" marker-end="url(#c)"/>
+<rect x="500" y="110" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="586.0" y="136" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Calendário</text>
+<text x="586.0" y="154" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">mês, semana e lista</text>
+<path d="M444 291 L472 291 L472 136 L500 136" fill="none" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="500" y="180" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="586.0" y="206" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Disciplinas</text>
+<text x="586.0" y="224" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">cores da paleta</text>
+<path d="M444 291 L472 291 L472 206 L500 206" fill="none" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="500" y="250" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="586.0" y="276" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Atividades</text>
+<text x="586.0" y="294" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">busca e filtros</text>
+<path d="M444 291 L472 291 L472 276 L500 276" fill="none" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="500" y="320" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="586.0" y="346" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Membros</text>
+<text x="586.0" y="364" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">foto e perfil</text>
+<path d="M444 291 L472 291 L472 346 L500 346" fill="none" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="500" y="390" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="586.0" y="416" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Conquistas</text>
+<text x="586.0" y="434" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">ofensiva e ranking</text>
+<path d="M444 291 L472 291 L472 416 L500 416" fill="none" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="722" y="110" width="172" height="52" rx="10" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="808.0" y="136" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Nova atividade</text>
+<text x="808.0" y="154" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">prazo do dia escolhido</text>
+<line x1="672" y1="136" x2="722" y2="136" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="722" y="180" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="808.0" y="206" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Disciplina</text>
+<text x="808.0" y="224" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">conteúdos e progresso</text>
+<line x1="672" y1="206" x2="722" y2="206" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="722" y="250" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="808.0" y="276" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Detalhe</text>
+<text x="808.0" y="294" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">da atividade</text>
+<line x1="672" y1="276" x2="722" y2="276" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<text x="697" y="268" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">abrir</text>
+<rect x="722" y="320" width="172" height="52" rx="10" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
+<text x="808.0" y="346" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Novo membro</text>
+<text x="808.0" y="364" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">formulário com foto</text>
+<line x1="672" y1="346" x2="722" y2="346" stroke="#5B6678" stroke-width="1.8" marker-end="url(#p)"/>
+<rect x="944" y="250" width="172" height="52" rx="10" fill="#F1EAFE" stroke="#7C3AED" stroke-width="2"/>
+<text x="1030.0" y="276" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#7C3AED" font-weight="700" text-anchor="middle" letter-spacing="0">Concluída</text>
+<text x="1030.0" y="294" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">+ experiência</text>
+<line x1="894" y1="276" x2="944" y2="276" stroke="#7C3AED" stroke-width="2" marker-end="url(#v)"/>
+<text x="919" y="268" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11" fill="#7C3AED" font-weight="700" text-anchor="middle" letter-spacing="0">concluir</text>
+<path d="M1030 302 L1030 512 L358 512 L358 320" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#v)"/>
+<text x="694" y="500" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#7C3AED" font-weight="700" text-anchor="middle" letter-spacing="0">progresso, experiência, ofensiva e conquistas atualizados</text>
+<text x="575.0" y="570" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">A barra do topo leva a qualquer seção a partir de qualquer tela.</text>
+<text x="575.0" y="588" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Nova atividade abre também do Painel e da lista de Atividades; o detalhe leva à edição no mesmo formulário.</text>
+</svg>

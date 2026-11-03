@@ -16,7 +16,7 @@
 | **RNF07** | O sistema deve exibir mensagem orientativa quando uma listagem não possuir registros. | Usabilidade | Média | RF04 |
 | **RNF08** | O sistema deve recalcular e exibir o progresso, a experiência e a ofensiva em até 1 segundo após a alteração do status de uma atividade. | Desempenho | Alta | RF10, RF15, RF16 |
 | **RNF09** | O sistema deve representar o progresso e o status com valor textual ou numérico além da cor, permitindo a leitura por usuários com daltonismo. | Acessibilidade | Média | RF10, RF11 |
-| **RNF10** | O sistema deve permanecer utilizável quando um serviço externo estiver indisponível, substituindo o recurso afetado por alternativa local e informando o usuário quando a substituição for perceptível. | Disponibilidade | Alta | RF07, RF19, RF21 |
+| **RNF10** | O sistema deve permanecer utilizável quando um serviço externo estiver indisponível, substituindo o recurso afetado por alternativa local e informando o usuário quando a substituição for perceptível. | Disponibilidade | Alta | RF07, RF21 |
 
 ---
 
