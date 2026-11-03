@@ -1,15 +1,49 @@
-$ npm ci && npm run build   # commit c29279b · 19/10/2026 09:17
+$ node --version
+v22.22.0
+$ npm --version
+10.9.4
 
-added 82 packages in 5s
+$ npm ci
 
-> vertice@1.0.0 build
+added 149 packages, and audited 150 packages in 3s
+
+18 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+$ npm run build
+
+> vertice@2.0.0 build
 > vite build
 
-vite v5.4.21 building for production...
+vite v6.4.5 building for production...
 transforming...
-✓ 95 modules transformed.
+✓ 2196 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                  0.95 kB │ gzip:  0.53 kB
-dist/assets/index-Dw7Yv77Q.js  312.43 kB │ gzip: 95.48 kB
-✓ built in 2.77s
+dist/index.html                                                     1.49 kB │ gzip:   0.73 kB
+dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2    7.50 kB
+dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2         9.00 kB
+dist/assets/inter-tight-vietnamese-wght-normal-TKKdAiBA.woff2      10.48 kB
+dist/assets/inter-tight-greek-ext-wght-normal-DQgQPNk4.woff2       11.70 kB
+dist/assets/jetbrains-mono-cyrillic-wght-normal-D73BlboJ.woff2     12.11 kB
+dist/assets/jetbrains-mono-latin-ext-wght-normal-DBQx-q_a.woff2    15.20 kB
+dist/assets/inter-tight-cyrillic-wght-normal-BS41q_Tv.woff2        17.00 kB
+dist/assets/inter-tight-greek-wght-normal-sS1B39LI.woff2           22.19 kB
+dist/assets/inter-tight-cyrillic-ext-wght-normal-okcGN4Nq.woff2    26.66 kB
+dist/assets/avatar-matheus-DR6obLdF.webp                           26.96 kB
+dist/assets/avatar-andrey-D9NfJ-69.webp                            27.60 kB
+dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2        40.40 kB
+dist/assets/inter-tight-latin-wght-normal-DX-nOvPD.woff2           44.87 kB
+dist/assets/inter-tight-latin-ext-wght-normal-B4u9PlvR.woff2       89.80 kB
+dist/assets/index-dlD2a4Cl.css                                     67.52 kB │ gzip:  14.95 kB
+dist/assets/react-B6sfNDQf.js                                     182.35 kB │ gzip:  60.11 kB
+dist/assets/interface-D7Iptqff.js                                 191.25 kB │ gzip:  57.55 kB
+dist/assets/index-C9A_MppL.js                                     634.03 kB │ gzip: 213.82 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.53s

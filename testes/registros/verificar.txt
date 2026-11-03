@@ -1,7 +1,7 @@
-$ npm run verificar   # commit c29279b · 19/10/2026 09:17 · Node v22.22.0 · npm 10.9.4
+$ npm run verificar
 
-> vertice@1.0.0 verificar
-> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js
+> vertice@2.0.0 verificar
+> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js
 
 
 O cenário destrutivo: já migrado, mas sem o marcador de versão
@@ -9,7 +9,7 @@ O cenário destrutivo: já migrado, mas sem o marcador de versão
 ok    não tenta migrar -> false
 ok    e diz por quê -> "sem-tarefas-antigas"
 ok    as atividades continuam lá -> 3
-ok    o marcador é gravado, para não repetir -> 1
+ok    o marcador é gravado, para não repetir -> 2
 
 Caminho normal: dados no formato antigo
 
@@ -44,8 +44,37 @@ ok    id repetido quebraria chave de lista e `find` -> true
 Instalação nova: nada gravado
 
 ok    não migra -> false
-ok    marca a versão mesmo assim -> 1
+ok    marca a versão mesmo assim -> 2
 ok    e não inventa coleção -> null
+
+Versão 2: atividade sem responsável ganha um
+
+ok    o passo 1 não roda de novo -> false
+ok    sem responsável vai para o organizador do grupo -> "m2"
+ok    responsável válido continua o mesmo -> "m1"
+ok    responsável de outro grupo é trocado (RN03) -> "m2"
+ok    responsável que não existe mais é trocado -> "m2"
+ok    conta quantas recebeu -> 3
+ok    nenhuma atividade fica sem responsável -> true
+ok    o marcador vai para 2 -> 2
+
+Versão 2: cores fora da paleta nova
+
+ok    a cor que saiu da paleta vira a equivalente -> "#a8a29e"
+ok    cor da paleta continua a mesma -> "#0ea5e9"
+ok    cor inválida vira a padrão -> "#3b82f6"
+ok    conta quantas mudaram -> 2
+
+Versão 2: grupo sem membro nenhum
+
+ok    não inventa responsável -> ""
+ok    e não conta como definido -> 0
+
+Versão 2: nada a mudar, nada é regravado
+
+ok    resumo zerado -> {"responsaveisDefinidos":0,"coresAjustadas":0}
+ok    a coleção fica exatamente como estava -> true
+ok    e a terceira passada nem roda -> "ja-migrado"
 
 Todas as verificações passaram.
 
@@ -155,6 +184,194 @@ A trava não atrapalha o resto da validação
 ok    nome continua obrigatório -> "O nome do membro é obrigatório."
 ok    e-mail invalido continua sendo apontado -> "E-mail inválido."
 ok    cadastrar membro novo nunca cai na trava -> undefined
+ok    nome com mais de 80 caracteres é barrado -> "O nome pode ter no máximo 80 caracteres."
+
+D01 — o primeiro membro de um grupo vazio é o organizador
+
+ok    grupo vazio não aceita participante como primeiro -> "O primeiro membro do grupo precisa ser o organizador."
+ok    grupo vazio aceita o organizador -> undefined
+
+RF01 — quem cria o grupo informa o próprio nome
+
+ok    sem nome do grupo -> "Dê um nome ao grupo."
+ok    sem o nome de quem cria -> "Informe o seu nome."
+ok    com os dois, passa -> {}
 
 Todas as verificações passaram.
 
+
+Atividade completa passa
+
+ok    sem erro nenhum -> {}
+
+RN06 — toda atividade tem responsável
+
+ok    sem responsável é barrada -> "Escolha o responsável pela atividade."
+ok    responsável de outro grupo é barrado (RN03) -> "O responsável escolhido não pertence ao grupo."
+ok    qualquer membro do grupo serve -> undefined
+
+RN13 — a atividade pertence a um conteúdo do grupo
+
+ok    sem conteúdo é barrada -> "Escolha o conteúdo a que a atividade pertence."
+ok    conteúdo de outro grupo é barrado -> "O conteúdo escolhido não pertence a este grupo."
+
+RN09 — peso inteiro de 1 a 5
+
+ok    peso 0 -> "O peso vai de 1 a 5."
+ok    peso 6 -> "O peso vai de 1 a 5."
+ok    peso 2,5 -> "O peso vai de 1 a 5."
+ok    peso em branco vira 1, não é erro -> undefined
+
+Título e prazo
+
+ok    título vazio -> "Informe um título para a atividade."
+ok    título curto -> "O título precisa ter pelo menos 3 caracteres."
+ok    sem prazo -> "Defina um prazo de entrega."
+ok    dia que não existe -> "O prazo informado não é uma data válida."
+ok    29 de fevereiro em ano bissexto existe -> true
+ok    e em ano comum, não -> false
+
+Os dados de exemplo seguem a regra
+
+ok    toda atividade de exemplo tem responsável do grupo -> true
+ok    e passa na validação -> 0
+ok    o primeiro membro do exemplo é o organizador (RN07) -> "organizador"
+
+Todas as verificações passaram.
+
+
+Contagem básica
+
+ok    nada concluído -> 0
+ok    só hoje -> 1
+ok    hoje, ontem e anteontem -> 3
+ok    duas no mesmo dia contam um dia -> 1
+
+Hoje ainda está em aberto
+
+ok    ontem e anteontem, nada hoje: continua 2 -> 2
+ok    última conclusão há 2 dias: zerou -> 0
+
+Um dia vazio quebra a sequência
+
+ok    hoje e anteontem: só 1 -> 1
+ok    7 dias seguidos com um buraco antes -> 7
+
+O que não entra na conta
+
+ok    conclusão de outra pessoa -> 0
+ok    atividade reaberta (sem data de conclusão) -> 0
+ok    concluída perto da meia-noite fica no dia certo -> 2
+
+Os últimos 7 dias do painel
+
+ok    são 7 dias -> 7
+ok    o último é hoje -> "2026-10-28"
+ok    o primeiro é seis dias antes -> "2026-10-22"
+ok    marca os dias com conclusão -> [false,false,false,false,true,false,true]
+
+Todas as verificações passaram.
+
+
+O catálogo é o mesmo do script do banco
+
+ok    seis conquistas, na ordem da carga inicial -> ["PRIMEIRO_PASSO","CONTEUDO_DOMINADO","DISCIPLINA_FECHADA","SEMANA_CHEIA","MES_CHEIO","MEIO_MILHAR"]
+
+Quando cada marco é atingido
+
+ok    sem atividade, nada -> []
+ok    pendente não conta -> []
+ok    a primeira conclusão dá o Primeiro Passo -> ["PRIMEIRO_PASSO"]
+ok    quem fez a última conclusão do conteúdo leva o Conteúdo Dominado -> ["PRIMEIRO_PASSO","CONTEUDO_DOMINADO"]
+ok    quem concluiu antes não leva -> ["PRIMEIRO_PASSO"]
+ok    a última conclusão da disciplina dá a Disciplina Fechada -> ["PRIMEIRO_PASSO","CONTEUDO_DOMINADO","DISCIPLINA_FECHADA"]
+ok    6 dias seguidos ainda não é Semana Cheia -> false
+ok    7 dias seguidos é -> true
+ok    30 dias seguidos é Mês Cheio -> true
+ok    490 XP ainda não é Meio Milhar -> false
+ok    500 XP é -> true
+
+Concessão: uma vez só e sem revogar
+
+ok    concede o que é novo -> [{"membroId":"m1","codigo":"PRIMEIRO_PASSO","obtidaEm":"2026-10-28T12:00:00.000Z"}]
+ok    não concede de novo o que já foi concedido -> []
+ok    o marco deixou de valer (atividade reaberta): nada é retirado -> []
+ok    a mesma conquista para outra pessoa é outra concessão -> 1
+ok    código repetido na mesma rodada conta uma vez -> 1
+
+Todas as verificações passaram.
+
+
+RN20 — só o responsável muda o status
+
+ok    Ana conclui a própria atividade -> true
+ok    Bruno conclui a própria atividade -> true
+ok    Bruno não conclui a da Ana -> false
+ok    nem a organizadora conclui a do Bruno -> false
+ok    ninguém da sessão, ninguém conclui -> false
+ok    atividade sem responsável não tem quem conclua -> false
+
+RN07 — editar e excluir
+
+ok    a organizadora edita a atividade do Bruno -> true
+ok    a organizadora exclui a atividade do Bruno -> true
+ok    o Bruno edita a própria -> true
+ok    o Bruno exclui a própria -> true
+ok    a Carla não edita a do Bruno -> false
+ok    a Carla não exclui a do Bruno -> false
+ok    grupo vazio: quem monta edita (dado antigo) -> true
+ok    responsável é reconhecido -> [true,false]
+
+RN20 no formulário — o status que é gravado
+
+ok    nova, para si mesmo: vale o status escolhido -> "fazendo"
+ok    nova, para si mesmo, sem escolher: começa em "a fazer" -> "a fazer"
+ok    nova, para outra pessoa: começa em "a fazer", mesmo escolhendo "concluido" -> "a fazer"
+ok    edição da organizadora na atividade do Bruno: o status não muda -> "concluido"
+ok    edição do próprio responsável: o status muda -> "a fazer"
+
+Todas as verificações passaram.
+
+
+Sem mexer, o recorte é o quadrado do meio
+
+ok    zoom 1, sem arrastar -> {"sx":500,"sy":0,"lado":3000}
+
+Zoom aproxima em torno do centro
+
+ok    zoom 2 pega metade do lado, no meio -> {"sx":1250,"sy":750,"lado":1500}
+
+Arrastar a foto para a direita mostra o lado esquerdo dela
+
+ok    arrastar 70 px para a direita -> {"sx":-250,"sy":0,"lado":3000}
+
+Os limites impedem canto vazio
+
+ok    zoom 1: só anda na horizontal, até ~46,7 px -> [46.7,0]
+ok    no limite, o recorte encosta na borda esquerda da foto -> {"sx":0,"sy":0,"lado":3000}
+ok    zoom 2: anda nos dois eixos -> [233.3,140]
+ok    no limite de baixo, o recorte encosta na borda de cima -> {"sx":1250,"sy":0,"lado":1500}
+
+Foto em pé funciona do mesmo jeito
+
+ok    3000 × 4000, sem mexer -> {"sx":0,"sy":500,"lado":3000}
+
+Todas as verificações passaram.
+
+Estilos oferecidos
+ok    são cinco -> 5
+ok    o padrão está entre eles -> true
+ok    estilo inventado não vale -> false
+Desenho
+ok    é uma imagem SVG embutida, sem buscar nada fora -> true
+ok    mesma semente e estilo, mesmo desenho -> true
+ok    a semente ignora maiúsculas e espaços nas pontas -> true
+ok    outra semente, outro desenho -> true
+ok    cada estilo desenha diferente -> 5
+ok    estilo desconhecido usa o padrão -> true
+ok    sem semente ainda desenha -> true
+Sorteio e iniciais
+ok    50 sorteios, 50 sementes diferentes -> 50
+ok    iniciais de nome composto -> "AS"
+
+Todas as verificações passaram.
