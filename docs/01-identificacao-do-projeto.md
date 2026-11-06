@@ -1,6 +1,6 @@
 # 01 · Identificação do Projeto
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
 > Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1)
 
 ---
@@ -25,7 +25,7 @@ O Vértice é uma plataforma web para grupos de estudo organizarem suas discipli
 
 ## Local e data
 
-Ponta Grossa — PR
+Ponta Grossa (PR)
 08 de setembro de 2026
 
 ---

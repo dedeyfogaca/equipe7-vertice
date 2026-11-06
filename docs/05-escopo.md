@@ -1,6 +1,6 @@
 # 05 · Escopo
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
 > Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 29/10/2026
 
 ---
@@ -12,21 +12,26 @@
 - Criação, edição, seleção e exclusão de grupos de estudo, com foto do grupo
 - Cadastro, edição e exclusão de membros do grupo, com foto de perfil enquadrada num editor
 - Cadastro, edição e exclusão de disciplinas, com cor escolhida numa paleta
-- Cadastro, edição e exclusão de conteúdos vinculados a uma disciplina
+- Cadastro, edição e exclusão de conteúdos vinculados a uma disciplina, opcionais, para quem quer separar a disciplina por assunto
 - Acesso com conta Google ou e-mail e entrada no grupo por convite, com link e código
 
 **Atividades**
 
-- Cadastro, edição e exclusão de atividades com título, descrição, conteúdo, prazo, peso, prioridade, status e responsável — toda atividade tem um responsável, e só ele altera o status
+- Cadastro, edição e exclusão de atividades com título, descrição, disciplina, conteúdo opcional, prazo, peso, prioridade, status e responsável. Toda atividade tem uma disciplina e um responsável, e só o responsável altera o status
 - Cadastro de conteúdo a partir do formulário de atividade, sem perder o que já foi preenchido
 - Listagem de atividades com busca por texto, filtros por status, responsável, disciplina e prazo, e ordenação
 - Página de detalhe da atividade com alteração rápida de status pelo responsável
 - Sinalização de prazos que coincidem com feriados nacionais ou com fim de semana
 
+**Eventos**
+
+- Cadastro, edição e exclusão de eventos do grupo (prova, apresentação, palestra, reunião ou outro), com dia, horário, local e disciplina opcionais
+- Página de eventos com os próximos e os passados, e os eventos no painel e no calendário
+
 **Acompanhamento e desempenho**
 
 - Painel com totais por status, atividades atrasadas, próximas entregas e próximos feriados nacionais
-- Calendário do mês, da semana ou em lista, com as entregas de cada dia nas cores das disciplinas e transição animada entre os meses
+- Calendário do mês, da semana ou em lista, com as entregas e os eventos de cada dia, nas cores das disciplinas, e transição animada entre os meses
 - Cálculo e exibição do progresso por conteúdo e por disciplina
 - Registro e visualização do histórico de progresso ao longo do tempo
 - Pontos de experiência atribuídos por atividade concluída, proporcionais ao peso
@@ -38,8 +43,9 @@
 
 - Tema claro e escuro em todas as telas, inclusive as públicas
 - Listas de escolha e campo de data com a identidade visual do sistema: cor da disciplina, foto do membro e calendário próprio
-- Foto de perfil enviada pelo membro ou avatar sorteado e trocável, em cinco estilos de desenho
-- Páginas públicas de apresentação: início e sobre a equipe
+- Foto de perfil enviada pelo membro ou avatar sorteado e trocável, em dois estilos de desenho
+- Páginas públicas de apresentação: início, com elementos que reagem à rolagem e ao mouse, e sobre a equipe
+- Formulário anônimo de feedback para os usuários de teste, aberto pela página inicial e pelo menu da conta
 - Carga de dados de exemplo para conhecer o sistema sem cadastrar nada
 
 ---

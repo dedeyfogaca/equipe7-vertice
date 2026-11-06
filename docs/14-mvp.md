@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 29/10/2026
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 06/11/2026
 
 ---
 
@@ -9,7 +9,7 @@
 
 O Vértice existe para responder uma pergunta: **o quanto o estudante já avançou em cada disciplina**. Tudo o que é preciso para responder isso do início ao fim é indispensável. Tudo o que torna a resposta mais rica, mas não a produz, é desejável.
 
-Por esse critério, o MVP é o ciclo que vai de cadastrar a estrutura de estudo até ver a barra de progresso se mover — mais a experiência creditada na conclusão, que é o retorno imediato do esforço.
+Por esse critério, o MVP é o ciclo que vai de cadastrar a estrutura de estudo até ver a barra de progresso se mover, mais a experiência creditada na conclusão, que é o retorno imediato do esforço.
 
 O que **não** entrou no MVP não entrou por ser menos importante, e sim por não ser necessário para o ciclo fechar. A ofensiva de dias consecutivos, por exemplo, só faz sentido depois de existirem várias conclusões ao longo do tempo: ela não tem o que medir numa primeira versão.
 
@@ -19,36 +19,36 @@ O que **não** entrou no MVP não entrou por ser menos importante, e sim por nã
 
 | Requisito | Classificação | No MVP? | Justificativa |
 |---|---|---|---|
-| **RF01** — Criar, selecionar e excluir grupos | Indispensável | Sim | É a porta de entrada. Sem grupo não existe nada mais |
-| **RF02** — Gerenciar membros | Indispensável | Sim | A atividade precisa de responsável para creditar experiência |
-| **RF13** — Gerenciar disciplinas | Indispensável | Sim | É a unidade em que o progresso é lido |
-| **RF14** — Gerenciar conteúdos | Indispensável | Sim | É onde o progresso é calculado; sem ele não há onde ancorar a atividade |
-| **RF03** — Cadastrar atividade com peso | Indispensável | Sim | O peso é o que transforma execução em medida |
-| **RF04** — Listar com busca, filtros e ordenação | Indispensável | Sim | Com poucas atividades seria dispensável; com um semestre inteiro, não |
-| **RF05** — Detalhe e alteração de status | Indispensável | Sim | É onde a conclusão acontece |
-| **RF06** — Painel com totais e atrasadas | Indispensável | Sim | Primeira tela da sessão; é ela que responde "como estamos" |
-| **RF10** — Progresso por conteúdo | Indispensável | Sim | O cálculo central do produto |
-| **RF11** — Progresso por disciplina | Indispensável | Sim | A leitura que o estudante procura |
-| **RF15** — Experiência por atividade concluída | Indispensável | Sim | Retorno imediato da conclusão. Sem ele, concluir não devolve nada ao estudante |
-| **RF09** — Encerrar sessão | Indispensável | Sim | Trocar de grupo exige sair do atual |
-| **RF19** — Avatar do membro | Indispensável | Sim | Já implementado. Identifica quem é quem nas listagens sem custo adicional |
-| **RF20** — Carregar dados de exemplo | Indispensável | Sim | Já implementado. É como alguém conhece o sistema sem cadastrar nada antes |
-| **RF08** — Tema claro e escuro | Indispensável | Sim | Já implementado e prototipado nos dois temas. Removê-lo do MVP custaria retrabalho para tirar algo que funciona |
-| **RF16** — Ofensiva de dias consecutivos | Desejável | Não | Precisa de histórico de vários dias para ter o que mostrar |
-| **RF17** — Conquistas por marcos | Desejável | Não | Depende de experiência e ofensiva já acumuladas |
-| **RF18** — Painel de desempenho do grupo | Desejável | Não | Comparação entre integrantes; depende de RF16 e RF17 |
-| **RF12** — Histórico de progresso ao longo do tempo | Desejável | Não | Só tem o que exibir depois de semanas de uso |
-| **RF07** — Sinalizar prazo em feriado | Desejável | Não | Conveniência; a data continua visível sem isso |
-| **RF21** — Relação dos próximos feriados | Desejável | Não | Mesma razão do RF07 |
-| **RF22** — Sinalizar prazo em fim de semana | Desejável | Não | Mesma razão do RF07 |
-| **RF23** — Calendário com as entregas nas cores das disciplinas | Desejável | Não | Outra forma de ver os prazos que a lista e o painel já mostram |
-| **RF24** — Foto de perfil do membro | Desejável | Não | O avatar sorteado (RF19) já identifica cada membro |
-| **RF25** — Paleta de cores das disciplinas | Desejável | Não | A cor ajuda a reconhecer a disciplina, mas o nome já a identifica |
-| **RF26** — Páginas públicas de apresentação | Desejável | Não | Apresentam o produto e a equipe; não fazem parte do ciclo |
-| **RF27** — Acesso com conta Google ou e-mail | Desejável | Não | Depende do banco de dados; sem ele, o acesso por seleção do grupo atende ao ciclo |
-| **RF28** — Convite para o grupo por link ou código | Desejável | Não | Depende do acesso com conta (RF27) |
-| **RF29** — Foto do grupo | Desejável | Não | As iniciais do nome já identificam o grupo |
-| **RF30** — Criar conteúdo a partir do formulário de atividade | Desejável | Não | Atalho: o conteúdo pode ser cadastrado antes, na tela de disciplinas |
+| **RF01**: Criar, selecionar e excluir grupos | Indispensável | Sim | É a porta de entrada. Sem grupo não existe nada mais |
+| **RF02**: Gerenciar membros | Indispensável | Sim | A atividade precisa de responsável para creditar experiência |
+| **RF13**: Gerenciar disciplinas | Indispensável | Sim | É a unidade em que o progresso é lido |
+| **RF14**: Gerenciar conteúdos | Indispensável | Sim | É onde o progresso é calculado; sem ele não há onde ancorar a atividade |
+| **RF03**: Cadastrar atividade com peso | Indispensável | Sim | O peso é o que transforma execução em medida |
+| **RF04**: Listar com busca, filtros e ordenação | Indispensável | Sim | Com poucas atividades seria dispensável; com um semestre inteiro, não |
+| **RF05**: Detalhe e alteração de status | Indispensável | Sim | É onde a conclusão acontece |
+| **RF06**: Painel com totais e atrasadas | Indispensável | Sim | Primeira tela da sessão; é ela que responde "como estamos" |
+| **RF10**: Progresso por conteúdo | Indispensável | Sim | O cálculo central do produto |
+| **RF11**: Progresso por disciplina | Indispensável | Sim | A leitura que o estudante procura |
+| **RF15**: Experiência por atividade concluída | Indispensável | Sim | Retorno imediato da conclusão. Sem ele, concluir não devolve nada ao estudante |
+| **RF09**: Encerrar sessão | Indispensável | Sim | Trocar de grupo exige sair do atual |
+| **RF19**: Avatar do membro | Indispensável | Sim | Já implementado. Identifica quem é quem nas listagens sem custo adicional |
+| **RF20**: Carregar dados de exemplo | Indispensável | Sim | Já implementado. É como alguém conhece o sistema sem cadastrar nada antes |
+| **RF08**: Tema claro e escuro | Indispensável | Sim | Já implementado e prototipado nos dois temas. Removê-lo do MVP custaria retrabalho para tirar algo que funciona |
+| **RF16**: Ofensiva de dias consecutivos | Desejável | Não | Precisa de histórico de vários dias para ter o que mostrar |
+| **RF17**: Conquistas por marcos | Desejável | Não | Depende de experiência e ofensiva já acumuladas |
+| **RF18**: Painel de desempenho do grupo | Desejável | Não | Comparação entre integrantes; depende de RF16 e RF17 |
+| **RF12**: Histórico de progresso ao longo do tempo | Desejável | Não | Só tem o que exibir depois de semanas de uso |
+| **RF07**: Sinalizar prazo em feriado | Desejável | Não | Conveniência; a data continua visível sem isso |
+| **RF21**: Relação dos próximos feriados | Desejável | Não | Mesma razão do RF07 |
+| **RF22**: Sinalizar prazo em fim de semana | Desejável | Não | Mesma razão do RF07 |
+| **RF23**: Calendário com as entregas nas cores das disciplinas | Desejável | Não | Outra forma de ver os prazos que a lista e o painel já mostram |
+| **RF24**: Foto de perfil do membro | Desejável | Não | O avatar sorteado (RF19) já identifica cada membro |
+| **RF25**: Paleta de cores das disciplinas | Desejável | Não | A cor ajuda a reconhecer a disciplina, mas o nome já a identifica |
+| **RF26**: Páginas públicas de apresentação | Desejável | Não | Apresentam o produto e a equipe; não fazem parte do ciclo |
+| **RF27**: Acesso com conta Google ou e-mail | Desejável | Não | Depende do banco de dados; sem ele, o acesso por seleção do grupo atende ao ciclo |
+| **RF28**: Convite para o grupo por link ou código | Desejável | Não | Depende do acesso com conta (RF27) |
+| **RF29**: Foto do grupo | Desejável | Não | As iniciais do nome já identificam o grupo |
+| **RF30**: Criar conteúdo a partir do formulário de atividade | Desejável | Não | Atalho: o conteúdo pode ser cadastrado antes, na tela de disciplinas |
 | Persistência em banco de dados | Desejável | Não | O modelo lógico já existe; a troca da camada de acesso para o PostgreSQL do Supabase está planejada para 27/11 |
 | Notificações por e-mail ou push | Futura | Não | Exige servidor, que esta versão não tem |
 | Exportação de relatórios | Futura | Não | Nenhum requisito do bimestre depende disso |
@@ -88,7 +88,7 @@ Entrar no grupo  →  Cadastrar disciplina  →  Cadastrar conteúdo
 
 ### Por que esse fluxo e não outro
 
-Ele atravessa as três camadas do domínio — estrutura, execução e medida — e termina onde o produto entrega o seu valor. Um fluxo que parasse em "cadastrar atividade" demonstraria um gerenciador de tarefas. É o passo seguinte, a barra se movendo, que demonstra o Vértice.
+Ele atravessa as três camadas do domínio (estrutura, execução e medida) e termina onde o produto entrega o seu valor. Um fluxo que parasse em "cadastrar atividade" demonstraria um gerenciador de tarefas. É o passo seguinte, a barra se movendo, que demonstra o Vértice.
 
 O momento decisivo é a conclusão. Ali, uma ação isolada do estudante vira três coisas ao mesmo tempo: progresso no conteúdo, progresso na disciplina e experiência acumulada. É a única tela em que se vê, junto, o que o sistema faz com o que a pessoa fez.
 
@@ -96,17 +96,17 @@ O momento decisivo é a conclusão. Ali, uma ação isolada do estudante vira tr
 
 ## Situação da construção
 
-As 24 tarefas do 1º bimestre no [backlog](12-backlog.md) estão concluídas. As 6 do caminho crítico — as que separavam um gerenciador de tarefas de um sistema que mede aprendizagem — foram executadas nesta ordem:
+As 24 tarefas do 1º bimestre no [backlog](12-backlog.md) estão concluídas. As 6 do caminho crítico (as que separavam um gerenciador de tarefas de um sistema que mede aprendizagem) foram executadas nesta ordem:
 
 | Tarefa | O que entrou |
 |---|---|
 | T06, T07 | Disciplina e conteúdo como cadastros próprios, com tela e formulário |
-| T13 | Vínculo obrigatório da atividade a um conteúdo (RN13) |
+| T13 | Vínculo obrigatório da atividade a um conteúdo (RN13); desde a revisão de 03/11, a atividade fica ligada direto à disciplina, e o conteúdo é opcional (T67) |
 | T12 | Campo peso, escala de 1 a 5, padrão 1 (RN09) |
 | T18, T19 | Progresso por conteúdo e por disciplina, por razão de pesos somados (RN08, RN14) |
 | T21 | Crédito e estorno de experiência, `peso × 10` (RN10) |
 
-As vinte regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
+As vinte e uma regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
 
 A **T24**, que estava parcial, foi absorvida pela nova identidade visual (T27), aplicada a todas as telas.
 
@@ -117,6 +117,8 @@ A troca de formato não podia apagar o que quem já usava o sistema tinha feito.
 A conversão cria uma disciplina para cada nome distinto que aparecia nas atividades, um conteúdo "Geral" dentro de cada uma para recebê-las, atribui peso 1 às que não tinham (RN09) e define o perfil dos membros (RN07). Roda uma vez só, controlada por um marcador de versão gravado junto com os dados.
 
 A revisão de 28/10 acrescentou um segundo passo: a atividade sem responsável passa para o organizador do grupo (RN06), e a cor de disciplina que saiu da paleta vira a equivalente (RN18). Atividade antiga cujo grupo não existe mais não é convertida nem apagada, e a pessoa é avisada uma vez.
+
+A revisão de 03/11 acrescentou o terceiro passo: cada atividade passa a guardar a sua disciplina (RN13); o conteúdo "Geral" criado automaticamente pelo primeiro passo sai, e as atividades dele ficam direto na disciplina; e o estilo de avatar que saiu da lista vira Rabisco (RN15). Nenhuma atividade é apagada.
 
 ## Recorte da entrega de 20/10/2026
 
@@ -138,25 +140,26 @@ Também estavam funcionando e testados: encerramento de sessão (RF09), tema cla
 
 ## Recorte da entrega de 06/11/2026
 
-Para 06/11 o manual pede o sistema parcialmente funcional, com fluxos integrados, regras de negócio e testes. O recorte desta entrega é **o sistema funcionando no navegador, com tudo o que não depende do banco de dados**: o fluxo do MVP, os requisitos desejáveis que ficaram de fora em 20/10, os pedidos da professora depois daquela entrega, a nova identidade visual e os ajustes de uso da revisão de 29/10. Ficam para 27/11 o banco de dados, o acesso com conta e o convite para o grupo, que dependem um do outro, e o histórico de progresso.
+Para 06/11 o manual pede o sistema parcialmente funcional, com fluxos integrados, regras de negócio e testes. O recorte desta entrega é **o sistema funcionando no navegador, com tudo o que não depende do banco de dados**: o fluxo do MVP, os requisitos desejáveis que ficaram de fora em 20/10, os pedidos da professora depois daquela entrega, a nova identidade visual e os ajustes de uso das revisões de 29/10, 01/11 e 03/11. Ficam para 27/11 o banco de dados, o acesso com conta e o convite para o grupo, que dependem um do outro, e o histórico de progresso.
 
 ### O que funciona e será demonstrado
 
 | Passo da demonstração | Requisitos e regras | Testes |
 |---|---|---|
-| Abrir a página inicial e a página Sobre nós | RF26 | CT33 |
+| Abrir a página inicial, com o movimento ao rolar e ao passar o mouse, a seção de feedback e a página Sobre nós | RF26, RF32 | CT33, CT54 e CT56 |
 | Criar o grupo, com foto: quem cria entra como organizador, e a marca do Vértice aparece enquanto o grupo abre | RF01, RF29, RN07, RN19 | CT01, CT02, CT40 e CT45 |
-| Cadastrar membros com foto de perfil, enquadrada no editor, ou com o avatar num dos cinco estilos | RF02, RF19, RF24, RN15, RN19 | CT03 a CT05, CT39 e CT47 |
-| Cadastrar disciplinas com a paleta de cores, e os conteúdos delas | RF13, RF14, RF25, RN13, RN18 | CT06 a CT08 |
-| Cadastrar atividades no formulário vazio, com o prazo no calendário do campo e o responsável obrigatório | RF03, RN04, RN06, RN09 | CT09, CT10 e CT44 |
+| Cadastrar membros com foto de perfil, enquadrada no editor, ou com o avatar num dos dois estilos | RF02, RF19, RF24, RN15, RN19 | CT03 a CT05, CT39 e CT47 |
+| Cadastrar disciplinas com a paleta de cores e, se o grupo quiser, os conteúdos delas | RF13, RF14, RF25, RN13, RN18 | CT06 a CT08 e CT49 |
+| Cadastrar atividades no formulário vazio, só com a disciplina ou também com o conteúdo, o prazo no calendário do campo e o responsável obrigatório | RF03, RN04, RN06, RN09, RN13 | CT09, CT10, CT44 e CT48 |
 | Criar o conteúdo sem sair do cadastro da atividade | RF30, RN07, RN13 | CT41 |
-| Concluir a atividade — só quem é responsável: progresso, experiência e conquista | RF05, RF10, RF11, RF15, RF17, RN08, RN10, RN12, RN14, RN20 | CT11, CT12 e CT42 |
-| Ver as entregas no calendário, nas cores das disciplinas, trocar de mês com a animação e criar uma atividade a partir de um dia | RF23 | CT15 a CT17 e CT43 |
+| Concluir a atividade (só quem é responsável): progresso, experiência e conquista | RF05, RF10, RF11, RF15, RF17, RN08, RN10, RN12, RN14, RN20 | CT11, CT12 e CT42 |
+| Cadastrar eventos do grupo (uma prova, uma palestra) e vê-los na página Eventos e no painel | RF31, RN21 | CT51 |
+| Ver as entregas e os eventos no calendário, nas cores das disciplinas, trocar de mês com a animação e criar uma atividade ou um evento a partir de um dia | RF23, RF31 | CT15 a CT17, CT43 e CT52 |
 | Ver o desempenho do grupo: experiência, ofensiva, conquistas e ranking | RF16, RF17, RF18, RN11 | CT18 |
 | Remover um membro escolhendo quem assume as atividades dele | RF02, RN02 | CT23 |
 | Filtrar a lista com a cor das disciplinas e a foto dos responsáveis, conferir o painel e os avisos de feriado e fim de semana | RF04, RF06, RF07, RF21, RF22 | CT13, CT14, CT29 e CT30 |
 
-Também estão funcionando e testados: a barra de seções no topo, que no celular vira um menu que desce (RNF01, CT34 e CT46), perfis de organizador e participante (RN07, CT20 a CT22), encerramento de sessão (RF09, CT24), tema claro e escuro em todas as telas, inclusive as públicas (RF08, CT25), exclusão em cascata de disciplina e de grupo (RN02, CT26 e CT38), edição e exclusão de atividade (RF03, CT37), comportamento sem serviços externos (RNF10, CT27), dados de exemplo (RF20, CT28), aviso de falha de gravação (RNF02, CT32), uso no celular (RNF01, CT34) e migração dos dados das versões anteriores (CT35 e CT36).
+Também estão funcionando e testados: a barra de seções no topo, que no celular vira um menu que desce (RNF01, CT34 e CT46), perfis de organizador e participante (RN07, CT20 a CT22), encerramento de sessão (RF09, CT24), tema claro e escuro em todas as telas, inclusive as públicas (RF08, CT25), exclusão em cascata de disciplina e de grupo (RN02, CT26 e CT38), edição e exclusão de atividade (RF03, CT37), comportamento sem serviços externos (RNF10, CT27), dados de exemplo (RF20, CT28), aviso de falha de gravação (RNF02, CT32), uso no celular (RNF01, CT34) migração dos dados das versões anteriores (CT35, CT36 e CT50), a tela de acesso em duas colunas (CT53) e os textos sem travessão (CT55).
 
 O sistema está publicado na Vercel, e o endereço está no [README](../README.md).
 

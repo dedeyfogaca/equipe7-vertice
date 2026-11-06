@@ -1,7 +1,7 @@
 # Telas e Navegação
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 01/11/2026
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
+> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 06/11/2026
 
 ---
 
@@ -9,7 +9,7 @@ Este documento reúne as telas do Vértice em dois momentos: as da **versão 2**
 
 ---
 
-## Versão 2 — entrega de 06/11/2026
+## Versão 2: entrega de 06/11/2026
 
 As telas abaixo são capturas do próprio sistema, carregado com os dados de exemplo. Em tamanho original, estão em [`telas-v2/`](telas-v2/): no tema escuro, que é o padrão, em [`telas-v2/claro/`](telas-v2/claro/) no tema claro e em [`telas-v2/celular/`](telas-v2/celular/) na tela de celular.
 
@@ -19,16 +19,19 @@ As telas abaixo são capturas do próprio sistema, carregado com os dados de exe
 |---|---|---|---|---|
 | RF26 | Apresentação do produto | Início | `/` | Qualquer visitante |
 | RF26 | História da equipe | Sobre nós | `/sobre` | Qualquer visitante |
-| RF01, RF20, RF29 | Escolher ou criar o grupo, com foto, e carregar os dados de exemplo | Acesso | `/entrar` | Qualquer estudante |
+| RF32 | Feedback dos usuários de teste | Início, seção Feedback | `/#feedback` | Qualquer visitante |
+| RF01, RF20, RF29 | Escolher um grupo existente, numa coluna, ou criar um, com foto, na outra, e carregar os dados de exemplo | Acesso | `/entrar` | Qualquer estudante |
 | RF01, RN07 | Dizer quem é dentro do grupo | Quem é você | `/entrar` | Qualquer estudante |
 | RF06, RF16, RF21 | Painel do grupo | Painel | `/painel` | Ambos |
-| RF07, RF23 | Calendário das entregas | Calendário | `/calendario` | Ambos |
+| RF07, RF23, RF31 | Calendário das entregas e dos eventos | Calendário | `/calendario` | Ambos |
+| RF31 | Eventos do grupo, próximos e passados | Eventos | `/eventos` | Ambos cadastram; quem cadastrou e o organizador editam |
+| RF31 | Cadastro e edição de evento | Novo evento | janela, em Eventos e no Calendário | Ambos |
 | RF13, RF25 | Disciplinas e paleta de cores | Disciplinas | `/disciplinas` | Organizador gerencia; participante consulta |
-| RF10, RF14 | Conteúdos e progresso | Disciplina | `/disciplina/:id` | Organizador gerencia; participante consulta |
+| RF10, RF14 | Atividades, conteúdos (opcionais) e progresso | Disciplina | `/disciplina/:id` | Organizador gerencia; participante consulta |
 | RF04 | Lista com busca e filtros | Atividades | `/atividades` | Ambos |
 | RF03, RF07, RF22, RF30 | Cadastro e edição de atividade, com o calendário do prazo | Nova atividade | `/atividade/nova` | Ambos |
 | RF05, RF15, RF17 | Detalhe e conclusão | Detalhe da atividade | `/atividade/:id` | Ambos |
-| RF02, RF19, RF24 | Membros, foto de perfil e avatar em cinco estilos | Membros | `/membros` | Organizador gerencia; participante edita o próprio perfil |
+| RF02, RF19, RF24 | Membros, foto de perfil e avatar em dois estilos | Membros | `/membros` | Organizador gerencia; participante edita o próprio perfil |
 | RF16, RF17, RF18 | Experiência, ofensiva, conquistas e ranking | Conquistas | `/conquistas` | Ambos |
 | RF24, RF29 | Enquadrar a foto de perfil ou do grupo | Ajustar foto | janela, em Membros e no Acesso | Ambos |
 | RF01, RF29 | Nome, descrição e foto do grupo | Editar grupo | janela, no seletor de grupo | Organizador |
@@ -40,7 +43,7 @@ As telas abaixo são capturas do próprio sistema, carregado com os dados de exe
 
 > Desenho-fonte: [`../diagramas/svg/mapa-navegacao-v2.svg`](../diagramas/svg/mapa-navegacao-v2.svg)
 
-As páginas públicas levam ao acesso, e o acesso leva ao Painel. Dentro da sessão, a barra do topo liga o Painel às cinco seções, e cada seção abre as telas que dependem dela. A linha violeta de volta ao Painel é a mesma do mapa do MVP: concluir uma atividade muda o progresso, a experiência, a ofensiva e as conquistas que o Painel mostra.
+As páginas públicas levam ao acesso, e o acesso leva ao Painel. Dentro da sessão, a barra do topo liga o Painel às outras seis seções, e cada seção abre as telas que dependem dela. A linha violeta de volta ao Painel é a mesma do mapa do MVP: concluir uma atividade muda o progresso, a experiência, a ofensiva e as conquistas que o Painel mostra.
 
 ### As telas
 
@@ -48,7 +51,11 @@ As páginas públicas levam ao acesso, e o acesso leva ao Painel. Dentro da sess
 
 ![Página inicial](telas-v2/inicio.png)
 
-A página de apresentação: o que o Vértice mede, como funciona e o acesso. Os cartões mostram o produto em uso, e o botão do topo troca o tema.
+A página de apresentação: o que o Vértice mede, como funciona e o acesso. O topo entra animado, a prévia do sistema acompanha o mouse, os blocos aparecem ao rolar, e cada recurso demonstra o que faz quando o mouse passa por cima (no celular, quando aparece na tela). Quem pede menos movimento no sistema vê tudo parado. O botão do topo troca o tema.
+
+![Seção de feedback na página inicial](telas-v2/feedback.png)
+
+Perto do fim, a seção de feedback convida quem testou a responder um formulário anônimo, com as três perguntas que importam. O mesmo formulário abre pelo rodapé e pelo menu da conta, dentro do sistema (RF32).
 
 #### Sobre nós
 
@@ -60,7 +67,7 @@ A história da equipe, com os avatares em pixel art feitos pelo Andrey.
 
 ![Tela de acesso](telas-v2/acesso.png)
 
-Sem grupos no dispositivo, a tela oferece criar o primeiro: quem cria informa o próprio nome e entra como organizador. A foto do grupo é opcional; sem ela, o grupo aparece com as iniciais do nome. Os dados de exemplo ficam a um clique.
+Duas colunas: à esquerda, os grupos que já existem neste navegador e os dados de exemplo, a um clique; à direita, a criação de um grupo novo, em que quem cria informa o próprio nome e entra como organizador. A foto do grupo é opcional; sem ela, o grupo aparece com as iniciais do nome. No celular, os grupos vêm primeiro e a criação embaixo.
 
 #### Quem é você
 
@@ -72,31 +79,41 @@ Num grupo com membros, a pessoa escolhe quem é. É essa escolha que decide o qu
 
 ![A marca do Vértice no centro da tela, com o nome do grupo e o fio de progresso, enquanto o grupo abre](telas-v2/abrindo.png)
 
-Depois da escolha, a tela escurece e a marca do Vértice aparece no centro, com o nome do grupo e um fio de progresso. A marca dá um terço de volta — o desenho tem três pontas, então para exatamente como começou — enquanto o fio se completa, e a tela se dissolve no painel. A passagem inteira leva pouco mais de um segundo: o bastante para perceber que o grupo abriu, sem fazer ninguém esperar. Fora daqui, a marca só dá uma volta rápida quando o mouse passa por cima dela; quem pede menos movimento no sistema vê só um esmaecer curto.
+Depois da escolha, a tela escurece e a marca do Vértice aparece no centro, com o nome do grupo e um fio de progresso. A marca dá um terço de volta (o desenho tem três pontas, então para exatamente como começou) enquanto o fio se completa, e a tela se dissolve no painel. A passagem inteira leva pouco mais de um segundo: o bastante para perceber que o grupo abriu, sem fazer ninguém esperar. Fora daqui, a marca só dá uma volta rápida quando o mouse passa por cima dela; quem pede menos movimento no sistema vê só um esmaecer curto.
 
 #### Painel
 
 ![Painel](telas-v2/painel.png)
 
-No topo, a barra do sistema: a marca, o grupo, as seis seções, o tema e a conta de quem está usando. Embaixo, a saudação, as quatro situações como filtro, o aviso de entrega em feriado, as próximas entregas, o progresso por disciplina, o ritmo de quem está usando e os próximos feriados.
+No topo, a barra do sistema: a marca, o grupo, as sete seções, o tema e a conta de quem está usando. Embaixo, a saudação, as quatro situações como filtro, o aviso de entrega em feriado, as próximas entregas, os próximos eventos, o progresso por disciplina, o ritmo de quem está usando e os próximos feriados.
 
 #### Calendário
 
 ![Calendário](telas-v2/calendario.png)
 
-O mês com as entregas nas cores das disciplinas, o filtro por disciplina e o painel do dia escolhido, com o atalho para criar uma atividade nele. As visões de semana e de lista ficam no topo.
+O mês com as entregas nas cores das disciplinas e os eventos do grupo, o filtro por disciplina e por eventos, e o painel do dia escolhido, com os atalhos para criar uma atividade ou um evento nele. As visões de semana e de lista ficam no topo.
+
+#### Eventos
+
+![Página de eventos](telas-v2/eventos.png)
+
+Provas, apresentações, palestras e reuniões do grupo, separadas em próximos e passados e agrupadas por mês. Cada cartão mostra o dia, o horário, o local, a disciplina e quanto falta; se o dia é feriado, o cartão avisa. Quem cadastrou o evento, e o organizador, tem o menu para editar e excluir (RN21).
+
+![Janela de novo evento](telas-v2/novo-evento.png)
+
+Nome, tipo e dia são obrigatórios. Sem horário, o evento vale o dia todo; o fim precisa ser depois do início. A disciplina é opcional e dá a cor do evento no calendário.
 
 #### Disciplinas
 
 ![Disciplinas](telas-v2/disciplinas.png)
 
-Cada disciplina com a sua cor da paleta, o progresso e os conteúdos.
+Cada disciplina com a sua cor da paleta, o progresso e, quando o grupo usa, os conteúdos.
 
 #### Disciplina
 
 ![Conteúdos de uma disciplina](telas-v2/disciplina.png)
 
-Os conteúdos em ordem, com o progresso de cada um e as atividades que o compõem.
+As atividades da disciplina e, quando houver, os conteúdos em ordem, com o progresso de cada um. Atividades sem conteúdo aparecem na própria disciplina, e excluir um conteúdo não apaga as atividades dele.
 
 #### Atividades
 
@@ -112,7 +129,7 @@ Os filtros seguem a identidade do sistema: cada disciplina aparece com a sua cor
 
 ![Formulário de nova atividade](telas-v2/nova-atividade.png)
 
-O formulário começa vazio e cobra só o que é obrigatório: título, conteúdo, prazo e responsável. O peso tem cinco níveis, o prazo mostra o aviso de feriado, e o status só abre quando o responsável é quem está cadastrando (RN20).
+O formulário começa vazio e cobra só o que é obrigatório: título, disciplina, prazo e responsável. O conteúdo é opcional e começa em "Sem conteúdo". O peso tem cinco níveis, o prazo mostra o aviso de feriado, e o status só abre quando o responsável é quem está cadastrando (RN20).
 
 ![Calendário do campo de prazo](telas-v2/campo-data.png)
 
@@ -120,13 +137,13 @@ O prazo é escolhido num calendário com a identidade do sistema, que marca hoje
 
 ![Janela de novo conteúdo, aberta pelo formulário de atividade](telas-v2/novo-conteudo.png)
 
-Se o conteúdo ainda não existe, o organizador escolhe "Criar novo conteúdo" no fim da lista. A janela já vem na disciplina escolhida; ao cadastrar, o conteúdo fica selecionado, e nada do que foi preenchido se perde (RF30).
+Para separar a atividade num conteúdo que ainda não existe, o organizador escolhe "Criar novo conteúdo" no fim da lista. A janela já vem na disciplina escolhida; ao cadastrar, o conteúdo fica selecionado, e nada do que foi preenchido se perde (RF30).
 
 #### Detalhe e conclusão
 
 ![Detalhe da atividade logo depois de concluída](telas-v2/detalhe.png)
 
-Logo depois de concluir: o progresso do conteúdo antes e depois, a experiência creditada e o aviso da conquista obtida.
+Logo depois de concluir: o progresso do conteúdo (ou da disciplina, se a atividade não tiver conteúdo) antes e depois, a experiência creditada e o aviso da conquista obtida.
 
 #### Membros
 
@@ -136,9 +153,9 @@ Cada membro com foto ou avatar, perfil, experiência, atividades e ofensiva. A e
 
 ![Editor de foto](telas-v2/editor-foto.png)
 
-![Formulário de membro com os cinco estilos de avatar](telas-v2/membro-avatar.png)
+![Formulário de membro com os dois estilos de avatar](telas-v2/membro-avatar.png)
 
-Sem foto, vale o avatar: os cinco estilos aparecem lado a lado com a mesma semente, e "Sortear outro" troca o desenho. O avatar é desenhado pelo próprio sistema, então aparece mesmo sem internet (RF19, RN15).
+Sem foto, vale o avatar: os dois estilos, Rabisco e Ilustrado, aparecem lado a lado com a mesma semente, e "Sortear outro" troca o desenho. O avatar é desenhado pelo próprio sistema, então aparece mesmo sem internet (RF19, RN15).
 
 Ao escolher uma foto, abre o editor: arrastar posiciona a foto, o zoom vai até 4 vezes, e o sistema grava só o que está dentro da moldura, reduzido a 256 × 256 (RN19). Pelo teclado, as setas movem a foto e + e − mudam o zoom.
 
@@ -161,13 +178,13 @@ Os números de quem está usando, as seis conquistas com o andamento das que fal
 | ![Painel no tema escuro](telas-v2/painel.png) | ![Painel no tema claro](telas-v2/claro/painel.png) |
 | ![Início no tema escuro](telas-v2/inicio.png) | ![Início no tema claro](telas-v2/claro/inicio.png) |
 
-A escolha do tema vale para todas as telas — as do sistema, as páginas públicas e a de acesso — e fica gravada no navegador (RF08). Os dois temas saem dos mesmos tokens de cor, definidos em `src/index.css`.
+A escolha do tema vale para todas as telas (as do sistema, as páginas públicas e a de acesso) e fica gravada no navegador (RF08). Os dois temas saem dos mesmos tokens de cor, definidos em `src/index.css`.
 
 ### No celular
 
-| Início | Painel | Menu | Calendário |
-|---|---|---|---|
-| ![Início no celular](telas-v2/celular/inicio.png) | ![Painel no celular](telas-v2/celular/painel.png) | ![Menu no celular](telas-v2/celular/menu.png) | ![Calendário no celular](telas-v2/celular/calendario.png) |
+| Início | Painel | Menu | Calendário | Eventos |
+|---|---|---|---|---|
+| ![Início no celular](telas-v2/celular/inicio.png) | ![Painel no celular](telas-v2/celular/painel.png) | ![Menu no celular](telas-v2/celular/menu.png) | ![Calendário no celular](telas-v2/celular/calendario.png) | ![Eventos no celular](telas-v2/celular/eventos.png) |
 
 Na tela de celular, a barra do topo vira um menu que desce do topo, e os filtros da lista de atividades ficam recolhidos. No calendário, deslizar o dedo troca de mês. Nenhuma tela rola para os lados (RNF01).
 
@@ -197,7 +214,7 @@ Na tela de celular, a barra do topo vira um menu que desce do topo, e os filtros
 
 ---
 
-## Protótipo do MVP — Entrega 3
+## Protótipo do MVP: Entrega 3
 
 As oito telas abaixo são exatamente as necessárias para executar o [fluxo completo do MVP](../docs/14-mvp.md). Nenhuma tela de funcionalidade desejável foi prototipada: o protótipo mostra a primeira versão, não o sistema inteiro.
 
@@ -224,7 +241,7 @@ As oito telas abaixo são exatamente as necessárias para executar o [fluxo comp
 
 > Desenho-fonte: [`../diagramas/svg/mapa-navegacao.svg`](../diagramas/svg/mapa-navegacao.svg)
 
-O mapa tem duas regiões. Fora da sessão só existem duas telas, e nenhuma delas pede senha: o acesso é a escolha do grupo. Dentro da sessão, o Painel é a porta de entrada e a barra lateral liga qualquer tela a qualquer outra — a árvore do desenho mostra o caminho natural, não o único.
+O mapa tem duas regiões. Fora da sessão só existem duas telas, e nenhuma delas pede senha: o acesso é a escolha do grupo. Dentro da sessão, o Painel é a porta de entrada e a barra lateral liga qualquer tela a qualquer outra; a árvore do desenho mostra o caminho natural, não o único.
 
 A linha violeta de volta ao Painel é o que fecha o ciclo do produto: concluir uma atividade altera o progresso que o Painel exibe. É por isso que ela existe no mapa, mesmo não sendo um clique do usuário.
 
@@ -294,7 +311,7 @@ O RF08 está no MVP e o protótipo demonstra os dois temas. O botão fica no rod
 
 As duas versões saem dos **mesmos tokens**. Não há folha de estilo duplicada: o tema escuro só redefine as variáveis de cor, e todo componente acompanha. É por isso que trocar o tema não exige revisar tela por tela.
 
-A gamificação muda de `#7C3AED` para `#A78BFA` — é a mesma cor, clareada para manter o contraste sobre o fundo escuro. O mesmo vale para o ciano, que sobe de `#0891B2` para `#22D3EE`.
+A gamificação muda de `#7C3AED` para `#A78BFA`: é a mesma cor, clareada para manter o contraste sobre o fundo escuro. O mesmo vale para o ciano, que sobe de `#0891B2` para `#22D3EE`.
 
 Todas as oito telas estão nos dois temas em [`telas/`](telas/) e [`telas/escuro/`](telas/escuro/).
 

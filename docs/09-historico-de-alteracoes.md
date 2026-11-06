@@ -1,11 +1,11 @@
 # 09 · Histórico de Alterações
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 29/10/2026
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 06/11/2026
 
 ---
 
-Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, e a de 29/10/2026, com os ajustes que a equipe pediu ao revisar a versão 2. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
+Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, as de 29/10 e 01/11/2026, com os ajustes que a equipe pediu ao revisar a versão 2, e a de 03/11/2026, com os pedidos da equipe para a entrega de 06/11. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
 
 ---
 
@@ -21,10 +21,10 @@ Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do
 
 | Data | Item | Alteração | Motivo |
 |---|---|---|---|
-| 27/08/2026 | Doc. 05 — Escopo | "Sistema de conquistas e gamificação" saiu de *Não incluído* e passou a integrar o escopo da primeira versão | Orientação da professora, que solicitou barra de progresso das atividades e métricas de conquistas |
-| 27/08/2026 | Doc. 05 — Escopo | Incluídos o cadastro de disciplinas e o cadastro de conteúdos como funcionalidades próprias | Progresso por conteúdo e por disciplina (RF10 e RF11) exige que ambos existam como cadastros, e não como texto livre dentro da atividade |
-| 27/08/2026 | Doc. 05 — Escopo | Incluído "Ranking competitivo entre grupos ou entre instituições" em *Não incluído* | Delimitar a gamificação ao acompanhamento individual, evitando ampliação do escopo |
-| 27/08/2026 | Doc. 05 — Restrições | Restrição de persistência passou a citar que a estrutura no navegador segue o modelo lógico do banco de dados | Manter coerência entre a Entrega 2 (modelagem de dados) e a implementação prevista |
+| 27/08/2026 | Doc. 05: Escopo | "Sistema de conquistas e gamificação" saiu de *Não incluído* e passou a integrar o escopo da primeira versão | Orientação da professora, que solicitou barra de progresso das atividades e métricas de conquistas |
+| 27/08/2026 | Doc. 05: Escopo | Incluídos o cadastro de disciplinas e o cadastro de conteúdos como funcionalidades próprias | Progresso por conteúdo e por disciplina (RF10 e RF11) exige que ambos existam como cadastros, e não como texto livre dentro da atividade |
+| 27/08/2026 | Doc. 05: Escopo | Incluído "Ranking competitivo entre grupos ou entre instituições" em *Não incluído* | Delimitar a gamificação ao acompanhamento individual, evitando ampliação do escopo |
+| 27/08/2026 | Doc. 05: Restrições | Restrição de persistência passou a citar que a estrutura no navegador segue o modelo lógico do banco de dados | Manter coerência entre a Entrega 2 (modelagem de dados) e a implementação prevista |
 
 ---
 
@@ -63,7 +63,7 @@ Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do
 
 ---
 
-## Revisão de 17/09/2026 — conferência com o código implementado
+## Revisão de 17/09/2026: conferência com o código implementado
 
 O código da aplicação foi percorrido tela a tela e confrontado com os requisitos. A conferência encontrou funcionalidades já implementadas que a documentação não previa e uma descrição incorreta de comportamento. Os requisitos e regras existentes não foram renumerados; os novos foram acrescentados ao final de cada tabela.
 
@@ -76,8 +76,8 @@ O código da aplicação foi percorrido tela a tela e confrontado com os requisi
 | 17/09/2026 | RF22 | Requisito novo: sinalização de prazo em fim de semana | Aviso já exibido em três telas, sem requisito correspondente |
 | 17/09/2026 | RNF10 | Requisito novo: permanecer utilizável com serviço externo fora do ar | Os três serviços externos já tinham alternativa local implementada, sem requisito que a exigisse |
 | 17/09/2026 | RN15 a RN17 | Regras novas: semente e reserva do avatar, classificação de urgência do prazo e cadeia de obtenção dos feriados | Dar regra explícita a comportamentos que estavam apenas no código |
-| 17/09/2026 | Doc. 05 — Restrições | A restrição de integração passou a citar os três serviços externos e a origem da tipografia, no lugar de citar apenas a BrasilAPI | A documentação registrava uma dependência externa; existem quatro |
-| 17/09/2026 | Doc. 10 — UC08, fluxo 4A | **Correção.** O fluxo descrevia a cadeia BrasilAPI → cache. A cadeia real é BrasilAPI → Nager.Date → reaproveitamento da última relação obtida | A fonte reserva existia no código desde a Entrega 1 e nunca foi documentada; o fluxo alternativo descrevia comportamento que o sistema não tem |
+| 17/09/2026 | Doc. 05: Restrições | A restrição de integração passou a citar os três serviços externos e a origem da tipografia, no lugar de citar apenas a BrasilAPI | A documentação registrava uma dependência externa; existem quatro |
+| 17/09/2026 | Doc. 10: UC08, fluxo 4A | **Correção.** O fluxo descrevia a cadeia BrasilAPI → cache. A cadeia real é BrasilAPI → Nager.Date → reaproveitamento da última relação obtida | A fonte reserva existia no código desde a Entrega 1 e nunca foi documentada; o fluxo alternativo descrevia comportamento que o sistema não tem |
 | 17/09/2026 | Doc. 10 | Especificados os casos de uso UC02 e UC12, que antes não tinham especificação | O UC02 passou a ter ator secundário e fluxo alternativo próprios; o UC12 é caso de uso novo |
 | 17/09/2026 | Diagrama de casos de uso | Acrescentados o UC12 e os atores secundários DiceBear e Nager.Date | Todo serviço externo consumido passa a estar representado no diagrama |
 | 17/09/2026 | Doc. 11 | Refeita a verificação cruzada, que afirmava não haver tela com funcionalidade sem requisito | A afirmação havia deixado de ser verdadeira |
@@ -97,7 +97,7 @@ Itens identificados na conferência que dependem de alteração no código, e n�
 
 ---
 
-## Entrega 3 — 25/09/2026
+## Entrega 3: 25/09/2026
 
 A terceira entrega não altera requisitos: acrescenta o planejamento do trabalho, a arquitetura, os protótipos e a definição do MVP. As correções abaixo são de coerência, não de escopo.
 
@@ -129,42 +129,42 @@ A conferência das telas apontou problemas de interface que não alteram requisi
 
 ---
 
-## Construção do MVP — 21/09/2026
+## Construção do MVP: 21/09/2026
 
 Rodada de implementação que levou o sistema do estado da Entrega 3 ao MVP construído. Nenhum requisito, regra ou caso de uso foi alterado: o que mudou foi o código passar a fazer o que os documentos já descreviam.
 
 | Item | Alteração | Motivo |
 |---|---|---|
-| Doc. 12 — Backlog | 13 tarefas passaram de *A fazer* e *Em andamento* para *Concluída*, restando a T24 em andamento | Execução do caminho crítico T06 → T07 → T13 → T12 → T18 → T21 e das tarefas paralelas |
-| Doc. 12 — Situação geral | Tabela corrigida de 9/3/12 para a contagem real das linhas, e depois atualizada para 23/1/— | A tabela resumo divergia das linhas da tabela de tarefas desde a Entrega 3 |
-| Doc. 14 — MVP | A seção "O que falta construir" passou a "Situação da construção", com o que entrou em cada tarefa do caminho crítico e o registro da migração de dados | O documento descrevia um estado que deixou de valer |
+| Doc. 12: Backlog | 13 tarefas passaram de *A fazer* e *Em andamento* para *Concluída*, restando a T24 em andamento | Execução do caminho crítico T06 → T07 → T13 → T12 → T18 → T21 e das tarefas paralelas |
+| Doc. 12: Situação geral | Tabela corrigida de 9/3/12 para a contagem real das linhas, e depois atualizada para 23/1/0 | A tabela resumo divergia das linhas da tabela de tarefas desde a Entrega 3 |
+| Doc. 14: MVP | A seção "O que falta construir" passou a "Situação da construção", com o que entrou em cada tarefa do caminho crítico e o registro da migração de dados | O documento descrevia um estado que deixou de valer |
 | Pasta `src/` | Deixou de estar vazia: recebeu o código-fonte da aplicação | A pasta existia como reserva desde a Entrega 2 |
 
-Quinze das dezessete regras de negócio ficaram implementadas. As duas de fora, RN11 (ofensiva) e RN12 (conquistas), pertencem a requisitos classificados como desejáveis e não entraram no MVP — sem bloquear caminho, já que a data de conclusão da atividade passou a ser gravada.
+Quinze das dezessete regras de negócio ficaram implementadas. As duas de fora, RN11 (ofensiva) e RN12 (conquistas), pertencem a requisitos classificados como desejáveis e não entraram no MVP, sem bloquear caminho, já que a data de conclusão da atividade passou a ser gravada.
 
 Os dados gravados no navegador por quem já usava o sistema foram convertidos ao formato novo, e não descartados: a disciplina que era texto livre dentro da atividade virou cadastro próprio, com um conteúdo "Geral" recebendo as atividades existentes.
 
 ---
 
-## 2º bimestre — revisão de 19/10/2026
+## 2º bimestre: revisão de 19/10/2026
 
 A equipe releu problema, objetivos, perfis, escopo, requisitos, regras, casos de uso, protótipos e modelo de dados, e comparou tudo com o código entregue. **Nenhum requisito, regra ou caso de uso foi removido ou renumerado.** A proposta continua coerente e a base do 1º bimestre foi mantida; as mudanças abaixo são correções de coerência e os registros novos que o 2º bimestre exige.
 
 | Data | Item | Alteração e motivo | Impacto |
 |---|---|---|---|
-| 19/10/2026 | Doc. 13 — Arquitetura | A tipografia citada era Space Grotesk e Space Mono; o sistema usa Manrope e JetBrains Mono desde a revisão visual. A arquitetura passou de "prevista" a confirmada, ganhou a seção de ambiente e a organização das pastas | Atualizar documento e README |
+| 19/10/2026 | Doc. 13: Arquitetura | A tipografia citada era Space Grotesk e Space Mono; o sistema usa Manrope e JetBrains Mono desde a revisão visual. A arquitetura passou de "prevista" a confirmada, ganhou a seção de ambiente e a organização das pastas | Atualizar documento e README |
 | 19/10/2026 | Diagrama de arquitetura | Título mudou de "Arquitetura prevista" para "Arquitetura do Vértice". O MySQL saiu do desenho, porque o projeto não o usa nesta versão; continua citado no texto como evolução futura | Atualizar SVG e PNG |
 | 19/10/2026 | README | Tecnologias passaram de "previstas" a usadas, com a tipografia corrigida; entraram versões do ambiente, `npm run verificar`, funcionalidades disponíveis, pendências, o índice da entrega e o GitHub do Matheus | Atualizar README |
-| 19/10/2026 | Doc. 14 — MVP | Seção nova com o recorte da entrega de 20/10, o que fica para 06/11 e o que está em desenvolvimento | Orienta a demonstração |
-| 19/10/2026 | Doc. 12 — Backlog | Acrescentada a coluna de prazo; tarefas T25 a T36 do 2º bimestre; critérios de conclusão das prioritárias; forma de integrar as contribuições | Planejamento até 27/11 |
-| 19/10/2026 | Doc. 11 — Matriz | Seção nova ligando cada requisito ao arquivo que o implementa, ao caso de teste e ao estado atual | Rastreabilidade até o código |
-| 19/10/2026 | Doc. 15 — Casos de teste | Documento novo: 29 casos executados sobre o commit `c29279b`, com evidências | Exigência do Passo 7 do manual |
-| 19/10/2026 | Doc. 16 — Defeitos e pendências | Documento novo: 7 defeitos encontrados nos testes (D01 a D07) e as pendências até 27/11 | Gera as tarefas T28, T29, T33 e T36 |
+| 19/10/2026 | Doc. 14: MVP | Seção nova com o recorte da entrega de 20/10, o que fica para 06/11 e o que está em desenvolvimento | Orienta a demonstração |
+| 19/10/2026 | Doc. 12: Backlog | Acrescentada a coluna de prazo; tarefas T25 a T36 do 2º bimestre; critérios de conclusão das prioritárias; forma de integrar as contribuições | Planejamento até 27/11 |
+| 19/10/2026 | Doc. 11: Matriz | Seção nova ligando cada requisito ao arquivo que o implementa, ao caso de teste e ao estado atual | Rastreabilidade até o código |
+| 19/10/2026 | Doc. 15: Casos de teste | Documento novo: 29 casos executados sobre o commit `c29279b`, com evidências | Exigência do Passo 7 do manual |
+| 19/10/2026 | Doc. 16: Defeitos e pendências | Documento novo: 7 defeitos encontrados nos testes (D01 a D07) e as pendências até 27/11 | Gera as tarefas T28, T29, T33 e T36 |
 | 19/10/2026 | Identidade visual | Decidido refazer o visual do Vértice para a entrega de 06/11 (T27), absorvendo a T24 | Atualizar protótipos e capturas na próxima entrega |
 
 ---
 
-## 2º bimestre — revisão de 28/10/2026
+## 2º bimestre: revisão de 28/10/2026
 
 Depois da entrega de 20/10, a professora pediu que toda atividade tivesse um responsável, um calendário com as entregas nas cores das disciplinas, mais cores para as disciplinas, um visual mais profissional mantendo as cores atuais, foto de perfil no cadastro, banco de dados, hospedagem e login com conta Google. A equipe incluiu esses pedidos no escopo e revisou os documentos afetados. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
 
@@ -179,15 +179,15 @@ Depois da entrega de 20/10, a professora pediu que toda atividade tivesse um res
 | 28/10/2026 | RF26 | Requisito novo: páginas públicas de apresentação, com a página inicial e a página Sobre nós | UC01, protótipos e mapa de navegação |
 | 28/10/2026 | RF27, RF28 | Requisitos novos: acesso com conta Google ou e-mail e convite para o grupo por link ou código, a pedido da professora por banco de dados e login com Google | Planejados para 27/11 (T46 a T49) |
 | 28/10/2026 | RN11 | Redação completada: o dia atual fica em aberto até terminar. Descreve o comportamento implementado, em que a ofensiva não zera de manhã só porque ainda não houve conclusão no dia | Regra |
-| 28/10/2026 | Doc. 05 — Escopo e restrições | Entraram foto de perfil, paleta, calendário, páginas públicas, acesso com conta e convite; o acesso por senha saiu de "não incluído"; as restrições ganharam os prazos do 2º bimestre, o banco e a hospedagem, e o Google Fonts deixou de ser dependência | Escopo |
-| 28/10/2026 | Doc. 13 — Arquitetura | O estilo passou de Styled Components para Tailwind CSS e Radix UI, na nova identidade visual; a tipografia passou a Inter Tight e JetBrains Mono, servidas junto com o sistema; a hospedagem passou a ser a Vercel; o banco escolhido para 27/11 é o PostgreSQL do Supabase; Vite e React Router foram atualizados para eliminar as vulnerabilidades apontadas pelo `npm audit` | Diagrama de arquitetura e README |
+| 28/10/2026 | Doc. 05: Escopo e restrições | Entraram foto de perfil, paleta, calendário, páginas públicas, acesso com conta e convite; o acesso por senha saiu de "não incluído"; as restrições ganharam os prazos do 2º bimestre, o banco e a hospedagem, e o Google Fonts deixou de ser dependência | Escopo |
+| 28/10/2026 | Doc. 13: Arquitetura | O estilo passou de Styled Components para Tailwind CSS e Radix UI, na nova identidade visual; a tipografia passou a Inter Tight e JetBrains Mono, servidas junto com o sistema; a hospedagem passou a ser a Vercel; o banco escolhido para 27/11 é o PostgreSQL do Supabase; Vite e React Router foram atualizados para eliminar as vulnerabilidades apontadas pelo `npm audit` | Diagrama de arquitetura e README |
 | 28/10/2026 | Diagramas e modelo de dados | Diagrama de casos de uso com o UC13; classes e modelos com `membro.foto` e o responsável obrigatório; fluxos de atividade sem a decisão "a atividade tem responsável?"; script de criação com as restrições novas | Imagens regeneradas |
-| 28/10/2026 | Protótipos | Acrescentadas as telas da versão 2 e o mapa de navegação com as telas novas | — |
+| 28/10/2026 | Protótipos | Acrescentadas as telas da versão 2 e o mapa de navegação com as telas novas | Nenhum |
 | 28/10/2026 | Docs. 11, 12, 14, 15 e 16 | Matriz, backlog, recorte, casos de teste e defeitos da entrega de 06/11 | Exigência do manual |
 
 ---
 
-## 2º bimestre — revisão de 29/10/2026
+## 2º bimestre: revisão de 29/10/2026
 
 Ao revisar a versão 2, a equipe pediu ajustes de uso: o tema claro também nas páginas públicas, listas de escolha e campo de data com a identidade visual, um editor para enquadrar a foto, foto do grupo, criar o conteúdo sem sair do cadastro de atividade, o formulário de atividade sem valores pré-escolhidos, animação no calendário, a exclusão do grupo no pé da tela de Membros e cada pessoa concluindo só as próprias atividades. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
 
@@ -198,7 +198,7 @@ Ao revisar a versão 2, a equipe pediu ajustes de uso: o tema claro também nas 
 | 29/10/2026 | RF01, RF29, RN19 | Requisito novo: foto do grupo, na criação ou em "Editar grupo"; sem foto, ficam as iniciais. A RN19 passou a valer também para ela | UC01, classes, modelo de dados (`grupo.foto`) e testes (CT40) |
 | 29/10/2026 | RF24, RN19 | A foto de perfil passa por um editor em que a pessoa arrasta e dá zoom antes de salvar, no lugar do recorte automático do centro | UC02 e testes (CT04 e CT39) |
 | 29/10/2026 | RF30 | Requisito novo: criar o conteúdo a partir do formulário de atividade, sem perder o que já foi preenchido | UC05, fluxo "cadastrar atividade" e testes (CT41) |
-| 29/10/2026 | RF03 | O formulário de atividade começa vazio — antes, responsável, status e peso vinham escolhidos — e o prazo é escolhido no calendário do próprio sistema. O que fica em branco assume o padrão das RN04 e RN09 | UC05 e testes (CT09, CT10 e CT44) |
+| 29/10/2026 | RF03 | O formulário de atividade começa vazio (antes, responsável, status e peso vinham escolhidos) e o prazo é escolhido no calendário do próprio sistema. O que fica em branco assume o padrão das RN04 e RN09 | UC05 e testes (CT09, CT10 e CT44) |
 | 29/10/2026 | RF04 | Os filtros mostram a cor da disciplina, a foto do responsável e o símbolo de cada ordem | Testes (CT13) |
 | 29/10/2026 | RF08 | O tema claro passou a valer também nas páginas públicas, que antes eram sempre escuras | Testes (CT25) |
 | 29/10/2026 | RF23 | A troca de mês e de semana do calendário ganhou transição animada, também pelo gesto de deslizar no celular, respeitando quem pede menos movimento no sistema | UC13 e testes (CT43) |
@@ -209,18 +209,38 @@ Ao revisar a versão 2, a equipe pediu ajustes de uso: o tema claro também nas 
 
 ---
 
-## 2º bimestre — revisão de 01/11/2026
+## 2º bimestre: revisão de 01/11/2026
 
 Na revisão seguinte, a equipe pediu a marca nova do Vértice, as seções no topo da tela, avatares que funcionem em qualquer lugar e com estilos para escolher, e as fotos dos integrantes sem a cabeça cortada na página inicial. **Nenhum requisito ou regra foi removido ou renumerado.**
 
 | Data | Item | Alteração e motivo | Impacto |
 |---|---|---|---|
-| 01/11/2026 | RF19, RN15 | O avatar passou a ser desenhado pelo próprio sistema, com a biblioteca da DiceBear, em um entre cinco estilos escolhido pelo membro. Antes ele vinha do serviço da DiceBear pela internet, e onde a imagem externa era bloqueada — como na versão de demonstração — o sorteio não mudava nada na tela | UC02 sem ator secundário e sem o fluxo 4A; DiceBear fora dos diagramas de casos de uso e de arquitetura; `membro.estilo_avatar` no modelo de dados; testes (CT27 e CT47) |
+| 01/11/2026 | RF19, RN15 | O avatar passou a ser desenhado pelo próprio sistema, com a biblioteca da DiceBear, em um entre cinco estilos escolhido pelo membro. Antes ele vinha do serviço da DiceBear pela internet, e onde a imagem externa era bloqueada (como na versão de demonstração) o sorteio não mudava nada na tela | UC02 sem ator secundário e sem o fluxo 4A; DiceBear fora dos diagramas de casos de uso e de arquitetura; `membro.estilo_avatar` no modelo de dados; testes (CT27 e CT47) |
 | 01/11/2026 | RNF10 | Deixa de depender do RF19: os avatares não usam mais serviço externo | Doc. 05 e Doc. 13 |
 | 01/11/2026 | Interface do sistema | As seções saíram da barra lateral e foram para uma barra no topo, com a marca, o grupo, o tema e a conta; no celular, o menu desce do topo | Matriz, casos de uso, protótipos e testes (CT46) |
 | 01/11/2026 | Marca | Marca nova do Vértice, a partir da arte da equipe. Ao abrir o grupo, aparece no centro com o nome dele e dá um terço de volta, e a tela se dissolve no painel; dá uma volta ao passar o mouse | Protótipos e testes (CT45) |
 | 01/11/2026 | Página inicial | As fotos dos integrantes aparecem nos círculos enquadradas pela cabeça | Testes (CT33) |
 | 01/11/2026 | Docs. 11 a 16 | Matriz, tarefas T62 a T65, arquitetura sem a DiceBear como serviço, recorte de 06/11 e casos de teste CT45 a CT47 | Exigência do manual |
+
+---
+
+## 2º bimestre: revisão de 03/11/2026
+
+Ao usar a versão 2 no dia a dia, a equipe pediu: só dois estilos de avatar, o conteúdo deixando de ser obrigatório, um cadastro de eventos (prova, palestra) que também apareça no calendário, uma página inicial com mais movimento, a tela de acesso em duas colunas e os textos sem travessão. Na mesma revisão entrou o formulário de feedback dos usuários de teste. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 03/11/2026 | RF03, RF14, RN06, RN13 | O conteúdo passou a ser opcional: a atividade fica ligada direto à disciplina, que virou obrigatória, e o conteúdo serve só para quem quer separar a disciplina por assunto. Exigir disciplina, conteúdo e atividade deixava o cadastro pesado para quem só quer anotar uma tarefa da matéria | UC05, classes, modelo de dados (`atividade.disciplina_id` obrigatória e `atividade.conteudo_id` opcional), migração para a versão 3 dos dados e testes (CT09, CT48 e CT50) |
+| 03/11/2026 | RN02, RN13 | Excluir um conteúdo não exclui mais as atividades dele: elas continuam na disciplina, sem conteúdo. Excluir a disciplina continua levando as atividades junto | UC04 e testes (CT26 e CT49) |
+| 03/11/2026 | RF10, RF11, RN14 | O progresso da disciplina soma todas as atividades dela, com ou sem conteúdo; o progresso por conteúdo continua para os conteúdos cadastrados | Testes (CT11 e CT48) |
+| 03/11/2026 | RF31, RN21 | Requisito e regra novos: eventos do grupo (prova, apresentação, palestra, reunião ou outro), com página própria. Qualquer integrante cadastra; quem cadastrou e o organizador editam e excluem | UC14 novo, classes, modelo de dados (tabela `evento`) e testes (CT51) |
+| 03/11/2026 | RF23 | O calendário mostra os eventos junto com as entregas, e o painel do dia cadastra um evento já com a data escolhida | UC13 e testes (CT52) |
+| 03/11/2026 | RF19, RN15 | Os estilos de avatar caíram de cinco para dois: Rabisco (Croodles Neutral) e Ilustrado (Notionists). Quem usava um estilo que saiu passa para o Rabisco na migração | Testes (CT47 e CT50) |
+| 03/11/2026 | RF26, RNF06 | A página inicial ganhou movimento: o topo entra animado, os blocos aparecem ao rolar, a prévia do sistema acompanha o mouse e cada recurso demonstra o que faz ao passar o mouse (no celular, quando aparece na tela). Quem pede menos movimento no sistema vê tudo parado | Testes (CT54) |
+| 03/11/2026 | RF01 | A tela de acesso separa os grupos que já existem, numa coluna, da criação de um grupo novo, na outra | Testes (CT53) |
+| 03/11/2026 | Textos do sistema | Os textos das telas foram reescritos sem travessão, com dois-pontos, parênteses ou frases separadas | Testes (CT55) |
+| 03/11/2026 | RF32 | Requisito novo: formulário anônimo de feedback para os usuários de teste, aberto pela página inicial, pelo rodapé e pelo menu da conta | Testes (CT56) |
+| 03/11/2026 | Docs. 05, 06, 07, 08, 10 a 16, diagramas, modelo de dados e protótipos | Escopo, requisitos e regras novos; caso de uso de eventos; matriz com RF31, RF32 e RN21; tarefas T66 a T73; arquitetura com eventos e a versão 3 dos dados; casos de teste CT48 a CT56 e nova execução completa; telas recapturadas | Exigência do manual |
 
 ---
 
