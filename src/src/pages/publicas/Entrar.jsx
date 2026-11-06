@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, UsersRound } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
@@ -12,7 +12,7 @@ import { RodapePublico } from '../../components/layout/LayoutPublico.jsx';
 import { Avatar } from '../../components/ui/avatar-membro.jsx';
 import { AvatarGrupo } from '../../components/ui/avatar-grupo.jsx';
 import { Button } from '../../components/ui/botao.jsx';
-import { Card, Rotulo } from '../../components/ui/basicos.jsx';
+import { Card } from '../../components/ui/basicos.jsx';
 import { Field, Input } from '../../components/ui/campos.jsx';
 import { CampoFoto } from '../../components/ui/editor-foto.jsx';
 import { MarcaVertice } from '../../components/ui/marca.jsx';
@@ -20,11 +20,14 @@ import { useTransicaoGrupo } from '../../components/layout/TransicaoGrupo.jsx';
 import { rotuloPerfil } from '../../lib/constants.js';
 import { gerarDadosExemplo } from '../../lib/seed.js';
 import { semErros, validarGrupo } from '../../lib/validacao.js';
-import { plural, semErroEm } from '../../lib/utils.js';
+import { cn, plural, semErroEm } from '../../lib/utils.js';
 
 // Tela de acesso, em dois passos: primeiro o grupo, depois quem você é
-// dentro dele. Nenhum dos dois tem senha — são seleções. O login com Google
+// dentro dele. Nenhum dos dois tem senha (são seleções). O login com Google
 // e e-mail chega com o banco de dados, na próxima etapa do projeto.
+//
+// No primeiro passo, duas colunas (revisão de 06/11/2026): à esquerda os
+// grupos que já existem, à direita o cadastro de um grupo novo.
 
 const classeOpcao =
   'group flex w-full items-center gap-3 rounded-2xl border border-borda bg-superficie-2 p-3 text-left transition-colors hover:border-primaria-barra/60 hover:bg-superficie-3';
@@ -58,7 +61,7 @@ export default function Entrar() {
   };
 
   // Grupo com gente dentro: a pessoa ainda precisa dizer quem é (RN07).
-  // Grupo vazio (dado antigo) entra direto — alguém tem que poder montá-lo.
+  // Grupo vazio (dado antigo) entra direto: alguém tem que poder montá-lo.
   const entrarNoGrupo = (id) => {
     const temMembros = membros.some((m) => m.grupoId === id);
     if (temMembros) entrar(id);
@@ -69,7 +72,7 @@ export default function Entrar() {
     abrir(grupoAtivo?.nome, () => identificar(id));
   };
 
-  // RF01 — quem cria o grupo entra como o primeiro membro e organizador.
+  // RF01: quem cria o grupo entra como o primeiro membro e organizador.
   const criar = (evento) => {
     evento.preventDefault();
     const novosErros = validarGrupo(form);
@@ -115,95 +118,122 @@ export default function Entrar() {
         </div>
       </header>
 
-      <main id="conteudo" className="relative flex flex-1 justify-center px-4 pb-16 pt-6 sm:items-center sm:pt-2">
-        <div className="w-full max-w-[460px]">
-          <div className="mb-6 text-center">
+      <main
+        id="conteudo"
+        className={cn(
+          'relative mx-auto flex w-full flex-1 justify-center px-4 pb-16 pt-6',
+          precisaIdentificar ? 'max-w-[492px] sm:items-center sm:pt-2' : 'max-w-[1080px] lg:pt-10'
+        )}
+      >
+        <div className="w-full">
+          <div className="mb-7 text-center">
             <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.04em] text-forte">
               {precisaIdentificar ? 'Quem é você?' : 'Acesse seu grupo'}
             </h1>
             <p className="mt-2 text-balance text-[15px] text-sutil">
               {precisaIdentificar
                 ? 'Escolha o seu nome para entrar. É ele que decide o que você pode gerenciar.'
-                : grupos.length > 0
-                  ? 'Entre num grupo que já existe ou crie um novo.'
-                  : 'Crie o grupo para começar. Depois é só cadastrar quem estuda com você.'}
+                : 'Entre num grupo que já existe ou crie um novo.'}
             </p>
           </div>
 
-          <Card className="p-6 shadow-flutuante sm:p-7">
-            {precisaIdentificar ? (
-              <>
-                <p className="mb-3 text-sm text-sutil">
-                  Em <strong className="font-semibold text-texto">{grupoAtivo?.nome}</strong>
-                </p>
-                <ul className="flex flex-col gap-2">
-                  {membrosDoGrupoAtivo.map((membro) => (
-                    <li key={membro.id}>
-                      <button type="button" onClick={() => escolherMembro(membro.id)} className={classeOpcao}>
-                        <Avatar membro={membro} tamanho={40} decorativo />
-                        <span className="flex min-w-0 flex-1 flex-col">
-                          <span className="truncate font-semibold text-forte">{membro.nome}</span>
-                          <span className="truncate text-[13px] text-sutil">
-                            {rotuloPerfil(membro.perfil)}
-                            {membro.funcao ? ` · ${membro.funcao}` : ''}
-                          </span>
+          {precisaIdentificar ? (
+            <Card className="p-6 shadow-flutuante sm:p-7">
+              <p className="mb-3 text-sm text-sutil">
+                Em <strong className="font-semibold text-texto">{grupoAtivo?.nome}</strong>
+              </p>
+              <ul className="flex flex-col gap-2">
+                {membrosDoGrupoAtivo.map((membro) => (
+                  <li key={membro.id}>
+                    <button type="button" onClick={() => escolherMembro(membro.id)} className={classeOpcao}>
+                      <Avatar membro={membro} tamanho={40} decorativo />
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate font-semibold text-forte">{membro.nome}</span>
+                        <span className="truncate text-[13px] text-sutil">
+                          {rotuloPerfil(membro.perfil)}
+                          {membro.funcao ? ` · ${membro.funcao}` : ''}
                         </span>
-                        <ArrowRight
-                          className="size-4 shrink-0 text-sutil transition-colors group-hover:text-primaria"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-5 text-center">
-                  <Button variante="link" onClick={sair}>
-                    Trocar de grupo
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                {grupos.length > 0 && (
-                  <>
-                    <Rotulo as="h2" className="mb-3 block">
+                      </span>
+                      <ArrowRight
+                        className="size-4 shrink-0 text-sutil transition-[color,transform] group-hover:translate-x-0.5 group-hover:text-primaria"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 text-center">
+                <Button variante="link" onClick={sair}>
+                  Trocar de grupo
+                </Button>
+              </div>
+            </Card>
+          ) : (
+            <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-6">
+              {/* Coluna 1: os grupos que já existem neste navegador. */}
+              <Card as="section" aria-labelledby="t-seus-grupos" className="flex flex-col p-6 shadow-flutuante sm:p-7">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primaria-barra/10 text-primaria-texto">
+                    <UsersRound className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="flex flex-col">
+                    <h2 id="t-seus-grupos" className="text-[19px] font-semibold tracking-[-0.02em] text-forte">
                       Seus grupos
-                    </Rotulo>
-                    <ul className="flex flex-col gap-2">
-                      {grupos.map((grupo) => {
-                        const qtd = membros.filter((m) => m.grupoId === grupo.id).length;
-                        return (
-                          <li key={grupo.id}>
-                            <button type="button" onClick={() => entrarNoGrupo(grupo.id)} className={classeOpcao}>
-                              <AvatarGrupo grupo={grupo} tamanho={40} tom="suave" />
-                              <span className="flex min-w-0 flex-1 flex-col">
-                                <span className="truncate font-semibold text-forte">{grupo.nome}</span>
-                                <span className="truncate text-[13px] text-sutil">
-                                  {plural(qtd, 'membro')}
-                                  {grupo.descricao ? ` · ${grupo.descricao}` : ''}
-                                </span>
+                    </h2>
+                    <p className="text-[13px] text-sutil">
+                      {grupos.length > 0 ? `${plural(grupos.length, 'grupo')} neste navegador` : 'Nenhum grupo ainda'}
+                    </p>
+                  </div>
+                </div>
+
+                {grupos.length > 0 ? (
+                  <ul className="flex flex-col gap-2">
+                    {grupos.map((grupo) => {
+                      const qtd = membros.filter((m) => m.grupoId === grupo.id).length;
+                      return (
+                        <li key={grupo.id}>
+                          <button type="button" onClick={() => entrarNoGrupo(grupo.id)} className={classeOpcao}>
+                            <AvatarGrupo grupo={grupo} tamanho={40} tom="suave" />
+                            <span className="flex min-w-0 flex-1 flex-col">
+                              <span className="truncate font-semibold text-forte">{grupo.nome}</span>
+                              <span className="truncate text-[13px] text-sutil">
+                                {plural(qtd, 'membro')}
+                                {grupo.descricao ? ` · ${grupo.descricao}` : ''}
                               </span>
-                              <ArrowRight
-                                className="size-4 shrink-0 text-sutil transition-colors group-hover:text-primaria"
-                                aria-hidden="true"
-                              />
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <div className="my-6 flex items-center gap-3 text-[13px] text-sutil before:h-px before:flex-1 before:bg-borda after:h-px after:flex-1 after:bg-borda">
-                      ou crie um novo
-                    </div>
-                  </>
+                            </span>
+                            <ArrowRight
+                              className="size-4 shrink-0 text-sutil transition-[color,transform] group-hover:translate-x-0.5 group-hover:text-primaria"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="rounded-2xl border border-dashed border-borda px-4 py-5 text-[14px] leading-relaxed text-sutil">
+                    Os grupos que você criar aparecem aqui. Quer só conhecer o sistema? Carregue um grupo de exemplo,
+                    com disciplinas, atividades e eventos prontos.
+                  </p>
                 )}
 
+                <div className="mt-5 border-t border-divisor pt-4">
+                  <Button variante="secundaria" className="w-full" onClick={carregarExemplo}>
+                    <Sparkles aria-hidden="true" />
+                    Carregar dados de exemplo
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Coluna 2: criar um grupo novo. */}
+              <Card as="section" aria-labelledby="t-criar-grupo" className="p-6 shadow-flutuante sm:p-7">
+                <div className="mb-5 flex flex-col">
+                  <h2 id="t-criar-grupo" className="text-[19px] font-semibold tracking-[-0.02em] text-forte">
+                    Criar um grupo
+                  </h2>
+                  <p className="text-[13px] text-sutil">Você entra como organizador e chama o resto da turma depois.</p>
+                </div>
                 <form onSubmit={criar} noValidate className="flex flex-col gap-4">
-                  {grupos.length === 0 && (
-                    <Rotulo as="h2" className="block">
-                      Criar um grupo
-                    </Rotulo>
-                  )}
                   <Field id="nome" label="Nome do grupo" obrigatorio erro={erros.nome}>
                     <Input
                       value={form.nome}
@@ -212,13 +242,7 @@ export default function Entrar() {
                       autoComplete="off"
                     />
                   </Field>
-                  <Field
-                    id="criador"
-                    label="Seu nome"
-                    obrigatorio
-                    erro={erros.criador}
-                    dica="Você entra como organizador do grupo."
-                  >
+                  <Field id="criador" label="Seu nome" obrigatorio erro={erros.criador}>
                     <Input
                       value={form.criador}
                       onChange={atualizarCampo('criador')}
@@ -247,15 +271,9 @@ export default function Entrar() {
                     Criar grupo e entrar
                   </Button>
                 </form>
-
-                <div className="mt-5 text-center">
-                  <Button variante="link" onClick={carregarExemplo}>
-                    Carregar dados de exemplo
-                  </Button>
-                </div>
-              </>
-            )}
-          </Card>
+              </Card>
+            </div>
+          )}
         </div>
       </main>
 

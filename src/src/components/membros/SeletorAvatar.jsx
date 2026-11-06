@@ -6,7 +6,7 @@ import { ESTILOS_AVATAR, urlAvatar } from '../../lib/avatar.js';
 import { cn } from '../../lib/utils.js';
 
 /**
- * Escolha do avatar (RF19): os cinco estilos lado a lado, todos desenhados com
+ * Escolha do avatar (RF19): os dois estilos lado a lado, todos desenhados com
  * a mesma semente, e o botão de sortear outra. É um grupo de rádio: as setas
  * do teclado trocam o estilo.
  */
@@ -39,7 +39,7 @@ export function SeletorAvatar({ semente, estilo, aoEscolherEstilo, aoSortear, te
         role="radiogroup"
         aria-labelledby="estilo-avatar-rotulo"
         aria-describedby="estilo-avatar-dica"
-        className="grid grid-cols-5 gap-1.5 rounded-2xl border border-borda bg-superficie-2 p-1.5"
+        className="grid grid-cols-2 gap-1.5 rounded-2xl border border-borda bg-superficie-2 p-1.5"
       >
         {ESTILOS_AVATAR.map((opcao, indice) => {
           const marcado = indice === indiceAtual;
@@ -56,18 +56,18 @@ export function SeletorAvatar({ semente, estilo, aoEscolherEstilo, aoSortear, te
               onClick={() => aoEscolherEstilo(opcao.id)}
               onKeyDown={(e) => mover(e, indice)}
               className={cn(
-                'flex min-w-0 flex-col items-center gap-1.5 rounded-xl px-1 py-2 text-[12px] font-medium transition-colors',
+                'flex min-w-0 items-center justify-center gap-3 rounded-xl px-2 py-2.5 text-[13px] font-medium transition-colors',
                 marcado ? 'bg-superficie text-forte ring-2 ring-primaria-barra' : 'text-sutil hover:bg-superficie-3 hover:text-texto'
               )}
             >
               <img
                 src={urlAvatar(semente, { estilo: opcao.id })}
                 alt=""
-                width="44"
-                height="44"
-                className="size-11 rounded-full"
+                width="52"
+                height="52"
+                className="size-13 rounded-full"
               />
-              <span className="max-w-full truncate text-[11px] sm:text-[12px]">{opcao.rotulo}</span>
+              <span className="max-w-full truncate">{opcao.rotulo}</span>
             </button>
           );
         })}

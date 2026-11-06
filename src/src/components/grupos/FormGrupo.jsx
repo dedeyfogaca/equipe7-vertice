@@ -11,7 +11,7 @@ import { semErroEm } from '../../lib/utils.js';
 export const DICA_FOTO_GRUPO = `Opcional. JPG, PNG ou WebP, até ${FOTO.TAMANHO_MAXIMO_MB} MB. Sem foto, o grupo aparece com as iniciais do nome.`;
 
 /**
- * Edição do grupo: nome, descrição e foto (RN07 — só o organizador). Monte
+ * Edição do grupo: nome, descrição e foto (RN07: só o organizador). Monte
  * com `key` para reiniciar o formulário.
  */
 export function FormGrupo({ aberto, aoMudar, grupo, aoSalvar }) {

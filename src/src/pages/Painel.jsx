@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, CalendarDays, Layers, ListPlus, Plus, Search } from 'lucide-react';
+import { BookOpen, CalendarDays, CalendarPlus, ListPlus, Plus, Search } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -13,6 +13,8 @@ import { CartoesSituacao } from '../components/atividades/CartoesSituacao.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
 import { SeuRitmo } from '../components/gamificacao/SeuRitmo.jsx';
 import { ProximosFeriados } from '../components/ProximosFeriados.jsx';
+import { CartaoEvento } from '../components/eventos/CartaoEvento.jsx';
+import { eventoFuturo } from '../components/eventos/tipos.jsx';
 import { STATUS } from '../lib/constants.js';
 import { anoDaData, formatarData } from '../lib/datas.js';
 import { diaPorExtenso, porPrazo, saudacao } from '../lib/formatos.js';
@@ -28,30 +30,17 @@ const TITULOS = {
 
 const LIMITE_LISTA = 8;
 
-// Primeiros passos, na ordem da cadeia: disciplina -> conteúdo -> atividade.
-function PrimeirosPassos({ temDisciplinas, temConteudos }) {
+// Primeiros passos: disciplina, depois atividade. Conteúdo é opcional.
+function PrimeirosPassos({ temDisciplinas }) {
   if (!temDisciplinas) {
     return (
       <EmptyState
         icone={BookOpen}
         titulo="Comece pelas disciplinas"
-        descricao="No Vértice a atividade pertence a um conteúdo, e o conteúdo a uma disciplina. É essa cadeia que permite medir o quanto o grupo avançou, em vez de só contar itens feitos."
+        descricao="Toda atividade é de uma disciplina. É por ela que o Vértice mede o quanto o grupo avançou, em vez de só contar itens feitos."
       >
         <Button asChild>
           <Link to="/disciplinas">Cadastrar disciplinas</Link>
-        </Button>
-      </EmptyState>
-    );
-  }
-  if (!temConteudos) {
-    return (
-      <EmptyState
-        icone={Layers}
-        titulo="Divida as disciplinas em conteúdos"
-        descricao="Cada conteúdo reúne as atividades de um assunto. É nele que o peso das atividades vira progresso."
-      >
-        <Button asChild>
-          <Link to="/disciplinas">Abrir disciplinas</Link>
         </Button>
       </EmptyState>
     );
@@ -60,7 +49,7 @@ function PrimeirosPassos({ temDisciplinas, temConteudos }) {
     <EmptyState
       icone={ListPlus}
       titulo="Nenhuma atividade ainda"
-      descricao="As disciplinas e os conteúdos estão prontos. Agora é cadastrar a primeira atividade num deles."
+      descricao="As disciplinas estão prontas. Agora é cadastrar a primeira atividade."
     >
       <Button asChild>
         <Link to="/atividade/nova">
@@ -76,11 +65,11 @@ export default function Painel() {
   useTitulo('Painel');
   const navigate = useNavigate();
   const { grupoAtivo, membroAtivo } = useAuth();
-  const { atividadesDoGrupo, disciplinasDoGrupo, conteudosDoGrupo, progressoDaDisciplina } = useData();
+  const { atividadesDoGrupo, disciplinasDoGrupo, eventosDoGrupo, progressoDaDisciplina } = useData();
 
   const atividades = atividadesDoGrupo(grupoAtivo.id);
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
-  const temConteudos = conteudosDoGrupo(grupoAtivo.id).length > 0;
+  const proximosEventos = eventosDoGrupo(grupoAtivo.id).filter(eventoFuturo).slice(0, 3);
 
   // As situações filtram a lista aqui mesmo. Sem filtro, a lista mostra as
   // próximas entregas (o que ainda não foi concluído, por prazo).
@@ -202,7 +191,7 @@ export default function Painel() {
           </div>
 
           {atividades.length === 0 ? (
-            <PrimeirosPassos temDisciplinas={disciplinas.length > 0} temConteudos={temConteudos} />
+            <PrimeirosPassos temDisciplinas={disciplinas.length > 0} />
           ) : lista.length === 0 ? (
             <p className="px-5 pb-6 pt-2 text-[15px] text-sutil sm:px-[22px]">
               {filtro
@@ -226,6 +215,36 @@ export default function Painel() {
         </Card>
 
         <div className="flex min-w-0 flex-col gap-5">
+          <Card as="section" aria-labelledby="t-eventos" className="flex flex-col gap-3.5 p-[22px]">
+            <div className="flex items-center justify-between gap-3">
+              <TituloCartao id="t-eventos">Próximos eventos</TituloCartao>
+              <Link to="/eventos" className="text-sm font-medium text-primaria-texto hover:underline">
+                Ver todos
+              </Link>
+            </div>
+            {proximosEventos.length === 0 ? (
+              <p className="text-sm text-sutil">
+                Nenhuma prova ou palestra marcada.{' '}
+                <Link to="/eventos?novo=" className="inline-flex items-center gap-1 font-medium text-primaria-texto hover:underline">
+                  <CalendarPlus className="size-3.5" aria-hidden="true" />
+                  Cadastrar evento
+                </Link>
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {proximosEventos.map((evento) => (
+                  <li key={evento.id}>
+                    <CartaoEvento
+                      evento={evento}
+                      compacto
+                      disciplina={disciplinas.find((d) => d.id === evento.disciplinaId)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
           <Card as="section" aria-labelledby="t-progresso" className="flex flex-col gap-4 p-[22px]">
             <TituloCartao id="t-progresso">Progresso por disciplina</TituloCartao>
             {disciplinas.length === 0 ? (

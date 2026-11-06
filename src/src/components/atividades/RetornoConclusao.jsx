@@ -3,8 +3,9 @@ import { Card } from '../ui/basicos.jsx';
 import { BarraProgresso } from '../ui/progresso.jsx';
 import { xpDaAtividade } from '../../lib/gamificacao.js';
 
-// RF15 — concluir não risca um item: move a barra do conteúdo e credita
-// experiência. Sem isto a pessoa conclui e não vê nada acontecer.
+// RF15: concluir não risca um item. Move a barra do conteúdo (ou da
+// disciplina, se a atividade não tem conteúdo) e credita experiência. Sem
+// isto a pessoa conclui e não vê nada acontecer.
 export function RetornoConclusao({ atividade, conteudo, disciplina, antes, depois }) {
   const xp = xpDaAtividade(atividade);
   const temBarras = Boolean(antes && depois);
@@ -18,9 +19,9 @@ export function RetornoConclusao({ atividade, conteudo, disciplina, antes, depoi
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-semibold text-forte">Atividade concluída</p>
           <p className="text-[13px] text-sutil">
-            {conteudo && temBarras
-              ? `${conteudo.nome} foi de ${antes.percentual}% para ${depois.percentual}%.`
-              : 'O progresso do conteúdo foi atualizado.'}
+            {(conteudo || disciplina) && temBarras
+              ? `${(conteudo || disciplina).nome} foi de ${antes.percentual}% para ${depois.percentual}%.`
+              : 'O progresso foi atualizado.'}
           </p>
         </div>
         {xp > 0 && (

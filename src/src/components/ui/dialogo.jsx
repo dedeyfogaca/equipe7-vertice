@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils.js';
 import { Button } from './botao.jsx';
 
 // Janelas sobrepostas (Radix): prendem o foco, fecham no Esc e devolvem o
-// foco ao botão que as abriu — o que um <div> posicionado não faz sozinho.
+// foco ao botão que as abriu (o que um <div> posicionado não faz sozinho).
 
 const classeFundo =
   'fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] data-[state=open]:animate-surgir data-[state=closed]:animate-sumir';
@@ -60,7 +60,7 @@ export function Dialogo({ aberto, aoMudar, titulo, descricao, largura = 520, chi
 
 /**
  * Confirmação de ação destrutiva. `children` entra entre a mensagem e os
- * botões — é onde a remoção de membro pede quem assume as atividades.
+ * botões: é onde a remoção de membro pede quem assume as atividades.
  */
 export function Confirmacao({
   aberto,

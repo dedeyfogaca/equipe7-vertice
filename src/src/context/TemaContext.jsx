@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 
 // Modo de cor do sistema (escuro ou claro). A escolha fica gravada no
 // navegador e vale para todas as telas, públicas e internas. É aplicada pela
-// classe `dark` no <html> — é dela que saem as variáveis de cor de
+// classe `dark` no <html>. É dela que saem as variáveis de cor de
 // `index.css`.
 const TemaContext = createContext(null);
 const CHAVE = 'tema';

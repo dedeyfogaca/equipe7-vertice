@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-// Ao trocar de página, volta ao topo — o navegador não faz isso sozinho numa
+// Ao trocar de página, volta ao topo: o navegador não faz isso sozinho numa
 // aplicação de página única. Com âncora no endereço (#perguntas), rola até
 // ela.
 export function RolarParaTopo() {

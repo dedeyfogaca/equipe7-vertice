@@ -3,7 +3,7 @@
 // Roda com `npm run verificar`, sem instalar nada.
 //
 // O alvo aqui é o estorno. Concluir, desmarcar e concluir de novo não pode
-// creditar duas vezes — é o bug clássico de quem guarda um contador e o
+// creditar duas vezes. É o bug clássico de quem guarda um contador e o
 // incrementa a cada transição. A verificação percorre esse ciclo inteiro e
 // confere o total em cada passo.
 
@@ -30,18 +30,18 @@ const BRUNO = 'membro-bruno';
 
 const atividade = (peso, status, responsavelId = ANA) => ({ peso, status, responsavelId });
 
-console.log('\nRN10 — xp = peso × 10, creditado ao responsável\n');
+console.log('\nRN10: xp = peso × 10, creditado ao responsável\n');
 
 checar('peso 3 concluída vale 30', xpDaAtividade(atividade(3, 'concluido')), 30);
 checar('constante bate com a regra', XP_POR_PESO, 10);
 checar('peso 5 concluída vale 50', xpDaAtividade(atividade(5, 'concluido')), 50);
 
-console.log('\nRN10 — só conta quando está concluída\n');
+console.log('\nRN10: só conta quando está concluída\n');
 
 checar('a fazer não credita', xpDaAtividade(atividade(3, 'a fazer')), 0);
 checar('fazendo não credita', xpDaAtividade(atividade(3, 'fazendo')), 0);
 
-console.log('\nRN10 — atividade sem responsável não gera experiência\n');
+console.log('\nRN10: atividade sem responsável não gera experiência\n');
 
 checar('concluída sem responsável', xpDaAtividade(atividade(4, 'concluido', '')), 0);
 checar(
@@ -50,7 +50,7 @@ checar(
   20
 );
 
-console.log('\nRN10 — o estorno: concluir, desmarcar e concluir de novo\n');
+console.log('\nRN10: o estorno: concluir, desmarcar e concluir de novo\n');
 
 // O ciclo inteiro, como acontece na tela: a pessoa conclui, se arrepende,
 // desmarca e conclui de novo.
@@ -69,7 +69,7 @@ checar('4. ao concluir de novo, NÃO dobrou', xpDoMembro(ANA, [umaAtividade]), 3
 umaAtividade = { ...umaAtividade, status: 'concluido' };
 checar('5. concluir duas vezes seguidas não soma', xpDoMembro(ANA, [umaAtividade]), 30);
 
-console.log('\nRN10 — trocar o responsável leva a experiência junto\n');
+console.log('\nRN10: trocar o responsável leva a experiência junto\n');
 
 const trocada = { peso: 4, status: 'concluido', responsavelId: BRUNO };
 checar('quem era responsável antes fica sem', xpDoMembro(ANA, [trocada]), 0);
@@ -110,7 +110,7 @@ checar(
 checar('empate ordena por nome, para a lista não dançar', ranking[0].membro.nome, 'Ana Souza');
 checar('conta as concluídas de cada um', ranking.map((l) => l.concluidas), [2, 2, 0]);
 
-console.log('\nRN09 — peso ausente ou fora da faixa também vale aqui\n');
+console.log('\nRN09: peso ausente ou fora da faixa também vale aqui\n');
 
 checar('sem peso vale 1, logo 10 de xp', xpDaAtividade({ status: 'concluido', responsavelId: ANA }), 10);
 checar(

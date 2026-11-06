@@ -4,7 +4,7 @@
 //
 // O editor mostra a foto na tela, em pixels de tela; o recorte é feito na
 // imagem original, em pixels da imagem. A conta que liga os dois é a que
-// decide se o que a pessoa enquadrou é o que fica gravado — e se dá para
+// decide se o que a pessoa enquadrou é o que fica gravado, e se dá para
 // arrastar a foto até sobrar canto vazio na moldura.
 
 import { limitesDoArraste, recorteDaMoldura } from '../src/lib/foto.js';

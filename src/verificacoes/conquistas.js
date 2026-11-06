@@ -3,7 +3,7 @@
 // Roda com `npm run verificar`, sem instalar nada.
 //
 // Duas partes: (1) quando o marco de cada conquista é atingido e (2) a
-// concessão — uma vez só por membro e sem revogar depois.
+// concessão: uma vez só por membro e sem revogar depois.
 
 import { CONQUISTAS, conquistasAlcancadas, conquistasNovas } from '../src/lib/gamificacao.js';
 

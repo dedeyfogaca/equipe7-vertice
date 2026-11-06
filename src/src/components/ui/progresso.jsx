@@ -31,7 +31,7 @@ export function BarraProgresso({
     return (
       <div className={cn('flex flex-col gap-2', className)}>
         {nome}
-        <span className="text-[13px] text-sutil">Sem atividades — fora do cálculo</span>
+        <span className="text-[13px] text-sutil">Sem atividades (fica fora do cálculo)</span>
       </div>
     );
   }

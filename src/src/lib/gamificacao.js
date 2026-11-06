@@ -14,7 +14,7 @@
 //
 // O estorno é a parte que costuma faltar: concluir, desmarcar e concluir de
 // novo não pode creditar duas vezes. Um contador guardado no membro, somado
-// e subtraído a cada transição, é exatamente onde esse bug nasce — basta uma
+// e subtraído a cada transição, é exatamente onde esse bug nasce: basta uma
 // transição perdida para o número ficar errado para sempre, sem como saber.
 //
 // Aqui a experiência é uma projeção sobre as atividades: o registro da
@@ -33,7 +33,7 @@
 import { normalizarPeso, STATUS } from './constants.js';
 import { paraISO } from './datas.js';
 
-// RN10 — cada ponto de peso vale 10 de experiência.
+// RN10: cada ponto de peso vale 10 de experiência.
 export const XP_POR_PESO = 10;
 
 /**
@@ -116,7 +116,7 @@ export function xpDoGrupo(atividades = []) {
 // menos uma atividade. Um dia inteiro sem conclusão zera a contagem.
 //
 // O dia de hoje ainda está em aberto: se a pessoa ainda não concluiu nada
-// hoje, a ofensiva não cai para zero de manhã — a contagem parte de ontem.
+// hoje, a ofensiva não cai para zero de manhã: a contagem parte de ontem.
 // Ela só zera quando um dia termina sem conclusão.
 //
 // Como a experiência, a ofensiva é derivada das atividades (pela
@@ -144,7 +144,7 @@ function inicioDoDia(data) {
   return new Date(data.getFullYear(), data.getMonth(), data.getDate());
 }
 
-/** RN11 — ofensiva atual do membro, em dias. */
+/** RN11: ofensiva atual do membro, em dias. */
 export function ofensivaDoMembro(membroId, atividades = [], hoje = new Date()) {
   if (!membroId) return 0;
   const dias = diasComConclusao(membroId, atividades);
@@ -230,7 +230,7 @@ export function obterConquista(codigo) {
 }
 
 // Quem "fechou" um conjunto de atividades: se todas estão concluídas, é o
-// responsável pela última conclusão — foi ela que levou o conjunto a 100%.
+// responsável pela última conclusão, porque foi ela que levou o conjunto a 100%.
 function quemFechou(lista) {
   if (lista.length === 0) return null;
   if (!lista.every((a) => a.status === STATUS.CONCLUIDO)) return null;
@@ -241,7 +241,7 @@ function quemFechou(lista) {
 }
 
 /**
- * RN12 — o que conceder agora. Recebe as conquistas já concedidas
+ * RN12: o que conceder agora. Recebe as conquistas já concedidas
  * ([{ membroId, codigo }]) e os marcos atingidos neste momento
  * ([{ membroId, codigos }]) e devolve só as novas, com a data de hoje.
  *
@@ -283,8 +283,11 @@ export function conquistasAlcancadas(membroId, { atividades = [], conteudos = []
   const xp = xpDoMembro(membroId, atividades);
   const ofensiva = ofensivaDoMembro(membroId, atividades, hoje);
 
+  // Conteúdo é opcional desde 06/11/2026: atividade sem conteúdo não entra
+  // na conta do "Conteúdo Dominado", só na da disciplina.
   const porConteudo = new Map();
   atividades.forEach((a) => {
+    if (!a.conteudoId) return;
     if (!porConteudo.has(a.conteudoId)) porConteudo.set(a.conteudoId, []);
     porConteudo.get(a.conteudoId).push(a);
   });
@@ -293,7 +296,7 @@ export function conquistasAlcancadas(membroId, { atividades = [], conteudos = []
   const disciplinaDoConteudo = new Map(conteudos.map((c) => [c.id, c.disciplinaId]));
   const porDisciplina = new Map();
   atividades.forEach((a) => {
-    const disciplinaId = disciplinaDoConteudo.get(a.conteudoId);
+    const disciplinaId = a.disciplinaId || disciplinaDoConteudo.get(a.conteudoId);
     if (!disciplinaId) return;
     if (!porDisciplina.has(disciplinaId)) porDisciplina.set(disciplinaId, []);
     porDisciplina.get(disciplinaId).push(a);

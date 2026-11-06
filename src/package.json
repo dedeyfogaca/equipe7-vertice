@@ -3,7 +3,7 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
-  "description": "Vértice — plataforma de acompanhamento de aprendizagem para grupos de estudo.",
+  "description": "Vértice: plataforma de acompanhamento de aprendizagem para grupos de estudo.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,12 +11,9 @@
     "verificar": "node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js"
   },
   "dependencies": {
-    "@dicebear/adventurer": "9.4.3",
-    "@dicebear/big-smile": "9.4.3",
     "@dicebear/core": "9.4.3",
     "@dicebear/croodles-neutral": "9.4.3",
-    "@dicebear/fun-emoji": "9.4.3",
-    "@dicebear/pixel-art": "9.4.3",
+    "@dicebear/notionists": "9.4.3",
     "@fontsource-variable/inter-tight": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@radix-ui/react-alert-dialog": "^1.2.1",

@@ -21,14 +21,14 @@ const distancia = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
 /**
  * Editor de foto (RN19): a pessoa arrasta para posicionar e aproxima com o
- * zoom — pela barra, pela rodinha do mouse, com dois dedos no celular ou pelo
+ * zoom: pela barra, pela rodinha do mouse, com dois dedos no celular ou pelo
  * teclado. Ao aplicar, o que está dentro da moldura vira a foto de 256 × 256.
  *
  * Leve de propósito: a imagem é decodificada fora da linha principal e o
  * movimento é só um `transform` (desenhado pela placa de vídeo). O recorte
  * acontece uma vez, no "Aplicar".
  *
- * `forma`: 'circulo' (membro) ou 'quadrado' (grupo) — só muda a moldura; a
+ * `forma`: 'circulo' (membro) ou 'quadrado' (grupo). Só muda a moldura; a
  * foto gravada é sempre quadrada.
  */
 export function EditorFoto({ arquivo, forma = 'circulo', aoCancelar, aoAplicar }) {

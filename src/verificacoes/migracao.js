@@ -4,8 +4,8 @@
 //
 // Existe por causa de um bug que chegou a ser gravado: a guarda de saída
 // exigia que TUDO estivesse vazio para não migrar. Quem já tinha migrado mas
-// perdeu o marcador de versão — limpeza parcial do armazenamento, outro
-// perfil do navegador, falha silenciosa na gravação — caía adiante, a
+// perdeu o marcador de versão (limpeza parcial do armazenamento, outro
+// perfil do navegador, falha silenciosa na gravação) caía adiante, a
 // conversão não achava tarefa antiga nenhuma, montava uma lista vazia e
 // gravava por cima. Três atividades viravam zero.
 //
@@ -82,7 +82,7 @@ function montarJaMigrado() {
 console.log('\nO cenário destrutivo: já migrado, mas sem o marcador de versão\n');
 
 montarJaMigrado();
-// O marcador NÃO é gravado — é exatamente esse o caso.
+// O marcador NÃO é gravado: é exatamente esse o caso.
 const semMarcador = migrarDados();
 
 checar('não tenta migrar', semMarcador.migrou, false);
@@ -114,14 +114,14 @@ checar(
   ['Física', 'Sem disciplina']
 );
 checar('a chave antiga é apagada', ler('tarefas'), null);
-checar('RN09 — toda atividade ganha peso', (ler('atividades') || []).every((a) => a.peso === 1), true);
+checar('RN09: toda atividade ganha peso', (ler('atividades') || []).every((a) => a.peso === 1), true);
 checar(
   'a concluída ganha data de conclusão',
   Boolean((ler('atividades') || []).find((a) => a.status === 'concluido').dataConclusao),
   true
 );
 checar(
-  'RN07 — o primeiro membro vira organizador',
+  'RN07: o primeiro membro vira organizador',
   (ler('membros') || []).map((m) => m.perfil),
   ['organizador', 'participante']
 );
@@ -150,7 +150,7 @@ const comOrfa = migrarDados();
 checar('converte o que dá', (ler('atividades') || []).length, 1);
 checar('e conta as órfãs', comOrfa.orfas, 1);
 checar(
-  'a chave antiga NÃO é apagada — a órfã fica recuperável',
+  'a chave antiga NÃO é apagada, a órfã fica recuperável',
   (ler('tarefas') || []).length,
   2
 );
@@ -158,7 +158,7 @@ checar(
 console.log('\nÓrfã + marcador perdido: a segunda passada não pode duplicar id\n');
 
 // Com órfã a chave antiga fica, de propósito. Se o marcador de versão se
-// perder depois disso, a migração roda de novo sobre as MESMAS tarefas —
+// perder depois disso, a migração roda de novo sobre as MESMAS tarefas:
 // e a atividade carrega o id da tarefa que a originou.
 memoria.delete('versaoDados');
 const segundaPassada = migrarDados();
@@ -181,7 +181,7 @@ checar('marca a versão mesmo assim', ler('versaoDados'), VERSAO_DADOS);
 checar('e não inventa coleção', ler('atividades'), null);
 
 // ---------------------------------------------------------------------------
-// Versão 2 — responsável obrigatório (RN06) e paleta de 18 cores
+// Versão 2: responsável obrigatório (RN06) e paleta de 18 cores
 // ---------------------------------------------------------------------------
 
 console.log('\nVersão 2: atividade sem responsável ganha um\n');
@@ -220,7 +220,7 @@ checar('responsável de outro grupo é trocado (RN03)', responsaveis[2], 'm2');
 checar('responsável que não existe mais é trocado', responsaveis[3], 'm2');
 checar('conta quantas recebeu', v2.v2.responsaveisDefinidos, 3);
 checar('nenhuma atividade fica sem responsável', responsaveis.every(Boolean), true);
-checar('o marcador vai para 2', ler('versaoDados'), 2);
+checar('o marcador vai para a versão atual', ler('versaoDados'), VERSAO_DADOS);
 
 console.log('\nVersão 2: cores fora da paleta nova\n');
 
@@ -251,12 +251,50 @@ gravar('grupos', [GRUPO]);
 gravar('membros', [{ id: 'm1', nome: 'Alguém', grupoId: 'g1', perfil: 'organizador' }]);
 gravar('disciplinas', [{ id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' }]);
 gravar('conteudos', [{ id: 'c1', nome: 'Geral', descricao: '', disciplinaId: 'd1', ordem: 0 }]);
-gravar('atividades', [atividadeNova('a1')]);
+gravar('atividades', [{ ...atividadeNova('a1'), disciplinaId: 'd1' }]);
 const antes = memoria.get('atividades');
 const limpo = migrarDados();
 checar('resumo zerado', limpo.v2, { responsaveisDefinidos: 0, coresAjustadas: 0 });
 checar('a coleção fica exatamente como estava', memoria.get('atividades') === antes, true);
 checar('e a terceira passada nem roda', migrarDados().motivo, 'ja-migrado');
+
+console.log('\nVersão 3: disciplina na atividade e conteúdo opcional\n');
+
+memoria.clear();
+gravar('versaoDados', 2);
+gravar('grupos', [GRUPO]);
+gravar('membros', [
+  { id: 'm1', nome: 'Alguém', grupoId: 'g1', perfil: 'organizador', estiloAvatar: 'adventurer' },
+  { id: 'm2', nome: 'Outra', grupoId: 'g1', perfil: 'participante', estiloAvatar: 'notionists' },
+  { id: 'm3', nome: 'Sem estilo', grupoId: 'g1', perfil: 'participante' },
+]);
+gravar('disciplinas', [
+  { id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' },
+  { id: 'd2', nome: 'Física', cor: '#0ea5e9', grupoId: 'g1' },
+]);
+gravar('conteudos', [
+  { id: 'c1', nome: 'Limites', descricao: '', disciplinaId: 'd1', ordem: 0 },
+  { id: 'c2', nome: 'Geral', descricao: 'Recebeu as atividades que existiam antes das disciplinas.', disciplinaId: 'd2', ordem: 0 },
+  { id: 'c3', nome: 'Geral', descricao: 'Criado pela pessoa', disciplinaId: 'd1', ordem: 1 },
+]);
+gravar('atividades', [
+  { ...atividadeNova('a1'), conteudoId: 'c1' },
+  { ...atividadeNova('a2'), conteudoId: 'c2' },
+  { ...atividadeNova('a3'), conteudoId: 'c3' },
+]);
+const v3 = migrarDados();
+const ativ3 = ler('atividades');
+checar('a atividade ganha a disciplina do conteúdo', ativ3.map((a) => a.disciplinaId), ['d1', 'd2', 'd1']);
+checar('continua no conteúdo que a pessoa criou', ativ3[0].conteudoId, 'c1');
+checar('sai do "Geral" automático e fica direto na disciplina', ativ3[1].conteudoId, '');
+checar('"Geral" criado pela pessoa continua', ativ3[2].conteudoId, 'c3');
+checar('o "Geral" automático sai da lista de conteúdos', ler('conteudos').map((c) => c.id), ['c1', 'c3']);
+checar('nenhuma atividade some', ativ3.length, 3);
+checar('estilo de avatar que saiu vira o padrão', ler('membros').map((m) => m.estiloAvatar ?? null), ['croodles-neutral', 'notionists', null]);
+checar('resumo do passo 3', v3.v3, { atividadesAjustadas: 3, conteudosGeraisRemovidos: 1, avataresAjustados: 1 });
+checar('o passo 2 não roda de novo', v3.v2, null);
+checar('marcador na versão 3', ler('versaoDados'), 3);
+checar('e não roda outra vez', migrarDados().motivo, 'ja-migrado');
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

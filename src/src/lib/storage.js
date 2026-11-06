@@ -8,9 +8,11 @@ export const CHAVES = {
   disciplinas: 'disciplinas',
   conteudos: 'conteudos',
   atividades: 'atividades',
-  // RN12 — conquistas já concedidas ({ membroId, codigo, obtidaEm }). Espelha
+  // RN12: conquistas já concedidas ({ membroId, codigo, obtidaEm }). Espelha
   // a tabela `membro_conquista` do modelo lógico.
   conquistas: 'conquistasMembro',
+  // RF31: eventos do grupo (prova, palestra, apresentação...).
+  eventos: 'eventos',
   sessao: 'sessao',
   versao: 'versaoDados',
 };
@@ -46,7 +48,7 @@ export function salvarColecao(chave, valor) {
 // Sessão = o grupo e quem, dentro dele, está usando o sistema.
 //
 // O membro entrou por causa do RN07: sem saber quem é a pessoa não dá para
-// comparar com o perfil dela. Continua sem senha — é seleção, como o grupo.
+// comparar com o perfil dela. Continua sem senha: é seleção, como o grupo.
 export function lerSessao() {
   try {
     const bruto = localStorage.getItem(CHAVES.sessao);

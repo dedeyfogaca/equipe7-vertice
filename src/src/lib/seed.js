@@ -6,7 +6,7 @@
 import { novoId } from './storage.js';
 import { paraISO } from './datas.js';
 import { novaSeedAvatar } from './avatar.js';
-import { PERFIL, PRIORIDADE, STATUS } from './constants.js';
+import { PERFIL, PRIORIDADE, STATUS, TIPO_EVENTO } from './constants.js';
 
 function emDias(offset) {
   const d = new Date();
@@ -35,10 +35,10 @@ export function gerarDadosExemplo() {
     criadoEm: agora,
   };
 
-  // RN07 — quem cria o grupo é o organizador; os demais, participantes.
-  const ana = { id: novoId(), nome: 'Ana Souza', grupoId, funcao: 'Introdução e revisão', email: 'ana@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'adventurer', foto: '', perfil: PERFIL.ORGANIZADOR };
-  const bruno = { id: novoId(), nome: 'Bruno Lima', grupoId, funcao: 'Desenvolvimento', email: '', avatar: novaSeedAvatar(), estiloAvatar: 'pixel-art', foto: '', perfil: PERFIL.PARTICIPANTE };
-  const carla = { id: novoId(), nome: 'Carla Dias', grupoId, funcao: 'Slides e apresentação', email: 'carla@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'big-smile', foto: '', perfil: PERFIL.PARTICIPANTE };
+  // RN07: quem cria o grupo é o organizador; os demais, participantes.
+  const ana = { id: novoId(), nome: 'Ana Souza', grupoId, funcao: 'Introdução e revisão', email: 'ana@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.ORGANIZADOR };
+  const bruno = { id: novoId(), nome: 'Bruno Lima', grupoId, funcao: 'Desenvolvimento', email: '', avatar: novaSeedAvatar(), estiloAvatar: 'croodles-neutral', foto: '', perfil: PERFIL.PARTICIPANTE };
+  const carla = { id: novoId(), nome: 'Carla Dias', grupoId, funcao: 'Slides e apresentação', email: 'carla@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.PARTICIPANTE };
   const membros = [ana, bruno, carla];
 
   const disciplinas = [
@@ -62,25 +62,27 @@ export function gerarDadosExemplo() {
     { disciplina: banco, nome: 'Modelagem', descricao: 'Diagrama ER e normalização.' },
     { disciplina: banco, nome: 'SQL', descricao: 'Consultas e criação de tabelas.' },
     { disciplina: metodologia, nome: 'Normas ABNT', descricao: 'Formatação e citações.' },
-    { disciplina: estatistica, nome: 'Probabilidade', descricao: '' },
   ].reduce((lista, { disciplina, nome, descricao }) => {
     const ordem = lista.filter((c) => c.disciplinaId === disciplina.id).length;
     return [...lista, { id: novoId(), nome, descricao, disciplinaId: disciplina.id, ordem }];
   }, []);
 
-  const [introducao, referencial, apresentacao, prototipacao, componentes, modelagem, sql, normasAbnt, probabilidade] =
-    conteudos;
+  const [introducao, referencial, apresentacao, prototipacao, componentes, modelagem, sql, normasAbnt] = conteudos;
+  const disciplinaDoConteudo = new Map(conteudos.map((c) => [c.id, c.disciplinaId]));
 
-  // Cada atividade pertence a um conteúdo (RN13), tem responsável (RN06) e um
-  // peso de 1 a 5 (RN09). Os pesos variam de propósito — é a razão entre eles
-  // que o progresso mede.
-  const atividade = (dados) => ({
+  // Cada atividade pertence a uma disciplina e, se a pessoa quiser, a um
+  // conteúdo dela (RN13). Tem responsável (RN06) e um peso de 1 a 5 (RN09).
+  // Os pesos variam de propósito: é a razão entre eles que o progresso mede.
+  // Estatística ficou sem conteúdo nenhum, para mostrar que ele é opcional.
+  const atividade = ({ disciplina, ...dados }) => ({
     id: novoId(),
     descricao: '',
     prioridade: '',
     criadaEm: agora,
     dataConclusao: null,
+    conteudoId: '',
     ...dados,
+    disciplinaId: disciplina?.id || disciplinaDoConteudo.get(dados.conteudoId) || '',
   });
 
   const atividades = [
@@ -89,16 +91,38 @@ export function gerarDadosExemplo() {
     atividade({ titulo: 'Levantar os artigos de referência', descricao: 'Selecionar as fontes que sustentam o referencial.', conteudoId: referencial.id, prazo: emDias(8), peso: 3, status: STATUS.A_FAZER, prioridade: PRIORIDADE.MEDIA, responsavelId: ana.id }),
     atividade({ titulo: 'Preparar os slides da apresentação', conteudoId: apresentacao.id, prazo: emDias(12), peso: 3, status: STATUS.A_FAZER, prioridade: PRIORIDADE.BAIXA, responsavelId: carla.id }),
     atividade({ titulo: 'Montar protótipo das telas', descricao: 'Desenhar os wireframes das telas principais.', conteudoId: prototipacao.id, prazo: emDias(1), peso: 4, status: STATUS.A_FAZER, prioridade: PRIORIDADE.ALTA, responsavelId: bruno.id }),
-    atividade({ titulo: 'Configurar o repositório no GitHub', descricao: 'Criar o repositório, escrever o README e fazer o primeiro commit.', conteudoId: componentes.id, prazo: emDias(-5), peso: 1, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.MEDIA, responsavelId: bruno.id, dataConclusao: emISO(-5) }),
+    atividade({ titulo: 'Configurar o repositório no GitHub', descricao: 'Criar o repositório, escrever o README e fazer o primeiro commit.', disciplina: frontEnd, prazo: emDias(-5), peso: 1, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.MEDIA, responsavelId: bruno.id, dataConclusao: emISO(-5) }),
     atividade({ titulo: 'Componentes do formulário', conteudoId: componentes.id, prazo: emDias(4), peso: 3, status: STATUS.FAZENDO, prioridade: PRIORIDADE.MEDIA, responsavelId: bruno.id }),
     atividade({ titulo: 'Modelar o diagrama ER', conteudoId: modelagem.id, prazo: emDias(-1), peso: 3, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.ALTA, responsavelId: ana.id, dataConclusao: emISO(-1) }),
     atividade({ titulo: 'Normalizar as tabelas até a 3FN', conteudoId: modelagem.id, prazo: emDias(3), peso: 2, status: STATUS.A_FAZER, prioridade: PRIORIDADE.MEDIA, responsavelId: bruno.id }),
     atividade({ titulo: 'Resolver a lista de SELECT', conteudoId: sql.id, prazo: emDias(6), peso: 2, status: STATUS.FAZENDO, responsavelId: carla.id }),
     atividade({ titulo: 'Revisar as referências bibliográficas', descricao: 'Conferir a formatação das referências no padrão ABNT.', conteudoId: normasAbnt.id, prazo: emDias(5), peso: 2, status: STATUS.A_FAZER, prioridade: PRIORIDADE.MEDIA, responsavelId: carla.id }),
     atividade({ titulo: 'Formatar as citações', conteudoId: normasAbnt.id, prazo: emDias(15), peso: 1, status: STATUS.A_FAZER, prioridade: PRIORIDADE.BAIXA, responsavelId: ana.id }),
-    atividade({ titulo: 'Lista de probabilidade', conteudoId: probabilidade.id, prazo: emDias(-3), peso: 2, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.MEDIA, responsavelId: ana.id, dataConclusao: emISO(-2) }),
-    atividade({ titulo: 'Exercícios de variância', conteudoId: probabilidade.id, prazo: emDias(10), peso: 1, status: STATUS.A_FAZER, responsavelId: bruno.id }),
+    atividade({ titulo: 'Lista de probabilidade', disciplina: estatistica, prazo: emDias(-3), peso: 2, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.MEDIA, responsavelId: ana.id, dataConclusao: emISO(-2) }),
+    atividade({ titulo: 'Exercícios de variância', disciplina: estatistica, prazo: emDias(10), peso: 1, status: STATUS.A_FAZER, responsavelId: bruno.id }),
   ];
 
-  return { grupo, membros, disciplinas, conteudos, atividades };
+  // Eventos (RF31): o que acontece num dia e não é entrega de ninguém.
+  const evento = (dados) => ({
+    id: novoId(),
+    grupoId,
+    horaInicio: '',
+    horaFim: '',
+    local: '',
+    disciplinaId: '',
+    descricao: '',
+    criadoPor: ana.id,
+    criadoEm: agora,
+    ...dados,
+  });
+
+  const eventos = [
+    evento({ titulo: 'Prova de Estatística', tipo: TIPO_EVENTO.PROVA, data: emDias(-6), horaInicio: '19:00', horaFim: '20:40', local: 'Sala 108', disciplinaId: estatistica.id }),
+    evento({ titulo: 'Reunião do grupo', tipo: TIPO_EVENTO.REUNIAO, data: emDias(2), horaInicio: '20:00', horaFim: '21:00', local: 'Google Meet', descricao: 'Dividir o que falta do TCC.', criadoPor: carla.id }),
+    evento({ titulo: 'Palestra: carreira em dados', tipo: TIPO_EVENTO.PALESTRA, data: emDias(4), horaInicio: '19:30', local: 'Auditório', descricao: 'Vale hora complementar.' }),
+    evento({ titulo: 'Prova de Banco de Dados', tipo: TIPO_EVENTO.PROVA, data: emDias(9), horaInicio: '19:00', horaFim: '20:40', local: 'Sala 204', disciplinaId: banco.id, descricao: 'Modelagem e SQL. Pode levar uma folha de consulta.', criadoPor: bruno.id }),
+    evento({ titulo: 'Banca do TCC', tipo: TIPO_EVENTO.APRESENTACAO, data: emDias(20), horaInicio: '14:00', horaFim: '15:00', local: 'Sala de defesas', disciplinaId: tcc.id }),
+  ];
+
+  return { grupo, membros, disciplinas, conteudos, atividades, eventos };
 }

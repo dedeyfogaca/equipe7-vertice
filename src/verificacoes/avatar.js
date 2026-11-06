@@ -1,7 +1,8 @@
 // Verificação dos avatares (RF19, RN15).
 //
 // Roda com `npm run verificar`. Desde 01/11/2026 o avatar é desenhado no
-// próprio sistema, com a biblioteca da DiceBear, em cinco estilos. O que se
+// próprio sistema, com a biblioteca da DiceBear; desde 06/11/2026, em dois
+// estilos (Croodles Neutral e Notionists). O que se
 // confere: a mesma semente dá sempre o mesmo desenho, outra semente dá outro,
 // cada estilo desenha diferente, e estilo desconhecido cai no padrão.
 
@@ -25,18 +26,19 @@ function checar(nome, real, esperado) {
 }
 
 console.log('Estilos oferecidos');
-checar('são cinco', ESTILOS_AVATAR.length, 5);
+checar('são dois', ESTILOS_AVATAR.map((e) => e.id), ['croodles-neutral', 'notionists']);
 checar('o padrão está entre eles', estiloAvatarValido(ESTILO_AVATAR_PADRAO), true);
 checar('estilo inventado não vale', estiloAvatarValido('qualquer'), false);
 
 console.log('Desenho');
-const a = urlAvatar('abc123', { estilo: 'adventurer' });
+const a = urlAvatar('abc123', { estilo: 'notionists' });
 checar('é uma imagem SVG embutida, sem buscar nada fora', a.startsWith('data:image/svg+xml'), true);
-checar('mesma semente e estilo, mesmo desenho', urlAvatar('abc123', { estilo: 'adventurer' }) === a, true);
-checar('a semente ignora maiúsculas e espaços nas pontas', urlAvatar('  ABC123 ', { estilo: 'adventurer' }) === a, true);
-checar('outra semente, outro desenho', urlAvatar('xyz789', { estilo: 'adventurer' }) !== a, true);
+checar('mesma semente e estilo, mesmo desenho', urlAvatar('abc123', { estilo: 'notionists' }) === a, true);
+checar('a semente ignora maiúsculas e espaços nas pontas', urlAvatar('  ABC123 ', { estilo: 'notionists' }) === a, true);
+checar('outra semente, outro desenho', urlAvatar('xyz789', { estilo: 'notionists' }) !== a, true);
 const desenhos = new Set(ESTILOS_AVATAR.map((e) => urlAvatar('abc123', { estilo: e.id })));
-checar('cada estilo desenha diferente', desenhos.size, 5);
+checar('cada estilo desenha diferente', desenhos.size, 2);
+checar('estilo que saiu (Aventura) usa o padrão', urlAvatar('abc123', { estilo: 'adventurer' }) === urlAvatar('abc123'), true);
 checar('estilo desconhecido usa o padrão', urlAvatar('abc123', { estilo: 'qualquer' }) === urlAvatar('abc123'), true);
 checar('sem semente ainda desenha', urlAvatar('').startsWith('data:image/svg+xml'), true);
 

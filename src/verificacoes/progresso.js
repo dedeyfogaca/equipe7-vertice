@@ -31,7 +31,7 @@ const atividade = (peso, concluida = false) => ({
   status: concluida ? 'concluido' : 'a fazer',
 });
 
-console.log('\nRN08 — progresso do conteúdo é razão de peso, não contagem\n');
+console.log('\nRN08: progresso do conteúdo é razão de peso, não contagem\n');
 
 // Uma única atividade concluída, mas ela sozinha vale mais que as outras quatro.
 checar(
@@ -66,11 +66,11 @@ checar(
   100
 );
 
-console.log('\nRN08 — conteúdo sem atividade é ausente, não 0%\n');
+console.log('\nRN08: conteúdo sem atividade é ausente, não 0%\n');
 
 checar('conteúdo sem atividade devolve nulo', progressoDoConteudo([]), null);
 
-console.log('\nRN14 — progresso da disciplina é razão de pesos somados\n');
+console.log('\nRN14: progresso da disciplina é razão de pesos somados\n');
 
 // O caso que o RN14 existe para evitar. Dois conteúdos muito diferentes:
 // um grande quase pronto, um pequeno parado.
@@ -95,7 +95,7 @@ checar(
 );
 console.log(`      média: ${mediaDosPercentuais}%   ·   correto: ${disciplina.percentual}%`);
 
-console.log('\nRN14 + RN08 — conteúdo vazio não derruba a disciplina\n');
+console.log('\nRN14 + RN08: conteúdo vazio não derruba a disciplina\n');
 
 checar(
   'conteúdo vazio fica fora da conta',
@@ -105,7 +105,7 @@ checar(
 checar('disciplina só com conteúdos vazios', progressoDaDisciplina([[], []]), null);
 checar('disciplina sem nenhum conteúdo', progressoDaDisciplina([]), null);
 
-console.log('\nRN09 — peso ausente ou fora da faixa\n');
+console.log('\nRN09: peso ausente ou fora da faixa\n');
 
 checar(
   'sem peso definido vale 1',
@@ -123,7 +123,7 @@ checar(
   1
 );
 
-console.log('\nRF15 — o progresso antes da conclusão, para o retorno na tela\n');
+console.log('\nRF15: o progresso antes da conclusão, para o retorno na tela\n');
 
 // O "antes" é o mesmo conteúdo recalculado fingindo que a atividade ainda
 // não foi concluída. O peso dela continua no total: ela sempre existiu.
@@ -135,7 +135,7 @@ const conteudoDela = [comId('x', 4, true), comId('y', 1, true), comId('z', 5)];
 checar('depois: 5 de 10', progressoDoConteudo(conteudoDela).percentual, 50);
 checar('antes de x: 1 de 10', progressoAntesDe(conteudoDela, 'x').percentual, 10);
 checar(
-  'o peso total nao muda — a atividade sempre existiu',
+  'o peso total nao muda: a atividade sempre existiu',
   progressoAntesDe(conteudoDela, 'x').pesoTotal,
   10
 );

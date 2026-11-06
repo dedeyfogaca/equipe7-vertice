@@ -1,12 +1,15 @@
 // Migração dos dados já gravados no navegador.
 //
-// Versão 1 — o sistema saiu com `tarefa` guardando a disciplina como texto
+// Versão 1: o sistema saiu com `tarefa` guardando a disciplina como texto
 // livre. O modelo alvo é outro: a atividade pertence a um conteúdo, o
 // conteúdo a uma disciplina, e a disciplina a um grupo (RN13). Trocar a
 // estrutura sem migrar apagaria o que quem já usa o sistema fez.
 //
-// Versão 2 — toda atividade passou a ter responsável (RN06, revisão de
+// Versão 2: toda atividade passou a ter responsável (RN06, revisão de
 // 28/10/2026) e a paleta das disciplinas passou de 8 para 18 cores.
+//
+// Versão 3: o conteúdo virou opcional (revisão de 06/11/2026): a atividade
+// passa a guardar a própria disciplina. E os avatares ficaram em dois estilos.
 //
 // Cada passo roda uma vez só. O marcador de versão gravado é o que impede uma
 // segunda passada de duplicar disciplina.
@@ -29,15 +32,18 @@ import {
   PERFIL,
   STATUS,
 } from './constants.js';
+import { ESTILO_AVATAR_PADRAO, estiloAvatarValido } from './avatar.js';
 
 // Sobe de 1 em 1 a cada mudança de formato.
 //   0 -> 1: tarefa com disciplina de texto vira atividade na cadeia
 //   1 -> 2: responsável obrigatório e paleta de 18 cores
-export const VERSAO_DADOS = 2;
+//   2 -> 3: disciplina na atividade, conteúdo opcional, dois estilos de avatar
+export const VERSAO_DADOS = 3;
 
 // Nome do conteúdo que recebe as atividades que já existiam. A pessoa
 // renomeia ou divide depois; o importante é não deixar atividade solta.
 const CONTEUDO_PADRAO = 'Geral';
+const DESCRICAO_CONTEUDO_PADRAO = 'Recebeu as atividades que existiam antes das disciplinas.';
 
 // Atividade sem disciplina escrita precisa de uma mesmo assim, porque não
 // existe atividade fora da cadeia. O nome é explícito para a pessoa achar e
@@ -109,7 +115,7 @@ function migrarGrupo({ grupo, tarefas, disciplinas, conteudos }) {
     const conteudo = {
       id: novoId(),
       nome: CONTEUDO_PADRAO,
-      descricao: 'Recebeu as atividades que existiam antes das disciplinas.',
+      descricao: DESCRICAO_CONTEUDO_PADRAO,
       disciplinaId: disciplina.id,
       ordem: irmaos.length,
     };
@@ -131,7 +137,7 @@ function migrarGrupo({ grupo, tarefas, disciplinas, conteudos }) {
     atividades.push({
       ...resto,
       conteudoId: conteudo.id,
-      // RN09 — toda atividade tem peso, e quem não tinha vale 1.
+      // RN09: toda atividade tem peso, e quem não tinha vale 1.
       peso: resto.peso ?? 1,
       // Data de conclusão estimada: o formato antigo não guardava quando a
       // atividade foi concluída, e `criadaEm` é o único instante que temos.
@@ -157,7 +163,7 @@ function migrarParaV1() {
   const tarefasAntigas = lerColecao(CHAVE_LEGADA_TAREFAS);
 
   // Não há tarefa no formato antigo: não existe nada para converter.
-  // Dois casos caem aqui — instalação nova, e dados que JÁ foram migrados mas
+  // Dois casos caem aqui: instalação nova, e dados que JÁ foram migrados mas
   // perderam o marcador de versão (limpeza parcial do armazenamento, outro
   // perfil do navegador, falha silenciosa na gravação da versão).
   // Nos dois, seguir adiante gravaria `atividades` com a lista vazia montada
@@ -173,7 +179,7 @@ function migrarParaV1() {
 
   // Segunda linha de defesa: a migração ACRESCENTA ao que já existe, em vez
   // de gravar por cima. Mesmo que uma guarda falhe um dia, o pior caso passa
-  // a ser dado duplicado — que se vê e se conserta — e não dado apagado.
+  // a ser dado duplicado (que se vê e se conserta), e não dado apagado.
   const atividadesExistentes = lerColecao(CHAVES.atividades);
 
   grupos.forEach((grupo) => {
@@ -192,7 +198,7 @@ function migrarParaV1() {
     atividadesFinais.push(...resultado.atividades);
   });
 
-  // RN07 — o primeiro membro cadastrado no grupo vira organizador; os demais,
+  // RN07: o primeiro membro cadastrado no grupo vira organizador; os demais,
   // participantes. Quem já tem perfil gravado fica como está.
   const membrosFinais = membros.map((membro) => {
     if (membro.perfil) return membro;
@@ -208,7 +214,7 @@ function migrarParaV1() {
   salvarColecao(CHAVES.conteudos, conteudosFinais);
   // Junta por id: a atividade carrega o id da tarefa que a originou, então
   // reconverter a mesma tarefa duas vezes produziria duas linhas com o mesmo
-  // id — e id repetido quebra chave de lista e faz `find` devolver só a
+  // id, e id repetido quebra chave de lista e faz `find` devolver só a
   // primeira. Indexar por id mantém a proteção do acréscimo e ainda deixa a
   // migração idempotente.
   const porId = new Map(
@@ -217,7 +223,7 @@ function migrarParaV1() {
   salvarColecao(CHAVES.atividades, [...porId.values()]);
 
   // Tarefa antiga cujo grupo não existe mais. O `removerGrupo` antigo fazia
-  // cascata, então órfã não deveria existir — mas se existir, ela não tem
+  // cascata, então órfã não deveria existir. Mas, se existir, ela não tem
   // onde morar no modelo novo, que exige a cadeia até o grupo.
   //
   // Em vez de sumir em silêncio, ela fica: a chave antiga só é apagada
@@ -244,13 +250,13 @@ function migrarParaV1() {
 /**
  * Passo 1 -> 2.
  *
- * RN06 (revisada) — toda atividade tem responsável. As que estavam sem um, ou
+ * RN06 (revisada): toda atividade tem responsável. As que estavam sem um, ou
  * com um que não existe mais no grupo, passam para o organizador do grupo
  * (o primeiro, se houver mais de um), ou para o primeiro membro. Grupo sem
  * membro nenhum não tem a quem atribuir: a atividade fica como está, e o
  * formulário pede o responsável na próxima edição.
  *
- * Paleta — a cor que não existe na paleta nova vira a equivalente
+ * Paleta: a cor que não existe na paleta nova vira a equivalente
  * (`CORES_SUBSTITUIDAS`), ou a cor padrão.
  *
  * Só grava a coleção que de fato mudou.
@@ -296,6 +302,52 @@ function migrarParaV2() {
 }
 
 /**
+ * Passo 2 -> 3.
+ *
+ * - A atividade ganha `disciplinaId`, tirado do conteúdo dela. Daqui para a
+ *   frente o conteúdo é opcional e a disciplina vem da própria atividade.
+ * - O conteúdo "Geral" que a versão 1 criou só para não deixar atividade
+ *   solta deixa de ser necessário: as atividades dele ficam direto na
+ *   disciplina e ele sai. Um "Geral" criado pela pessoa (outra descrição,
+ *   ou renomeado) fica.
+ * - Membro com um dos estilos de avatar que saíram passa para o padrão.
+ */
+function migrarParaV3() {
+  const membros = lerColecao(CHAVES.membros);
+  const conteudos = lerColecao(CHAVES.conteudos);
+  const atividades = lerColecao(CHAVES.atividades);
+
+  const disciplinaDoConteudo = new Map(conteudos.map((c) => [c.id, c.disciplinaId]));
+  const automaticos = new Set(
+    conteudos
+      .filter((c) => c.nome === CONTEUDO_PADRAO && c.descricao === DESCRICAO_CONTEUDO_PADRAO)
+      .map((c) => c.id)
+  );
+
+  let atividadesAjustadas = 0;
+  const atividadesFinais = atividades.map((a) => {
+    const disciplinaId = a.disciplinaId || disciplinaDoConteudo.get(a.conteudoId) || '';
+    const conteudoId = automaticos.has(a.conteudoId) ? '' : a.conteudoId || '';
+    if (disciplinaId === a.disciplinaId && conteudoId === a.conteudoId) return a;
+    atividadesAjustadas += 1;
+    return { ...a, disciplinaId, conteudoId };
+  });
+
+  let avataresAjustados = 0;
+  const membrosFinais = membros.map((m) => {
+    if (!m.estiloAvatar || estiloAvatarValido(m.estiloAvatar)) return m;
+    avataresAjustados += 1;
+    return { ...m, estiloAvatar: ESTILO_AVATAR_PADRAO };
+  });
+
+  if (atividadesAjustadas > 0) salvarColecao(CHAVES.atividades, atividadesFinais);
+  if (automaticos.size > 0) salvarColecao(CHAVES.conteudos, conteudos.filter((c) => !automaticos.has(c.id)));
+  if (avataresAjustados > 0) salvarColecao(CHAVES.membros, membrosFinais);
+
+  return { atividadesAjustadas, conteudosGeraisRemovidos: automaticos.size, avataresAjustados };
+}
+
+/**
  * Executa os passos que ainda não rodaram. Chamada uma vez, antes de a
  * aplicação montar. Devolve um resumo do que mudou (útil em teste e no log):
  * os campos do passo 1 no topo e o resumo do passo 2 em `v2`.
@@ -307,8 +359,9 @@ export function migrarDados() {
   }
 
   const resultado = versao < 1 ? migrarParaV1() : { migrou: false, motivo: 'ja-migrado' };
-  const v2 = migrarParaV2();
+  const v2 = versao < 2 ? migrarParaV2() : null;
+  const v3 = migrarParaV3();
   salvarVersaoDados(VERSAO_DADOS);
 
-  return { ...resultado, v2 };
+  return { ...resultado, v2, v3 };
 }

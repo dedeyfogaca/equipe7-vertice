@@ -56,16 +56,17 @@ export default function AtividadeDetalhe() {
     atualizarAtividade,
     removerAtividade,
     membrosDoGrupo,
-    conteudosDoGrupo,
+    disciplinasDoGrupo,
     trilhaDaAtividade,
     progressoDoConteudo,
+    progressoDaDisciplina,
     progressoAntesDe,
   } = useData();
 
   const existente = obterAtividade(id);
-  // RN01 — atividade de outro grupo é tratada como inexistente.
+  // RN01: atividade de outro grupo é tratada como inexistente.
   const atividade =
-    existente && conteudosDoGrupo(grupoAtivo.id).some((c) => c.id === existente.conteudoId) ? existente : null;
+    existente && disciplinasDoGrupo(grupoAtivo.id).some((d) => d.id === existente.disciplinaId) ? existente : null;
   useTitulo(atividade?.titulo ?? 'Atividade');
 
   const membros = membrosDoGrupo(grupoAtivo.id);
@@ -95,15 +96,20 @@ export default function AtividadeDetalhe() {
   const { conteudo, disciplina } = trilhaDaAtividade(atividade);
   const responsavel = membros.find((m) => m.id === atividade.responsavelId) || null;
   const concluida = atividade.status === STATUS.CONCLUIDO;
-  // RN20 — só o responsável conclui e muda o status. RN07 — o organizador
+  // RN20: só o responsável conclui e muda o status. RN07: o organizador
   // edita e exclui qualquer atividade; o participante, só as dele.
   const podeStatus = podeMudarStatus(atividade);
   const podeEditarEsta = podeEditar(atividade);
   const podeExcluir = podeExcluirAtividade(atividade);
   const nomeResponsavel = responsavel ? primeiroNome(responsavel.nome) : 'o responsável';
 
-  // RF15 — o que a conclusão desta atividade fez com o conteúdo.
-  const depois = concluida ? progressoDoConteudo(atividade.conteudoId) : null;
+  // RF15: o que a conclusão desta atividade fez com o conteúdo (ou com a
+  // disciplina, quando ela não está em conteúdo nenhum).
+  const depois = concluida
+    ? conteudo
+      ? progressoDoConteudo(conteudo.id)
+      : progressoDaDisciplina(atividade.disciplinaId)
+    : null;
   const antes = concluida ? progressoAntesDe(atividade) : null;
 
   const prazo = rotuloPrazo(atividade.prazo);
@@ -148,10 +154,10 @@ export default function AtividadeDetalhe() {
                 <Link to={`/disciplina/${disciplina.id}`} className="font-medium hover:text-primaria-texto">
                   {disciplina.nome}
                 </Link>
-                <span aria-hidden="true">›</span>
+                {conteudo && <span aria-hidden="true">›</span>}
               </>
             )}
-            <span>{conteudo?.nome}</span>
+            {conteudo && <span>{conteudo.nome}</span>}
           </p>
           <h1 className="text-[clamp(26px,3vw,36px)] font-semibold leading-[1.1] tracking-[-0.04em] text-forte">
             {atividade.titulo}
@@ -201,13 +207,16 @@ export default function AtividadeDetalhe() {
             )}
           </Card>
 
-          {/* Concluída, o retorno no topo já mostra a barra do conteúdo. */}
-          {conteudo && !concluida && (
+          {/* Concluída, o retorno no topo já mostra a barra. */}
+          {(conteudo || disciplina) && !concluida && (
             <Card as="section" aria-labelledby="t-conteudo" className="p-6">
               <TituloCartao id="t-conteudo" className="mb-4">
-                Progresso de {conteudo.nome}
+                Progresso de {(conteudo || disciplina).nome}
               </TituloCartao>
-              <BarraProgresso progresso={progressoDoConteudo(conteudo.id)} cor={disciplina?.cor} />
+              <BarraProgresso
+                progresso={conteudo ? progressoDoConteudo(conteudo.id) : progressoDaDisciplina(disciplina.id)}
+                cor={disciplina?.cor}
+              />
             </Card>
           )}
         </div>
@@ -269,7 +278,7 @@ export default function AtividadeDetalhe() {
               </span>
             </Dado>
 
-            {/* RN09 — o peso é o que a atividade vale no progresso do conteúdo. */}
+            {/* RN09: o peso é o que a atividade vale no progresso do conteúdo. */}
             <Dado rotulo="Peso">
               <span className="flex items-center gap-2.5">
                 <AnelPeso peso={atividade.peso} tamanho={28} />
@@ -279,7 +288,7 @@ export default function AtividadeDetalhe() {
               </span>
             </Dado>
 
-            {/* RN10 — xp = peso × 10, para o responsável, enquanto concluída. */}
+            {/* RN10: xp = peso × 10, para o responsável, enquanto concluída. */}
             <Dado rotulo="Experiência">
               <span className="flex flex-wrap items-baseline gap-x-2">
                 <span className="numero font-bold text-gam-texto">{xp} XP</span>

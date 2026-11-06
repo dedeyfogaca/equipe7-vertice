@@ -43,7 +43,7 @@ export function ddmm(iso) {
   return d ? `${doisDigitos(d.getDate())}/${doisDigitos(d.getMonth() + 1)}` : '';
 }
 
-/** Título do mês no calendário: 'Outubro de 2026' (o "de" em minúscula — D04). */
+/** Título do mês no calendário: 'Outubro de 2026' (o "de" em minúscula, D04). */
 export function tituloMes(ano, mes) {
   return `${capitalizar(MESES[mes])} de ${ano}`;
 }

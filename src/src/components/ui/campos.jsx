@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils.js';
 
 // Campos de formulário. Texto e área de texto são os controles nativos. As
 // listas de escolha (com cor, foto ou ícone) ficam em `selecao.jsx`, e a data
-// em `campo-data.jsx` — todos com a mesma moldura daqui.
+// em `campo-data.jsx`, todos com a mesma moldura daqui.
 
 export const baseControle =
   'w-full rounded-xl border border-borda bg-superficie text-[15px] text-texto shadow-cartao outline-none transition-[border-color,box-shadow] placeholder:text-apagado hover:border-borda-forte focus-visible:border-primaria-barra focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria-barra/15 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-perigo aria-[invalid=true]:focus-visible:ring-perigo/15';

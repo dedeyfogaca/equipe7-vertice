@@ -13,7 +13,7 @@
 //    Tratá-lo como 0% derrubaria o progresso da disciplina indevidamente.
 //
 // Por isso `null` é um retorno legítimo aqui, e significa "não há o que
-// medir" — quem chama precisa distinguir isso de zero.
+// medir". Quem chama precisa distinguir isso de zero.
 
 import { normalizarPeso, STATUS } from './constants.js';
 
@@ -37,7 +37,7 @@ function resumir(pesoConcluido, pesoTotal, { total, concluidas }) {
 }
 
 /**
- * RN08 — progresso de um conteúdo.
+ * RN08: progresso de um conteúdo.
  *
  * progresso = soma(peso das atividades CONCLUÍDAS) / soma(peso de TODAS)
  *
@@ -60,7 +60,7 @@ export function progressoDoConteudo(atividades = []) {
  *
  * Serve ao retorno da conclusão (RF15): para mostrar "antes → depois" não é
  * preciso guardar histórico nenhum. Basta recalcular o conteúdo fingindo que
- * esta atividade ainda não foi concluída — o peso dela continua no total,
+ * esta atividade ainda não foi concluída: o peso dela continua no total,
  * porque ela sempre existiu; o que muda é o lado de cima da razão.
  *
  * @param {Array} atividades atividades do conteúdo
@@ -75,13 +75,13 @@ export function progressoAntesDe(atividades = [], atividadeId) {
 }
 
 /**
- * RN14 — progresso de uma disciplina.
+ * RN14: progresso de uma disciplina.
  *
  * progresso = soma(peso concluído de TODOS os conteúdos)
  *           / soma(peso total de TODOS os conteúdos)
  *
  * Recebe as atividades já agrupadas por conteúdo para deixar visível que a
- * agregação é feita sobre os conteúdos — mas somando peso, não tirando média
+ * agregação é feita sobre os conteúdos, mas somando peso, não tirando média
  * de percentual.
  *
  * @param {Array<Array>} atividadesPorConteudo uma lista de atividades por conteúdo

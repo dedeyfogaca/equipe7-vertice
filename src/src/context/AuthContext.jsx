@@ -5,14 +5,14 @@ import { useData } from './DataContext.jsx';
 
 // Sessão: o grupo e quem, dentro dele, está usando o sistema.
 //
-// Continua sem senha — o acesso é seleção, como sempre foi. O membro entrou
+// Continua sem senha: o acesso é seleção, como sempre foi. O membro entrou
 // aqui por causa do RN07: "só o organizador exclui o grupo, gerencia membros,
 // disciplinas e conteúdos". Sem saber quem é a pessoa, não há o que comparar
 // com o perfil, e o campo `perfil` fica sendo enfeite.
 //
 // Um caso precisa de cuidado: o grupo recém-criado não tem membro nenhum, e
 // alguém precisa poder cadastrar o primeiro. Nesse caso quem está lá é
-// tratado como organizador — é o mesmo que a migração faz, dando
+// tratado como organizador. É o mesmo que a migração faz, dando
 // `organizador` ao primeiro membro do grupo.
 const AuthContext = createContext(null);
 
@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
   // O grupo tem gente, mas ainda não sabemos quem é quem está usando.
   const precisaIdentificar = Boolean(grupoAtivo) && !grupoVazio && !membroAtivo;
 
-  // RN07 — quem pode gerenciar membros, disciplinas, conteúdos e excluir o
+  // RN07: quem pode gerenciar membros, disciplinas, conteúdos e excluir o
   // grupo. Enquanto o grupo está vazio, quem o criou pode tudo.
   const ehOrganizador = grupoVazio || membroAtivo?.perfil === PERFIL.ORGANIZADOR;
 

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { CHAVES, lerColecao, novoId, salvarColecao } from '../lib/storage.js';
-import { COR_DISCIPLINA_PADRAO, normalizarPeso, PERFIL, STATUS } from '../lib/constants.js';
+import { COR_DISCIPLINA_PADRAO, normalizarPeso, PERFIL, STATUS, TIPO_EVENTO, tipoEventoValido } from '../lib/constants.js';
 import {
   progressoAntesDe as calcularProgressoAntesDe,
   progressoDaDisciplina as calcularProgressoDaDisciplina,
@@ -16,8 +16,8 @@ import {
 } from '../lib/gamificacao.js';
 import { ESTILO_AVATAR_PADRAO, estiloAvatarValido, novaSeedAvatar } from '../lib/avatar.js';
 
-// Guarda as coleções (grupos, membros, disciplinas, conteúdos, atividades e
-// conquistas) e expõe as operações de cadastro, edição e exclusão. Tudo fica
+// Guarda as coleções (grupos, membros, disciplinas, conteúdos, atividades,
+// eventos e conquistas) e expõe as operações de cadastro, edição e exclusão. Tudo fica
 // em useState e é espelhado no armazenamento do navegador por useEffect, então
 // recarregar a página não perde nada.
 //
@@ -32,8 +32,9 @@ export function DataProvider({ children }) {
   const [conteudos, setConteudos] = useState(() => lerColecao(CHAVES.conteudos));
   const [atividades, setAtividades] = useState(() => lerColecao(CHAVES.atividades));
   const [conquistas, setConquistas] = useState(() => lerColecao(CHAVES.conquistas));
+  const [eventos, setEventos] = useState(() => lerColecao(CHAVES.eventos));
 
-  // D02 — gravação recusada pelo navegador (armazenamento cheio ou
+  // D02: gravação recusada pelo navegador (armazenamento cheio ou
   // bloqueado). Cada coleção responde por si: a casca do sistema mostra o
   // aviso enquanto alguma delas estiver sem conseguir gravar, e ele some
   // sozinho quando a gravação volta a funcionar.
@@ -55,8 +56,9 @@ export function DataProvider({ children }) {
   useEffect(() => gravar(CHAVES.conteudos, conteudos), [conteudos, gravar]);
   useEffect(() => gravar(CHAVES.atividades, atividades), [atividades, gravar]);
   useEffect(() => gravar(CHAVES.conquistas, conquistas), [conquistas, gravar]);
+  useEffect(() => gravar(CHAVES.eventos, eventos), [eventos, gravar]);
 
-  // ----- Seletores por grupo (cada grupo só enxerga o que é dele — RN01) -----
+  // ----- Seletores por grupo (cada grupo só enxerga o que é dele, RN01) -----
   const membrosDoGrupo = useCallback(
     (grupoId) => membros.filter((m) => m.grupoId === grupoId),
     [membros]
@@ -82,36 +84,42 @@ export function DataProvider({ children }) {
     },
     [conteudos, disciplinas]
   );
-  // A atividade também não guarda grupoId: atividade -> conteudo -> disciplina -> grupo.
+  // A atividade não guarda grupoId: atividade -> disciplina -> grupo. O
+  // conteúdo é opcional desde 06/11/2026, então a disciplina fica na própria
+  // atividade (`disciplinaId`).
   const atividadesDoGrupo = useCallback(
     (grupoId) => {
       const idsDisciplinas = new Set(
         disciplinas.filter((d) => d.grupoId === grupoId).map((d) => d.id)
       );
-      const idsConteudos = new Set(
-        conteudos.filter((c) => idsDisciplinas.has(c.disciplinaId)).map((c) => c.id)
-      );
-      return atividades.filter((a) => idsConteudos.has(a.conteudoId));
+      return atividades.filter((a) => idsDisciplinas.has(a.disciplinaId));
     },
-    [atividades, conteudos, disciplinas]
+    [atividades, disciplinas]
   );
   const atividadesDoConteudo = useCallback(
     (conteudoId) => atividades.filter((a) => a.conteudoId === conteudoId),
     [atividades]
   );
   const atividadesDaDisciplina = useCallback(
-    (disciplinaId) => {
-      const idsConteudos = new Set(
-        conteudos.filter((c) => c.disciplinaId === disciplinaId).map((c) => c.id)
-      );
-      return atividades.filter((a) => idsConteudos.has(a.conteudoId));
-    },
-    [atividades, conteudos]
+    (disciplinaId) => atividades.filter((a) => a.disciplinaId === disciplinaId),
+    [atividades]
+  );
+  // Atividades da disciplina que não estão em conteúdo nenhum.
+  const atividadesSemConteudo = useCallback(
+    (disciplinaId) => atividades.filter((a) => a.disciplinaId === disciplinaId && !a.conteudoId),
+    [atividades]
+  );
+  const eventosDoGrupo = useCallback(
+    (grupoId) =>
+      eventos
+        .filter((e) => e.grupoId === grupoId)
+        .sort((a, b) => `${a.data} ${a.horaInicio || ''}`.localeCompare(`${b.data} ${b.horaInicio || ''}`)),
+    [eventos]
   );
 
   // ----- Grupos -----
 
-  // RF01 — quem cria o grupo informa o próprio nome e vira o primeiro membro,
+  // RF01: quem cria o grupo informa o próprio nome e vira o primeiro membro,
   // como organizador (RN07). O grupo nunca nasce sem ninguém para geri-lo.
   // A foto é opcional: sem ela, o grupo aparece com as iniciais do nome.
   const criarGrupo = useCallback(({ nome, descricao = '', criador = '', foto = '' }) => {
@@ -147,8 +155,8 @@ export function DataProvider({ children }) {
     setGrupos((atual) => atual.map((g) => (g.id === id ? { ...g, ...dados } : g)));
   }, []);
 
-  // RN02 — exclui um grupo e, em cascata, disciplinas, conteúdos, atividades,
-  // membros e as conquistas desses membros.
+  // RN02: exclui um grupo e, em cascata, disciplinas, conteúdos, atividades,
+  // eventos, membros e as conquistas desses membros.
   const removerGrupo = useCallback(
     (id) => {
       const idsDisciplinas = new Set(
@@ -163,7 +171,8 @@ export function DataProvider({ children }) {
       setMembros((atual) => atual.filter((m) => m.grupoId !== id));
       setDisciplinas((atual) => atual.filter((d) => !idsDisciplinas.has(d.id)));
       setConteudos((atual) => atual.filter((c) => !idsConteudos.has(c.id)));
-      setAtividades((atual) => atual.filter((a) => !idsConteudos.has(a.conteudoId)));
+      setAtividades((atual) => atual.filter((a) => !idsDisciplinas.has(a.disciplinaId)));
+      setEventos((atual) => atual.filter((e) => e.grupoId !== id));
       setConquistas((atual) => atual.filter((c) => !idsMembros.has(c.membroId)));
     },
     [disciplinas, conteudos, membros]
@@ -172,7 +181,7 @@ export function DataProvider({ children }) {
   // ----- Membros -----
   const criarMembro = useCallback(
     ({ nome, grupoId, funcao = '', email = '', avatar = '', estiloAvatar = '', foto = '', perfil }) => {
-      // RN07 — o primeiro membro de um grupo vazio é sempre o organizador
+      // RN07: o primeiro membro de um grupo vazio é sempre o organizador
       // (defeito D01). Os seguintes entram com o perfil escolhido.
       const primeiroDoGrupo = !membros.some((m) => m.grupoId === grupoId);
 
@@ -197,7 +206,7 @@ export function DataProvider({ children }) {
     setMembros((atual) => atual.map((m) => (m.id === id ? { ...m, ...dados } : m)));
   }, []);
 
-  // RN02 (revisada) — como toda atividade precisa de responsável (RN06), as
+  // RN02 (revisada): como toda atividade precisa de responsável (RN06), as
   // atividades do membro removido passam para quem a pessoa escolher. As
   // conquistas dele saem junto (`membro_conquista` é ON DELETE CASCADE).
   const removerMembro = useCallback((id, novoResponsavelId = '') => {
@@ -225,18 +234,15 @@ export function DataProvider({ children }) {
     setDisciplinas((atual) => atual.map((d) => (d.id === id ? { ...d, ...dados } : d)));
   }, []);
 
-  // RN02 — excluir a disciplina leva junto seus conteúdos e as atividades deles.
-  const removerDisciplina = useCallback(
-    (id) => {
-      const idsConteudos = new Set(
-        conteudos.filter((c) => c.disciplinaId === id).map((c) => c.id)
-      );
-      setDisciplinas((atual) => atual.filter((d) => d.id !== id));
-      setConteudos((atual) => atual.filter((c) => !idsConteudos.has(c.id)));
-      setAtividades((atual) => atual.filter((a) => !idsConteudos.has(a.conteudoId)));
-    },
-    [conteudos]
-  );
+  // RN02: excluir a disciplina leva junto seus conteúdos e atividades. Os
+  // eventos ligados a ela continuam, só que sem disciplina: uma prova
+  // marcada não deixa de existir porque a disciplina saiu do grupo.
+  const removerDisciplina = useCallback((id) => {
+    setDisciplinas((atual) => atual.filter((d) => d.id !== id));
+    setConteudos((atual) => atual.filter((c) => c.disciplinaId !== id));
+    setAtividades((atual) => atual.filter((a) => a.disciplinaId !== id));
+    setEventos((atual) => atual.map((e) => (e.disciplinaId === id ? { ...e, disciplinaId: '' } : e)));
+  }, []);
 
   const obterDisciplina = useCallback(
     (id) => disciplinas.find((d) => d.id === id) || null,
@@ -267,10 +273,11 @@ export function DataProvider({ children }) {
     setConteudos((atual) => atual.map((c) => (c.id === id ? { ...c, ...dados } : c)));
   }, []);
 
-  // RN13 — não se exclui conteúdo deixando atividade solta.
+  // RN13 (revisada em 06/11/2026): o conteúdo é opcional: excluir um
+  // conteúdo não apaga as atividades dele, elas ficam direto na disciplina.
   const removerConteudo = useCallback((id) => {
     setConteudos((atual) => atual.filter((c) => c.id !== id));
-    setAtividades((atual) => atual.filter((a) => a.conteudoId !== id));
+    setAtividades((atual) => atual.map((a) => (a.conteudoId === id ? { ...a, conteudoId: '' } : a)));
   }, []);
 
   const obterConteudo = useCallback(
@@ -300,13 +307,21 @@ export function DataProvider({ children }) {
   }, []);
 
   // ----- Atividades -----
+  // A disciplina é obrigatória; o conteúdo, opcional. Se vier só o conteúdo,
+  // a disciplina sai dele.
+  const disciplinaDe = useCallback(
+    (dados) => dados.disciplinaId || conteudos.find((c) => c.id === dados.conteudoId)?.disciplinaId || '',
+    [conteudos]
+  );
+
   const criarAtividade = useCallback((dados) => {
     const status = dados.status || STATUS.A_FAZER;
     const atividade = {
       id: novoId(),
       titulo: (dados.titulo || '').trim(),
       descricao: (dados.descricao || '').trim(),
-      conteudoId: dados.conteudoId,
+      disciplinaId: disciplinaDe(dados),
+      conteudoId: dados.conteudoId || '',
       prazo: dados.prazo || '',
       peso: normalizarPeso(dados.peso),
       status,
@@ -317,14 +332,17 @@ export function DataProvider({ children }) {
     };
     setAtividades((atual) => [...atual, atividade]);
     return atividade;
-  }, []);
+  }, [disciplinaDe]);
 
   const atualizarAtividade = useCallback((id, dados) => {
+    const disciplinaNova = dados.conteudoId !== undefined || dados.disciplinaId !== undefined ? disciplinaDe(dados) : null;
     setAtividades((atual) =>
       atual.map((a) => {
         if (a.id !== id) return a;
 
         const atualizada = { ...a, ...dados };
+        if (disciplinaNova) atualizada.disciplinaId = disciplinaNova;
+        if (dados.conteudoId !== undefined) atualizada.conteudoId = dados.conteudoId || '';
         if (dados.peso !== undefined) {
           atualizada.peso = normalizarPeso(dados.peso);
         }
@@ -343,7 +361,7 @@ export function DataProvider({ children }) {
         return atualizada;
       })
     );
-  }, []);
+  }, [disciplinaDe]);
 
   const removerAtividade = useCallback((id) => {
     setAtividades((atual) => atual.filter((a) => a.id !== id));
@@ -354,6 +372,41 @@ export function DataProvider({ children }) {
     [atividades]
   );
 
+  // ----- Eventos (RF31) -----
+  const montarEvento = (dados) => ({
+    titulo: (dados.titulo || '').trim(),
+    tipo: tipoEventoValido(dados.tipo) ? dados.tipo : TIPO_EVENTO.OUTRO,
+    data: dados.data || '',
+    // Sem horário = o dia todo.
+    horaInicio: dados.horaInicio || '',
+    horaFim: dados.horaInicio ? dados.horaFim || '' : '',
+    local: (dados.local || '').trim(),
+    disciplinaId: dados.disciplinaId || '',
+    descricao: (dados.descricao || '').trim(),
+  });
+
+  const criarEvento = useCallback((dados) => {
+    const evento = {
+      id: novoId(),
+      grupoId: dados.grupoId,
+      ...montarEvento(dados),
+      criadoPor: dados.criadoPor || '',
+      criadoEm: new Date().toISOString(),
+    };
+    setEventos((atual) => [...atual, evento]);
+    return evento;
+  }, []);
+
+  const atualizarEvento = useCallback((id, dados) => {
+    setEventos((atual) => atual.map((e) => (e.id === id ? { ...e, ...montarEvento({ ...e, ...dados }) } : e)));
+  }, []);
+
+  const removerEvento = useCallback((id) => {
+    setEventos((atual) => atual.filter((e) => e.id !== id));
+  }, []);
+
+  const obterEvento = useCallback((id) => eventos.find((e) => e.id === id) || null, [eventos]);
+
   // ----- Progresso (RN08, RN14) -----
   const progressoDoConteudo = useCallback(
     (conteudoId) =>
@@ -361,20 +414,28 @@ export function DataProvider({ children }) {
     [atividades]
   );
 
+  // O progresso de onde a atividade está: o conteúdo, se ela tiver um, ou a
+  // disciplina, se não tiver.
   const progressoAntesDe = useCallback(
     (atividade) =>
       calcularProgressoAntesDe(
-        atividades.filter((a) => a.conteudoId === atividade?.conteudoId),
+        atividade?.conteudoId
+          ? atividades.filter((a) => a.conteudoId === atividade.conteudoId)
+          : atividades.filter((a) => a.disciplinaId === atividade?.disciplinaId),
         atividade?.id
       ),
     [atividades]
   );
 
+  // RN14: soma os pesos de todas as atividades da disciplina, estejam ou não
+  // num conteúdo. As sem conteúdo entram como mais um bloco da soma.
   const progressoDaDisciplina = useCallback(
     (disciplinaId) => {
+      const daDisciplina = atividades.filter((a) => a.disciplinaId === disciplinaId);
       const atividadesPorConteudo = conteudos
         .filter((c) => c.disciplinaId === disciplinaId)
-        .map((c) => atividades.filter((a) => a.conteudoId === c.id));
+        .map((c) => daDisciplina.filter((a) => a.conteudoId === c.id));
+      atividadesPorConteudo.push(daDisciplina.filter((a) => !a.conteudoId));
       return calcularProgressoDaDisciplina(atividadesPorConteudo);
     },
     [atividades, conteudos]
@@ -428,7 +489,7 @@ export function DataProvider({ children }) {
     [membrosDoGrupo, atividadesDoGrupo, conquistas]
   );
 
-  // RN12 — concessão das conquistas. A cada mudança nas atividades, confere
+  // RN12: concessão das conquistas. A cada mudança nas atividades, confere
   // os marcos de cada membro e grava o que ainda não tinha sido concedido.
   // Nada é retirado depois: concluir e desmarcar não revoga a conquista.
   //
@@ -439,7 +500,7 @@ export function DataProvider({ children }) {
   const [novasConquistas, setNovasConquistas] = useState([]);
 
   // Conquistas já concedidas. Fica num ref, atualizado na hora, para a mesma
-  // conquista nunca ser concedida duas vezes — nem quando o React roda o
+  // conquista nunca ser concedida duas vezes, nem quando o React roda o
   // efeito em dobro no modo de desenvolvimento.
   const concedidas = useRef(null);
   if (concedidas.current === null) {
@@ -472,13 +533,12 @@ export function DataProvider({ children }) {
 
   const falhaGravacao = falhas.size > 0;
 
-  // Sobe a cadeia a partir da atividade.
+  // Disciplina e conteúdo (se houver) da atividade.
   const trilhaDaAtividade = useCallback(
     (atividade) => {
-      const conteudo = conteudos.find((c) => c.id === atividade?.conteudoId) || null;
-      const disciplina = conteudo
-        ? disciplinas.find((d) => d.id === conteudo.disciplinaId) || null
-        : null;
+      const conteudo = (atividade?.conteudoId && conteudos.find((c) => c.id === atividade.conteudoId)) || null;
+      const disciplinaId = atividade?.disciplinaId || conteudo?.disciplinaId;
+      const disciplina = disciplinas.find((d) => d.id === disciplinaId) || null;
       return { conteudo, disciplina };
     },
     [conteudos, disciplinas]
@@ -486,13 +546,14 @@ export function DataProvider({ children }) {
 
   // Importa um pacote pronto (os dados de exemplo da tela de acesso).
   const importarExemplo = useCallback(
-    ({ grupo, membros: ms, disciplinas: ds = [], conteudos: cs = [], atividades: ts }) => {
+    ({ grupo, membros: ms, disciplinas: ds = [], conteudos: cs = [], atividades: ts, eventos: es = [] }) => {
       silenciar.current = true;
       setGrupos((atual) => [...atual, grupo]);
       setMembros((atual) => [...atual, ...ms]);
       setDisciplinas((atual) => [...atual, ...ds]);
       setConteudos((atual) => [...atual, ...cs]);
       setAtividades((atual) => [...atual, ...ts]);
+      setEventos((atual) => [...atual, ...es]);
       return grupo;
     },
     []
@@ -505,6 +566,7 @@ export function DataProvider({ children }) {
       disciplinas,
       conteudos,
       atividades,
+      eventos,
       conquistas,
       falhaGravacao,
       criarGrupo,
@@ -526,6 +588,12 @@ export function DataProvider({ children }) {
       atualizarAtividade,
       removerAtividade,
       obterAtividade,
+      criarEvento,
+      atualizarEvento,
+      removerEvento,
+      obterEvento,
+      eventosDoGrupo,
+      atividadesSemConteudo,
       membrosDoGrupo,
       disciplinasDoGrupo,
       conteudosDaDisciplina,
@@ -552,6 +620,7 @@ export function DataProvider({ children }) {
       disciplinas,
       conteudos,
       atividades,
+      eventos,
       conquistas,
       falhaGravacao,
       criarGrupo,
@@ -573,6 +642,12 @@ export function DataProvider({ children }) {
       atualizarAtividade,
       removerAtividade,
       obterAtividade,
+      criarEvento,
+      atualizarEvento,
+      removerEvento,
+      obterEvento,
+      eventosDoGrupo,
+      atividadesSemConteudo,
       membrosDoGrupo,
       disciplinasDoGrupo,
       conteudosDaDisciplina,

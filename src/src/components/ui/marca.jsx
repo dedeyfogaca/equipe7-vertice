@@ -8,8 +8,9 @@ import { cn } from '../../lib/utils.js';
 // O desenho tem simetria de três pontas em torno do centro do triângulo
 // (50,2; 30,7), e é em torno desse ponto que ele gira: ao passar o mouse
 // sobre um elemento com a classe `marca-giro`, dá uma volta inteira, rápida
-// (quem pede menos movimento não vê o giro). Ao abrir um grupo, a marca rola
-// pela tela como uma roda — ver `layout/TransicaoGrupo.jsx`.
+// (quem pede menos movimento não vê o giro). Ao abrir um grupo, a marca dá um
+// terço de volta enquanto a tela se dissolve no painel (ver
+// `layout/TransicaoGrupo.jsx`).
 const CENTRO = '50.18px 30.73px';
 
 export function SimboloVertice({ tamanho = 28, className }) {

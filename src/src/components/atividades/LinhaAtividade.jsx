@@ -16,7 +16,7 @@ import { cn, primeiroNome } from '../../lib/utils.js';
  * (disciplina › conteúdo), prazo e responsável. A linha inteira leva ao
  * detalhe.
  *
- * Com `aoAlternar`, a linha ganha o botão de concluir na frente — ativo só
+ * Com `aoAlternar`, a linha ganha o botão de concluir na frente, ativo só
  * nas atividades de quem está usando (RN20). Nas dos outros, o círculo só
  * mostra a situação.
  */
@@ -96,7 +96,8 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
           {atividade.titulo}
         </Link>
         <p className="mt-0.5 truncate text-[13px] text-sutil">
-          {disciplina?.nome ?? 'Sem disciplina'} › {conteudo?.nome ?? 'Sem conteúdo'}
+          {disciplina?.nome ?? 'Sem disciplina'}
+          {conteudo ? ` › ${conteudo.nome}` : ''}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:hidden">{selos}</div>
       </div>

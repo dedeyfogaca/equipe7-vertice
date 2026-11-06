@@ -3,13 +3,17 @@
 // Roda com `npm run verificar`, sem instalar nada.
 //
 // O alvo é o RN20, de 29/10/2026: cada pessoa conclui as próprias
-// atividades, e ninguém — nem o organizador — muda o status da atividade de
+// atividades, e ninguém (nem o organizador) muda o status da atividade de
 // outra pessoa. Junto, o RN07: o participante edita e exclui só as suas; o
 // organizador, qualquer uma do grupo.
+//
+// No fim, os eventos (RN21, de 03/11/2026): quem cadastrou e o organizador
+// editam e excluem; os outros, não.
 
 import {
   ehResponsavel,
   podeEditarAtividade,
+  podeEditarEvento,
   podeExcluirAtividade,
   podeMudarStatus,
   statusAoSalvar,
@@ -33,7 +37,7 @@ const bruno = { membroId: 'bruno', organizador: false }; // participante
 const carla = { membroId: 'carla', organizador: false }; // participante
 const grupoVazio = { membroId: null, organizador: true }; // montando o grupo
 
-console.log('\nRN20 — só o responsável muda o status\n');
+console.log('\nRN20: só o responsável muda o status\n');
 
 checar('Ana conclui a própria atividade', podeMudarStatus(daAna, ana), true);
 checar('Bruno conclui a própria atividade', podeMudarStatus(doBruno, bruno), true);
@@ -42,7 +46,7 @@ checar('nem a organizadora conclui a do Bruno', podeMudarStatus(doBruno, ana), f
 checar('ninguém da sessão, ninguém conclui', podeMudarStatus(daAna, grupoVazio), false);
 checar('atividade sem responsável não tem quem conclua', podeMudarStatus({ responsavelId: '' }, ana), false);
 
-console.log('\nRN07 — editar e excluir\n');
+console.log('\nRN07: editar e excluir\n');
 
 checar('a organizadora edita a atividade do Bruno', podeEditarAtividade(doBruno, ana), true);
 checar('a organizadora exclui a atividade do Bruno', podeExcluirAtividade(doBruno, ana), true);
@@ -53,7 +57,7 @@ checar('a Carla não exclui a do Bruno', podeExcluirAtividade(doBruno, carla), f
 checar('grupo vazio: quem monta edita (dado antigo)', podeEditarAtividade(daAna, grupoVazio), true);
 checar('responsável é reconhecido', [ehResponsavel(daAna, ana), ehResponsavel(daAna, bruno)], [true, false]);
 
-console.log('\nRN20 no formulário — o status que é gravado\n');
+console.log('\nRN20 no formulário: o status que é gravado\n');
 
 checar(
   'nova, para si mesmo: vale o status escolhido',
@@ -80,6 +84,16 @@ checar(
   statusAoSalvar({ statusEscolhido: 'a fazer', statusAtual: 'concluido', responsavelId: 'bruno', quem: bruno }),
   'a fazer'
 );
+
+console.log('\nEventos (RN21)\n');
+
+const provaDoBruno = { id: 'e1', titulo: 'Prova de Banco de Dados', criadoPor: 'bruno' };
+const semAutor = { id: 'e2', titulo: 'Palestra' };
+checar('quem cadastrou edita o evento', podeEditarEvento(provaDoBruno, { membroId: 'bruno', organizador: false }), true);
+checar('outro participante não edita', podeEditarEvento(provaDoBruno, { membroId: 'carla', organizador: false }), false);
+checar('o organizador edita o evento de qualquer um', podeEditarEvento(provaDoBruno, { membroId: 'ana', organizador: true }), true);
+checar('evento sem autor: só o organizador', [podeEditarEvento(semAutor, { membroId: 'carla', organizador: false }), podeEditarEvento(semAutor, { membroId: 'ana', organizador: true })], [false, true]);
+checar('sem saber quem é, ninguém edita', podeEditarEvento(provaDoBruno, { membroId: null, organizador: false }), false);
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

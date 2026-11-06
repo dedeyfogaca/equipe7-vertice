@@ -9,8 +9,8 @@ import { SimboloVertice } from '../ui/marca.jsx';
 // 1. Uma cortina na cor do fundo cobre a tela de acesso, e a marca do
 //    Vértice surge no centro, com o nome do grupo e um fio de progresso.
 // 2. Com a tela coberta, a sessão é aberta e o painel monta por baixo.
-// 3. A marca dá um terço de volta — o desenho tem três pontas, então para
-//    exatamente como começou — enquanto o fio se completa.
+// 3. A marca dá um terço de volta (o desenho tem três pontas, então para
+//    exatamente como começou) enquanto o fio se completa.
 // 4. A cortina se dissolve, e o conteúdo do painel assenta no lugar.
 //
 // Só transform e opacity são animados, pela Web Animations API: o navegador

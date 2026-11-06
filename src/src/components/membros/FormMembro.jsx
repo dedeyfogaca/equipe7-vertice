@@ -25,7 +25,7 @@ import { semErroEm } from '../../lib/utils.js';
  */
 export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = false, aoSalvar }) {
   const edicao = Boolean(membro);
-  // RN07 — o primeiro membro de um grupo vazio é o organizador (D01).
+  // RN07: o primeiro membro de um grupo vazio é o organizador (D01).
   const primeiroDoGrupo = !edicao && membros.length === 0;
 
   const [form, setForm] = useState(() => ({
@@ -124,7 +124,7 @@ export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = f
           </Field>
         </div>
 
-        {/* RN07 — o perfil decide quem gerencia membros, disciplinas e
+        {/* RN07: o perfil decide quem gerencia membros, disciplinas e
             conteúdos. O participante cadastra e edita atividades. */}
         {proprioPerfil ? (
           <p className="text-sm text-sutil">

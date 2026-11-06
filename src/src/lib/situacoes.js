@@ -2,7 +2,7 @@
 //
 // "A fazer", "Fazendo", "Concluídas" e "Atrasadas" não são contadores: são
 // filtros. Clicar numa delas filtra a lista. Por isso a regra mora aqui, e
-// não na tela — o Painel conta e a lista de Atividades filtra usando
+// não na tela. O Painel conta e a lista de Atividades filtra usando
 // exatamente o mesmo predicado.
 //
 // Repare que "atrasada" não é um status: é um cruzamento de prazo com status
@@ -27,7 +27,7 @@ export const SITUACAO_OPCOES = [
   { valor: SITUACAO.ATRASADAS, rotulo: 'Atrasadas', tom: 'atrasada' },
 ];
 
-/** RN05 — atrasada é prazo no passado com status diferente de concluído. */
+/** RN05: atrasada é prazo no passado com status diferente de concluído. */
 export function estaAtrasada(atividade) {
   if (!atividade || atividade.status === STATUS.CONCLUIDO) return false;
   const dias = diasRestantes(atividade.prazo);
@@ -51,7 +51,7 @@ export function naSituacao(atividade, situacao) {
 }
 
 /**
- * A situação que representa a atividade, quando é preciso escolher uma só —
+ * A situação que representa a atividade, quando é preciso escolher uma só:
  * na cor da barra do cartão, no ponto do calendário.
  *
  * A ordem importa: atraso vem antes do status, porque é o que precisa ser

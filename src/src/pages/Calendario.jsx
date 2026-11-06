@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { CalendarClock, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -10,6 +10,10 @@ import { Button } from '../components/ui/botao.jsx';
 import { Badge, Card, EmptyState, Rotulo } from '../components/ui/basicos.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
 import { ProximosFeriados } from '../components/ProximosFeriados.jsx';
+import { CartaoEvento } from '../components/eventos/CartaoEvento.jsx';
+import { horarioDoEvento, iconeDoEvento } from '../components/eventos/tipos.jsx';
+import { useEventos } from '../components/eventos/useEventos.jsx';
+import { rotuloTipoEvento } from '../lib/constants.js';
 import { STATUS } from '../lib/constants.js';
 import { dataLocal, hojeISO, paraISO } from '../lib/datas.js';
 import {
@@ -26,9 +30,10 @@ import { estaAtrasada, situacaoDaAtividade, SITUACAO } from '../lib/situacoes.js
 import { cn, corComAlfa, plural, primeiroNome } from '../lib/utils.js';
 
 // Calendário do grupo (RF20): as entregas de cada dia, na cor da disciplina,
-// como numa agenda. Três jeitos de ver — mês, semana e lista — e um painel
-// com o dia escolhido. Trocar de mês (ou de semana) passa a página para o
-// lado, pelos botões ou deslizando o dedo no celular.
+// e os eventos (RF31: prova, palestra, reunião), como numa agenda. Três jeitos
+// de ver (mês, semana e lista) e um painel com o dia escolhido. Trocar de mês
+// (ou de semana) passa a página para o lado, pelos botões ou deslizando o
+// dedo no celular.
 
 const VISOES = [
   { valor: 'mes', rotulo: 'Mês' },
@@ -104,6 +109,31 @@ function Etiqueta({ item, inteira = false }) {
   );
 }
 
+/** Etiqueta do evento: contorno em vez de faixa, com o ícone (e a hora, na semana). */
+function EtiquetaEvento({ item, inteira = false }) {
+  const { evento, disciplina } = item;
+  const Icone = iconeDoEvento(evento.tipo);
+  return (
+    <span
+      className={cn(
+        'flex items-center gap-1.5 rounded-[7px] border border-borda-forte bg-superficie px-1.5 py-[3px] text-left text-[12px] font-semibold leading-snug text-forte',
+        inteira ? 'items-start' : 'min-w-0'
+      )}
+    >
+      <Icone
+        aria-hidden="true"
+        className="size-3.5 shrink-0"
+        style={{ color: disciplina?.cor || 'var(--primaria-texto)' }}
+        strokeWidth={2.2}
+      />
+      <span className={cn('min-w-0', inteira ? 'break-words' : 'truncate')}>
+        {inteira && evento.horaInicio && <span className="numero font-medium text-sutil">{evento.horaInicio} </span>}
+        {evento.titulo}
+      </span>
+    </span>
+  );
+}
+
 function CartaoDoDia({ item, membros }) {
   const { atividade, disciplina, conteudo } = item;
   const responsavel = membros.find((m) => m.id === atividade.responsavelId);
@@ -122,7 +152,8 @@ function CartaoDoDia({ item, membros }) {
           {atividade.titulo}
         </Link>
         <span className="text-[13px] text-sutil">
-          {disciplina?.nome} › {conteudo?.nome}
+          {disciplina?.nome}
+          {conteudo ? ` › ${conteudo.nome}` : ''}
         </span>
         <span className="flex flex-wrap items-center gap-1.5">
           <Badge tom={tomDaAtividade(atividade)}>{rotuloSituacao(atividade)}</Badge>
@@ -137,16 +168,19 @@ function CartaoDoDia({ item, membros }) {
 export default function Calendario() {
   useTitulo('Calendário');
   const { grupoAtivo } = useAuth();
-  const { atividadesDoGrupo, disciplinasDoGrupo, trilhaDaAtividade, membros } = useData();
+  const { atividadesDoGrupo, disciplinasDoGrupo, eventosDoGrupo, trilhaDaAtividade, membros } = useData();
+  const { novoEvento, menuDoEvento, janelas } = useEventos();
 
   const atividades = atividadesDoGrupo(grupoAtivo.id);
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
+  const eventos = eventosDoGrupo(grupoAtivo.id);
 
   const hoje = hojeISO();
   const [selecionado, setSelecionado] = useState(hoje);
   const [mesVisivel, setMesVisivel] = useState(() => primeiroDoMes(new Date()));
   const [visao, setVisao] = useState('mes');
   const [ocultas, setOcultas] = useState(() => new Set());
+  const [mostrarEventos, setMostrarEventos] = useState(true);
   // Para que lado a última troca de página andou (decide a animação).
   const [direcao, setDirecao] = useState(null);
   const painelRef = useRef(null);
@@ -174,6 +208,20 @@ export default function Calendario() {
     );
     return mapa;
   }, [atividades, trilhaDaAtividade, ocultas]);
+
+  // Eventos por dia (já em ordem de horário). O de disciplina escondida na
+  // legenda some junto com ela.
+  const eventosPorDia = useMemo(() => {
+    const mapa = new Map();
+    if (!mostrarEventos) return mapa;
+    eventos.forEach((evento) => {
+      if (evento.disciplinaId && ocultas.has(evento.disciplinaId)) return;
+      const disciplina = disciplinas.find((d) => d.id === evento.disciplinaId) || null;
+      if (!mapa.has(evento.data)) mapa.set(evento.data, []);
+      mapa.get(evento.data).push({ evento, disciplina });
+    });
+    return mapa;
+  }, [eventos, disciplinas, ocultas, mostrarEventos]);
 
   // Quadro do mês: semanas completas, de domingo a sábado.
   const celulas = useMemo(() => {
@@ -260,14 +308,15 @@ export default function Calendario() {
   };
 
   const doSelecionado = porDia.get(selecionado) || [];
+  const eventosDoSelecionado = eventosPorDia.get(selecionado) || [];
   const feriadoSelecionado = feriadoEm(selecionado);
 
+  // Lista do mês: os dias com entrega ou evento.
   const doMesEmLista = useMemo(() => {
     const prefixo = `${ano}-${String(mes + 1).padStart(2, '0')}-`;
-    return [...porDia.entries()]
-      .filter(([iso]) => iso.startsWith(prefixo))
-      .sort(([a], [b]) => a.localeCompare(b));
-  }, [porDia, ano, mes]);
+    const dias = new Set([...porDia.keys(), ...eventosPorDia.keys()].filter((iso) => iso.startsWith(prefixo)));
+    return [...dias].sort().map((iso) => [iso, porDia.get(iso) || [], eventosPorDia.get(iso) || []]);
+  }, [porDia, eventosPorDia, ano, mes]);
 
   const semanaTexto =
     visao === 'semana'
@@ -326,6 +375,10 @@ export default function Calendario() {
               </button>
             ))}
           </div>
+          <Button variante="secundaria" onClick={() => novoEvento(selecionado)}>
+            <CalendarPlus aria-hidden="true" />
+            Novo evento
+          </Button>
           <Button asChild>
             <Link to={`/atividade/nova?prazo=${selecionado}`}>
               <Plus aria-hidden="true" />
@@ -335,8 +388,24 @@ export default function Calendario() {
         </div>
       </header>
 
-      {disciplinas.length > 0 && (
-        <div role="group" aria-label="Disciplinas visíveis" className="flex flex-wrap gap-2">
+      {(disciplinas.length > 0 || eventos.length > 0) && (
+        <div role="group" aria-label="O que aparece no calendário" className="flex flex-wrap gap-2">
+          {eventos.length > 0 && (
+            <button
+              type="button"
+              aria-pressed={mostrarEventos}
+              onClick={() => setMostrarEventos((atual) => !atual)}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-[opacity,border-color]',
+                mostrarEventos
+                  ? 'border border-borda-forte bg-superficie text-texto'
+                  : 'border border-dashed border-borda-forte text-apagado opacity-70'
+              )}
+            >
+              <CalendarClock aria-hidden="true" className="size-4 text-primaria-texto" />
+              Eventos
+            </button>
+          )}
           {disciplinas.map((d) => {
             const ligada = !ocultas.has(d.id);
             return (
@@ -385,14 +454,19 @@ export default function Calendario() {
                   const iso = paraISO(data);
                   const doMes = data.getMonth() === mes;
                   const itens = porDia.get(iso) || [];
+                  const doDia = eventosPorDia.get(iso) || [];
                   const feriado = feriadoEm(iso);
                   const ehHoje = iso === hoje;
                   const ehSelecionado = iso === selecionado;
                   const ultimaLinha = i >= celulas.length - 7;
+                  // Cabem três etiquetas: os eventos primeiro, depois as entregas.
+                  const vagasEntregas = Math.max(0, 3 - doDia.length);
+                  const sobra = Math.max(0, doDia.length - 3) + Math.max(0, itens.length - vagasEntregas);
                   const rotulo = [
                     diaEMes(data),
                     ehHoje ? 'hoje' : null,
                     plural(itens.length, 'entrega'),
+                    doDia.length > 0 ? plural(doDia.length, 'evento') : null,
                     feriado ? `feriado: ${feriado.name}` : null,
                   ]
                     .filter(Boolean)
@@ -435,15 +509,23 @@ export default function Calendario() {
                         )}
                       </span>
                       <span className="hidden flex-col gap-1 sm:flex">
-                        {itens.slice(0, 3).map((item) => (
+                        {doDia.slice(0, 3).map((item) => (
+                          <EtiquetaEvento key={item.evento.id} item={item} />
+                        ))}
+                        {itens.slice(0, vagasEntregas).map((item) => (
                           <Etiqueta key={item.atividade.id} item={item} />
                         ))}
-                        {itens.length > 3 && (
-                          <span className="pl-1 text-[12px] text-sutil">+{itens.length - 3} mais</span>
-                        )}
+                        {sobra > 0 && <span className="pl-1 text-[12px] text-sutil">+{sobra} mais</span>}
                       </span>
-                      {itens.length > 0 && (
+                      {itens.length + doDia.length > 0 && (
                         <span aria-hidden="true" className="flex flex-wrap gap-1 px-1 sm:hidden">
+                          {doDia.slice(0, 2).map((item) => (
+                            <span
+                              key={item.evento.id}
+                              className="size-1.5 rounded-full ring-[1.5px] ring-inset"
+                              style={{ '--tw-ring-color': item.disciplina?.cor || 'var(--primaria-texto)' }}
+                            />
+                          ))}
                           {itens.slice(0, 4).map((item) => (
                             <span
                               key={item.atividade.id}
@@ -473,6 +555,7 @@ export default function Calendario() {
               {diasDaSemana.map((data, i) => {
                 const iso = paraISO(data);
                 const itens = porDia.get(iso) || [];
+                const doDia = eventosPorDia.get(iso) || [];
                 const feriado = feriadoEm(iso);
                 const ehHoje = iso === hoje;
                 const ehSelecionado = iso === selecionado;
@@ -503,14 +586,22 @@ export default function Calendario() {
                       >
                         {data.getDate()}
                       </span>
-                      <span className="sr-only">{plural(itens.length, 'entrega')}</span>
+                      <span className="sr-only">
+                        {plural(itens.length, 'entrega')}
+                        {doDia.length > 0 ? `, ${plural(doDia.length, 'evento')}` : ''}
+                      </span>
                     </button>
                     {feriado && (
                       <p className="mb-2 px-1 text-[11px] font-semibold leading-snug text-feriado">{feriado.name}</p>
                     )}
                     <ul className="flex flex-col gap-1.5 md:min-h-[320px]">
+                      {doDia.map((item) => (
+                        <li key={item.evento.id} title={`${rotuloTipoEvento(item.evento.tipo)}, ${horarioDoEvento(item.evento)}`}>
+                          <EtiquetaEvento item={item} inteira />
+                        </li>
+                      ))}
                       {itens.length === 0 ? (
-                        <li className="px-1 text-[12px] text-apagado">Sem entregas</li>
+                        doDia.length === 0 && <li className="px-1 text-[12px] text-apagado">Nada marcado</li>
                       ) : (
                         itens.map((item) => (
                           <li key={item.atividade.id}>
@@ -533,13 +624,13 @@ export default function Calendario() {
               <Card>
                 <EmptyState
                   icone={CalendarDays}
-                  titulo={`Nenhuma entrega em ${MESES[mes]}`}
-                  descricao="As atividades aparecem aqui no dia do prazo, na cor da disciplina."
+                  titulo={`Nada marcado em ${MESES[mes]}`}
+                  descricao="As atividades aparecem aqui no dia do prazo, na cor da disciplina, junto com os eventos do grupo."
                 />
               </Card>
             ) : (
               <div key={`lista-${ano}-${mes}`} className={cn('flex flex-col gap-5', animacao)}>
-                {doMesEmLista.map(([iso, itens]) => {
+                {doMesEmLista.map(([iso, itens, doDia]) => {
                   const data = dataLocal(iso);
                   const feriado = feriadoEm(iso);
                   return (
@@ -552,13 +643,24 @@ export default function Calendario() {
                         {iso === hoje && <Badge tom="primaria">Hoje</Badge>}
                         {feriado && <Badge tom="feriado">{feriado.name}</Badge>}
                       </h2>
-                      <Card className="overflow-hidden">
-                        <ul className="divide-y divide-divisor">
-                          {itens.map(({ atividade }) => (
-                            <LinhaAtividade key={atividade.id} atividade={atividade} />
+                      {doDia.length > 0 && (
+                        <ul className={cn('flex flex-col gap-2', itens.length > 0 && 'mb-2.5')}>
+                          {doDia.map(({ evento, disciplina }) => (
+                            <li key={evento.id}>
+                              <CartaoEvento evento={evento} disciplina={disciplina} compacto mostrarDia={false} acoes={menuDoEvento(evento)} />
+                            </li>
                           ))}
                         </ul>
-                      </Card>
+                      )}
+                      {itens.length > 0 && (
+                        <Card className="overflow-hidden">
+                          <ul className="divide-y divide-divisor">
+                            {itens.map(({ atividade }) => (
+                              <LinhaAtividade key={atividade.id} atividade={atividade} />
+                            ))}
+                          </ul>
+                        </Card>
+                      )}
                     </section>
                   );
                 })}
@@ -587,28 +689,52 @@ export default function Calendario() {
               Feriado nacional: {feriadoSelecionado.name}
             </p>
           )}
+          {eventosDoSelecionado.length > 0 && (
+            <ul aria-label="Eventos do dia" className="flex flex-col gap-2">
+              {eventosDoSelecionado.map(({ evento, disciplina }) => (
+                <li key={evento.id}>
+                  <CartaoEvento evento={evento} disciplina={disciplina} compacto mostrarDia={false} acoes={menuDoEvento(evento)} />
+                </li>
+              ))}
+            </ul>
+          )}
           {doSelecionado.length === 0 ? (
-            <p className="text-[15px] leading-relaxed text-sutil">Nenhuma entrega neste dia.</p>
+            eventosDoSelecionado.length === 0 && (
+              <p className="text-[15px] leading-relaxed text-sutil">Nada marcado neste dia.</p>
+            )
           ) : (
-            <ul className="flex flex-col gap-2.5">
+            <ul aria-label="Entregas do dia" className="flex flex-col gap-2.5">
               {doSelecionado.map((item) => (
                 <CartaoDoDia key={item.atividade.id} item={item} membros={membros} />
               ))}
             </ul>
           )}
-          <Link
-            to={`/atividade/nova?prazo=${selecionado}`}
-            className="flex items-center justify-center gap-2 rounded-full border border-dashed border-borda-forte p-3 text-sm font-medium text-suave transition-colors hover:border-primaria-barra hover:text-primaria-texto"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            Nova atividade neste dia
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              to={`/atividade/nova?prazo=${selecionado}`}
+              aria-label="Nova atividade neste dia"
+              className="flex items-center justify-center gap-1.5 rounded-full border border-dashed border-borda-forte px-2 py-3 text-[13px] font-medium text-suave transition-colors hover:border-primaria-barra hover:text-primaria-texto"
+            >
+              <Plus className="size-4 shrink-0" aria-hidden="true" />
+              Atividade
+            </Link>
+            <button
+              type="button"
+              onClick={() => novoEvento(selecionado)}
+              aria-label="Novo evento neste dia"
+              className="flex items-center justify-center gap-1.5 rounded-full border border-dashed border-borda-forte px-2 py-3 text-[13px] font-medium text-suave transition-colors hover:border-primaria-barra hover:text-primaria-texto"
+            >
+              <CalendarPlus className="size-4 shrink-0" aria-hidden="true" />
+              Evento
+            </button>
+          </div>
           <div className="border-t border-divisor pt-4">
             <ProximosFeriados feriados={feriados} carregando={carregando} erro={erro} />
           </div>
         </Card>
         )}
       </div>
+      {janelas}
     </div>
   );
 }

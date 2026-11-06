@@ -92,7 +92,7 @@ export function sugerirCorDisciplina(coresEmUso = []) {
   return ORDEM_SUGESTAO.find((c) => !coresEmUso.includes(c)) ?? ORDEM_SUGESTAO[0];
 }
 
-// RN07 — perfis dentro do grupo. Só o organizador gerencia membros,
+// RN07: perfis dentro do grupo. Só o organizador gerencia membros,
 // disciplinas e conteúdos e exclui o grupo; o participante cadastra e edita
 // atividades.
 export const PERFIL = {
@@ -109,7 +109,7 @@ export function rotuloPerfil(valor) {
   return PERFIL_OPCOES.find((o) => o.valor === valor)?.rotulo ?? valor;
 }
 
-// RN09 — o peso da atividade é um inteiro de 1 a 5. Sem peso definido, vale 1.
+// RN09: o peso da atividade é um inteiro de 1 a 5. Sem peso definido, vale 1.
 // É a razão entre pesos que dá o progresso (RN08/RN14): peso não é enfeite,
 // é o que faz o Vértice medir avanço em vez de contar itens.
 export const PESO = {
@@ -124,4 +124,31 @@ export function normalizarPeso(valor) {
   const numero = Number.parseInt(valor, 10);
   if (!Number.isFinite(numero)) return PESO.PADRAO;
   return Math.min(PESO.MAXIMO, Math.max(PESO.MINIMO, numero));
+}
+
+// Eventos do grupo (RF31): o que acontece num dia e não é uma atividade com
+// responsável e peso. Prova, palestra, apresentação, reunião. Aparecem no
+// calendário junto das entregas.
+export const TIPO_EVENTO = {
+  PROVA: 'prova',
+  APRESENTACAO: 'apresentacao',
+  PALESTRA: 'palestra',
+  REUNIAO: 'reuniao',
+  OUTRO: 'outro',
+};
+
+export const TIPO_EVENTO_OPCOES = [
+  { valor: TIPO_EVENTO.PROVA, rotulo: 'Prova' },
+  { valor: TIPO_EVENTO.APRESENTACAO, rotulo: 'Apresentação' },
+  { valor: TIPO_EVENTO.PALESTRA, rotulo: 'Palestra' },
+  { valor: TIPO_EVENTO.REUNIAO, rotulo: 'Reunião' },
+  { valor: TIPO_EVENTO.OUTRO, rotulo: 'Outro' },
+];
+
+export function rotuloTipoEvento(valor) {
+  return TIPO_EVENTO_OPCOES.find((o) => o.valor === valor)?.rotulo ?? 'Evento';
+}
+
+export function tipoEventoValido(valor) {
+  return TIPO_EVENTO_OPCOES.some((o) => o.valor === valor);
 }

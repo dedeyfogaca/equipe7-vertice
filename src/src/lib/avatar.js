@@ -4,24 +4,19 @@
 //
 // O avatar sai de uma semente ALEATÓRIA salva no cadastro (campo `avatar`),
 // não do nome: se a pessoa não gostar, é só sortear outra. O estilo (campo
-// `estiloAvatar`) é escolhido entre os cinco abaixo. Dados antigos sem semente
-// usam o nome como reserva, e sem estilo usam o estilo padrão.
+// `estiloAvatar`) é escolhido entre os dois abaixo. Dados antigos sem semente
+// usam o nome como reserva; sem estilo, ou com um dos estilos que saíram em
+// 06/11/2026, usam o estilo padrão.
 
 import { createAvatar } from '@dicebear/core';
 import * as croodlesNeutral from '@dicebear/croodles-neutral';
-import * as adventurer from '@dicebear/adventurer';
-import * as bigSmile from '@dicebear/big-smile';
-import * as funEmoji from '@dicebear/fun-emoji';
-import * as pixelArt from '@dicebear/pixel-art';
+import * as notionists from '@dicebear/notionists';
 
 // Estilos oferecidos. Os créditos de cada um (licença dos desenhos) estão no
 // README de `src/`.
 export const ESTILOS_AVATAR = [
   { id: 'croodles-neutral', rotulo: 'Rabisco', estilo: croodlesNeutral },
-  { id: 'adventurer', rotulo: 'Aventura', estilo: adventurer },
-  { id: 'big-smile', rotulo: 'Sorriso', estilo: bigSmile },
-  { id: 'fun-emoji', rotulo: 'Emoji', estilo: funEmoji },
-  { id: 'pixel-art', rotulo: 'Pixel', estilo: pixelArt },
+  { id: 'notionists', rotulo: 'Ilustrado', estilo: notionists },
 ];
 
 export const ESTILO_AVATAR_PADRAO = 'croodles-neutral';

@@ -5,11 +5,12 @@ Plataforma de acompanhamento de aprendizagem.
 O Vértice **mede o quanto o estudante avançou em cada disciplina**. Não é um
 gerenciador de tarefas: toda atividade tem um **peso de 1 a 5**, e o progresso
 é a razão entre o peso concluído e o peso total. Concluir uma atividade não
-risca um item de uma lista — move uma barra e credita experiência a quem a fez.
+risca um item de uma lista: move uma barra e credita experiência a quem a fez.
 
 Quem entra no sistema entra como um **grupo**. O grupo organiza suas
-disciplinas, divide cada uma em conteúdos e pendura as atividades nos
-conteúdos. Tudo fica salvo no navegador, então recarregar a página não perde
+disciplinas e cadastra as atividades de cada uma (dividindo a disciplina em
+conteúdos, se quiser), além dos **eventos** com dia marcado, como provas e
+palestras. Tudo fica salvo no navegador, então recarregar a página não perde
 nada.
 
 > Front-end em **React + Vite**, com **Tailwind CSS** e **Radix UI**. Nesta
@@ -22,23 +23,31 @@ nada.
 Essa cadeia é a espinha do sistema, e o que permite medir progresso:
 
 ```
-grupo ──▶ disciplina ──▶ conteúdo ──▶ atividade (peso 1–5, com responsável)
+grupo ──▶ disciplina ──▶ atividade (peso 1–5, com responsável)
+                 └──▶ conteúdo (opcional) ──┘
 ```
 
-Uma atividade pertence a **exatamente um** conteúdo, e um conteúdo a
-**exatamente uma** disciplina. Não existe atividade solta, e toda atividade
-tem um **responsável**.
+Uma atividade pertence a **exatamente uma** disciplina e tem um
+**responsável**. O **conteúdo é opcional** (desde 06/11/2026): quem quer ver o
+progresso por assunto divide a disciplina em conteúdos, como "SQL" e
+"Modelagem" dentro de Banco de Dados, e põe a atividade num deles. Quem não
+quer cadastra a atividade direto na disciplina.
 
-O progresso sobe por essa cadeia somando peso:
+O progresso soma peso:
 
-- **progresso do conteúdo** = peso das atividades concluídas ÷ peso de todas
-- **progresso da disciplina** = peso concluído de todos os conteúdos ÷ peso
-  total de todos os conteúdos
+- **progresso do conteúdo** = peso das atividades concluídas do conteúdo ÷
+  peso de todas as atividades dele
+- **progresso da disciplina** = peso concluído de todas as atividades da
+  disciplina (com ou sem conteúdo) ÷ peso total delas
 
 A segunda linha **não é a média dos percentuais dos conteúdos**. Um conteúdo
 que vale 20 pontos de peso pesa mais que um de 4, e a média trataria os dois
 como iguais. Conteúdo sem atividade nenhuma fica **fora** do cálculo, em vez de
 contar como 0%.
+
+Os **eventos** (prova, apresentação, palestra, reunião) não têm peso nem
+responsável, então não entram no progresso: servem para o grupo ver no
+calendário o que tem dia e hora marcados.
 
 **Experiência:** cada ponto de peso vale 10 de experiência, creditada ao
 responsável quando a atividade é concluída e estornada se ela deixar de estar.
@@ -50,23 +59,39 @@ outros.
 ## Funcionalidades
 
 - **Páginas públicas**: página inicial, "Sobre nós" com a história da equipe
-  e página 404.
+  e página 404. A página inicial se mexe: o topo entra em cascata e acende em
+  volta do mouse, a prévia do sistema inclina com o ponteiro, as barras
+  enchem quando aparecem e cada funcionalidade mostra uma demonstração curta
+  ao passar o mouse (no celular, quando aparece na tela). Quem pede menos
+  movimento no sistema vê tudo parado.
+- **Feedback** dos usuários de teste: seção na página inicial (com link no
+  topo e no rodapé) e item no menu da conta, que abrem um formulário anônimo.
+  O link fica em `src/lib/feedback.js`; enquanto está vazio, os botões
+  aparecem como "em breve".
 - **Acesso em dois passos, sem senha**: primeiro o grupo, depois quem você é
-  dentro dele. Quem cria o grupo informa o próprio nome, pode pôr uma **foto
-  do grupo** e entra como organizador.
+  dentro dele. Os grupos que já existem ficam numa coluna e a criação de um
+  grupo novo, em outra. Quem cria o grupo informa o próprio nome, pode pôr uma
+  **foto do grupo** e entra como organizador.
 - **Painel** com saudação, as quatro situações (a fazer, fazendo, concluídas,
   atrasadas) como filtro, próximas entregas, progresso por disciplina, o seu
-  ritmo (experiência e ofensiva) e os próximos feriados.
+  ritmo (experiência e ofensiva), os próximos eventos e os próximos feriados.
 - **Calendário** do mês, da semana ou em lista, com as entregas de cada dia
-  nas cores das disciplinas e os feriados nacionais. A troca de mês (ou de
+  nas cores das disciplinas, os eventos do grupo e os feriados nacionais. A troca de mês (ou de
   semana) passa a página para o lado, pelos botões ou deslizando o dedo no
-  celular. Um dia do calendário abre a criação de atividade com o prazo já
-  preenchido.
+  celular. Um dia do calendário abre a criação de atividade (ou de evento)
+  com a data já preenchida.
+- **Eventos** do grupo: prova, apresentação, palestra, reunião ou outro, com
+  dia, horário (opcional), local, disciplina (opcional) e observações. Têm
+  página própria, com os próximos e os passados, e aparecem no calendário e
+  no painel. Qualquer membro cadastra; edita e exclui quem cadastrou ou o
+  organizador.
 - **Disciplinas** por grupo, com cor escolhida numa **paleta de 18 cores**
   legíveis nos dois temas. Nome único dentro do grupo.
-- **Conteúdos** dentro de cada disciplina, em ordem definida pelo grupo.
-- **Atividades** dentro de um conteúdo, com título, prazo e responsável
-  obrigatórios, além de descrição, peso de 1 a 5, prioridade e status. O
+- **Conteúdos** (opcionais) dentro de cada disciplina, em ordem definida pelo
+  grupo.
+- **Atividades** de uma disciplina, com título, disciplina, prazo e
+  responsável obrigatórios, além de conteúdo, descrição, peso de 1 a 5,
+  prioridade e status. O
   formulário começa vazio: o que é obrigatório é cobrado ao salvar, e o que
   fica em branco assume o padrão (peso 1, status "a fazer"). O prazo é
   escolhido num calendário com a cara do sistema, que marca hoje, os fins de
@@ -84,15 +109,15 @@ outros.
   dele e dá um terço de volta enquanto a tela se dissolve no painel; ao passar
   o mouse, dá uma volta rápida. As seções ficam numa **barra no topo** (no
   celular, num menu que desce do topo).
-- **Membros** com **foto de perfil** ou **avatar**, em cinco estilos de desenho
-  à escolha, com sorteio. A foto passa por um **editor** em que a pessoa
+- **Membros** com **foto de perfil** ou **avatar**, em dois estilos de desenho
+  à escolha (Croodles Neutral e Notionists), com sorteio. A foto passa por um **editor** em que a pessoa
   arrasta e dá zoom para enquadrar antes de salvar.
 - **Perfis**: o **organizador** gerencia membros, disciplinas e conteúdos,
   edita o grupo (nome, descrição e foto), edita e exclui qualquer atividade e
   exclui o grupo; o **participante** cadastra atividades, edita e exclui as
   que estão sob a responsabilidade dele e edita o próprio perfil. **Só o
-  responsável conclui ou muda o status** de uma atividade — nem o organizador
-  conclui pelos outros. Ao remover um membro com atividades, o organizador
+  responsável conclui ou muda o status** de uma atividade (nem o organizador
+  conclui pelos outros). Ao remover um membro com atividades, o organizador
   escolhe quem as assume. A exclusão do grupo fica no pé da tela de Membros.
 - **Feriados** da BrasilAPI, com aviso quando um prazo cai em feriado
   nacional ou em fim de semana.
@@ -120,7 +145,7 @@ outros.
 | Estado | Context API + hooks |
 | Persistência | armazenamento do navegador (`localStorage`) |
 | API externa | [BrasilAPI](https://brasilapi.com.br/) e [Nager.Date](https://date.nager.at/) (feriados) |
-| Avatares | [DiceBear](https://www.dicebear.com/) como biblioteca (`@dicebear/core` 9.4.3 e cinco estilos): o avatar é desenhado no próprio navegador, sem depender de serviço externo |
+| Avatares | [DiceBear](https://www.dicebear.com/) como biblioteca (`@dicebear/core` 9.4.3 e dois estilos): o avatar é desenhado no próprio navegador, sem depender de serviço externo |
 | Hospedagem | Vercel |
 
 ---
@@ -157,7 +182,7 @@ O projeto já vem pronto para a Vercel:
 | Configuração | Valor |
 |---|---|
 | Framework | Vite (detectado sozinho) |
-| Pasta raiz do projeto (*Root Directory*) | `src` — a pasta deste README no repositório da equipe |
+| Pasta raiz do projeto (*Root Directory*) | `src` (a pasta deste README no repositório da equipe) |
 | Comando de build | `npm run build` |
 | Pasta publicada | `dist` |
 
@@ -190,8 +215,9 @@ src/
 │   ├── gamificacao.js        # Experiência, ofensiva e conquistas
 │   ├── migracao.js           # Migração dos dados das versões anteriores
 │   ├── foto.js               # Enquadramento, recorte e redução das fotos
-│   ├── avatar.js             # Avatares nos cinco estilos (DiceBear) + iniciais
+│   ├── avatar.js             # Avatares nos dois estilos (DiceBear) + iniciais
 │   ├── feriados.js           # BrasilAPI → Nager.Date → cache
+│   ├── feedback.js           # Link do formulário anônimo de feedback
 │   ├── seed.js               # Dados de exemplo
 │   └── utils.js              # Classes, plural, primeiro nome
 ├── hooks/
@@ -209,6 +235,9 @@ src/
 │   │                         # campo de data, editor de foto, diálogo, avatares...
 │   ├── layout/               # Barra do topo, layout das páginas públicas e a passagem ao abrir o grupo
 │   ├── atividades/           # Linha da lista, cartões de situação, peso, conclusão
+│   ├── eventos/              # Cartão, formulário e tipos de evento
+│   ├── feedback/             # Seção e botão do formulário de feedback
+│   ├── publicas/             # Movimento das páginas públicas (aparecer ao rolar, mouse)
 │   ├── disciplinas/          # Formulários de disciplina e conteúdo, paleta de cores
 │   ├── grupos/               # Edição do grupo (nome, descrição e foto)
 │   ├── membros/              # Formulário de membro com foto de perfil e escolha do avatar
@@ -223,8 +252,9 @@ src/
     ├── publicas/             # Início, Sobre nós, Entrar, página 404
     ├── Painel.jsx
     ├── Calendario.jsx
+    ├── Eventos.jsx           # Próximos e passados, com filtro por tipo
     ├── Disciplinas.jsx
-    ├── DisciplinaDetalhe.jsx # Conteúdos da disciplina + progresso
+    ├── DisciplinaDetalhe.jsx # Atividades, conteúdos (opcionais) e progresso
     ├── Atividades.jsx
     ├── AtividadeForm.jsx     # Criar e editar (mesmo componente)
     ├── AtividadeDetalhe.jsx
@@ -243,7 +273,7 @@ relacional entregue. Isso é proposital: levar os dados para um banco troca a
 camada de acesso, não remodela dados.
 
 Chaves: `grupos`, `membros`, `disciplinas`, `conteudos`, `atividades`,
-`conquistasMembro`, `sessao`, `versaoDados`.
+`eventos`, `conquistasMembro`, `sessao`, `versaoDados`.
 
 A `sessao` guarda o grupo e o membro que está usando o sistema. Ela não vem
 do modelo relacional: é estado do navegador, e existe porque o perfil do RN07
@@ -253,15 +283,18 @@ precisa saber quem é a pessoa.
 |---|---|
 | **grupo** | `id`, `nome`, `descricao`, `foto`, `criadoEm` |
 | **membro** | `id`, `grupoId`, `nome`, `funcao`, `email`, `avatar`, `estiloAvatar`, `foto`, `perfil` |
-| **disciplina** | `id`, `grupoId`, `nome`, `cor`, `criadaEm` — nome único no grupo, cor da paleta |
-| **conteudo** | `id`, `disciplinaId`, `nome`, `descricao`, `ordem` — nome único na disciplina |
-| **atividade** | `id`, `conteudoId`, `responsavelId`, `titulo`, `descricao`, `prazo`, `peso`, `prioridade`, `status`, `criadaEm`, `dataConclusao` |
-| **conquista do membro** | `membroId`, `codigo`, `obtidaEm` — espelha a tabela `membro_conquista` |
+| **disciplina** | `id`, `grupoId`, `nome`, `cor`, `criadaEm` (nome único no grupo, cor da paleta) |
+| **conteudo** | `id`, `disciplinaId`, `nome`, `descricao`, `ordem` (nome único na disciplina) |
+| **atividade** | `id`, `disciplinaId`, `conteudoId` (vazio quando não tem conteúdo), `responsavelId`, `titulo`, `descricao`, `prazo`, `peso`, `prioridade`, `status`, `criadaEm`, `dataConclusao` |
+| **evento** | `id`, `grupoId`, `titulo`, `tipo`, `data`, `horaInicio`, `horaFim`, `local`, `disciplinaId` (opcional), `descricao`, `criadoPor`, `criadoEm` |
+| **conquista do membro** | `membroId`, `codigo`, `obtidaEm` (espelha a tabela `membro_conquista`) |
 
 Repare que **a atividade não guarda `grupoId`**: o grupo chega pela cadeia
-`atividade → conteudo → disciplina → grupo`. Guardá-lo ali seria um dado
-derivado com prazo de validade. Todo seletor filtra por grupo atravessando essa
-cadeia, e por isso cada grupo só enxerga o que é dele.
+`atividade → disciplina → grupo`. Guardá-lo ali seria um dado derivado com
+prazo de validade. Todo seletor filtra por grupo atravessando essa cadeia, e
+por isso cada grupo só enxerga o que é dele. Se a atividade tiver conteúdo,
+ele é da mesma disciplina. O evento guarda o `grupoId` porque a disciplina
+dele é opcional.
 
 O `status` é gravado como `'a fazer'`, `'fazendo'` ou `'concluido'`.
 
@@ -277,10 +310,12 @@ conquista concedida não é retirada depois.
 
 ### Exclusão em cascata
 
-- Grupo excluído remove disciplinas, conteúdos, atividades, membros e
-  conquistas.
-- Disciplina excluída remove seus conteúdos e as atividades deles.
-- Conteúdo excluído remove suas atividades.
+- Grupo excluído remove disciplinas, conteúdos, atividades, eventos, membros
+  e conquistas.
+- Disciplina excluída remove seus conteúdos e atividades. Os eventos dela
+  continuam, sem disciplina.
+- **Conteúdo excluído não leva as atividades**: elas continuam na
+  disciplina, sem conteúdo.
 - **Membro excluído não leva as atividades junto**: antes de remover, o
   organizador escolhe quem assume as atividades dele.
 
@@ -289,14 +324,18 @@ conquista concedida não é retirada depois.
 A migração roda **uma vez** ao abrir o sistema, com o número da versão dos
 dados gravado em `versaoDados`.
 
-- **Versão 1** — quem usou a primeira versão tinha as atividades gravadas
+- **Versão 1**: quem usou a primeira versão tinha as atividades gravadas
   como `tarefas`, com a disciplina em texto livre. A migração cria uma
   disciplina por nome distinto, um conteúdo "Geral" em cada uma, atribui
   peso 1, preenche a data de conclusão das já concluídas e define o perfil
   dos membros. A chave antiga só é apagada depois de a nova estar gravada.
-- **Versão 2** — atividade sem responsável passa para o organizador do grupo,
+- **Versão 2**: atividade sem responsável passa para o organizador do grupo,
   e a cor que saiu da paleta vira a equivalente. Atividade antiga cujo grupo
   não existe mais não é convertida nem apagada, e a pessoa é avisada.
+- **Versão 3**: a atividade ganha a disciplina do próprio conteúdo. O
+  conteúdo "Geral" que a versão 1 criou só para não deixar atividade solta
+  sai, e as atividades dele ficam direto na disciplina. Membro com um dos
+  estilos de avatar que saíram passa para o estilo padrão.
 
 ---
 
@@ -309,8 +348,9 @@ dados gravado em `versaoDados`.
 | `/entrar` | Acesso ao grupo (`/login` leva para cá) | pública |
 | `/painel` | Painel | privada |
 | `/calendario` | Calendário | privada |
+| `/eventos` | Eventos do grupo (`?novo=` já abre o cadastro) | privada |
 | `/disciplinas` | Disciplinas do grupo | privada |
-| `/disciplina/:id` | Conteúdos da disciplina e progresso | privada |
+| `/disciplina/:id` | Atividades, conteúdos e progresso da disciplina | privada |
 | `/atividades` | Lista de atividades com filtros | privada |
 | `/atividade/nova` | Formulário de nova atividade | privada |
 | `/atividade/:id` | Detalhe da atividade | privada |
@@ -362,7 +402,7 @@ As rotas privadas só abrem com uma sessão; sem ela, o sistema manda para
 - **O perfil restringe, mas não protege.** O organizador é quem gerencia
   membros, disciplinas, conteúdos e exclui o grupo, e cada pessoa conclui só
   as próprias atividades; os controles somem para quem não pode usá-los. Isso
-  organiza o grupo; não é segurança — sem servidor e sem senha, quem quiser
+  organiza o grupo; não é segurança: sem servidor e sem senha, quem quiser
   entra como outra pessoa. O que a regra evita é a bagunça acidental, que é o
   problema real de um trabalho em grupo. Com o login da próxima etapa, as
   mesmas regras passam a valer no servidor.
@@ -376,10 +416,7 @@ estilos de outros autores:
 
 | Estilo no sistema | Original | Autor | Licença |
 |---|---|---|---|
-| Rabisco | Croodles - Doodle your face | vijay verma | CC BY 4.0 |
-| Aventura | Adventurer | Lisa Wischofsky | CC BY 4.0 |
-| Sorriso | Custom Avatar (Big Smile) | Ashley Seo | CC BY 4.0 |
-| Emoji | Fun Emoji Set | Davis Uche | CC BY 4.0 |
-| Pixel | Pixel Art | DiceBear | CC0 1.0 |
+| Rabisco | Croodles - Doodle your face (Croodles Neutral) | vijay verma | CC BY 4.0 |
+| Ilustrado | Notionists | Zoish | CC0 1.0 |
 
 Cada imagem gerada leva o crédito do seu estilo nos metadados do próprio SVG.

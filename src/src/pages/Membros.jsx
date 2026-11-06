@@ -82,7 +82,7 @@ export default function Membros() {
   const qtdRemovendo = removendo ? atividadesPorMembro[removendo.id] || 0 : 0;
   const quemAssume = membros.filter((m) => m.id !== removendo?.id);
 
-  // RN02 + RN06 — as atividades do membro removido passam para quem a pessoa
+  // RN02 + RN06: as atividades do membro removido passam para quem a pessoa
   // escolher: nenhuma atividade fica sem responsável.
   const confirmarRemocao = () => {
     const assume = membros.find((m) => m.id === novoResponsavel);
@@ -96,7 +96,7 @@ export default function Membros() {
     setRemovendo(null);
   };
 
-  // RN07 + RN02 — só o organizador exclui o grupo, e o grupo leva tudo junto.
+  // RN07 + RN02: só o organizador exclui o grupo, e o grupo leva tudo junto.
   const excluirGrupo = () => {
     const id = grupoAtivo.id;
     const nome = grupoAtivo.nome;
@@ -186,7 +186,7 @@ export default function Membros() {
                           {eu && !ehOrganizador ? 'Editar meu perfil' : 'Editar'}
                         </MenuItem>
                         {ehOrganizador && (
-                          // RN07 — o último organizador não sai: o grupo
+                          // RN07: o último organizador não sai: o grupo
                           // ficaria sem ninguém para geri-lo.
                           <MenuItem
                             perigo
@@ -223,7 +223,7 @@ export default function Membros() {
         </ul>
       )}
 
-      {/* RN07 — só o organizador exclui o grupo. Fica no pé da página. */}
+      {/* RN07: só o organizador exclui o grupo. Fica no pé da página. */}
       {ehOrganizador && (
         <div className="mt-auto pt-10">
         <section
@@ -236,7 +236,7 @@ export default function Membros() {
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-sutil">
               O grupo <strong className="font-semibold text-texto">{grupoAtivo.nome}</strong> sai com todos os
-              seus membros, disciplinas, conteúdos e atividades. Não dá para desfazer.
+              seus membros, disciplinas, conteúdos, atividades e eventos. Não dá para desfazer.
             </p>
           </div>
           <Button variante="perigo-contorno" onClick={() => setExcluindoGrupo(true)}>
@@ -288,7 +288,7 @@ export default function Membros() {
       <Confirmacao
         aberto={excluindoGrupo}
         titulo="Excluir o grupo?"
-        mensagem={`O grupo "${grupoAtivo.nome}" será excluído com todos os seus membros, disciplinas, conteúdos e atividades. Essa ação não pode ser desfeita.`}
+        mensagem={`O grupo "${grupoAtivo.nome}" será excluído com todos os seus membros, disciplinas, conteúdos, atividades e eventos. Essa ação não pode ser desfeita.`}
         textoConfirmar="Confirmar exclusão"
         perigo
         onConfirmar={excluirGrupo}

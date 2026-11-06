@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils.js';
 
 const VALORES = Array.from({ length: PESO.MAXIMO - PESO.MINIMO + 1 }, (_, i) => i + PESO.MINIMO);
 
-// RN09 — peso de 1 a 5, como grupo de rádio (setas do teclado mudam o valor).
+// RN09: peso de 1 a 5, como grupo de rádio (setas do teclado mudam o valor).
 // Pode começar sem nada escolhido: o campo é opcional, e sem escolha a
 // atividade vale 1.
 export function SeletorPeso({ id = 'peso', valor, aoEscolher, descritoPor }) {

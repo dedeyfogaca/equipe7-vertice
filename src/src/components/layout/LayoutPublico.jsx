@@ -6,10 +6,12 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { BotaoTema } from '../BotaoTema.jsx';
 import { Button } from '../ui/botao.jsx';
 import { MarcaVertice, SimboloVertice } from '../ui/marca.jsx';
+import { temFormularioFeedback, LINK_FEEDBACK } from '../../lib/feedback.js';
 import { cn } from '../../lib/utils.js';
 
 // Casca das páginas públicas (início, sobre nós): o menu do site no topo, com
-// a troca de tema, e o rodapé com os créditos da equipe e o Instagram.
+// a troca de tema, e o rodapé com os créditos da equipe, o feedback e o
+// Instagram.
 
 const INSTAGRAM = 'https://www.instagram.com/go.vertice/';
 
@@ -18,6 +20,7 @@ const LINKS = [
   { para: '/#como-funciona', rotulo: 'Como funciona' },
   { para: '/sobre', rotulo: 'Sobre nós' },
   { para: '/#perguntas', rotulo: 'Perguntas' },
+  { para: '/#feedback', rotulo: 'Feedback' },
 ];
 
 export function RodapePublico() {
@@ -29,6 +32,20 @@ export function RodapePublico() {
           Vértice
         </span>
         <span>Equipe 7 · Andrey Fogaça e Matheus Saraiva Faustin · Imersão Profissional: Projeto de Software</span>
+        {temFormularioFeedback() ? (
+          <a
+            href={LINK_FEEDBACK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-suave transition-colors hover:text-primaria"
+          >
+            Enviar feedback<span className="sr-only"> (abre em outra aba)</span>
+          </a>
+        ) : (
+          <Link to="/#feedback" className="font-semibold text-suave transition-colors hover:text-primaria">
+            Feedback
+          </Link>
+        )}
         <a
           href={INSTAGRAM}
           target="_blank"
@@ -70,7 +87,7 @@ export function LayoutPublico({ children }) {
           <Link to="/" aria-label="Vértice, página inicial" className="rounded-lg">
             <MarcaVertice />
           </Link>
-          <div className="hidden flex-1 items-center gap-7 text-[15px] md:flex">
+          <div className="hidden flex-1 items-center gap-7 text-[15px] lg:flex">
             {LINKS.map(({ para, rotulo }) => (
               <Link
                 key={para}
@@ -104,7 +121,7 @@ export function LayoutPublico({ children }) {
             <Button
               variante="fantasma"
               tamanho="icone"
-              className="md:hidden"
+              className="lg:hidden"
               aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuAberto}
               aria-controls="menu-publico"
@@ -115,7 +132,7 @@ export function LayoutPublico({ children }) {
           </div>
         </nav>
         {menuAberto && (
-          <div id="menu-publico" className="border-t border-divisor px-6 pb-5 pt-3 md:hidden">
+          <div id="menu-publico" className="border-t border-divisor px-6 pb-5 pt-3 lg:hidden">
             <ul className="flex flex-col">
               {LINKS.map(({ para, rotulo }) => (
                 <li key={para}>

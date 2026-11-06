@@ -29,7 +29,7 @@ export function MenuItem({ className, perigo, ...props }) {
   return (
     <Menu.Item
       className={cn(
-        'flex cursor-pointer select-none items-center gap-2.5 rounded-xl px-3 py-2.5 text-[14px] font-medium outline-none transition-colors data-[highlighted]:bg-superficie-3 [&_svg]:size-4 [&_svg]:text-sutil',
+        'flex cursor-pointer select-none items-center gap-2.5 rounded-xl px-3 py-2.5 text-[14px] font-medium outline-none transition-colors data-[highlighted]:bg-superficie-3 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-55 [&_svg]:size-4 [&_svg]:text-sutil',
         perigo && 'text-perigo [&_svg]:text-perigo',
         className
       )}

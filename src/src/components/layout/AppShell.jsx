@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import {
   BookOpen,
+  CalendarClock,
   CalendarDays,
   Check,
   ChevronDown,
@@ -11,6 +12,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOut,
+  MessageSquareText,
   Menu,
   Pencil,
   Plus,
@@ -32,15 +34,17 @@ import { MarcaVertice } from '../ui/marca.jsx';
 import { FormGrupo } from '../grupos/FormGrupo.jsx';
 import { obterConquista } from '../../lib/gamificacao.js';
 import { rotuloPerfil } from '../../lib/constants.js';
+import { LINK_FEEDBACK, temFormularioFeedback } from '../../lib/feedback.js';
 import { cn, plural } from '../../lib/utils.js';
 
 // Casca das telas internas: a barra no topo com as seções (no celular, um
 // menu que desce do topo) e o conteúdo da página embaixo. Também é quem dá os avisos que valem para
-// o sistema inteiro — conquista nova e falha ao salvar.
+// o sistema inteiro: conquista nova e falha ao salvar.
 
 const SECOES = [
   { para: '/painel', rotulo: 'Painel', icone: LayoutDashboard, prefixos: ['/painel'] },
   { para: '/calendario', rotulo: 'Calendário', icone: CalendarDays, prefixos: ['/calendario'] },
+  { para: '/eventos', rotulo: 'Eventos', icone: CalendarClock, prefixos: ['/eventos'] },
   { para: '/disciplinas', rotulo: 'Disciplinas', icone: BookOpen, prefixos: ['/disciplina'] },
   { para: '/atividades', rotulo: 'Atividades', icone: ListChecks, prefixos: ['/atividade'] },
   { para: '/membros', rotulo: 'Membros', icone: Users, prefixos: ['/membros'] },
@@ -121,7 +125,7 @@ function SeletorGrupo({ compacto = false }) {
             </MenuItem>
           ))}
           <MenuSeparador />
-          {/* RN07 — nome, descrição e foto do grupo são do organizador. */}
+          {/* RN07: nome, descrição e foto do grupo são do organizador. */}
           {ehOrganizador && (
             <MenuItem onSelect={() => setEditando(true)}>
               <Pencil aria-hidden="true" />
@@ -151,6 +155,27 @@ function useSairDoGrupo() {
 }
 
 // Canto direito da barra: quem está usando, com o perfil e a saída do grupo.
+// Feedback dos usuários de teste: abre o formulário anônimo em outra aba.
+// Sem o link ainda, o item aparece desligado, como "em breve".
+function ItemFeedback() {
+  if (!temFormularioFeedback()) {
+    return (
+      <MenuItem disabled>
+        <MessageSquareText aria-hidden="true" />
+        Enviar feedback (em breve)
+      </MenuItem>
+    );
+  }
+  return (
+    <MenuItem asChild>
+      <a href={LINK_FEEDBACK} target="_blank" rel="noopener noreferrer">
+        <MessageSquareText aria-hidden="true" />
+        Enviar feedback
+      </a>
+    </MenuItem>
+  );
+}
+
 function MenuUsuario() {
   const { membroAtivo } = useAuth();
   const sairDoGrupo = useSairDoGrupo();
@@ -178,6 +203,7 @@ function MenuUsuario() {
           </span>
         </div>
         <MenuSeparador />
+        <ItemFeedback />
         <MenuItem onSelect={sairDoGrupo}>
           <LogOut aria-hidden="true" />
           Sair do grupo
@@ -216,7 +242,7 @@ function BarraTopo({ aoAbrirMenu, menuAberto }) {
                 to={para}
                 aria-current={ativa ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-2 rounded-full px-3 py-2 text-[14px] font-medium transition-colors',
+                  'flex items-center gap-2 rounded-full px-2.5 py-2 text-[14px] font-medium transition-colors xl:px-3',
                   ativa ? 'bg-primaria-barra/12 font-semibold text-forte' : 'text-suave hover:bg-superficie-3 hover:text-texto'
                 )}
               >
@@ -307,6 +333,13 @@ function MenuCelular({ aberto, aoMudar }) {
                 </span>
               </span>
               <BotaoTema />
+              {temFormularioFeedback() && (
+                <Button variante="fantasma" tamanho="icone" asChild>
+                  <a href={LINK_FEEDBACK} target="_blank" rel="noopener noreferrer" aria-label="Enviar feedback (abre em outra aba)" title="Enviar feedback">
+                    <MessageSquareText className="!size-[18px]" />
+                  </a>
+                </Button>
+              )}
               <Button variante="fantasma" tamanho="icone" aria-label="Sair do grupo" title="Sair do grupo" onClick={sairDoGrupo}>
                 <LogOut className="!size-[18px]" />
               </Button>
@@ -318,8 +351,8 @@ function MenuCelular({ aberto, aoMudar }) {
   );
 }
 
-// Conquista nova vira aviso no canto. Ela pode ser de outra pessoa — uma
-// atividade concluída que passou para ela —, então o aviso diz de quem é.
+// Conquista nova vira aviso no canto. Ela pode ser de outra pessoa (uma
+// atividade concluída que passou para ela), então o aviso diz de quem é.
 function useAvisoDeConquistas() {
   const { membroAtivo } = useAuth();
   const { membros, novasConquistas, consumirNovasConquistas } = useData();
@@ -341,7 +374,7 @@ function useAvisoDeConquistas() {
   }, [novasConquistas, consumirNovasConquistas, membros, membroAtivo]);
 }
 
-// D02 — o navegador recusou gravar. Avisa uma vez no canto; a faixa no topo
+// D02: o navegador recusou gravar. Avisa uma vez no canto; a faixa no topo
 // fica enquanto o problema durar.
 function useAvisoDeFalha(falhaGravacao) {
   const avisado = useRef(false);

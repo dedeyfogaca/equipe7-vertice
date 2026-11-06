@@ -7,7 +7,7 @@ import { xpPotencial } from '../../lib/gamificacao.js';
 
 // Concluir direto da lista, com aviso e "Desfazer". Reabrir volta a
 // atividade para "a fazer". Só vale para as atividades de quem está usando
-// (RN20) — a lista nem mostra o botão nas dos outros, e aqui fica a segunda
+// (RN20). A lista nem mostra o botão nas dos outros, e aqui fica a segunda
 // trava.
 export function useAlternarConclusao() {
   const { atualizarAtividade } = useData();

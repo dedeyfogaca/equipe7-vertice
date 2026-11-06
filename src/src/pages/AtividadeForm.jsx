@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { BookOpen, CalendarDays, CircleHelp, Layers, Lock, Plus, Sparkles } from 'lucide-react';
+import { BookOpen, CalendarDays, CircleHelp, CircleSlash, Lock, Plus, Sparkles } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -28,8 +28,10 @@ import { statusAoSalvar } from '../lib/permissoes.js';
 import { semErros, validarAtividade } from '../lib/validacao.js';
 import { primeiroNome, semErroEm } from '../lib/utils.js';
 
-// Valor especial da lista de conteúdos: abre o cadastro de conteúdo na hora.
+// Valores especiais da lista de conteúdos: um abre o cadastro de conteúdo na
+// hora; o outro é "sem conteúdo" (o conteúdo é opcional desde 06/11/2026).
 const NOVO_CONTEUDO = '__novo-conteudo__';
+const SEM_CONTEUDO = '__sem-conteudo__';
 
 export default function AtividadeForm() {
   const { id } = useParams();
@@ -56,9 +58,8 @@ export default function AtividadeForm() {
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
   const conteudosDoGrupoAtivo = conteudosDoGrupo(grupoAtivo.id);
   const existente = edicao ? obterAtividade(id) : null;
-  // RN01 — atividade de outro grupo é tratada como inexistente.
-  const atividade =
-    existente && conteudosDoGrupoAtivo.some((c) => c.id === existente.conteudoId) ? existente : null;
+  // RN01: atividade de outro grupo é tratada como inexistente.
+  const atividade = existente && disciplinas.some((d) => d.id === existente.disciplinaId) ? existente : null;
 
   // Valores que chegam pelo endereço: o calendário manda o dia
   // (?prazo=2026-10-30) e a disciplina manda o conteúdo (?conteudo=...).
@@ -68,7 +69,7 @@ export default function AtividadeForm() {
     (disciplinas.some((d) => d.id === params.get('disciplina')) ? params.get('disciplina') : '');
   const prazoInicial = dataValida(params.get('prazo')) ? params.get('prazo') : '';
 
-  // Na criação, tudo começa vazio — só com os exemplos dos campos. O que é
+  // Na criação, tudo começa vazio, só com os exemplos dos campos. O que é
   // obrigatório é cobrado ao salvar; o que é opcional pode ficar em branco.
   const [form, setForm] = useState(() => {
     if (atividade) {
@@ -97,14 +98,8 @@ export default function AtividadeForm() {
   const [erros, setErros] = useState({});
   const [criandoConteudo, setCriandoConteudo] = useState(false);
 
-  // A disciplina não é gravada na atividade: ela só filtra a lista de
-  // conteúdos. Na edição, vem de volta pela cadeia.
-  const [disciplinaId, setDisciplinaId] = useState(() => {
-    if (atividade) {
-      return conteudosDoGrupoAtivo.find((c) => c.id === atividade.conteudoId)?.disciplinaId ?? '';
-    }
-    return disciplinaInicial;
-  });
+  // A disciplina é obrigatória e também filtra a lista de conteúdos.
+  const [disciplinaId, setDisciplinaId] = useState(() => (atividade ? atividade.disciplinaId || '' : disciplinaInicial));
 
   const anos = useMemo(
     () => Array.from(new Set([new Date().getFullYear(), anoDaData(form.prazo)].filter(Boolean))),
@@ -122,9 +117,10 @@ export default function AtividadeForm() {
   const trocarDisciplina = (valor) => {
     setDisciplinaId(valor);
     setForm((atual) => ({ ...atual, conteudoId: '' }));
+    setErros((atual) => semErroEm(semErroEm(atual, 'disciplinaId'), 'conteudoId'));
   };
 
-  // RN20 — o status é de quem é responsável. Passar a atividade para outra
+  // RN20: o status é de quem é responsável. Passar a atividade para outra
   // pessoa devolve o status ao que era (ou ao vazio, na criação).
   const statusOriginal = atividade?.status || '';
   const trocarResponsavel = (valor) => {
@@ -157,7 +153,7 @@ export default function AtividadeForm() {
     );
   }
 
-  // RN07 — o participante edita só as atividades dele.
+  // RN07: o participante edita só as atividades dele.
   if (edicao && !podeEditar(atividade)) {
     const dono = membros.find((m) => m.id === atividade.responsavelId);
     return (
@@ -175,7 +171,7 @@ export default function AtividadeForm() {
     );
   }
 
-  // RN13 — sem disciplina não há onde pendurar a atividade.
+  // RN13: sem disciplina não há onde pendurar a atividade.
   if (disciplinas.length === 0) {
     return (
       <>
@@ -184,31 +180,10 @@ export default function AtividadeForm() {
           <EmptyState
             icone={BookOpen}
             titulo="Cadastre as disciplinas primeiro"
-            descricao="Toda atividade pertence a um conteúdo, e o conteúdo a uma disciplina. É essa cadeia que permite medir o progresso."
+            descricao="Toda atividade é de uma disciplina. É por ela que o Vértice mede o progresso do grupo."
           >
             <Button asChild>
               <Link to="/disciplinas">Ir para Disciplinas</Link>
-            </Button>
-          </EmptyState>
-        </Card>
-      </>
-    );
-  }
-
-  // Sem conteúdo nenhum, só quem pode cadastrar conteúdo segue (RN07): o
-  // organizador cria o conteúdo aqui mesmo, sem sair do formulário.
-  if (conteudosDoGrupoAtivo.length === 0 && !ehOrganizador) {
-    return (
-      <>
-        <PageHeader titulo="Nova atividade" />
-        <Card>
-          <EmptyState
-            icone={Layers}
-            titulo="Ainda não há conteúdos"
-            descricao="A atividade fica dentro de um conteúdo da disciplina. Peça ao organizador do grupo para cadastrar o primeiro."
-          >
-            <Button asChild>
-              <Link to="/disciplinas">Ver as disciplinas</Link>
             </Button>
           </EmptyState>
         </Card>
@@ -223,12 +198,11 @@ export default function AtividadeForm() {
 
   const enviar = (evento) => {
     evento.preventDefault();
-    const novosErros = validarAtividade(form, { membros, conteudos: conteudosDoGrupoAtivo });
+    const novosErros = validarAtividade({ ...form, disciplinaId }, { membros, conteudos: conteudosDoGrupoAtivo, disciplinas });
     setErros(novosErros);
     if (!semErros(novosErros)) {
       // Leva o foco ao primeiro campo com erro.
-      const primeiro = ['titulo', 'conteudoId', 'prazo', 'responsavelId', 'peso'].find((c) => novosErros[c]);
-      const alvo = primeiro === 'conteudoId' && !disciplinaId ? 'disciplinaId' : primeiro;
+      const alvo = ['titulo', 'disciplinaId', 'conteudoId', 'prazo', 'responsavelId', 'peso'].find((c) => novosErros[c]);
       const elemento = document.getElementById(alvo);
       (elemento?.getAttribute('role') === 'radiogroup' ? elemento.querySelector('[tabindex="0"]') : elemento)?.focus();
       return;
@@ -236,6 +210,7 @@ export default function AtividadeForm() {
 
     const dados = {
       ...form,
+      disciplinaId,
       peso: form.peso === '' ? PESO.PADRAO : form.peso,
       status: statusAoSalvar({
         statusEscolhido: form.status,
@@ -250,14 +225,14 @@ export default function AtividadeForm() {
       toast.success('Alterações salvas', { description: dados.titulo.trim() });
       navigate(`/atividade/${id}`);
     } else {
-      // Sem grupoId: o grupo da atividade vem do conteúdo escolhido.
+      // Sem grupoId: o grupo da atividade vem da disciplina escolhida.
       const nova = criarAtividade(dados);
       toast.success('Atividade criada', { description: nova.titulo });
       navigate(`/atividade/${nova.id}`, { replace: true });
     }
   };
 
-  // RN13 + RN07 — o conteúdo novo nasce na disciplina escolhida e já fica
+  // RN13 + RN07: o conteúdo novo nasce na disciplina escolhida e já fica
   // selecionado. O que estava preenchido no formulário continua lá.
   const salvarConteudo = (dados) => {
     const novo = criarConteudo({ ...dados, disciplinaId });
@@ -285,27 +260,28 @@ export default function AtividadeForm() {
     );
   }
 
-  let dicaConteudo;
+  // O conteúdo é opcional: serve para quem quer ver o progresso por assunto
+  // dentro da disciplina (ex.: "SQL" dentro de Banco de Dados).
+  let dicaConteudo = 'Opcional. Separa a disciplina por assunto, se o grupo quiser.';
   if (!disciplinaId) {
-    dicaConteudo = 'Escolha a disciplina primeiro.';
-  } else if (conteudosDaEscolhida.length === 0) {
-    dicaConteudo = ehOrganizador ? (
+    dicaConteudo = 'Opcional. Escolha a disciplina antes.';
+  } else if (conteudosDaEscolhida.length === 0 && ehOrganizador) {
+    dicaConteudo = (
       <>
-        {disciplinaEscolhida?.nome} ainda não tem conteúdos.{' '}
+        Opcional. {disciplinaEscolhida?.nome} ainda não tem conteúdos.{' '}
         <button
           type="button"
           onClick={() => setCriandoConteudo(true)}
           className="font-medium text-primaria-texto hover:underline"
         >
-          Criar o primeiro
+          Criar um
         </button>
       </>
-    ) : (
-      `${disciplinaEscolhida?.nome} ainda não tem conteúdos. Peça ao organizador para cadastrar.`
     );
   }
 
   const opcoesConteudo = [
+    { valor: SEM_CONTEUDO, rotulo: 'Sem conteúdo', icone: <IconeOpcao icone={CircleSlash} /> },
     ...conteudosDaEscolhida.map((c) => ({ valor: c.id, rotulo: c.nome })),
     ...(ehOrganizador && disciplinaId
       ? [{ valor: NOVO_CONTEUDO, rotulo: 'Criar novo conteúdo', icone: <IconeOpcao icone={Plus} className="text-primaria-texto" />, acao: true }]
@@ -355,9 +331,9 @@ export default function AtividadeForm() {
             />
           </Field>
 
-          {/* RN13 — a atividade pertence a exatamente um conteúdo. A
-              disciplina aqui só filtra a lista de conteúdos. */}
-          <Field id="disciplinaId" label="Disciplina" obrigatorio>
+          {/* RN13: a atividade pertence a uma disciplina; o conteúdo é
+              opcional (revisão de 06/11/2026). */}
+          <Field id="disciplinaId" label="Disciplina" obrigatorio erro={erros.disciplinaId}>
             <SelectRico
               valor={disciplinaId}
               aoMudar={trocarDisciplina}
@@ -365,19 +341,19 @@ export default function AtividadeForm() {
               placeholder="Selecione a disciplina"
             />
           </Field>
-          <Field id="conteudoId" label="Conteúdo" obrigatorio erro={erros.conteudoId} dica={dicaConteudo}>
+          <Field id="conteudoId" label="Conteúdo" erro={erros.conteudoId} dica={dicaConteudo}>
             <SelectRico
-              valor={form.conteudoId}
-              aoMudar={(valor) => mudar('conteudoId', valor)}
+              valor={form.conteudoId || (disciplinaId ? SEM_CONTEUDO : '')}
+              aoMudar={(valor) => mudar('conteudoId', valor === SEM_CONTEUDO ? '' : valor)}
               aoAcionar={() => setTimeout(() => setCriandoConteudo(true), 0)}
               opcoes={opcoesConteudo}
-              placeholder="Selecione o conteúdo"
-              disabled={!disciplinaId || opcoesConteudo.length === 0}
+              placeholder="Sem conteúdo"
+              disabled={!disciplinaId || opcoesConteudo.length === 1}
             />
           </Field>
 
-          {/* RN09 — o peso diz quanto a atividade vale no progresso do
-              conteúdo. Não é urgência: isso é a prioridade. */}
+          {/* RN09: o peso diz quanto a atividade vale no progresso. Não é
+              urgência (isso é a prioridade). */}
           <div className="flex flex-col gap-2 md:col-span-2">
             <span id="peso-rotulo" className="text-[13px] font-semibold tracking-wide text-suave">
               Peso
@@ -389,8 +365,8 @@ export default function AtividadeForm() {
             />
             {erros.peso && <p className="text-[13px] font-medium text-perigo">{erros.peso}</p>}
             <p id="peso-dica" className="text-[13px] leading-snug text-sutil">
-              Opcional: sem escolha, vale {PESO.PADRAO}. Quanto esta atividade pesa no progresso do conteúdo — não
-              é urgência, isso é a prioridade.
+              Opcional: sem escolha, vale {PESO.PADRAO}. É quanto esta atividade pesa no progresso da disciplina.
+              Urgência é outra coisa (para isso existe a prioridade).
             </p>
           </div>
 
@@ -398,7 +374,7 @@ export default function AtividadeForm() {
             <CampoData valor={form.prazo} aoMudar={(valor) => mudar('prazo', valor)} />
           </Field>
 
-          {/* RN06 — toda atividade tem responsável (revisão de 28/10/2026).
+          {/* RN06: toda atividade tem responsável (revisão de 28/10/2026).
               É ele quem recebe a experiência na conclusão (RN10). */}
           <Field
             id="responsavelId"
@@ -428,7 +404,7 @@ export default function AtividadeForm() {
             />
           </Field>
 
-          {/* RN20 — só o responsável mexe no status. */}
+          {/* RN20: só o responsável mexe no status. */}
           <Field id="status" label="Status" dica={dicaStatus}>
             <SelectRico
               valor={form.status}

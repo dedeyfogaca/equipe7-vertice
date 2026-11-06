@@ -1,8 +1,23 @@
 @import 'tailwindcss';
 
 /* O tema escuro é ligado pela classe `dark` no <html>. Sem ela, vale o
-   claro — nas telas internas e nas públicas. */
+   claro, nas telas internas e nas públicas. */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Demonstração dos cartões da página inicial: no computador, liga quando o
+   mouse passa no cartão; no celular (sem mouse), quando o cartão aparece. */
+@custom-variant demo {
+  @media (hover: hover) {
+    &:where(.group:hover *) {
+      @slot;
+    }
+  }
+  @media (hover: none) {
+    &:where([data-revelar='sim'] *) {
+      @slot;
+    }
+  }
+}
 
 /* Os tokens de cor moram em variáveis CSS, para o mesmo nome valer nos dois
    temas. O Tailwind gera as classes a partir daqui: `bg-superficie`,
@@ -259,5 +274,161 @@
     .simbolo-vertice {
       animation: none !important;
     }
+  }
+}
+
+/* ----- Páginas públicas: movimento (revisão de 06/11/2026) -----
+   Só transform, translate, scale e opacity. Quem pede menos movimento vê
+   tudo parado e já no lugar. */
+@layer components {
+  /* Blocos que sobem e aparecem quando chegam na tela (<Revelar>). */
+  .revelar {
+    opacity: 0;
+    translate: 0 18px;
+    transition:
+      opacity 700ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--atraso, 0ms),
+      translate 700ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--atraso, 0ms);
+  }
+  .revelar[data-revelar='sim'] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Entrada do topo da página inicial, em cascata. */
+  .entrada {
+    animation: entrada-suave 820ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--atraso, 0ms) both;
+  }
+
+  /* Sublinhado que enche como uma barra de progresso. */
+  .sublinhado-progresso {
+    position: relative;
+    white-space: nowrap;
+  }
+  .sublinhado-progresso::after {
+    content: '';
+    position: absolute;
+    left: 0.04em;
+    right: 0.04em;
+    bottom: -0.02em;
+    height: 0.07em;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.4;
+    transform-origin: left center;
+    scale: 0 1;
+    animation: encher 1300ms cubic-bezier(0.65, 0, 0.35, 1) 650ms forwards;
+  }
+
+  /* Brilho que segue o mouse (as variáveis vêm de usePonteiro). */
+  .brilho-ponteiro {
+    position: relative;
+    isolation: isolate;
+  }
+  .brilho-ponteiro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 350ms ease;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--primaria-barra) 13%, transparent),
+      transparent 60%
+    );
+  }
+  .brilho-ponteiro[data-ponteiro='dentro']::before {
+    opacity: 1;
+  }
+
+  /* Pontilhado do topo, que acende em volta do mouse. */
+  .grade-ponteiro {
+    position: relative;
+    isolation: isolate;
+  }
+  .grade-ponteiro::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(circle, var(--borda-forte) 1.1px, transparent 1.6px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(340px circle at var(--mx, 50%) var(--my, 18%), #000 0%, transparent 72%);
+    opacity: 0.55;
+    transition: opacity 500ms ease;
+  }
+  .grade-ponteiro[data-ponteiro='dentro']::after {
+    opacity: 1;
+  }
+
+  /* Prévia inclinada pelo mouse, como uma tela na mão. */
+  .inclinar {
+    transform: perspective(1800px) rotateX(calc(var(--ry, 0) * -2.6deg)) rotateY(calc(var(--rx, 0) * 3.4deg));
+    transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .inclinar[data-ponteiro='dentro'] {
+    transition-duration: 160ms;
+  }
+
+  /* "+30 XP" que sobe e some. */
+  .xp-sobe {
+    animation: xp-sobe 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .revelar {
+      translate: none;
+    }
+    .entrada,
+    .xp-sobe {
+      animation: none;
+    }
+    .sublinhado-progresso::after {
+      animation: none;
+      scale: 1 1;
+    }
+    .inclinar {
+      transform: none;
+    }
+  }
+}
+
+@keyframes entrada-suave {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@keyframes encher {
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes xp-sobe {
+  0% {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  25% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  75% {
+    opacity: 1;
+    translate: 0 -10px;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -18px;
+  }
+}
+
+@media print {
+  .revelar {
+    opacity: 1;
+    translate: none;
   }
 }

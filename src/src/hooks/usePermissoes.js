@@ -4,6 +4,7 @@ import {
   ehResponsavel,
   podeEditarAtividade,
   podeExcluirAtividade,
+  podeEditarEvento,
   podeMudarStatus,
 } from '../lib/permissoes.js';
 
@@ -20,6 +21,7 @@ export function usePermissoes() {
       podeMudarStatus: (atividade) => podeMudarStatus(atividade, quem),
       podeEditar: (atividade) => podeEditarAtividade(atividade, quem),
       podeExcluir: (atividade) => podeExcluirAtividade(atividade, quem),
+      podeEditarEvento: (evento) => podeEditarEvento(evento, quem),
     };
   }, [membroId, ehOrganizador]);
 }

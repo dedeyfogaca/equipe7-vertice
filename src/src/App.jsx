@@ -12,6 +12,7 @@ import NaoEncontrada from './pages/publicas/NaoEncontrada.jsx';
 
 import Painel from './pages/Painel.jsx';
 import Calendario from './pages/Calendario.jsx';
+import Eventos from './pages/Eventos.jsx';
 import Disciplinas from './pages/Disciplinas.jsx';
 import DisciplinaDetalhe from './pages/DisciplinaDetalhe.jsx';
 import Atividades from './pages/Atividades.jsx';
@@ -25,7 +26,7 @@ import Conquistas from './pages/Conquistas.jsx';
 // Públicas: a página inicial, a história da equipe e a tela de acesso.
 // Privadas: aninhadas em <ProtectedRoute> (que confere a sessão) e em
 // <AppShell> (a barra do topo com o <Outlet /> das telas). A passagem do
-// acesso para o painel (a marca rolando) fica por cima de todas as rotas.
+// acesso para o painel (a cortina com a marca) fica por cima de todas as rotas.
 export default function App() {
   return (
     <TransicaoGrupoProvider>
@@ -41,6 +42,7 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/painel" element={<Painel />} />
             <Route path="/calendario" element={<Calendario />} />
+            <Route path="/eventos" element={<Eventos />} />
             <Route path="/disciplinas" element={<Disciplinas />} />
             <Route path="/disciplina/:id" element={<DisciplinaDetalhe />} />
             <Route path="/atividades" element={<Atividades />} />

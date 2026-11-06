@@ -61,7 +61,7 @@ export default function Conquistas() {
   if (!membroAtivo) {
     return (
       <>
-        <PageHeader titulo="Conquistas" subtitulo="Experiência, ofensiva e marcos — os seus e os do grupo." />
+        <PageHeader titulo="Conquistas" subtitulo="Experiência, ofensiva e marcos: os seus e os do grupo." />
         <Card>
           <EmptyState
             icone={Users}
@@ -108,7 +108,7 @@ function ConquistasDoMembro({ grupoId, membroAtivo }) {
 
   return (
     <>
-      <PageHeader titulo="Conquistas" subtitulo="Experiência, ofensiva e marcos — os seus e os do grupo." />
+      <PageHeader titulo="Conquistas" subtitulo="Experiência, ofensiva e marcos: os seus e os do grupo." />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Estatistica rotulo="Experiência" valor={`${xp} XP`} destaque />
@@ -116,7 +116,7 @@ function ConquistasDoMembro({ grupoId, membroAtivo }) {
         <Estatistica rotulo="Concluídas" valor={concluidas} />
         <Estatistica
           rotulo="Posição no grupo"
-          valor={minha ? `${minha.posicao}º de ${ranking.length}` : '—'}
+          valor={minha ? `${minha.posicao}º de ${ranking.length}` : 'sem posição'}
         />
       </div>
 

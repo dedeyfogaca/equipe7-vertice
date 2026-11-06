@@ -53,20 +53,28 @@ export default function Disciplinas() {
     setRemovendo(null);
   };
 
-  // RN02 — avisa quantos conteúdos e atividades vão junto antes de confirmar.
+  // RN02: avisa o que vai junto antes de confirmar.
   const conteudosRemovendo = removendo ? conteudosDaDisciplina(removendo.id).length : 0;
   const atividadesRemovendo = removendo ? atividadesDaDisciplina(removendo.id).length : 0;
+  const levaJunto = [
+    atividadesRemovendo > 0 && plural(atividadesRemovendo, 'atividade'),
+    conteudosRemovendo > 0 && plural(conteudosRemovendo, 'conteúdo'),
+  ].filter(Boolean);
   const mensagemRemocao = !removendo
     ? ''
-    : conteudosRemovendo === 0
+    : levaJunto.length === 0
       ? `${removendo.nome} será removida do grupo.`
-      : `${removendo.nome} será removida do grupo, junto com ${plural(conteudosRemovendo, 'conteúdo')} e ${plural(atividadesRemovendo, 'atividade')}. Não dá para desfazer.`;
+      : `${removendo.nome} será removida do grupo, junto com ${levaJunto.join(' e ')}. Não dá para desfazer.`;
 
   return (
     <>
       <PageHeader
         titulo="Disciplinas"
-        subtitulo={`${plural(disciplinas.length, 'disciplina')} · ${plural(totalConteudos, 'conteúdo')}`}
+        subtitulo={
+          totalConteudos > 0
+            ? `${plural(disciplinas.length, 'disciplina')} · ${plural(totalConteudos, 'conteúdo')}`
+            : plural(disciplinas.length, 'disciplina')
+        }
         acoes={
           ehOrganizador && (
             <Button onClick={() => setFormulario({})}>
@@ -77,7 +85,7 @@ export default function Disciplinas() {
         }
       />
 
-      {/* RN07 — quem gerencia disciplina é o organizador. */}
+      {/* RN07: quem gerencia disciplina é o organizador. */}
       {!ehOrganizador && (
         <Aviso icone={Lock}>
           Só o organizador do grupo cadastra e edita disciplinas e conteúdos. Você pode cadastrar
@@ -90,7 +98,7 @@ export default function Disciplinas() {
           <EmptyState
             icone={BookOpen}
             titulo="Nenhuma disciplina ainda"
-            descricao="Cadastre as disciplinas do semestre. Elas organizam os conteúdos e são a base do cálculo de progresso."
+            descricao="Cadastre as disciplinas do semestre. Elas organizam as atividades e são a base do cálculo de progresso."
           >
             {ehOrganizador && (
               <Button onClick={() => setFormulario({})}>
@@ -121,7 +129,8 @@ export default function Disciplinas() {
                         </Link>
                       </h2>
                       <p className="text-[13px] text-sutil">
-                        {plural(conteudos.length, 'conteúdo')} · {plural(qtdAtividades, 'atividade')}
+                        {plural(qtdAtividades, 'atividade')}
+                        {conteudos.length > 0 && ` · ${plural(conteudos.length, 'conteúdo')}`}
                       </p>
                     </div>
                     {ehOrganizador && (
@@ -156,7 +165,7 @@ export default function Disciplinas() {
                             <span className="flex items-baseline justify-between gap-3 text-sm">
                               <span className="min-w-0 truncate text-texto">{conteudo.nome}</span>
                               <span className="numero shrink-0 text-[13px] text-sutil">
-                                {progresso ? `${progresso.percentual}%` : '—'}
+                                {progresso ? `${progresso.percentual}%` : 'sem atividade'}
                               </span>
                             </span>
                             <span aria-hidden="true" className="h-1 overflow-hidden rounded-full bg-superficie-3">
@@ -172,16 +181,14 @@ export default function Disciplinas() {
                         );
                       })}
                     </ul>
-                  ) : (
-                    <p className="border-t border-divisor pt-4 text-sm text-sutil">Nenhum conteúdo ainda.</p>
-                  )}
+                  ) : null}
                 </div>
                 <div className="border-t border-divisor px-5 py-3">
                   <Link
                     to={`/disciplina/${disciplina.id}`}
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-primaria-texto hover:underline"
                   >
-                    {conteudos.length === 0 && ehOrganizador ? 'Adicionar conteúdos' : 'Abrir disciplina'}
+                    Abrir disciplina
                     <ArrowRight className="size-4" aria-hidden="true" />
                   </Link>
                 </div>

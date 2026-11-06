@@ -3,7 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils.js';
 
-// Botão do sistema. `asChild` deixa o estilo ir para o filho — é assim que um
+// Botão do sistema. `asChild` deixa o estilo ir para o filho: é assim que um
 // <Link> do React Router vira botão sem perder a navegação.
 export const variantesBotao = cva(
   'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-[background-color,border-color,color,box-shadow,filter,transform] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',

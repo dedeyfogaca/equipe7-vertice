@@ -4,7 +4,7 @@
 //
 // O alvo é a trava do último organizador. Sem ela o grupo consegue se
 // trancar para fora: rebaixe ou remova o único organizador e ninguém mais
-// gerencia membros, disciplinas nem conteúdos — e não há como voltar atrás
+// gerencia membros, disciplinas nem conteúdos, e não há como voltar atrás
 // pela interface.
 
 import { PERFIL } from '../src/lib/constants.js';
@@ -23,7 +23,7 @@ function checar(nome, real, esperado) {
 const organizador = (id, nome) => ({ id, nome, perfil: PERFIL.ORGANIZADOR });
 const participante = (id, nome) => ({ id, nome, perfil: PERFIL.PARTICIPANTE });
 
-console.log('\nRN07 — o grupo não pode ficar sem organizador\n');
+console.log('\nRN07: o grupo não pode ficar sem organizador\n');
 
 const soUm = [organizador('a', 'Ana'), participante('b', 'Bruno')];
 
@@ -92,7 +92,7 @@ checar(
   'O nome pode ter no máximo 80 caracteres.'
 );
 
-console.log('\nD01 — o primeiro membro de um grupo vazio é o organizador\n');
+console.log('\nD01: o primeiro membro de um grupo vazio é o organizador\n');
 
 checar(
   'grupo vazio não aceita participante como primeiro',
@@ -105,7 +105,7 @@ checar(
   undefined
 );
 
-console.log('\nRF01 — quem cria o grupo informa o próprio nome\n');
+console.log('\nRF01: quem cria o grupo informa o próprio nome\n');
 
 checar(
   'sem nome do grupo',

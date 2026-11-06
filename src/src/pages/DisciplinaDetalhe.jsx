@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowDown, ArrowLeft, ArrowUp, Ellipsis, Layers, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Ellipsis, Layers, ListPlus, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import { useTitulo } from '../hooks/useTitulo.js';
 import { Button } from '../components/ui/botao.jsx';
-import { Aviso, Card, EmptyState } from '../components/ui/basicos.jsx';
+import { Card, EmptyState } from '../components/ui/basicos.jsx';
 import { Confirmacao } from '../components/ui/dialogo.jsx';
 import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz, MenuSeparador } from '../components/ui/flutuantes.jsx';
 import { BarraProgresso } from '../components/ui/progresso.jsx';
@@ -26,6 +26,7 @@ export default function DisciplinaDetalhe() {
     conteudosDaDisciplina,
     atividadesDoConteudo,
     atividadesDaDisciplina,
+    atividadesSemConteudo,
     criarConteudo,
     atualizarConteudo,
     removerConteudo,
@@ -43,7 +44,7 @@ export default function DisciplinaDetalhe() {
   const [editandoDisciplina, setEditandoDisciplina] = useState(false);
   const [removendo, setRemovendo] = useState(null);
 
-  // RN01 — disciplina de outro grupo é tratada como inexistente: quem está
+  // RN01: disciplina de outro grupo é tratada como inexistente: quem está
   // logado não pode enxergá-la nem pelo endereço direto.
   if (!disciplina || disciplina.grupoId !== grupoAtivo.id) {
     return (
@@ -63,6 +64,7 @@ export default function DisciplinaDetalhe() {
 
   const conteudos = conteudosDaDisciplina(disciplina.id);
   const qtdAtividades = atividadesDaDisciplina(disciplina.id).length;
+  const soltas = [...atividadesSemConteudo(disciplina.id)].sort(porPrazo);
 
   const salvarConteudo = (dados) => {
     if (formConteudo?.conteudo) {
@@ -108,7 +110,8 @@ export default function DisciplinaDetalhe() {
             </h1>
           </div>
           <p className="text-[15px] text-sutil">
-            {plural(conteudos.length, 'conteúdo')} · {plural(qtdAtividades, 'atividade')}
+            {plural(qtdAtividades, 'atividade')}
+            {conteudos.length > 0 && ` · ${plural(conteudos.length, 'conteúdo')}`}
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">
@@ -124,14 +127,12 @@ export default function DisciplinaDetalhe() {
               </Button>
             </>
           )}
-          {conteudos.length > 0 && (
-            <Button asChild>
-              <Link to={`/atividade/nova?disciplina=${disciplina.id}`}>
-                <Plus aria-hidden="true" />
-                Nova atividade
-              </Link>
-            </Button>
-          )}
+          <Button asChild>
+            <Link to={`/atividade/nova?disciplina=${disciplina.id}`}>
+              <Plus aria-hidden="true" />
+              Nova atividade
+            </Link>
+          </Button>
         </div>
       </header>
 
@@ -143,32 +144,64 @@ export default function DisciplinaDetalhe() {
         />
       </Card>
 
-      {!ehOrganizador && (
-        <Aviso icone={Lock} className="mb-5">
-          Só o organizador do grupo cadastra, edita e reordena conteúdos.
-        </Aviso>
+      {/* Atividades direto na disciplina, sem conteúdo. Desde 06/11/2026 o
+          conteúdo é opcional: quem não quer dividir por assunto usa só isto. */}
+      {(soltas.length > 0 || conteudos.length === 0) && (
+        <section aria-labelledby="t-soltas" className="mb-8">
+          <h2 id="t-soltas" className="mb-3 text-[19px] font-semibold tracking-[-0.02em] text-forte">
+            {conteudos.length > 0 ? 'Sem conteúdo' : 'Atividades'}
+          </h2>
+          <Card className="overflow-hidden">
+            {soltas.length > 0 ? (
+              <ul className="divide-y divide-divisor">
+                {soltas.map((atividade) => (
+                  <LinhaAtividade key={atividade.id} atividade={atividade} />
+                ))}
+              </ul>
+            ) : (
+              <EmptyState
+                icone={ListPlus}
+                titulo="Nenhuma atividade ainda"
+                descricao={`Cadastre a primeira atividade de ${disciplina.nome}.`}
+              >
+                <Button asChild>
+                  <Link to={`/atividade/nova?disciplina=${disciplina.id}`}>
+                    <Plus aria-hidden="true" />
+                    Nova atividade
+                  </Link>
+                </Button>
+              </EmptyState>
+            )}
+          </Card>
+        </section>
       )}
 
       <section aria-labelledby="t-conteudos">
-        <h2 id="t-conteudos" className="mb-3 text-[19px] font-semibold tracking-[-0.02em] text-forte">
-          Conteúdos
-        </h2>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 id="t-conteudos" className="text-[19px] font-semibold tracking-[-0.02em] text-forte">
+            Conteúdos <span className="text-[15px] font-medium text-sutil">(opcional)</span>
+          </h2>
+          {!ehOrganizador && (
+            <p className="flex items-center gap-1.5 text-[13px] text-sutil">
+              <Lock className="size-3.5" aria-hidden="true" />
+              Quem cria e organiza os conteúdos é o organizador.
+            </p>
+          )}
+        </div>
 
         {conteudos.length === 0 ? (
-          <Card>
-            <EmptyState
-              icone={Layers}
-              titulo="Nenhum conteúdo ainda"
-              descricao="Divida a disciplina nos assuntos que ela cobre. É o conteúdo que reúne as atividades e soma o peso delas."
-            >
-              {ehOrganizador && (
-                <Button onClick={() => setFormConteudo({})}>
-                  <Plus aria-hidden="true" />
-                  Novo conteúdo
-                </Button>
-              )}
-            </EmptyState>
-          </Card>
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-dashed border-borda px-5 py-4">
+            <p className="max-w-[560px] text-[14px] leading-relaxed text-sutil">
+              Quer ver o progresso por assunto? Divida {disciplina.nome} em conteúdos (por exemplo: Modelagem,
+              SQL). Dá para usar a disciplina inteira sem eles.
+            </p>
+            {ehOrganizador && (
+              <Button variante="secundaria" tamanho="sm" onClick={() => setFormConteudo({})}>
+                <Layers aria-hidden="true" />
+                Criar conteúdo
+              </Button>
+            )}
+          </div>
         ) : (
           <ol className="flex flex-col gap-3">
             {conteudos.map((conteudo, indice) => {
@@ -288,7 +321,7 @@ export default function DisciplinaDetalhe() {
         titulo="Remover conteúdo?"
         mensagem={
           qtdRemovendo > 0
-            ? `${removendo?.nome} será removido de ${disciplina.nome}, junto com ${plural(qtdRemovendo, 'atividade')}. Não dá para desfazer.`
+            ? `${removendo?.nome} sai de ${disciplina.nome}. ${qtdRemovendo === 1 ? 'A atividade dele continua' : `As ${qtdRemovendo} atividades dele continuam`} na disciplina, sem conteúdo.`
             : `${removendo?.nome} será removido de ${disciplina.nome}.`
         }
         textoConfirmar="Remover"

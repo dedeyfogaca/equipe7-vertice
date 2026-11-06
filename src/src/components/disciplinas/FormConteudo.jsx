@@ -7,7 +7,7 @@ import { semErroEm } from '../../lib/utils.js';
 
 /**
  * Cadastro e edição de conteúdo (RN13: pertence a exatamente uma
- * disciplina). Monte com `key` para reiniciar o formulário.
+ * disciplina; é opcional para a atividade). Monte com `key` para reiniciar o formulário.
  */
 export function FormConteudo({ aberto, aoMudar, conteudo, disciplina, conteudos, aoSalvar }) {
   const edicao = Boolean(conteudo);
@@ -29,7 +29,7 @@ export function FormConteudo({ aberto, aoMudar, conteudo, disciplina, conteudos,
       aberto={aberto}
       aoMudar={aoMudar}
       titulo={edicao ? 'Editar conteúdo' : 'Novo conteúdo'}
-      descricao={`Um assunto de ${disciplina.nome}. É o conteúdo que reúne as atividades e soma o peso delas.`}
+      descricao={`Um assunto de ${disciplina.nome}, como "SQL" ou "Modelagem". Opcional: serve para ver o progresso por assunto.`}
       rodape={
         <>
           <Button variante="secundaria" onClick={() => aoMudar(false)}>

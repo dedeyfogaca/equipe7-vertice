@@ -62,7 +62,7 @@ function pendentesPrimeiro(a, b) {
 export default function Atividades() {
   useTitulo('Atividades');
   const { grupoAtivo, membroAtivo } = useAuth();
-  const { atividadesDoGrupo, membrosDoGrupo, disciplinasDoGrupo, conteudosDoGrupo, trilhaDaAtividade } =
+  const { atividadesDoGrupo, membrosDoGrupo, disciplinasDoGrupo, trilhaDaAtividade } =
     useData();
   const alternarConclusao = useAlternarConclusao();
 
@@ -123,8 +123,7 @@ export default function Atividades() {
 
     const termo = busca.trim().toLowerCase();
     if (termo) {
-      // A disciplina não está escrita na atividade: a busca sobe a cadeia e
-      // casa também pelo nome do conteúdo e da disciplina.
+      // A busca casa também pelo nome da disciplina e do conteúdo.
       lista = lista.filter((a) => {
         const { conteudo, disciplina } = trilhaDaAtividade(a);
         return (
@@ -157,7 +156,7 @@ export default function Atividades() {
   }, [atividades, situacao, fDisciplina, fResponsavel, fPrazo, busca, ordem, trilhaDaAtividade]);
 
   const semAtividades = atividades.length === 0;
-  const semConteudos = conteudosDoGrupo(grupoAtivo.id).length === 0;
+  const semDisciplinas = disciplinasDoGrupo(grupoAtivo.id).length === 0;
   const temFiltro =
     situacao !== SITUACAO.TODAS ||
     busca.trim() !== '' ||
@@ -191,11 +190,11 @@ export default function Atividades() {
           {/* O vazio orienta pela cadeia: convidar a criar uma atividade
               antes de existir conteúdo levaria a pessoa a um formulário que
               ela não consegue preencher. */}
-          {semConteudos ? (
+          {semDisciplinas ? (
             <EmptyState
               icone={BookOpen}
               titulo="Comece pelas disciplinas"
-              descricao="No Vértice a atividade pertence a um conteúdo, e o conteúdo a uma disciplina. É essa cadeia que permite medir o quanto você avançou, em vez de só contar itens feitos."
+              descricao="Toda atividade é de uma disciplina. É por ela que o Vértice mede o quanto o grupo avançou, em vez de só contar itens feitos."
             >
               <Button asChild>
                 <Link to="/disciplinas">Cadastrar uma disciplina</Link>
