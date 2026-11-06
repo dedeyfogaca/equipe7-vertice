@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 1080" width="2730" height="3240">
-<rect width="910" height="1080" fill="#FFFFFF"/>
-<rect x="250" y="30" width="460" height="995" rx="6" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 1150" width="2730" height="3450">
+<rect width="910" height="1150" fill="#FFFFFF"/>
+<rect x="250" y="30" width="460" height="1065" rx="6" fill="#FAFBFE" stroke="#CDD4E1" stroke-width="1.6"/>
 <text x="480" y="60" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0E7490" font-weight="700" text-anchor="middle" letter-spacing="2.4">SISTEMA VÉRTICE</text>
 <line x1="141" y1="238" x2="300" y2="105" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="238" x2="300" y2="175" stroke="#5B6678" stroke-width="1.6" fill="none"/>
@@ -15,6 +15,7 @@
 <line x1="141" y1="683" x2="300" y2="835" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="683" x2="300" y2="905" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="141" y1="683" x2="300" y2="975" stroke="#5B6678" stroke-width="1.6" fill="none"/>
+<line x1="141" y1="683" x2="300" y2="1045" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="518" x2="660" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="518" x2="660" y2="695" stroke="#5B6678" stroke-width="1.6" fill="none"/>
 <line x1="765" y1="798" x2="660" y2="540" stroke="#5B6678" stroke-width="1.6" fill="none"/>
@@ -48,11 +49,13 @@
 <ellipse cx="480" cy="765" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
 <text x="480" y="770" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC13 · Consultar calendário</text>
 <ellipse cx="480" cy="835" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="840" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC09 · Consultar painel de desempenho</text>
+<text x="480" y="840" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC14 · Gerenciar eventos</text>
 <ellipse cx="480" cy="905" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="910" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC10 · Alternar tema</text>
+<text x="480" y="910" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC09 · Consultar painel de desempenho</text>
 <ellipse cx="480" cy="975" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
-<text x="480" y="980" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC11 · Encerrar sessão</text>
+<text x="480" y="980" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC10 · Alternar tema</text>
+<ellipse cx="480" cy="1045" rx="180" ry="25" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8"/>
+<text x="480" y="1050" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="400" text-anchor="middle" letter-spacing="0">UC11 · Encerrar sessão</text>
 
     <circle cx="120" cy="213.0" r="13.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>
     <line x1="120" y1="226.0" x2="120" y2="260.0" stroke="#0891B2" stroke-width="3" stroke-linecap="round" fill="none"/>

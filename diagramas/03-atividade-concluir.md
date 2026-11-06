@@ -1,7 +1,7 @@
-# Diagrama de Atividades — Concluir atividade e recalcular progresso
+# Diagrama de Atividades: Concluir atividade e recalcular progresso
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 29/10/2026
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 06/11/2026
 
 ---
 
@@ -27,8 +27,8 @@ flowchart TD
     D2 -- Não --> A7
     A61 --> A7
 
-    A7[Sistema recalcula o progresso do conteúdo<br/>peso concluído dividido pelo peso total]
-    A7 --> A8[Sistema recalcula o progresso da disciplina]
+    A7[Sistema recalcula o progresso do conteúdo, se a atividade tiver um,<br/>peso concluído dividido pelo peso total]
+    A7 --> A8[Sistema recalcula o progresso da disciplina,<br/>com todas as atividades dela]
     A8 --> A9[Sistema registra o percentual do dia<br/>no histórico de progresso]
     A9 --> A10[Sistema exibe barra de progresso atualizada,<br/>experiência creditada e conquistas obtidas]
     A10 --> FIM([Fim])
@@ -92,7 +92,7 @@ flowchart TD
 
 | Decisão | Origem | Consequência |
 |---|---|---|
-| Estudante é o responsável pela atividade? | RN20 | Só quem é responsável conclui ou reabre a atividade. Os outros integrantes — o organizador inclusive — veem a situação, mas não a alteram; o organizador continua podendo editar os dados e excluir a atividade (RN07) |
+| Estudante é o responsável pela atividade? | RN20 | Só quem é responsável conclui ou reabre a atividade. Os outros integrantes (o organizador inclusive) veem a situação, mas não a alteram; o organizador continua podendo editar os dados e excluir a atividade (RN07) |
 | Algum marco foi atingido? | RN12 | A conquista é concedida uma única vez, no instante em que a condição passa a ser satisfeita |
 
 Os dois fluxos não decidem a quem creditar ou de quem estornar a experiência: toda atividade tem um responsável (RN06), é ele quem conclui (RN20) e é sempre ele quem recebe.
@@ -101,4 +101,4 @@ Os dois fluxos não decidem a quem creditar ou de quem estornar a experiência: 
 
 ### Navegação
 
-[⬅ Anterior: Classes](02-classes.md) · [Índice](../README.md) · [Próximo: Fluxo — Cadastrar Atividade ➡](04-atividade-cadastrar.md)
+[⬅ Anterior: Classes](02-classes.md) · [Índice](../README.md) · [Próximo: Fluxo: Cadastrar Atividade ➡](04-atividade-cadastrar.md)

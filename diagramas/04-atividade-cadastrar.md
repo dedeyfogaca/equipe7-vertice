@@ -1,7 +1,7 @@
-# Diagrama de Atividades — Cadastrar atividade vinculada a disciplina e conteúdo
+# Diagrama de Atividades · Cadastrar atividade na disciplina, com conteúdo opcional
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 29/10/2026
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 06/11/2026
 
 ---
 
@@ -20,18 +20,19 @@ flowchart TD
     D0 -- Sim --> C5[Sistema exibe o formulário da atividade,<br/>com os campos vazios]
     C5 --> C6[Estudante seleciona a disciplina]
     C6 --> C7[Sistema filtra os conteúdos<br/>apenas os da disciplina escolhida]
-    C7 --> D3{O conteúdo<br/>já existe?}
-    D3 -- Não --> C4[Organizador cria o conteúdo numa janela,<br/>sem sair do formulário]
+    C7 --> D3{Separar a atividade<br/>num conteúdo?}
+    D3 -- Não --> C8[Estudante preenche título, descrição,<br/>prazo no calendário, peso, prioridade e responsável]
+    D3 -- Sim, um que existe --> C8
+    D3 -- Sim, um novo --> C4[Organizador cria o conteúdo numa janela,<br/>sem sair do formulário]
     C4 --> C4b[Sistema grava o conteúdo e o deixa escolhido,<br/>mantendo o que já foi preenchido]
     C4b --> C8
-    D3 -- Sim --> C8[Estudante preenche título, descrição, conteúdo,<br/>prazo no calendário, peso, prioridade e responsável]
     C8 --> D4{O responsável é<br/>quem está cadastrando?}
     D4 -- Sim --> C8b[Estudante pode escolher o status]
     D4 -- Não --> C8c[Status travado:<br/>a atividade começa em A fazer]
     C8b --> C9[Estudante confirma]
     C8c --> C9
 
-    C9 --> D1{Título com 3 ou mais caracteres, prazo válido,<br/>conteúdo e responsável selecionados?}
+    C9 --> D1{Título com 3 ou mais caracteres, disciplina,<br/>prazo válido e responsável?}
     D1 -- Não --> C10[Sistema destaca cada campo inválido<br/>com mensagem específica]
     C10 --> C8
 
@@ -41,7 +42,7 @@ flowchart TD
     D2 -- Não --> C13
     C12 --> C13[Sistema grava a atividade<br/>e registra a data de criação]
 
-    C13 --> C14[Sistema soma o peso da atividade<br/>ao peso total do conteúdo]
+    C13 --> C14[Sistema soma o peso da atividade ao peso total<br/>da disciplina e, se houver, do conteúdo]
     C14 --> C15[Sistema atualiza a listagem<br/>e o progresso do conteúdo e da disciplina]
     C15 --> FIM([Fim])
 
@@ -70,20 +71,20 @@ flowchart TD
 
 | Decisão | Origem | Consequência |
 |---|---|---|
-| Existe disciplina cadastrada no grupo? | RN13 | Toda atividade precisa de um conteúdo, e todo conteúdo de uma disciplina. Sem disciplina, o fluxo desvia para o cadastro dela antes de prosseguir |
-| O conteúdo já existe? | RF30, RN07, RN13 | O organizador cria o conteúdo ali mesmo, na disciplina escolhida, e volta ao formulário com tudo o que já tinha preenchido. O participante não cria conteúdo: escolhe um dos existentes |
+| Existe disciplina cadastrada no grupo? | RN13 | Toda atividade precisa de uma disciplina. Sem disciplina, o fluxo desvia para o cadastro dela antes de prosseguir |
+| Separar a atividade num conteúdo? | RF30, RN07, RN13 | O conteúdo é opcional: sem ele, a atividade fica direto na disciplina. Para um conteúdo novo, o organizador o cria ali mesmo, na disciplina escolhida, e volta ao formulário com tudo o que já tinha preenchido. O participante não cria conteúdo: escolhe um dos existentes ou nenhum |
 | O responsável é quem está cadastrando? | RN20 | Só o responsável decide o status. Cadastrada para outra pessoa, a atividade começa em "a fazer" |
-| Título, prazo, conteúdo e responsável válidos? | RN06, RN13, RNF03 | O sistema não grava dados incompletos e devolve a mensagem no próprio campo, preservando o que já foi digitado. Toda atividade tem um responsável |
+| Título, disciplina, prazo e responsável válidos? | RN06, RN13, RNF03 | O sistema não grava dados incompletos e devolve a mensagem no próprio campo, preservando o que já foi digitado. Toda atividade tem um responsável |
 | Prazo coincide com feriado nacional ou fim de semana? | RF07, RF22 | O feriado e o fim de semana são avisos, não impedimentos. A atividade é gravada normalmente |
 
 ---
 
 ## Observação sobre o peso
 
-O passo "soma o peso da atividade ao peso total do conteúdo" não corresponde a um campo gravado: o peso total é obtido pela soma dos pesos das atividades do conteúdo no momento do cálculo (RN08). O passo está no diagrama porque representa o efeito visível para o usuário — o percentual de progresso do conteúdo cai quando uma atividade nova é adicionada, já que o denominador aumenta.
+O passo "soma o peso da atividade ao peso total" não corresponde a um campo gravado: o peso total é obtido pela soma dos pesos das atividades da disciplina, ou do conteúdo, no momento do cálculo (RN08, RN14). O passo está no diagrama porque representa o efeito visível para o usuário: o percentual de progresso cai quando uma atividade nova é adicionada, já que o denominador aumenta.
 
 ---
 
 ### Navegação
 
-[⬅ Anterior: Fluxo — Concluir Atividade](03-atividade-concluir.md) · [Índice](../README.md) · [Próximo: Modelo Conceitual ➡](../banco-de-dados/01-modelo-conceitual.md)
+[⬅ Anterior: Fluxo: Concluir Atividade](03-atividade-concluir.md) · [Índice](../README.md) · [Próximo: Modelo Conceitual ➡](../banco-de-dados/01-modelo-conceitual.md)

@@ -1,6 +1,6 @@
 # Identidade visual dos diagramas
 
-> **Vértice** — Plataforma de Acompanhamento de Aprendizagem
+> **Vértice** · Plataforma de Acompanhamento de Aprendizagem
 > Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 28/10/2026
 
 ---
@@ -15,12 +15,12 @@ Na versão 2 do sistema (28/10/2026), a interface ganhou uma nova identidade vis
 
 | Papel | Cor | Onde aparece nos diagramas |
 |---|---|---|
-| Ciano — marca e ações principais | `#0891B2` | Atores, casos de uso e entidades do núcleo do domínio |
-| Verde limão — acento da marca | `#4D7C0F` | Início e fim dos fluxos, classe associativa |
-| Âmbar — status "fazendo" e alerta | `#D97706` | Losangos de decisão e avisos |
-| Verde — status "concluído" | `#16A34A` | Passos que geram ganho para o estudante: experiência, conquista, progresso |
-| Rosa — perigo | `#DC2626` | Erros de validação e estorno de experiência |
-| Cinza-azulado — neutro | `#64748B` | Sistemas externos, enumerações e ações sem efeito no progresso |
+| Ciano: marca e ações principais | `#0891B2` | Atores, casos de uso e entidades do núcleo do domínio |
+| Verde limão: acento da marca | `#4D7C0F` | Início e fim dos fluxos, classe associativa |
+| Âmbar: status "fazendo" e alerta | `#D97706` | Losangos de decisão e avisos |
+| Verde: status "concluído" | `#16A34A` | Passos que geram ganho para o estudante: experiência, conquista, progresso |
+| Rosa e perigo | `#DC2626` | Erros de validação e estorno de experiência |
+| Cinza-azulado: neutro | `#64748B` | Sistemas externos, enumerações e ações sem efeito no progresso |
 
 As cores são as do tema claro da primeira versão, escolhidas por atravessar bem os três meios em que os diagramas são vistos: o documento entregue, a impressão e a leitura no GitHub. Nenhuma cor foi inventada para os diagramas.
 
@@ -30,8 +30,8 @@ As cores são as do tema claro da primeira versão, escolhidas por atravessar be
 
 | Uso | Fonte |
 |---|---|
-| Rótulos de nós, entidades e classes | **Space Grotesk** — a do corpo de texto da primeira versão da aplicação |
-| Rótulos de transição e de relacionamento | **Space Mono** — a dos rótulos de dados da primeira versão |
+| Rótulos de nós, entidades e classes | **Space Grotesk**, a do corpo de texto da primeira versão da aplicação |
+| Rótulos de transição e de relacionamento | **Space Mono**, a dos rótulos de dados da primeira versão |
 
 As imagens em `png/` são geradas com as fontes embutidas. Aberto direto no navegador, o SVG usa a fonte instalada no computador ou recai na fonte sem serifa do sistema, e só a tipografia muda.
 
@@ -45,8 +45,8 @@ As imagens em `png/` são geradas com as fontes embutidas. Aberto direto no nave
 
 | Forma | Significado |
 |---|---|
-| Boneco palito ciano | Ator do sistema — a pessoa que inicia a interação |
-| Círculo cinza tracejado | Sistema externo — participa, mas não inicia nada e não é pessoa |
+| Boneco palito ciano | Ator do sistema: a pessoa que inicia a interação |
+| Círculo cinza tracejado | Sistema externo: participa, mas não inicia nada e não é pessoa |
 | Elipse com borda ciano | Caso de uso |
 | Pílula verde limão | Início e fim de um fluxo |
 | Retângulo neutro | Ação executada pelo usuário ou pelo sistema |
