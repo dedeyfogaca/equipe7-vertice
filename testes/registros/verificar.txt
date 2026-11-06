@@ -9,7 +9,7 @@ O cenário destrutivo: já migrado, mas sem o marcador de versão
 ok    não tenta migrar -> false
 ok    e diz por quê -> "sem-tarefas-antigas"
 ok    as atividades continuam lá -> 3
-ok    o marcador é gravado, para não repetir -> 2
+ok    o marcador é gravado, para não repetir -> 3
 
 Caminho normal: dados no formato antigo
 
@@ -17,9 +17,9 @@ ok    migrou -> true
 ok    converteu as três -> 3
 ok    nomes iguais viram uma disciplina só -> ["Física","Sem disciplina"]
 ok    a chave antiga é apagada -> null
-ok    RN09 — toda atividade ganha peso -> true
+ok    RN09: toda atividade ganha peso -> true
 ok    a concluída ganha data de conclusão -> true
-ok    RN07 — o primeiro membro vira organizador -> ["organizador","participante"]
+ok    RN07: o primeiro membro vira organizador -> ["organizador","participante"]
 ok    atividade não guarda grupoId -> false
 
 Rodar de novo não duplica nada
@@ -33,7 +33,7 @@ Tarefa órfã: o grupo dela não existe mais
 
 ok    converte o que dá -> 1
 ok    e conta as órfãs -> 1
-ok    a chave antiga NÃO é apagada — a órfã fica recuperável -> 2
+ok    a chave antiga NÃO é apagada, a órfã fica recuperável -> 2
 
 Órfã + marcador perdido: a segunda passada não pode duplicar id
 
@@ -44,7 +44,7 @@ ok    id repetido quebraria chave de lista e `find` -> true
 Instalação nova: nada gravado
 
 ok    não migra -> false
-ok    marca a versão mesmo assim -> 2
+ok    marca a versão mesmo assim -> 3
 ok    e não inventa coleção -> null
 
 Versão 2: atividade sem responsável ganha um
@@ -56,7 +56,7 @@ ok    responsável de outro grupo é trocado (RN03) -> "m2"
 ok    responsável que não existe mais é trocado -> "m2"
 ok    conta quantas recebeu -> 3
 ok    nenhuma atividade fica sem responsável -> true
-ok    o marcador vai para 2 -> 2
+ok    o marcador vai para a versão atual -> 3
 
 Versão 2: cores fora da paleta nova
 
@@ -76,67 +76,81 @@ ok    resumo zerado -> {"responsaveisDefinidos":0,"coresAjustadas":0}
 ok    a coleção fica exatamente como estava -> true
 ok    e a terceira passada nem roda -> "ja-migrado"
 
+Versão 3: disciplina na atividade e conteúdo opcional
+
+ok    a atividade ganha a disciplina do conteúdo -> ["d1","d2","d1"]
+ok    continua no conteúdo que a pessoa criou -> "c1"
+ok    sai do "Geral" automático e fica direto na disciplina -> ""
+ok    "Geral" criado pela pessoa continua -> "c3"
+ok    o "Geral" automático sai da lista de conteúdos -> ["c1","c3"]
+ok    nenhuma atividade some -> 3
+ok    estilo de avatar que saiu vira o padrão -> ["croodles-neutral","notionists",null]
+ok    resumo do passo 3 -> {"atividadesAjustadas":3,"conteudosGeraisRemovidos":1,"avataresAjustados":1}
+ok    o passo 2 não roda de novo -> null
+ok    marcador na versão 3 -> 3
+ok    e não roda outra vez -> "ja-migrado"
+
 Todas as verificações passaram.
 
 
-RN08 — progresso do conteúdo é razão de peso, não contagem
+RN08: progresso do conteúdo é razão de peso, não contagem
 
 ok    1 de 5 atividades concluídas, peso 5 de 9 -> 56
 ok    4 de 5 atividades concluídas, peso 4 de 9 -> 44
 ok    nada concluído -> 0
 ok    tudo concluído -> 100
 
-RN08 — conteúdo sem atividade é ausente, não 0%
+RN08: conteúdo sem atividade é ausente, não 0%
 
 ok    conteúdo sem atividade devolve nulo -> null
 
-RN14 — progresso da disciplina é razão de pesos somados
+RN14: progresso da disciplina é razão de pesos somados
 
 ok    pesos somados -> [15,21]
 ok    percentual pela razão de pesos -> 71
 ok    a média dos percentuais daria outro número (por isso não se usa) -> true
       média: 38%   ·   correto: 71%
 
-RN14 + RN08 — conteúdo vazio não derruba a disciplina
+RN14 + RN08: conteúdo vazio não derruba a disciplina
 
 ok    conteúdo vazio fica fora da conta -> 75
 ok    disciplina só com conteúdos vazios -> null
 ok    disciplina sem nenhum conteúdo -> null
 
-RN09 — peso ausente ou fora da faixa
+RN09: peso ausente ou fora da faixa
 
 ok    sem peso definido vale 1 -> 2
 ok    peso acima da faixa é coagido para 5 -> 5
 ok    peso abaixo da faixa é coagido para 1 -> 1
 
-RF15 — o progresso antes da conclusão, para o retorno na tela
+RF15: o progresso antes da conclusão, para o retorno na tela
 
 ok    depois: 5 de 10 -> 50
 ok    antes de x: 1 de 10 -> 10
-ok    o peso total nao muda — a atividade sempre existiu -> 10
+ok    o peso total nao muda: a atividade sempre existiu -> 10
 ok    antes de uma que nao esta concluida nao muda nada -> 50
 ok    unica atividade do conteudo: de 0% para 100% -> [0,100]
 
 Todas as verificações passaram.
 
 
-RN10 — xp = peso × 10, creditado ao responsável
+RN10: xp = peso × 10, creditado ao responsável
 
 ok    peso 3 concluída vale 30 -> 30
 ok    constante bate com a regra -> 10
 ok    peso 5 concluída vale 50 -> 50
 
-RN10 — só conta quando está concluída
+RN10: só conta quando está concluída
 
 ok    a fazer não credita -> 0
 ok    fazendo não credita -> 0
 
-RN10 — atividade sem responsável não gera experiência
+RN10: atividade sem responsável não gera experiência
 
 ok    concluída sem responsável -> 0
 ok    e não entra no total do grupo -> 20
 
-RN10 — o estorno: concluir, desmarcar e concluir de novo
+RN10: o estorno: concluir, desmarcar e concluir de novo
 
 ok    1. antes de concluir -> 0
 ok    2. ao concluir -> 30
@@ -144,7 +158,7 @@ ok    3. ao reverter, estornou -> 0
 ok    4. ao concluir de novo, NÃO dobrou -> 30
 ok    5. concluir duas vezes seguidas não soma -> 30
 
-RN10 — trocar o responsável leva a experiência junto
+RN10: trocar o responsável leva a experiência junto
 
 ok    quem era responsável antes fica sem -> 0
 ok    quem é responsável agora recebe -> 40
@@ -159,7 +173,7 @@ ok    empate compartilha a posição e a seguinte pula -> [["Ana Souza",70,1],["
 ok    empate ordena por nome, para a lista não dançar -> "Ana Souza"
 ok    conta as concluídas de cada um -> [2,2,0]
 
-RN09 — peso ausente ou fora da faixa também vale aqui
+RN09: peso ausente ou fora da faixa também vale aqui
 
 ok    sem peso vale 1, logo 10 de xp -> 10
 ok    peso acima da faixa é coagido para 5 -> 50
@@ -167,7 +181,7 @@ ok    peso acima da faixa é coagido para 5 -> 50
 Todas as verificações passaram.
 
 
-RN07 — o grupo não pode ficar sem organizador
+RN07: o grupo não pode ficar sem organizador
 
 ok    o único organizador é reconhecido -> true
 ok    o participante não é o último organizador -> false
@@ -186,12 +200,12 @@ ok    e-mail invalido continua sendo apontado -> "E-mail inválido."
 ok    cadastrar membro novo nunca cai na trava -> undefined
 ok    nome com mais de 80 caracteres é barrado -> "O nome pode ter no máximo 80 caracteres."
 
-D01 — o primeiro membro de um grupo vazio é o organizador
+D01: o primeiro membro de um grupo vazio é o organizador
 
 ok    grupo vazio não aceita participante como primeiro -> "O primeiro membro do grupo precisa ser o organizador."
 ok    grupo vazio aceita o organizador -> undefined
 
-RF01 — quem cria o grupo informa o próprio nome
+RF01: quem cria o grupo informa o próprio nome
 
 ok    sem nome do grupo -> "Dê um nome ao grupo."
 ok    sem o nome de quem cria -> "Informe o seu nome."
@@ -204,18 +218,21 @@ Atividade completa passa
 
 ok    sem erro nenhum -> {}
 
-RN06 — toda atividade tem responsável
+RN06: toda atividade tem responsável
 
 ok    sem responsável é barrada -> "Escolha o responsável pela atividade."
 ok    responsável de outro grupo é barrado (RN03) -> "O responsável escolhido não pertence ao grupo."
 ok    qualquer membro do grupo serve -> undefined
 
-RN13 — a atividade pertence a um conteúdo do grupo
+RN13: a atividade pertence a uma disciplina; o conteúdo é opcional
 
-ok    sem conteúdo é barrada -> "Escolha o conteúdo a que a atividade pertence."
+ok    sem conteúdo passa -> {}
+ok    sem disciplina é barrada -> "Escolha a disciplina da atividade."
+ok    disciplina de outro grupo é barrada -> "A disciplina escolhida não pertence a este grupo."
+ok    conteúdo de outra disciplina é barrado -> "Esse conteúdo é de outra disciplina."
 ok    conteúdo de outro grupo é barrado -> "O conteúdo escolhido não pertence a este grupo."
 
-RN09 — peso inteiro de 1 a 5
+RN09: peso inteiro de 1 a 5
 
 ok    peso 0 -> "O peso vai de 1 a 5."
 ok    peso 6 -> "O peso vai de 1 a 5."
@@ -236,6 +253,21 @@ Os dados de exemplo seguem a regra
 ok    toda atividade de exemplo tem responsável do grupo -> true
 ok    e passa na validação -> 0
 ok    o primeiro membro do exemplo é o organizador (RN07) -> "organizador"
+ok    exemplo tem atividade sem conteúdo -> true
+
+RF31: eventos
+
+ok    evento completo passa -> {}
+ok    sem horário vale o dia todo -> {}
+ok    sem nome -> "Dê um nome ao evento."
+ok    tipo inventado -> "Escolha o tipo do evento."
+ok    sem dia -> "Escolha o dia do evento."
+ok    dia que não existe -> "O dia informado não é uma data válida."
+ok    fim antes do início -> "O fim precisa ser depois do início."
+ok    fim sem início -> "Informe o início antes do fim."
+ok    horário inválido -> "Horário inválido."
+ok    disciplina de outro grupo -> "A disciplina escolhida não pertence a este grupo."
+ok    eventos de exemplo passam -> 0
 
 Todas as verificações passaram.
 
@@ -302,7 +334,7 @@ ok    código repetido na mesma rodada conta uma vez -> 1
 Todas as verificações passaram.
 
 
-RN20 — só o responsável muda o status
+RN20: só o responsável muda o status
 
 ok    Ana conclui a própria atividade -> true
 ok    Bruno conclui a própria atividade -> true
@@ -311,7 +343,7 @@ ok    nem a organizadora conclui a do Bruno -> false
 ok    ninguém da sessão, ninguém conclui -> false
 ok    atividade sem responsável não tem quem conclua -> false
 
-RN07 — editar e excluir
+RN07: editar e excluir
 
 ok    a organizadora edita a atividade do Bruno -> true
 ok    a organizadora exclui a atividade do Bruno -> true
@@ -322,13 +354,21 @@ ok    a Carla não exclui a do Bruno -> false
 ok    grupo vazio: quem monta edita (dado antigo) -> true
 ok    responsável é reconhecido -> [true,false]
 
-RN20 no formulário — o status que é gravado
+RN20 no formulário: o status que é gravado
 
 ok    nova, para si mesmo: vale o status escolhido -> "fazendo"
 ok    nova, para si mesmo, sem escolher: começa em "a fazer" -> "a fazer"
 ok    nova, para outra pessoa: começa em "a fazer", mesmo escolhendo "concluido" -> "a fazer"
 ok    edição da organizadora na atividade do Bruno: o status não muda -> "concluido"
 ok    edição do próprio responsável: o status muda -> "a fazer"
+
+Eventos (RN21)
+
+ok    quem cadastrou edita o evento -> true
+ok    outro participante não edita -> false
+ok    o organizador edita o evento de qualquer um -> true
+ok    evento sem autor: só o organizador -> [false,true]
+ok    sem saber quem é, ninguém edita -> false
 
 Todas as verificações passaram.
 
@@ -359,7 +399,7 @@ ok    3000 × 4000, sem mexer -> {"sx":0,"sy":500,"lado":3000}
 Todas as verificações passaram.
 
 Estilos oferecidos
-ok    são cinco -> 5
+ok    são dois -> ["croodles-neutral","notionists"]
 ok    o padrão está entre eles -> true
 ok    estilo inventado não vale -> false
 Desenho
@@ -367,7 +407,8 @@ ok    é uma imagem SVG embutida, sem buscar nada fora -> true
 ok    mesma semente e estilo, mesmo desenho -> true
 ok    a semente ignora maiúsculas e espaços nas pontas -> true
 ok    outra semente, outro desenho -> true
-ok    cada estilo desenha diferente -> 5
+ok    cada estilo desenha diferente -> 2
+ok    estilo que saiu (Aventura) usa o padrão -> true
 ok    estilo desconhecido usa o padrão -> true
 ok    sem semente ainda desenha -> true
 Sorteio e iniciais

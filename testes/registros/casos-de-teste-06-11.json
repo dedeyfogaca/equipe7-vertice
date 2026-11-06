@@ -1,14 +1,14 @@
 {
-  "quando": "2026-11-02T02:03:36.527Z",
+  "quando": "2026-11-06T17:45:50.580Z",
   "resultados": [
     {
       "id": "CT01",
       "titulo": "Criar grupo sem nome do grupo e sem o nome de quem cria",
       "ok": true,
       "obs": [
-        "ok — erro no nome do grupo: \"Dê um nome ao grupo.\"",
-        "ok — erro no nome de quem cria: \"Informe o seu nome.\"",
-        "ok — continua na tela de acesso: \"/entrar\""
+        "ok: erro no nome do grupo: \"Dê um nome ao grupo.\"",
+        "ok: erro no nome de quem cria: \"Informe o seu nome.\"",
+        "ok: continua na tela de acesso: \"/entrar\""
       ]
     },
     {
@@ -16,10 +16,10 @@
       "titulo": "Criar grupo: quem cria entra como organizador",
       "ok": true,
       "obs": [
-        "ok — abriu o painel: \"/painel\"",
-        "ok — saudação com o nome de quem criou: true",
-        "ok — Lucas é o único membro: 1",
-        "ok — com perfil Organizador: true"
+        "ok: abriu o painel: \"/painel\"",
+        "ok: saudação com o nome de quem criou: true",
+        "ok: Lucas é o único membro: 1",
+        "ok: com perfil Organizador: true"
       ]
     },
     {
@@ -27,8 +27,8 @@
       "titulo": "Cadastrar membro sem nome e com e-mail inválido",
       "ok": true,
       "obs": [
-        "ok — erro no nome: \"O nome do membro é obrigatório.\"",
-        "ok — erro no e-mail: \"E-mail inválido.\""
+        "ok: erro no nome: \"O nome do membro é obrigatório.\"",
+        "ok: erro no e-mail: \"E-mail inválido.\""
       ]
     },
     {
@@ -36,11 +36,11 @@
       "titulo": "Cadastrar membro com foto de perfil",
       "ok": true,
       "obs": [
-        "ok — o editor abre com a foto escolhida, sem zoom: \"1\"",
-        "ok — Marina entrou como Participante: true",
-        "ok — a foto foi gravada reduzida, em JPEG: true",
-        "ok — recortada em quadrado de 256 px: [256,256]",
-        "tamanho da foto gravada: 7 KB"
+        "ok: o editor abre com a foto escolhida, sem zoom: \"1\"",
+        "ok: Marina entrou como Participante: true",
+        "ok: a foto foi gravada reduzida, em JPEG: true",
+        "ok: recortada em quadrado de 256 px: [256,256]",
+        "tamanho da foto gravada: 4 KB"
       ]
     },
     {
@@ -48,8 +48,9 @@
       "titulo": "Foto de perfil com arquivo que não é imagem",
       "ok": true,
       "obs": [
-        "ok — mensagem de tipo inválido: \"Escolha uma imagem JPG, PNG ou WebP.\"",
-        "ok — a foto continua vazia (avatar sorteado): 1"
+        "ok: mensagem de tipo inválido: true",
+        "ok: o editor não abre: 0",
+        "ok: a foto continua vazia (avatar sorteado): 1"
       ]
     },
     {
@@ -57,11 +58,11 @@
       "titulo": "Cadastrar disciplinas escolhendo a cor na paleta",
       "ok": true,
       "obs": [
-        "ok — a paleta tem 18 cores: 18",
+        "ok: a paleta tem 18 cores: 18",
         "cor sugerida para a primeira: Azul",
-        "ok — a segunda nasce com outra cor sugerida: true",
-        "ok — subtítulo da tela: \"2 disciplinas · 0 conteúdos\"",
-        "ok — cores gravadas: [\"#3b82f6\",\"#f97316\"]"
+        "ok: a segunda nasce com outra cor sugerida: true",
+        "ok: subtítulo da tela: \"2 disciplinas\"",
+        "ok: cores gravadas: [\"#3b82f6\",\"#f97316\"]"
       ]
     },
     {
@@ -69,35 +70,37 @@
       "titulo": "Disciplina sem nome e com nome repetido",
       "ok": true,
       "obs": [
-        "ok — nome vazio: \"Informe o nome da disciplina.\"",
-        "ok — nome repetido: \"Este grupo já tem uma disciplina com esse nome.\"",
-        "ok — continuam 2 disciplinas: 2"
+        "ok: nome vazio: \"Informe o nome da disciplina.\"",
+        "ok: nome repetido: \"Este grupo já tem uma disciplina com esse nome.\"",
+        "ok: continuam 2 disciplinas: 2"
       ]
     },
     {
       "id": "CT08",
-      "titulo": "Cadastrar conteúdos e recusar nome repetido",
+      "titulo": "Cadastrar conteúdos (opcionais) e recusar nome repetido",
       "ok": true,
       "obs": [
-        "ok — repetido recusado: \"Esta disciplina já tem um conteúdo com esse nome.\"",
-        "ok — dois conteúdos na ordem: [\"Modelagem\",\"SQL\"]"
+        "ok: sem conteúdo, a disciplina diz que eles são opcionais: true",
+        "ok: repetido recusado: \"Esta disciplina já tem um conteúdo com esse nome.\"",
+        "ok: dois conteúdos na ordem: [\"Modelagem\",\"SQL\"]"
       ]
     },
     {
       "id": "CT09",
-      "titulo": "Atividade: o formulário começa vazio e cobra os campos obrigatórios",
+      "titulo": "Atividade: o formulário começa vazio e cobra só o que é obrigatório",
       "ok": true,
       "obs": [
-        "ok — disciplina, conteúdo, prazo, responsável, status e prioridade só com o texto de exemplo: [\"Selecione a disciplina\",\"Selecione o conteúdo\",\"Selecione a data\",\"Selecione o responsável\",\"Selecione o status\",\"Selecione a prioridade\"]",
-        "ok — nenhum peso marcado: 0",
-        "ok — o status fica travado até o responsável ser você (RN20): true",
-        "ok — título: \"Informe um título para a atividade.\"",
-        "ok — conteúdo: \"Escolha o conteúdo a que a atividade pertence.\"",
-        "ok — prazo: \"Defina um prazo de entrega.\"",
-        "ok — responsável (RN06): \"Escolha o responsável pela atividade.\"",
-        "ok — peso, status e prioridade não são cobrados: 0",
-        "ok — título curto: \"O título precisa ter pelo menos 3 caracteres.\"",
-        "ok — nada foi salvo: 0"
+        "ok: disciplina, conteúdo, prazo, responsável, status e prioridade só com o texto de exemplo: [\"Selecione a disciplina\",\"Sem conteúdo\",\"Selecione a data\",\"Selecione o responsável\",\"Selecione o status\",\"Selecione a prioridade\"]",
+        "ok: nenhum peso marcado: 0",
+        "ok: o status fica travado até o responsável ser você (RN20): true",
+        "ok: título: \"Informe um título para a atividade.\"",
+        "ok: disciplina (RN13): \"Escolha a disciplina da atividade.\"",
+        "ok: conteúdo não é cobrado (opcional): 0",
+        "ok: prazo: \"Defina um prazo de entrega.\"",
+        "ok: responsável (RN06): \"Escolha o responsável pela atividade.\"",
+        "ok: peso, status e prioridade não são cobrados: 0",
+        "ok: título curto: \"O título precisa ter pelo menos 3 caracteres.\"",
+        "ok: nada foi salvo: 0"
       ]
     },
     {
@@ -105,11 +108,12 @@
       "titulo": "Cadastrar atividades válidas com peso e responsável",
       "ok": true,
       "obs": [
-        "ok — contador: \"3 atividades encontradas\"",
-        "ok — todas com responsável: true",
-        "ok — sem peso escolhido, vale 1: 1",
-        "ok — sem status escolhido, começam em \"a fazer\": true",
-        "prazos: 03/11, 30/10 e 08/11"
+        "ok: contador: \"3 atividades encontradas\"",
+        "ok: todas com responsável: true",
+        "ok: todas com a disciplina gravada: true",
+        "ok: sem peso escolhido, vale 1: 1",
+        "ok: sem status escolhido, começam em \"a fazer\": true",
+        "prazos: 08/11, 04/11 e 13/11"
       ]
     },
     {
@@ -117,13 +121,13 @@
       "titulo": "Concluir atividade: progresso, experiência e conquista",
       "ok": true,
       "obs": [
-        "ok — Banco de Dados antes: 0",
-        "ok — Lucas antes: \"0 XP\"",
-        "ok — retorno da conclusão: true",
-        "ok — experiência no retorno: true",
-        "ok — aviso de conquista: \"Você conquistou: Primeiro Passo\"",
-        "ok — Banco de Dados depois (3 ÷ 6): 50",
-        "ok — Lucas depois (3 × 10): \"30 XP\""
+        "ok: Banco de Dados antes: 0",
+        "ok: Lucas antes: \"0 XP\"",
+        "ok: retorno da conclusão (Modelagem de 0% para 75%): true",
+        "ok: experiência no retorno: true",
+        "ok: aviso de conquista: \"Você conquistou: Primeiro Passo\"",
+        "ok: Banco de Dados depois (3 ÷ 6): 50",
+        "ok: Lucas depois (3 × 10): \"30 XP\""
       ]
     },
     {
@@ -131,12 +135,12 @@
       "titulo": "Reverter a conclusão e concluir de novo",
       "ok": true,
       "obs": [
-        "ok — Lucas sem experiência (estorno): \"0 XP\"",
-        "ok — Banco de Dados volta a 0%: 0",
-        "ok — a conquista continua (RN12): true",
-        "ok — botão marcado: \"true\"",
-        "ok — Lucas com 30, não 60: \"30 XP\"",
-        "ok — a conquista não foi concedida duas vezes: 1"
+        "ok: Lucas sem experiência (estorno): \"0 XP\"",
+        "ok: Banco de Dados volta a 0%: 0",
+        "ok: a conquista continua (RN12): true",
+        "ok: botão marcado: \"true\"",
+        "ok: Lucas com 30, não 60: \"30 XP\"",
+        "ok: a conquista não foi concedida duas vezes: 1"
       ]
     },
     {
@@ -144,20 +148,20 @@
       "titulo": "Busca e filtros por responsável, disciplina e situação, com a identidade visual",
       "ok": true,
       "obs": [
-        "ok — busca \"select\": \"1 atividade encontrada\"",
-        "ok — a Marina aparece com a foto dela: true",
-        "ok — quem está usando vem marcado: 1",
-        "ok — responsável Marina: \"2 atividades encontradas\"",
-        "ok — o campo mostra a foto de quem foi escolhido: 1",
-        "ok — Engenharia de Software com a sua cor (laranja): \"rgb(249, 115, 22)\"",
-        "ok — disciplina Engenharia de Software (D07): \"0 atividades encontradas\"",
-        "ok — disciplina Banco de Dados (D07): \"3 atividades encontradas\"",
-        "ok — o filtro vai para o endereço: true",
-        "ok — o campo mostra a cor da disciplina escolhida (azul): \"rgb(59, 130, 246)\"",
-        "ok — as quatro ordens têm símbolo: [1,1,1,1]",
-        "ok — ordem por maior peso: \"Modelar o diagrama ER\"",
-        "ok — situação Atrasadas: \"1 atividade encontrada\"",
-        "ok — a atrasada: \"Normalizar as tabelas até a 3FN\""
+        "ok: busca \"select\": \"1 atividade encontrada\"",
+        "ok: a Marina aparece com a foto dela: true",
+        "ok: quem está usando vem marcado: 1",
+        "ok: responsável Marina: \"2 atividades encontradas\"",
+        "ok: o campo mostra a foto de quem foi escolhido: 1",
+        "ok: Engenharia de Software com a sua cor (laranja): \"rgb(249, 115, 22)\"",
+        "ok: disciplina Engenharia de Software: \"0 atividades encontradas\"",
+        "ok: disciplina Banco de Dados: \"3 atividades encontradas\"",
+        "ok: o filtro vai para o endereço: true",
+        "ok: o campo mostra a cor da disciplina escolhida (azul): \"rgb(59, 130, 246)\"",
+        "ok: as quatro ordens têm símbolo: [1,1,1,1]",
+        "ok: ordem por maior peso: \"Modelar o diagrama ER\"",
+        "ok: situação Atrasadas: \"1 atividade encontrada\"",
+        "ok: a atrasada: true"
       ]
     },
     {
@@ -165,10 +169,10 @@
       "titulo": "Totais do painel e progresso por disciplina",
       "ok": true,
       "obs": [
-        "ok — totais: {\"A fazer\":2,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
-        "ok — Banco de Dados no painel: \"50\"",
-        "ok — ritmo de Lucas: true",
-        "ok — a lista filtra no próprio painel: \"Concluídas\""
+        "ok: totais: {\"A fazer\":2,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
+        "ok: Banco de Dados no painel: \"50\"",
+        "ok: ritmo de Lucas: true",
+        "ok: a lista filtra no próprio painel: \"Concluídas\""
       ]
     },
     {
@@ -176,12 +180,12 @@
       "titulo": "Calendário do mês com as cores das disciplinas",
       "ok": true,
       "obs": [
-        "ok — título do mês (D04): true",
+        "ok: título do mês (D04): \"Novembro de 2026\"",
         "título: \"Novembro de 2026\"",
-        "ok — o dia da atrasada mostra a entrega: true",
-        "ok — na cor da disciplina (azul): \"rgb(59, 130, 246)\"",
-        "ok — painel do dia: true",
-        "ok — esconder a disciplina tira as entregas: false"
+        "ok: o dia da atrasada mostra a entrega: true",
+        "ok: na cor da disciplina (azul): \"rgb(59, 130, 246)\"",
+        "ok: painel do dia: true",
+        "ok: esconder a disciplina tira as entregas: false"
       ]
     },
     {
@@ -189,10 +193,10 @@
       "titulo": "Calendário nas visões semana e lista",
       "ok": true,
       "obs": [
-        "ok — a semana mostra a atividade da semana: true",
+        "ok: a semana mostra a atividade da semana: true",
         "semana: Semana de 01/11 a 07/11",
-        "dias na lista do mês: TER, 03/11 | DOM, 08/11",
-        "ok — a lista agrupa por dia: true"
+        "dias na lista do mês: QUA, 04/11 | DOM, 08/11 | SEX, 13/11",
+        "ok: a lista agrupa por dia: true"
       ]
     },
     {
@@ -200,10 +204,10 @@
       "titulo": "Nova atividade a partir de um dia do calendário",
       "ok": true,
       "obs": [
-        "ok — o prazo vem preenchido com o dia escolhido: true",
-        "ok — aparece no dia 6: true",
-        "ok — na cor de Engenharia de Software (laranja): \"rgb(249, 115, 22)\"",
-        "prazo gravado: Domingo, 06 de dezembro de 2026"
+        "ok: o prazo vem preenchido com o dia escolhido: true",
+        "ok: gravada no dia escolhido: \"2026-12-06\"",
+        "ok: aparece no dia 6: true",
+        "ok: na cor de Engenharia de Software (laranja): \"rgb(249, 115, 22)\""
       ]
     },
     {
@@ -211,13 +215,13 @@
       "titulo": "Painel de desempenho: experiência, ofensiva, conquistas e ranking",
       "ok": true,
       "obs": [
-        "ok — experiência: true",
-        "ok — ofensiva (concluiu hoje): true",
-        "ok — posição: true",
-        "ok — conquistas: true",
-        "ok — andamento rumo à Semana Cheia: true",
-        "ok — ranking: Lucas em 1º: true",
-        "ok — ranking: Marina em 2º: true"
+        "ok: experiência: true",
+        "ok: ofensiva (concluiu hoje): true",
+        "ok: posição: true",
+        "ok: conquistas: true",
+        "ok: andamento rumo à Semana Cheia: true",
+        "ok: ranking: Lucas em 1º: true",
+        "ok: ranking: Marina em 2º: true"
       ]
     },
     {
@@ -225,10 +229,10 @@
       "titulo": "Dados recuperados ao reabrir o navegador",
       "ok": true,
       "obs": [
-        "ok — depois de recarregar continua no painel de desempenho: \"/conquistas\"",
-        "ok — reabriu já dentro da sessão: \"/painel\"",
-        "ok — totais preservados: {\"A fazer\":3,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
-        "ok — a foto da Marina continua gravada: \"data:image/jpeg\""
+        "ok: depois de recarregar continua no painel de desempenho: \"/conquistas\"",
+        "ok: reabriu já dentro da sessão: \"/painel\"",
+        "ok: totais preservados: {\"A fazer\":3,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
+        "ok: a foto da Marina continua gravada: \"data:image/jpeg\""
       ]
     },
     {
@@ -236,12 +240,12 @@
       "titulo": "Participante não vê a gestão do grupo",
       "ok": true,
       "obs": [
-        "ok — sem \"Nova disciplina\": 0",
-        "ok — sem menu de ações nas disciplinas: 0",
-        "ok — aviso de permissão: true",
-        "ok — sem \"Adicionar membro\": 0",
-        "ok — sem \"Excluir o grupo\": 0",
-        "ok — só o próprio cartão tem ações: 1"
+        "ok: sem \"Nova disciplina\": 0",
+        "ok: sem menu de ações nas disciplinas: 0",
+        "ok: aviso de permissão: true",
+        "ok: sem \"Adicionar membro\": 0",
+        "ok: sem \"Excluir o grupo\": 0",
+        "ok: só o próprio cartão tem ações: 1"
       ]
     },
     {
@@ -249,14 +253,14 @@
       "titulo": "Participante cadastra atividade, altera só as próprias e edita o próprio perfil",
       "ok": true,
       "obs": [
-        "ok — detalhe aberto: \"Criar as tabelas no banco\"",
-        "ok — a responsável é quem cadastrou: true",
-        "ok — pode excluir a atividade da qual é responsável: 1",
-        "ok — não exclui a atividade de outro membro (RN07): 0",
-        "ok — nem a edita (RN07): 0",
-        "ok — nem muda o status dela (RN20): 0",
-        "ok — sem campo de perfil: 0",
-        "ok — função atualizada: true"
+        "ok: detalhe aberto: \"Criar as tabelas no banco\"",
+        "ok: a responsável é quem cadastrou: true",
+        "ok: pode excluir a atividade da qual é responsável: 1",
+        "ok: não exclui a atividade de outro membro (RN07): 0",
+        "ok: nem a edita (RN07): 0",
+        "ok: nem muda o status dela (RN20): 0",
+        "ok: sem campo de perfil: 0",
+        "ok: função atualizada: \"Front-end e protótipos\""
       ]
     },
     {
@@ -264,8 +268,8 @@
       "titulo": "Grupo não fica sem o último organizador",
       "ok": true,
       "obs": [
-        "ok — \"Remover\" desabilitado para o único organizador: \"true\"",
-        "ok — rebaixar é recusado: \"O grupo precisa de pelo menos um organizador.\""
+        "ok: \"Remover\" desabilitado para o único organizador: \"true\"",
+        "ok: rebaixar é recusado: \"O grupo precisa de pelo menos um organizador.\""
       ]
     },
     {
@@ -274,12 +278,12 @@
       "ok": true,
       "obs": [
         "Marina era responsável por 3 atividades",
-        "ok — confirmar fica desabilitado até escolher quem assume: true",
-        "ok — com a escolha, libera: false",
-        "aviso: Membro removido — 3 atividades de Marina passaram para Lucas.",
-        "ok — nenhuma atividade sumiu: 5",
-        "ok — todas passaram para Lucas: 5",
-        "ok — nenhuma ficou sem responsável (D03): 0"
+        "ok: confirmar fica desabilitado até escolher quem assume: true",
+        "ok: com a escolha, libera: false",
+        "aviso: Membro removido 3 atividades de Marina passaram para Lucas.",
+        "ok: nenhuma atividade sumiu: 5",
+        "ok: todas passaram para Lucas: 5",
+        "ok: nenhuma ficou sem responsável (D03): 0"
       ]
     },
     {
@@ -287,9 +291,9 @@
       "titulo": "Encerrar sessão e acesso a rota privada",
       "ok": true,
       "obs": [
-        "ok — Sair leva à tela de acesso: \"/entrar\"",
-        "ok — /painel sem sessão vai para /entrar: \"/entrar\"",
-        "ok — o endereço antigo /login também: \"/entrar\""
+        "ok: Sair leva à tela de acesso: \"/entrar\"",
+        "ok: /painel sem sessão vai para /entrar: \"/entrar\"",
+        "ok: o endereço antigo /login também: \"/entrar\""
       ]
     },
     {
@@ -297,15 +301,15 @@
       "titulo": "Tema claro e escuro em todas as telas, mantido após recarregar",
       "ok": true,
       "obs": [
-        "ok — a tela de acesso começa no escuro: true",
-        "ok — a tela de acesso fica clara: [false,\"rgb(245, 247, 251)\"]",
-        "ok — o sistema entra no claro: false",
-        "ok — continua claro depois de recarregar: false",
-        "ok — / também fica claro: [false,\"rgb(245, 247, 251)\"]",
-        "ok — /sobre também fica claro: [false,\"rgb(245, 247, 251)\"]",
-        "ok — /endereco-que-nao-existe também fica claro: [false,\"rgb(245, 247, 251)\"]",
-        "ok — o botão do site volta ao escuro: [true,\"rgb(7, 9, 15)\"]",
-        "ok — e o sistema acompanha: true"
+        "ok: a tela de acesso começa no escuro: true",
+        "ok: a tela de acesso fica clara: [false,\"rgb(245, 247, 251)\"]",
+        "ok: o sistema entra no claro: false",
+        "ok: continua claro depois de recarregar: false",
+        "ok: / também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: /sobre também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: /endereco-que-nao-existe também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: o botão do site volta ao escuro: [true,\"rgb(7, 9, 15)\"]",
+        "ok: e o sistema acompanha: true"
       ]
     },
     {
@@ -313,9 +317,9 @@
       "titulo": "Remover disciplina em cascata",
       "ok": true,
       "obs": [
-        "ok — a confirmação avisa o que sai junto: \"Banco de Dados será removida do grupo, junto com 2 conteúdos e 4 atividades. Não dá para desfazer.\"",
-        "ok — sobrou só Engenharia de Software: [\"Engenharia de Software\"]",
-        "ok — conteúdos e atividades saíram junto: {\"conteudos\":1,\"atividades\":1}"
+        "ok: a confirmação avisa o que sai junto: \"Banco de Dados será removida do grupo, junto com 4 atividades e 2 conteúdos. Não dá para desfazer.\"",
+        "ok: sobrou só Engenharia de Software: [\"Engenharia de Software\"]",
+        "ok: conteúdos e atividades saíram junto: {\"conteudos\":1,\"atividades\":1}"
       ]
     },
     {
@@ -323,10 +327,11 @@
       "titulo": "Serviços externos indisponíveis",
       "ok": true,
       "obs": [
-        "ok — o painel avisa: true",
-        "ok — nenhum pedido à DiceBear: 0",
-        "ok — o avatar aparece mesmo sem a DiceBear: true",
-        "ok — sem a API, os feriados salvos continuam aparecendo: true"
+        "ok: o painel avisa: true",
+        "ok: nenhum pedido à DiceBear: 0",
+        "ok: o avatar aparece mesmo sem a DiceBear (desenhado no navegador): true",
+        "ok: sem a API, os feriados salvos continuam aparecendo: true",
+        "feriados antes da queda: Próximos feriados Proclamação da República 15/11 Dia da consciência negra 20/11 Natal 25/12"
       ]
     },
     {
@@ -334,10 +339,10 @@
       "titulo": "Carregar dados de exemplo",
       "ok": true,
       "obs": [
-        "ok — pede para escolher quem é: \"Quem é você?\"",
-        "ok — grupo de exemplo: {\"grupo\":\"Trio do TCC\",\"disciplinas\":5,\"conteudos\":9,\"atividades\":14,\"membros\":3}",
-        "ok — entrou como Ana: true",
-        "ok — carregar o exemplo não dispara aviso de conquista: 0"
+        "ok: pede para escolher quem é: \"Quem é você?\"",
+        "ok: grupo de exemplo: {\"grupo\":\"Trio do TCC\",\"disciplinas\":5,\"conteudos\":8,\"atividades\":14,\"eventos\":5,\"membros\":3}",
+        "ok: entrou como Ana: true",
+        "ok: carregar o exemplo não dispara aviso de conquista: 0"
       ]
     },
     {
@@ -345,13 +350,13 @@
       "titulo": "Feriado no prazo e próximos feriados",
       "ok": true,
       "obs": [
-        "ok — o calendário do campo já marca o feriado: true",
-        "ok — dica no formulário: \"Esse prazo cai no feriado: Finados.\"",
-        "ok — detalhe mostra o feriado: true",
-        "ok — painel avisa a entrega no feriado: true",
-        "próximos feriados no painel: Próximos feriados | Finados | 02/11 | Proclamação da República | 15/11 | Dia da consciência negra | 20/11",
-        "ok — lista os próximos feriados: true",
-        "ok — calendário marca o feriado: true"
+        "ok: o calendário do campo já marca o feriado: true",
+        "ok: dica no formulário: \"Esse prazo cai no feriado: Proclamação da República.\"",
+        "ok: detalhe mostra o feriado: true",
+        "ok: painel avisa a entrega no feriado: true",
+        "próximos feriados no painel: Próximos feriados | Proclamação da República | 15/11 | Dia da consciência negra | 20/11 | Natal | 25/12",
+        "ok: lista os próximos feriados: true",
+        "ok: calendário marca o feriado: true"
       ]
     },
     {
@@ -359,9 +364,10 @@
       "titulo": "Aviso de prazo em fim de semana",
       "ok": true,
       "obs": [
-        "ok — sábado: \"Esse prazo cai num fim de semana.\"",
-        "ok — domingo: \"Esse prazo cai num fim de semana.\"",
-        "ok — segunda-feira não tem aviso: 0"
+        "datas: 2026-11-07, 2026-11-08 e 2026-11-09",
+        "ok: sábado: \"Esse prazo cai num fim de semana.\"",
+        "ok: domingo: \"Esse prazo cai num fim de semana.\"",
+        "ok: segunda-feira não tem aviso: 0"
       ]
     },
     {
@@ -369,16 +375,16 @@
       "titulo": "Grupo antigo sem membros: as telas funcionam e o primeiro membro é o organizador",
       "ok": true,
       "obs": [
-        "ok — atividade antiga sem responsável: círculo vazio, sem avatar (D03): 1",
-        "ok — Conquistas orienta a cadastrar o primeiro membro (D09): \"O grupo ainda não tem membros\"",
-        "ok — o formulário explica por que não há responsável: true",
-        "ok — perfil travado: true",
-        "ok — em Organizador: \"Organizador\"",
-        "ok — com a explicação: \"O primeiro membro do grupo é o organizador.\"",
-        "ok — Rafael entrou como Organizador: true",
-        "ok — e já é quem está usando: 1",
-        "ok — continua podendo gerenciar: true",
-        "ok — nenhum erro no console: []"
+        "ok: atividade antiga sem responsável: círculo vazio, sem avatar (D03): true",
+        "ok: Conquistas orienta a cadastrar o primeiro membro (D09): true",
+        "ok: o formulário explica por que não há responsável: true",
+        "ok: perfil travado: true",
+        "ok: em Organizador: \"Organizador\"",
+        "ok: com a explicação: 1",
+        "ok: Rafael entrou como Organizador: \"organizador\"",
+        "ok: e já é quem está usando: 1",
+        "ok: continua podendo gerenciar: true",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -386,11 +392,11 @@
       "titulo": "Falha de gravação no armazenamento do navegador",
       "ok": true,
       "obs": [
-        "ok — aviso no canto: 1",
-        "ok — faixa no topo da tela: true",
-        "ok — a gravação voltou: a faixa some: 0",
-        "ok — depois de recarregar, as duas estão lá: [\"Estatística\",\"Cálculo\"]",
-        "ok — nenhum erro no console: []"
+        "ok: aviso no canto: 1",
+        "ok: faixa no topo da tela: true",
+        "ok: a gravação voltou: a faixa some: 0",
+        "ok: depois de recarregar, as duas estão lá: [\"Estatística\",\"Cálculo\"]",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -398,16 +404,16 @@
       "titulo": "Páginas públicas: início, sobre nós e endereço inexistente",
       "ok": true,
       "obs": [
-        "ok — título da página inicial: \"Veja o quanto você já avançou em cada matéria.\"",
-        "ok — \"Grupo por convite\" marcado como em breve: true",
-        "ok — rodapé com o Instagram da equipe, em outra aba: [\"Instagram @go.vertice\",\"https://www.instagram.com/go.vertice/\",\"_blank\"]",
-        "ok — as fotos da equipe no círculo partem do topo, com a cabeça inteira: [true,true]",
-        "ok — Andrey: true",
-        "ok — Matheus: true",
-        "ok — avatares carregados: true",
-        "ok — 404: \"Página não encontrada\"",
-        "ok — \"Começar agora\" leva à tela de acesso: \"/entrar\"",
-        "ok — nenhum erro no console: []"
+        "ok: título da página inicial: \"Veja o quanto você já avançou em cada matéria.\"",
+        "ok: \"Grupo por convite\" marcado como em breve: true",
+        "ok: rodapé com o Instagram da equipe, em outra aba: [\"Instagram @go.vertice\",\"https://www.instagram.com/go.vertice/\",\"_blank\"]",
+        "ok: as fotos da equipe no círculo partem do topo, com a cabeça inteira: [true,true]",
+        "ok: Andrey: true",
+        "ok: Matheus: true",
+        "ok: avatares carregados: true",
+        "ok: 404: \"Página não encontrada\"",
+        "ok: \"Começar agora\" leva à tela de acesso: \"/entrar\"",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -415,16 +421,17 @@
       "titulo": "Uso no celular",
       "ok": true,
       "obs": [
-        "ok — início sem rolagem lateral: false",
-        "ok — painel sem rolagem lateral: false",
-        "ok — calendário sem rolagem lateral: false",
-        "ok — /atividades sem rolagem lateral: false",
-        "ok — /disciplinas sem rolagem lateral: false",
-        "ok — /membros sem rolagem lateral: false",
-        "ok — /conquistas sem rolagem lateral: false",
-        "ok — /atividade/nova sem rolagem lateral: false",
-        "ok — /sobre sem rolagem lateral: false",
-        "ok — nenhum erro no console: []"
+        "ok: início sem rolagem lateral: false",
+        "ok: painel sem rolagem lateral: false",
+        "ok: /calendario sem rolagem lateral: false",
+        "ok: /eventos sem rolagem lateral: false",
+        "ok: /atividades sem rolagem lateral: false",
+        "ok: /disciplinas sem rolagem lateral: false",
+        "ok: /membros sem rolagem lateral: false",
+        "ok: /conquistas sem rolagem lateral: false",
+        "ok: /atividade/nova sem rolagem lateral: false",
+        "ok: /sobre sem rolagem lateral: false",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -432,11 +439,12 @@
       "titulo": "Dados da versão de 20/10 são migrados",
       "ok": true,
       "obs": [
-        "ok — versão dos dados: 2",
-        "ok — a atividade sem responsável foi para o organizador; a outra não mudou: [\"m1\",\"m2\"]",
-        "ok — a cor que saiu da paleta virou a equivalente (Pedra): \"#a8a29e\"",
-        "ok — o detalhe mostra o responsável: true",
-        "ok — nenhum erro no console: []"
+        "ok: versão dos dados: 3",
+        "ok: a atividade sem responsável foi para o organizador; a outra não mudou: [\"m1\",\"m2\"]",
+        "ok: e ganhou a disciplina do conteúdo (versão 3): [\"d1\",\"d1\"]",
+        "ok: a cor que saiu da paleta virou a equivalente (Pedra): \"#a8a29e\"",
+        "ok: o detalhe mostra o responsável: true",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -444,14 +452,14 @@
       "titulo": "Dados da primeira versão (tarefas) com atividade sem grupo",
       "ok": true,
       "obs": [
-        "ok — avisa a atividade sem grupo: \"Uma atividade antiga ficou sem grupo\"",
-        "ok — versão dos dados: 2",
-        "ok — a tarefa do grupo virou atividade: [\"Lista de exercícios\"]",
-        "ok — a disciplina escrita virou cadastro, com o conteúdo \"Geral\": [[\"Física\"],[\"Geral\"]]",
-        "ok — o primeiro membro virou organizador (RN07): \"organizador\"",
-        "ok — a antiga sem grupo continua guardada: 2",
-        "ok — o aviso aparece uma vez só: 0",
-        "ok — nenhum erro no console: []"
+        "ok: avisa a atividade sem grupo: \"Uma atividade antiga ficou sem grupo\"",
+        "ok: versão dos dados: 3",
+        "ok: a tarefa do grupo virou atividade: [\"Lista de exercícios\"]",
+        "ok: a disciplina escrita virou cadastro, e a atividade fica direto nela, sem o conteúdo \"Geral\" (versão 3): [[\"Física\"],0,\"\",true]",
+        "ok: o primeiro membro virou organizador (RN07): \"organizador\"",
+        "ok: a antiga sem grupo continua guardada: 2",
+        "ok: o aviso aparece uma vez só: 0",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -459,15 +467,15 @@
       "titulo": "Editar e excluir atividade",
       "ok": true,
       "obs": [
-        "ok — Banco de Dados antes: 3 de 7 de peso: 43",
-        "ok — o detalhe mostra o título novo: \"Resolver a lista de SELECT e JOIN\"",
-        "ok — peso gravado: 4",
-        "ok — Banco de Dados com o peso novo: 3 de 9: 33",
-        "ok — pede confirmação: \"Excluir atividade?\"",
-        "ok — saiu da lista: 0",
-        "ok — situação na tela: \"13 atividades encontradas\"",
-        "ok — saiu do armazenamento: 13",
-        "ok — Banco de Dados sem ela: 3 de 5: 60"
+        "ok: Banco de Dados antes: 3 de 7 de peso: 43",
+        "ok: o detalhe mostra o título novo: \"Resolver a lista de SELECT e JOIN\"",
+        "ok: peso gravado: 4",
+        "ok: Banco de Dados com o peso novo: 3 de 9: 33",
+        "ok: pede confirmação: \"Excluir atividade?\"",
+        "ok: saiu da lista: 0",
+        "ok: situação na tela: \"13 atividades encontradas\"",
+        "ok: saiu do armazenamento: 13",
+        "ok: Banco de Dados sem ela: 3 de 5: 60"
       ]
     },
     {
@@ -477,12 +485,12 @@
       "obs": [
         "conquistas do grupo antes da exclusão: 2",
         "a seção termina em 937 px, numa tela de 1000 px",
-        "ok — a exclusão fica no pé da página, mesmo com poucos membros: true",
-        "ok — pede confirmação: \"Excluir o grupo?\"",
-        "ok — voltou à tela de acesso: \"Acesse seu grupo\"",
-        "ok — grupo, membros, disciplinas, conteúdos, atividades e conquistas removidos: [0,0,0,0,0,0]",
-        "ok — sessão encerrada: null",
-        "ok — o painel não abre mais: \"/entrar\""
+        "ok: a exclusão fica no pé da página, mesmo com poucos membros: true",
+        "ok: pede confirmação: \"Excluir o grupo?\"",
+        "ok: voltou à tela de acesso: \"Acesse seu grupo\"",
+        "ok: grupo, membros, disciplinas, conteúdos, atividades, eventos e conquistas removidos: [0,0,0,0,0,0,0]",
+        "ok: sessão encerrada: null",
+        "ok: o painel não abre mais: \"/entrar\""
       ]
     },
     {
@@ -490,17 +498,17 @@
       "titulo": "Editor de foto: o que é enquadrado é o que fica gravado",
       "ok": true,
       "obs": [
-        "ok — o foco começa na área da foto: \"Enquadramento da foto\"",
-        "ok — sem mexer: o quadrado do meio (verde no canto, vermelho à esquerda, azul à direita): [\"verde\",\"vermelho\",\"azul\"]",
-        "ok — arrastada para a direita: o vermelho ocupa dois terços: [\"verde\",\"vermelho\",\"azul\"]",
-        "ok — com zoom 2: o miolo, sem o canto verde: [\"vermelho\",\"vermelho\",\"azul\"]",
-        "ok — cancelar mantém a foto anterior: true",
-        "foto grande: apareceu no editor em 226 ms; o \"Aplicar\" levou 353 ms",
-        "ok — a foto grande aparece no editor em menos de 3 s: true",
-        "tarefas longas na página (ms): 90",
-        "ok — gravada em 256 × 256, JPEG: [\"data:image/jpeg\",[256,256]]",
-        "tamanho gravado: 5 KB",
-        "ok — nenhum erro no console: []"
+        "ok: o foco começa na área da foto: \"Enquadramento da foto\"",
+        "ok: sem mexer: o quadrado do meio (verde no canto, vermelho à esquerda, azul à direita): [\"verde\",\"vermelho\",\"azul\"]",
+        "ok: arrastada para a direita: o vermelho ocupa dois terços: [[\"verde\",\"vermelho\",\"azul\"],true]",
+        "ok: com zoom 2: o miolo, sem o canto verde: [\"vermelho\",\"vermelho\",\"azul\"]",
+        "ok: cancelar mantém a foto anterior: true",
+        "foto grande: apareceu no editor em 216 ms; o \"Aplicar\" levou 461 ms",
+        "ok: a foto grande aparece no editor em menos de 3 s: true",
+        "tarefas longas na página (ms): 96",
+        "ok: gravada em 256 × 256, JPEG: [\"data:image/jpeg\",[256,256]]",
+        "tamanho gravado: 9 KB",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -508,14 +516,15 @@
       "titulo": "Foto do grupo: na criação e na edição, e as iniciais quando não há foto",
       "ok": true,
       "obs": [
-        "ok — a moldura do grupo é um quadrado de cantos arredondados: true",
-        "ok — a prévia mostra a foto escolhida: 1",
-        "ok — a barra lateral mostra a foto do grupo: true",
-        "ok — sem foto, voltam as iniciais do nome: \"FI\"",
-        "ok — nome, descrição e foto gravados: [\"Física II\",\"Turma da noite\",\"\"]",
-        "ok — a tela de acesso mostra a foto do grupo: true",
-        "ok — a participante não vê \"Editar grupo\": 0",
-        "ok — nenhum erro no console: []"
+        "moldura: {\"quadrado\":true,\"raio\":\"16px\",\"largura\":317.7642822265625}",
+        "ok: a moldura do grupo é um quadrado de cantos arredondados: true",
+        "ok: a prévia mostra a foto escolhida: true",
+        "ok: a barra do topo mostra a foto do grupo: 1",
+        "ok: sem foto, voltam as iniciais do nome: true",
+        "ok: nome, descrição e foto gravados: [\"Física II\",\"Turma da noite\",\"\"]",
+        "ok: a tela de acesso mostra a foto do grupo: 1",
+        "ok: a participante não vê \"Editar grupo\": 0",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -523,15 +532,15 @@
       "titulo": "Criar conteúdo sem sair do cadastro de atividade",
       "ok": true,
       "obs": [
-        "ok — a lista termina com \"Criar novo conteúdo\": [\"Modelagem\",\"SQL\",\"Criar novo conteúdo\"]",
-        "ok — a janela já sabe a disciplina: true",
-        "ok — o que já estava preenchido continua, com o conteúdo novo escolhido: [\"Exercícios de JOIN\",\"Lista 3 do professor.\",\"Banco de Dados\",\"Joins\",\"Peso 3 de 5\"]",
-        "ok — nenhum erro apareceu no formulário: 0",
-        "ok — a atividade ficou no conteúdo novo, que entrou por último na disciplina: {\"ordem\":2,\"mesmoConteudo\":true}",
-        "ok — a dica avisa e oferece o atalho: \"Física ainda não tem conteúdos. Criar o primeiro\"",
-        "ok — o primeiro conteúdo já fica escolhido: \"Cinemática\"",
-        "ok — para o participante, só os conteúdos: [\"Modelagem\",\"SQL\",\"Joins\"]",
-        "ok — nenhum erro no console: []"
+        "ok: a lista começa em \"Sem conteúdo\" e termina com \"Criar novo conteúdo\": [\"Sem conteúdo\",\"Modelagem\",\"SQL\",\"Criar novo conteúdo\"]",
+        "ok: a janela já sabe a disciplina: true",
+        "ok: o que já estava preenchido continua, com o conteúdo novo escolhido: [\"Exercícios de JOIN\",\"Lista 3 do professor.\",\"Banco de Dados\",\"Joins\",\"Peso 3 de 5\"]",
+        "ok: nenhum erro apareceu no formulário: 0",
+        "ok: a atividade ficou no conteúdo novo, que entrou por último na disciplina: {\"ordem\":2,\"mesmoConteudo\":true}",
+        "ok: a dica avisa que é opcional e oferece o atalho: \"Opcional. Física ainda não tem conteúdos. Criar um\"",
+        "ok: o primeiro conteúdo já fica escolhido: \"Cinemática\"",
+        "ok: para o participante, sem \"Criar novo conteúdo\": [\"Sem conteúdo\",\"Modelagem\",\"SQL\",\"Joins\"]",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -539,20 +548,20 @@
       "titulo": "Só o responsável muda o status da atividade (RN20)",
       "ok": true,
       "obs": [
-        "ok — Bruno só tem o botão de concluir nas atividades dele: 5",
-        "ok — nas dos outros, o círculo só mostra a situação: 9",
-        "ok — sem \"Concluir\", sem mudar o status, sem editar e sem excluir: [0,0,0,0]",
-        "ok — a tela diz quem muda o status: true",
-        "ok — nem pelo endereço de edição: \"Você não pode editar esta atividade\"",
-        "ok — Bruno conclui a própria e o aviso fala com ele: true",
-        "ok — a organizadora edita e exclui, mas não conclui a do Bruno: [0,0,1,1]",
-        "ok — no formulário, o status fica travado: true",
-        "ok — com a explicação: \"Só Bruno, que é responsável, muda o status.\"",
-        "ok — o título mudou e o status continua \"fazendo\": \"fazendo\"",
-        "ok — para si mesma, o status abre: false",
-        "ok — ao passar para a Carla, o status trava e volta ao vazio: [true,\"Selecione o status\"]",
-        "ok — gravada em \"a fazer\": \"a fazer\"",
-        "ok — nenhum erro no console: []"
+        "ok: Bruno só tem o botão de concluir nas atividades dele: 5",
+        "ok: nas dos outros, o círculo só mostra a situação: 9",
+        "ok: sem \"Concluir\", sem mudar o status, sem editar e sem excluir: [0,0,0,0]",
+        "ok: a tela diz quem muda o status: true",
+        "ok: nem pelo endereço de edição: \"Você não pode editar esta atividade\"",
+        "ok: Bruno conclui a própria e o aviso fala com ele: true",
+        "ok: a organizadora edita e exclui, mas não conclui a do Bruno: [0,0,1,1]",
+        "ok: no formulário, o status fica travado: true",
+        "ok: com a explicação: \"Só Bruno, que é responsável, muda o status.\"",
+        "ok: o título mudou e o status continua \"fazendo\": \"fazendo\"",
+        "ok: para si mesma, o status abre: false",
+        "ok: ao passar para a Carla, o status trava e volta ao vazio: [true,\"Selecione o status\"]",
+        "ok: gravada em \"a fazer\": \"a fazer\"",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -560,15 +569,16 @@
       "titulo": "Calendário: troca de mês com animação, também deslizando o dedo",
       "ok": true,
       "obs": [
-        "ok — avançar: a página nova entra pela direita: [\"mes-proximo\"]",
-        "ok — voltar: entra pela esquerda: [\"mes-anterior\"]",
-        "ok — e o título volta ao mês de antes: \"Novembro de 2026\"",
-        "ok — na semana também: [\"mes-proximo\"]",
-        "ok — deslizar para a esquerda vai ao próximo mês: \"Dezembro de 2026\"",
-        "ok — deslizar para a direita volta: \"Novembro de 2026\"",
-        "ok — um toque curto não troca de mês: \"Novembro de 2026\"",
-        "ok — com \"reduzir movimento\", a animação é instantânea: true",
-        "ok — nenhum erro no console, nos três navegadores: []"
+        "ok: avançar: a página nova entra pela direita: [\"mes-proximo\"]",
+        "ok: voltar: entra pela esquerda: [\"mes-anterior\"]",
+        "ok: e o título volta ao mês de antes: \"Novembro de 2026\"",
+        "ok: na semana também: [\"mes-proximo\"]",
+        "ok: nenhum erro no console: []",
+        "ok: deslizar para a esquerda vai ao próximo mês: \"Dezembro de 2026\"",
+        "ok: deslizar para a direita volta: \"Novembro de 2026\"",
+        "ok: um toque curto não troca de mês: \"Novembro de 2026\"",
+        "ok: com \"reduzir movimento\", a animação é instantânea: true",
+        "ok: nenhum erro no console, nos três navegadores: []"
       ]
     },
     {
@@ -576,15 +586,16 @@
       "titulo": "Campo de data com o calendário do sistema",
       "ok": true,
       "obs": [
-        "ok — abre no mês de hoje, com o foco em hoje: \"2026-11-01\"",
-        "ok — hoje vem marcado: true",
-        "ok — as setas andam um dia e uma semana: \"2026-11-09\"",
-        "PageDown levou de 2026-11-09 a 2026-12-09",
-        "ok — PageDown vai ao mês seguinte: true",
-        "ok — Enter escolhe o dia: true",
-        "ok — Limpar volta ao campo vazio: \"Selecione a data\"",
-        "ok — e o prazo continua obrigatório: \"Defina um prazo de entrega.\"",
-        "ok — nenhum erro no console: []"
+        "ok: abre no mês de hoje, com o foco em hoje: \"2026-11-06\"",
+        "ok: hoje vem marcado: true",
+        "ok: as setas andam um dia e uma semana: \"2026-11-14\"",
+        "PageDown levou de 2026-11-14 a 2026-12-14",
+        "ok: PageDown vai ao mês seguinte: true",
+        "ok: Enter escolhe o dia: true",
+        "dia escolhido: Sábado, 14 de novembro de 2026",
+        "ok: Limpar volta ao campo vazio: \"Selecione a data\"",
+        "ok: e o prazo continua obrigatório: \"Defina um prazo de entrega.\"",
+        "ok: nenhum erro no console: []"
       ]
     },
     {
@@ -592,19 +603,20 @@
       "titulo": "Marca do Vértice: dá um terço de volta enquanto o grupo abre e uma volta ao passar o mouse",
       "ok": true,
       "obs": [
-        "ok — ao entrar, a cortina diz qual grupo abre: \"Abrindo Trio do TCC…\"",
-        "ok — a tela de acesso não muda enquanto a cortina chega: \"/entrar\"",
-        "ok — a marca só anima transform e opacity: [\"opacity\",\"transform\"]",
-        "ok — e para depois de um terço de volta: \"scale(1) rotate(120deg)\"",
-        "ok — num ritmo calmo, abaixo de 1 s: true",
-        "ok — com a tela coberta, o painel já montou por baixo: \"/painel\"",
-        "ok — a passagem inteira leva menos de 1,5 s: true",
-        "ok — depois, a cortina sai e fica o painel: true",
-        "ok — parada, a marca não gira: 0",
-        "ok — com o mouse em cima, dá uma volta só, rápida: [[\"girar\",1,600]]",
-        "ok — nenhum erro no console: []",
-        "ok — com \"reduzir movimento\", a marca não gira: false",
-        "ok — e a cortina some em menos de 1 s: 0"
+        "ok: ao entrar, a cortina diz qual grupo abre: \"Abrindo Trio do TCC…\"",
+        "ok: a tela de acesso não muda enquanto a cortina chega: \"/entrar\"",
+        "ok: a marca só anima transform e opacity: [\"opacity\",\"transform\"]",
+        "ok: e para depois de um terço de volta: \"scale(1) rotate(120deg)\"",
+        "ok: num ritmo calmo, abaixo de 1 s: true",
+        "ok: com a tela coberta, o painel já montou por baixo: \"/painel\"",
+        "passagem inteira: 1435 ms",
+        "ok: a passagem inteira leva menos de 1,5 s: true",
+        "ok: depois, a cortina sai e fica o painel: true",
+        "ok: parada, a marca não gira: 0",
+        "ok: com o mouse em cima, dá uma volta só, rápida: [[\"girar\",1,600]]",
+        "ok: nenhum erro no console: []",
+        "ok: com \"reduzir movimento\", a marca não gira: false",
+        "ok: e a cortina some em menos de 1 s: true"
       ]
     },
     {
@@ -612,39 +624,188 @@
       "titulo": "Barra de seções no topo, também no celular",
       "ok": true,
       "obs": [
-        "ok — sem barra lateral: 0",
-        "ok — as seis seções na barra do topo: [\"Painel\",\"Calendário\",\"Disciplinas\",\"Atividades\",\"Membros\",\"Conquistas\"]",
-        "ok — a seção aberta fica marcada: \"page\"",
-        "ok — o menu da conta diz quem está usando e o perfil: true",
-        "ok — /painel em 1024 px sem rolagem lateral: false",
-        "ok — /atividades em 1024 px sem rolagem lateral: false",
-        "ok — /calendario em 1024 px sem rolagem lateral: false",
-        "ok — nenhum erro no console: []",
-        "ok — no celular, o menu desce do topo e ocupa a largura: [0,390]",
-        "ok — e leva à seção: \"/atividades\"",
-        "ok — nenhum erro no console (celular): []"
+        "ok: sem barra lateral: 0",
+        "ok: as sete seções na barra do topo: [\"Painel\",\"Calendário\",\"Eventos\",\"Disciplinas\",\"Atividades\",\"Membros\",\"Conquistas\"]",
+        "ok: a seção aberta fica marcada: \"page\"",
+        "ok: o menu da conta diz quem está usando e o perfil: true",
+        "ok: /painel em 1024 px sem rolagem lateral: false",
+        "ok: /atividades em 1024 px sem rolagem lateral: false",
+        "ok: /calendario em 1024 px sem rolagem lateral: false",
+        "ok: /eventos em 1024 px sem rolagem lateral: false",
+        "ok: nenhum erro no console: []",
+        "ok: no celular, o menu desce do topo e ocupa a largura: [0,390]",
+        "ok: e leva à seção: \"/atividades\"",
+        "ok: nenhum erro no console (celular): []"
       ]
     },
     {
       "id": "CT47",
-      "titulo": "Avatar: cinco estilos para escolher e sortear",
+      "titulo": "Avatar: dois estilos (Rabisco e Ilustrado) para escolher e sortear",
       "ok": true,
       "obs": [
-        "ok — cinco estilos: [\"Rabisco\",\"Aventura\",\"Sorriso\",\"Emoji\",\"Pixel\"]",
-        "ok — o primeiro vem marcado: \"true\"",
-        "ok — sortear troca o avatar da prévia: true",
-        "ok — as setas trocam o estilo: \"true\"",
-        "ok — trocar o estilo muda a prévia: true",
-        "ok — gravou o estilo e a semente sorteada: [\"pixel-art\",true]",
-        "ok — o cartão mostra o avatar escolhido, desenhado no próprio sistema: true",
-        "ok — com foto, a dica avisa que a foto aparece no lugar: \"Enquanto houver foto, ela aparece no lugar do avatar.\"",
-        "ok — sem a foto, volta o avatar escolhido: true",
-        "ok — nenhum pedido à DiceBear: 0",
-        "ok — nenhum erro no console: []"
+        "ok: dois estilos: [\"Rabisco\",\"Ilustrado\"]",
+        "ok: o primeiro vem marcado: \"true\"",
+        "ok: sortear troca o avatar da prévia: true",
+        "ok: as setas trocam o estilo: \"true\"",
+        "ok: trocar o estilo muda a prévia: true",
+        "ok: gravou o estilo e a semente sorteada: [\"notionists\",true]",
+        "ok: o cartão mostra o avatar escolhido, desenhado no próprio sistema: true",
+        "ok: com foto, a dica avisa que a foto aparece no lugar: 1",
+        "ok: sem a foto, volta o avatar escolhido: true",
+        "ok: nenhum pedido à DiceBear: 0",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT48",
+      "titulo": "Atividade sem conteúdo: só a disciplina é obrigatória, e ela conta no progresso da disciplina",
+      "ok": true,
+      "obs": [
+        "ok: sem disciplina, o erro aparece na disciplina: \"Escolha a disciplina da atividade.\"",
+        "ok: o conteúdo não é cobrado: 0",
+        "ok: o conteúdo mostra \"Sem conteúdo\": \"Sem conteúdo\"",
+        "ok: gravada com a disciplina e sem conteúdo: [true,\"\"]",
+        "ok: o detalhe mostra o progresso da disciplina: 1",
+        "ok: o retorno mostra a disciplina subindo: true",
+        "ok: a disciplina lista as atividades sem conteúdo: \"Atividades\"",
+        "ok: com as três: 3",
+        "ok: progresso da disciplina: 5 de 6 pontos: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT49",
+      "titulo": "Excluir um conteúdo não apaga as atividades: elas ficam na disciplina, sem conteúdo",
+      "ok": true,
+      "obs": [
+        "ok: a confirmação diz que a atividade continua: true",
+        "ok: a atividade continua gravada, sem conteúdo: [true,\"\"]",
+        "ok: aparece no bloco \"Sem conteúdo\": \"Sem conteúdo\"",
+        "ok: e na lista do bloco: 1",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT50",
+      "titulo": "Migração para a versão 3: disciplina na atividade, \"Geral\" automático sai, estilo antigo de avatar vira o padrão",
+      "ok": true,
+      "obs": [
+        "ok: as duas atividades ganharam a disciplina: [\"d1\",\"d1\"]",
+        "ok: a do \"Geral\" ficou sem conteúdo; a de Limites continua: [\"\",\"c2\"]",
+        "ok: o \"Geral\" automático saiu: [\"Limites\"]",
+        "ok: o estilo Pixel virou Rabisco: \"croodles-neutral\"",
+        "ok: marcador na versão 3: 3",
+        "ok: Cálculo em 60% (3 de 5 pontos): true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT51",
+      "titulo": "Evento: cadastro com validação, página de eventos, painel, edição e exclusão",
+      "ok": true,
+      "obs": [
+        "ok: a aba Próximos lista os quatro do exemplo: 4",
+        "ok: a prova que cai no feriado ganha aviso: 1",
+        "ok: sem nome: \"Dê um nome ao evento.\"",
+        "ok: sem tipo: \"Escolha o tipo do evento.\"",
+        "ok: sem dia: \"Escolha o dia do evento.\"",
+        "ok: fim antes do início é barrado: \"O fim precisa ser depois do início.\"",
+        "ok: o evento entra na lista: 1",
+        "ok: com horário, local e disciplina: true",
+        "ok: e \"Em 3 dias\": true",
+        "ok: gravado com quem cadastrou: \"9dfa0f09-36da-4417-87d1-534af884ff64\"",
+        "ok: Carla edita a reunião que ela cadastrou: 1",
+        "ok: mas não a palestra que a Ana cadastrou: 0",
+        "ok: a edição aparece: true",
+        "ok: o painel mostra os próximos eventos: true",
+        "ok: excluído: 0",
+        "ok: a prova que já passou fica em Passados: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT52",
+      "titulo": "Eventos no calendário: no dia, no painel do dia e cadastrados a partir do dia escolhido",
+      "ok": true,
+      "obs": [
+        "ok: a palestra aparece na célula do dia: 1",
+        "ok: a célula conta o evento para o leitor de tela: true",
+        "ok: o painel do dia mostra o evento: true",
+        "ok: o cadastro já vem com o dia: true",
+        "ok: entra no mesmo dia, o dia todo: true",
+        "ok: gravado no dia certo: \"2026-11-10\"",
+        "ok: o botão Eventos da legenda esconde os eventos: 0",
+        "ok: na semana, o evento aparece com a hora: true",
+        "ok: na lista do mês também: 1",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT53",
+      "titulo": "Acesso ao grupo: grupos existentes numa coluna, criar grupo na outra",
+      "ok": true,
+      "obs": [
+        "ok: sem grupo, a coluna explica e oferece o exemplo: 1",
+        "ok: no computador, lado a lado: true",
+        "ok: a coluna dos grupos lista o Trio do TCC: 1",
+        "ok: nenhum erro no console: []",
+        "ok: no celular, uma embaixo da outra (grupos primeiro): true"
+      ]
+    },
+    {
+      "id": "CT54",
+      "titulo": "Página inicial com movimento: aparece ao rolar, segue o mouse, demonstra no hover e respeita \"reduzir movimento\"",
+      "ok": true,
+      "obs": [
+        "ok: o topo entra animado: 1",
+        "ok: as três barras da prévia enchem: [\"1\",\"1\",\"1\"]",
+        "ok: e os números contam até o valor: true",
+        "ok: a prévia inclina com o mouse (para a direita): [\"dentro\",true]",
+        "ok: antes de rolar, o cartão está escondido: \"nao\"",
+        "ok: rolando, ele aparece: \"sim\"",
+        "ok: a demonstração está parada: \"0 1\"",
+        "ok: o mouse em cima liga a demonstração: \"1\"",
+        "ok: nenhum erro no console: []",
+        "ok: com \"reduzir movimento\", o topo não anima: \"none\"",
+        "ok: nem a prévia inclina: \"none\"",
+        "ok: os blocos de baixo não estão deslocados (só esperam aparecer): \"none\"",
+        "ok: no celular, a demonstração liga quando o cartão aparece: \"1\""
+      ]
+    },
+    {
+      "id": "CT55",
+      "titulo": "Textos sem travessão em nenhuma tela",
+      "ok": true,
+      "obs": [
+        "ok: nenhuma tela com \"—\": []",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT56",
+      "titulo": "Feedback: seção na página inicial, link no topo e no rodapé, e item no menu da conta",
+      "ok": true,
+      "obs": [
+        "ok: o link do topo leva à seção: true",
+        "ok: a seção explica e faz as três perguntas: true",
+        "ok: o botão abre o formulário anônimo em outra aba: [\"https://forms.gle/QpAtRSGux4XKd67T6\",\"_blank\",true]",
+        "ok: nenhum botão \"em breve\" sobrou: 0",
+        "ok: o rodapé também leva ao formulário: [1,\"https://forms.gle/QpAtRSGux4XKd67T6\"]",
+        "ok: no sistema, o menu da conta leva ao formulário: [1,null,\"https://forms.gle/QpAtRSGux4XKd67T6\",\"_blank\"]",
+        "ok: no menu do celular também: \"https://forms.gle/QpAtRSGux4XKd67T6\"",
+        "ok: nenhum erro no console: []"
       ]
     }
   ],
-  "errosPrincipal": [],
-  "errosExemplo": [],
-  "errosEdicao": []
+  "navegador": "Chromium (Playwright)",
+  "duracaoSegundos": 282,
+  "errosDeConsole": {
+    "cenario1": [],
+    "cenario2": [
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED"
+    ]
+  }
 }
