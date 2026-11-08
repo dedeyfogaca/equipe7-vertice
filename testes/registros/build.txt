@@ -1,25 +1,11 @@
-$ node --version
-v22.23.4
-$ npm --version
-10.9.9
-
 $ npm ci
-
-added 146 packages, and audited 147 packages in 5s
+18 packages are looking for funding
+  run `npm fund` for details
 
 found 0 vulnerabilities
 
 $ npm run build
-
-> vertice@2.0.0 build
-> vite build
-
-vite v6.4.5 building for production...
-transforming...
-✓ 2170 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/index.html                                                     1.48 kB │ gzip:   0.73 kB
+dist/index.html                                                     2.32 kB │ gzip:   0.97 kB
 dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2    7.50 kB
 dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2         9.00 kB
 dist/assets/inter-tight-vietnamese-wght-normal-TKKdAiBA.woff2      10.48 kB
@@ -34,13 +20,13 @@ dist/assets/avatar-andrey-D9NfJ-69.webp                            27.60 kB
 dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2        40.40 kB
 dist/assets/inter-tight-latin-wght-normal-DX-nOvPD.woff2           44.87 kB
 dist/assets/inter-tight-latin-ext-wght-normal-B4u9PlvR.woff2       89.80 kB
-dist/assets/index-DXnr3nzK.css                                     84.44 kB │ gzip:  17.15 kB
-dist/assets/react-D3gbAnCJ.js                                     182.35 kB │ gzip:  60.11 kB
-dist/assets/interface-BeZz0M8n.js                                 196.70 kB │ gzip:  58.63 kB
-dist/assets/index-BGtyUs8g.js                                     664.38 kB │ gzip: 202.32 kB
-
+dist/assets/index-BvVNuqMN.css                                     87.19 kB │ gzip:  17.71 kB
+dist/assets/banco-De9GV7Vy.js                                       0.77 kB │ gzip:   0.41 kB
+dist/assets/react-B6sfNDQf.js                                     182.35 kB │ gzip:  60.11 kB
+dist/assets/interface-BrT4mfYo.js                                 198.14 kB │ gzip:  58.73 kB
+dist/assets/index-BFfRrbme.js                                     698.07 kB │ gzip: 213.39 kB
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 3.40s
+✓ built in 5.08s

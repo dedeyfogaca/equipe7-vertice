@@ -1,7 +1,7 @@
 $ npm run verificar
 
 > vertice@2.0.0 verificar
-> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js
+> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js
 
 
 O cenário destrutivo: já migrado, mas sem o marcador de versão
@@ -414,5 +414,41 @@ ok    sem semente ainda desenha -> true
 Sorteio e iniciais
 ok    50 sorteios, 50 sementes diferentes -> 50
 ok    iniciais de nome composto -> "AS"
+
+Todas as verificações passaram.
+
+Diferença entre o banco e a tela
+
+ok    grupo novo: tudo vira inserção -> [1,1,1,1]
+ok    nada mudou, nada a enviar -> true
+ok    concluir é uma alteração só na atividade -> [["atividades"],1]
+
+Ordem das gravações
+
+ok    inserções do pai para o filho -> ["insert grupo","insert membro","insert disciplina","insert atividade"]
+ok    excluir o grupo manda só o grupo (o banco leva o resto em cascata) -> ["delete grupo"]
+ok    excluir só a atividade -> ["delete atividade"]
+
+Recusa do banco
+
+ok    update que não acha a linha vira recusa -> "Você não tem permissão para essa alteração."
+ok    mensagem das regras do banco passa em português -> "Só o responsável muda o status da atividade."
+ok    nome repetido de disciplina -> "Este grupo já tem uma disciplina com esse nome."
+ok    sem internet -> "Sem conexão com o servidor. Confira a internet e tente de novo."
+ok    erro desconhecido em inglês não aparece cru -> "Não foi possível salvar. Tente de novo."
+
+Fotos para o Storage
+
+ok    foto do editor é foto nova -> true
+ok    endereço do Storage não é -> false
+ok    a linha vai com a foto antiga -> "antiga.jpg"
+ok    a foto nova sobe na pasta do grupo -> [["membros","g1","membro"]]
+
+Evolução do progresso (RF12)
+
+ok    um ponto por dia, do primeiro cadastro até hoje -> ["2026-11-01","2026-11-02","2026-11-03","2026-11-04","2026-11-05"]
+ok    sobe na conclusão e cai quando entra atividade nova (peso, não contagem) -> [0,0,75,38,38]
+ok    fotos do banco: repete o último valor nos dias sem mudança -> [20,20,50,60]
+ok    sem foto nenhuma, só hoje -> [{"data":"2026-11-05","percentual":10}]
 
 Todas as verificações passaram.

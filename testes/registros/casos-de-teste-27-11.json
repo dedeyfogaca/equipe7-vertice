@@ -1,0 +1,950 @@
+{
+  "quando": "2026-11-08T17:02:19.884Z",
+  "resultados": [
+    {
+      "id": "CT01",
+      "titulo": "Criar grupo sem nome do grupo e sem o nome de quem cria",
+      "ok": true,
+      "obs": [
+        "ok: erro no nome do grupo: \"Dê um nome ao grupo.\"",
+        "ok: erro no nome de quem cria: \"Informe o seu nome.\"",
+        "ok: continua na tela de acesso: \"/entrar\""
+      ]
+    },
+    {
+      "id": "CT02",
+      "titulo": "Criar grupo: quem cria entra como organizador",
+      "ok": true,
+      "obs": [
+        "ok: abriu o painel: \"/painel\"",
+        "ok: saudação com o nome de quem criou: true",
+        "ok: Lucas é o único membro: 1",
+        "ok: com perfil Organizador: true"
+      ]
+    },
+    {
+      "id": "CT03",
+      "titulo": "Cadastrar membro sem nome e com e-mail inválido",
+      "ok": true,
+      "obs": [
+        "ok: erro no nome: \"O nome do membro é obrigatório.\"",
+        "ok: erro no e-mail: \"E-mail inválido.\""
+      ]
+    },
+    {
+      "id": "CT04",
+      "titulo": "Cadastrar membro com foto de perfil",
+      "ok": true,
+      "obs": [
+        "ok: o editor abre com a foto escolhida, sem zoom: \"1\"",
+        "ok: Marina entrou como Participante: true",
+        "ok: a foto foi gravada reduzida, em JPEG: true",
+        "ok: recortada em quadrado de 256 px: [256,256]",
+        "tamanho da foto gravada: 4 KB"
+      ]
+    },
+    {
+      "id": "CT05",
+      "titulo": "Foto de perfil com arquivo que não é imagem",
+      "ok": true,
+      "obs": [
+        "ok: mensagem de tipo inválido: true",
+        "ok: o editor não abre: 0",
+        "ok: a foto continua vazia (avatar sorteado): 1"
+      ]
+    },
+    {
+      "id": "CT06",
+      "titulo": "Cadastrar disciplinas escolhendo a cor na paleta",
+      "ok": true,
+      "obs": [
+        "ok: a paleta tem 18 cores: 18",
+        "cor sugerida para a primeira: Azul",
+        "ok: a segunda nasce com outra cor sugerida: true",
+        "ok: subtítulo da tela: \"2 disciplinas\"",
+        "ok: cores gravadas: [\"#3b82f6\",\"#f97316\"]"
+      ]
+    },
+    {
+      "id": "CT07",
+      "titulo": "Disciplina sem nome e com nome repetido",
+      "ok": true,
+      "obs": [
+        "ok: nome vazio: \"Informe o nome da disciplina.\"",
+        "ok: nome repetido: \"Este grupo já tem uma disciplina com esse nome.\"",
+        "ok: continuam 2 disciplinas: 2"
+      ]
+    },
+    {
+      "id": "CT08",
+      "titulo": "Cadastrar conteúdos (opcionais) e recusar nome repetido",
+      "ok": true,
+      "obs": [
+        "ok: sem conteúdo, a disciplina diz que eles são opcionais: true",
+        "ok: repetido recusado: \"Esta disciplina já tem um conteúdo com esse nome.\"",
+        "ok: dois conteúdos na ordem: [\"Modelagem\",\"SQL\"]"
+      ]
+    },
+    {
+      "id": "CT09",
+      "titulo": "Atividade: o formulário começa vazio e cobra só o que é obrigatório",
+      "ok": true,
+      "obs": [
+        "ok: disciplina, conteúdo, prazo, responsável, status e prioridade só com o texto de exemplo: [\"Selecione a disciplina\",\"Sem conteúdo\",\"Selecione a data\",\"Selecione o responsável\",\"Selecione o status\",\"Selecione a prioridade\"]",
+        "ok: nenhum peso marcado: 0",
+        "ok: o status fica travado até o responsável ser você (RN20): true",
+        "ok: título: \"Informe um título para a atividade.\"",
+        "ok: disciplina (RN13): \"Escolha a disciplina da atividade.\"",
+        "ok: conteúdo não é cobrado (opcional): 0",
+        "ok: prazo: \"Defina um prazo de entrega.\"",
+        "ok: responsável (RN06): \"Escolha o responsável pela atividade.\"",
+        "ok: peso, status e prioridade não são cobrados: 0",
+        "ok: título curto: \"O título precisa ter pelo menos 3 caracteres.\"",
+        "ok: nada foi salvo: 0"
+      ]
+    },
+    {
+      "id": "CT10",
+      "titulo": "Cadastrar atividades válidas com peso e responsável",
+      "ok": true,
+      "obs": [
+        "ok: contador: \"3 atividades encontradas\"",
+        "ok: todas com responsável: true",
+        "ok: todas com a disciplina gravada: true",
+        "ok: sem peso escolhido, vale 1: 1",
+        "ok: sem status escolhido, começam em \"a fazer\": true",
+        "prazos: 10/11, 06/11 e 15/11"
+      ]
+    },
+    {
+      "id": "CT11",
+      "titulo": "Concluir atividade: progresso, experiência e conquista",
+      "ok": true,
+      "obs": [
+        "ok: Banco de Dados antes: 0",
+        "ok: Lucas antes: \"0 XP\"",
+        "ok: retorno da conclusão (Modelagem de 0% para 75%): true",
+        "ok: experiência no retorno: true",
+        "ok: aviso de conquista: \"Você conquistou: Primeiro Passo\"",
+        "ok: Banco de Dados depois (3 ÷ 6): 50",
+        "ok: Lucas depois (3 × 10): \"30 XP\""
+      ]
+    },
+    {
+      "id": "CT12",
+      "titulo": "Reverter a conclusão e concluir de novo",
+      "ok": true,
+      "obs": [
+        "ok: Lucas sem experiência (estorno): \"0 XP\"",
+        "ok: Banco de Dados volta a 0%: 0",
+        "ok: a conquista continua (RN12): true",
+        "ok: botão marcado: \"true\"",
+        "ok: Lucas com 30, não 60: \"30 XP\"",
+        "ok: a conquista não foi concedida duas vezes: 1"
+      ]
+    },
+    {
+      "id": "CT13",
+      "titulo": "Busca e filtros por responsável, disciplina e situação, com a identidade visual",
+      "ok": true,
+      "obs": [
+        "ok: busca \"select\": \"1 atividade encontrada\"",
+        "ok: a Marina aparece com a foto dela: true",
+        "ok: quem está usando vem marcado: 1",
+        "ok: responsável Marina: \"2 atividades encontradas\"",
+        "ok: o campo mostra a foto de quem foi escolhido: 1",
+        "ok: Engenharia de Software com a sua cor (laranja): \"rgb(249, 115, 22)\"",
+        "ok: disciplina Engenharia de Software: \"0 atividades encontradas\"",
+        "ok: disciplina Banco de Dados: \"3 atividades encontradas\"",
+        "ok: o filtro vai para o endereço: true",
+        "ok: o campo mostra a cor da disciplina escolhida (azul): \"rgb(59, 130, 246)\"",
+        "ok: as quatro ordens têm símbolo: [1,1,1,1]",
+        "ok: ordem por maior peso: \"Modelar o diagrama ER\"",
+        "ok: situação Atrasadas: \"1 atividade encontrada\"",
+        "ok: a atrasada: true"
+      ]
+    },
+    {
+      "id": "CT14",
+      "titulo": "Totais do painel e progresso por disciplina",
+      "ok": true,
+      "obs": [
+        "ok: totais: {\"A fazer\":2,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
+        "ok: Banco de Dados no painel: \"50\"",
+        "ok: ritmo de Lucas: true",
+        "ok: a lista filtra no próprio painel: \"Concluídas\""
+      ]
+    },
+    {
+      "id": "CT15",
+      "titulo": "Calendário do mês com as cores das disciplinas",
+      "ok": true,
+      "obs": [
+        "ok: título do mês (D04): \"Novembro de 2026\"",
+        "título: \"Novembro de 2026\"",
+        "ok: o dia da atrasada mostra a entrega: true",
+        "ok: na cor da disciplina (azul): \"rgb(59, 130, 246)\"",
+        "ok: painel do dia: true",
+        "ok: esconder a disciplina tira as entregas: false"
+      ]
+    },
+    {
+      "id": "CT16",
+      "titulo": "Calendário nas visões semana e lista",
+      "ok": true,
+      "obs": [
+        "ok: a semana mostra a atividade da semana: true",
+        "semana: Semana de 08/11 a 14/11",
+        "dias na lista do mês: SEX, 06/11 | TER, 10/11 | DOM, 15/11 PROCLAMAÇÃO DA REPÚBLICA",
+        "ok: a lista agrupa por dia: true"
+      ]
+    },
+    {
+      "id": "CT17",
+      "titulo": "Nova atividade a partir de um dia do calendário",
+      "ok": true,
+      "obs": [
+        "ok: o prazo vem preenchido com o dia escolhido: true",
+        "ok: gravada no dia escolhido: \"2026-12-06\"",
+        "ok: aparece no dia 6: true",
+        "ok: na cor de Engenharia de Software (laranja): \"rgb(249, 115, 22)\""
+      ]
+    },
+    {
+      "id": "CT18",
+      "titulo": "Painel de desempenho: experiência, ofensiva, conquistas e ranking",
+      "ok": true,
+      "obs": [
+        "ok: experiência: true",
+        "ok: ofensiva (concluiu hoje): true",
+        "ok: posição: true",
+        "ok: conquistas: true",
+        "ok: andamento rumo à Semana Cheia: true",
+        "ok: ranking: Lucas em 1º: true",
+        "ok: ranking: Marina em 2º: true"
+      ]
+    },
+    {
+      "id": "CT19",
+      "titulo": "Dados recuperados ao reabrir o navegador",
+      "ok": true,
+      "obs": [
+        "ok: depois de recarregar continua no painel de desempenho: \"/conquistas\"",
+        "ok: reabriu já dentro da sessão: \"/painel\"",
+        "ok: totais preservados: {\"A fazer\":3,\"Fazendo\":0,\"Concluídas\":1,\"Atrasadas\":1}",
+        "ok: a foto da Marina continua gravada: \"data:image/jpeg\""
+      ]
+    },
+    {
+      "id": "CT20",
+      "titulo": "Participante não vê a gestão do grupo",
+      "ok": true,
+      "obs": [
+        "ok: sem \"Nova disciplina\": 0",
+        "ok: sem menu de ações nas disciplinas: 0",
+        "ok: aviso de permissão: true",
+        "ok: sem \"Adicionar membro\": 0",
+        "ok: sem \"Excluir o grupo\": 0",
+        "ok: só o próprio cartão tem ações: 1"
+      ]
+    },
+    {
+      "id": "CT21",
+      "titulo": "Participante cadastra atividade, altera só as próprias e edita o próprio perfil",
+      "ok": true,
+      "obs": [
+        "ok: detalhe aberto: \"Criar as tabelas no banco\"",
+        "ok: a responsável é quem cadastrou: true",
+        "ok: pode excluir a atividade da qual é responsável: 1",
+        "ok: não exclui a atividade de outro membro (RN07): 0",
+        "ok: nem a edita (RN07): 0",
+        "ok: nem muda o status dela (RN20): 0",
+        "ok: sem campo de perfil: 0",
+        "ok: função atualizada: \"Front-end e protótipos\""
+      ]
+    },
+    {
+      "id": "CT22",
+      "titulo": "Grupo não fica sem o último organizador",
+      "ok": true,
+      "obs": [
+        "ok: \"Remover\" desabilitado para o único organizador: \"true\"",
+        "ok: rebaixar é recusado: \"O grupo precisa de pelo menos um organizador.\""
+      ]
+    },
+    {
+      "id": "CT23",
+      "titulo": "Remover membro: as atividades passam para quem assume",
+      "ok": true,
+      "obs": [
+        "Marina era responsável por 3 atividades",
+        "ok: confirmar fica desabilitado até escolher quem assume: true",
+        "ok: com a escolha, libera: false",
+        "aviso: Membro removido 3 atividades de Marina passaram para Lucas.",
+        "ok: nenhuma atividade sumiu: 5",
+        "ok: todas passaram para Lucas: 5",
+        "ok: nenhuma ficou sem responsável (D03): 0"
+      ]
+    },
+    {
+      "id": "CT24",
+      "titulo": "Encerrar sessão e acesso a rota privada",
+      "ok": true,
+      "obs": [
+        "ok: Sair leva à tela de acesso: \"/entrar\"",
+        "ok: /painel sem sessão vai para /entrar: \"/entrar\"",
+        "ok: o endereço antigo /login também: \"/entrar\""
+      ]
+    },
+    {
+      "id": "CT25",
+      "titulo": "Tema claro e escuro em todas as telas, mantido após recarregar",
+      "ok": true,
+      "obs": [
+        "ok: a tela de acesso começa no escuro: true",
+        "ok: a tela de acesso fica clara: [false,\"rgb(245, 247, 251)\"]",
+        "ok: o sistema entra no claro: false",
+        "ok: continua claro depois de recarregar: false",
+        "ok: / também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: /sobre também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: /endereco-que-nao-existe também fica claro: [false,\"rgb(245, 247, 251)\"]",
+        "ok: o botão do site volta ao escuro: [true,\"rgb(7, 9, 15)\"]",
+        "ok: e o sistema acompanha: true"
+      ]
+    },
+    {
+      "id": "CT26",
+      "titulo": "Remover disciplina em cascata",
+      "ok": true,
+      "obs": [
+        "ok: a confirmação avisa o que sai junto: \"Banco de Dados será removida do grupo, junto com 4 atividades e 2 conteúdos. Não dá para desfazer.\"",
+        "ok: sobrou só Engenharia de Software: [\"Engenharia de Software\"]",
+        "ok: conteúdos e atividades saíram junto: {\"conteudos\":1,\"atividades\":1}"
+      ]
+    },
+    {
+      "id": "CT27",
+      "titulo": "Serviços externos indisponíveis",
+      "ok": true,
+      "obs": [
+        "ok: o painel avisa: true",
+        "ok: nenhum pedido à DiceBear: 0",
+        "ok: o avatar aparece mesmo sem a DiceBear (desenhado no navegador): true",
+        "ok: sem a API, os feriados salvos continuam aparecendo: true",
+        "feriados antes da queda: Próximos feriados Proclamação da República 15/11 Dia da consciência negra 20/11 Natal 25/12"
+      ]
+    },
+    {
+      "id": "CT28",
+      "titulo": "Carregar dados de exemplo",
+      "ok": true,
+      "obs": [
+        "ok: pede para escolher quem é: \"Quem é você?\"",
+        "ok: grupo de exemplo: {\"grupo\":\"Trio do TCC\",\"disciplinas\":5,\"conteudos\":8,\"atividades\":14,\"eventos\":5,\"membros\":3}",
+        "ok: entrou como Ana: true",
+        "ok: carregar o exemplo não dispara aviso de conquista: 0"
+      ]
+    },
+    {
+      "id": "CT29",
+      "titulo": "Feriado no prazo e próximos feriados",
+      "ok": true,
+      "obs": [
+        "ok: o calendário do campo já marca o feriado: true",
+        "ok: dica no formulário: \"Esse prazo cai no feriado: Proclamação da República.\"",
+        "ok: detalhe mostra o feriado: true",
+        "ok: painel avisa a entrega no feriado: true",
+        "próximos feriados no painel: Próximos feriados | Proclamação da República | 15/11 | Dia da consciência negra | 20/11 | Natal | 25/12",
+        "ok: lista os próximos feriados: true",
+        "ok: calendário marca o feriado: true"
+      ]
+    },
+    {
+      "id": "CT30",
+      "titulo": "Aviso de prazo em fim de semana",
+      "ok": true,
+      "obs": [
+        "datas: 2026-11-14, 2026-11-22 e 2026-11-09",
+        "ok: sábado: \"Esse prazo cai num fim de semana.\"",
+        "ok: domingo: \"Esse prazo cai num fim de semana.\"",
+        "ok: segunda-feira não tem aviso: 0"
+      ]
+    },
+    {
+      "id": "CT31",
+      "titulo": "Grupo antigo sem membros: as telas funcionam e o primeiro membro é o organizador",
+      "ok": true,
+      "obs": [
+        "ok: atividade antiga sem responsável: círculo vazio, sem avatar (D03): true",
+        "ok: Conquistas orienta a cadastrar o primeiro membro (D09): true",
+        "ok: o formulário explica por que não há responsável: true",
+        "ok: perfil travado: true",
+        "ok: em Organizador: \"Organizador\"",
+        "ok: com a explicação: 1",
+        "ok: Rafael entrou como Organizador: \"organizador\"",
+        "ok: e já é quem está usando: 1",
+        "ok: continua podendo gerenciar: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT32",
+      "titulo": "Falha de gravação no armazenamento do navegador",
+      "ok": true,
+      "obs": [
+        "ok: aviso no canto: 1",
+        "ok: faixa no topo da tela: true",
+        "ok: a gravação voltou: a faixa some: 0",
+        "ok: depois de recarregar, as duas estão lá: [\"Estatística\",\"Cálculo\"]",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT33",
+      "titulo": "Páginas públicas: início, sobre nós e endereço inexistente",
+      "ok": true,
+      "obs": [
+        "ok: título da página inicial: \"Veja o quanto você já avançou em cada matéria.\"",
+        "ok: sem o banco configurado, \"Grupo por convite\" aparece como em breve: true",
+        "ok: rodapé com o Instagram da equipe, em outra aba: [\"Instagram @go.vertice\",\"https://www.instagram.com/go.vertice/\",\"_blank\"]",
+        "ok: as fotos da equipe no círculo partem do topo, com a cabeça inteira: [true,true]",
+        "ok: Andrey: true",
+        "ok: Matheus: true",
+        "ok: avatares carregados: true",
+        "ok: 404: \"Página não encontrada\"",
+        "ok: \"Começar agora\" leva à tela de acesso: \"/entrar\"",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT34",
+      "titulo": "Uso no celular",
+      "ok": true,
+      "obs": [
+        "ok: início sem rolagem lateral: false",
+        "ok: painel sem rolagem lateral: false",
+        "ok: /calendario sem rolagem lateral: false",
+        "ok: /eventos sem rolagem lateral: false",
+        "ok: /atividades sem rolagem lateral: false",
+        "ok: /disciplinas sem rolagem lateral: false",
+        "ok: /membros sem rolagem lateral: false",
+        "ok: /conquistas sem rolagem lateral: false",
+        "ok: /atividade/nova sem rolagem lateral: false",
+        "ok: /sobre sem rolagem lateral: false",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT35",
+      "titulo": "Dados da versão de 20/10 são migrados",
+      "ok": true,
+      "obs": [
+        "ok: versão dos dados: 3",
+        "ok: a atividade sem responsável foi para o organizador; a outra não mudou: [\"m1\",\"m2\"]",
+        "ok: e ganhou a disciplina do conteúdo (versão 3): [\"d1\",\"d1\"]",
+        "ok: a cor que saiu da paleta virou a equivalente (Pedra): \"#a8a29e\"",
+        "ok: o detalhe mostra o responsável: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT36",
+      "titulo": "Dados da primeira versão (tarefas) com atividade sem grupo",
+      "ok": true,
+      "obs": [
+        "ok: avisa a atividade sem grupo: \"Uma atividade antiga ficou sem grupo\"",
+        "ok: versão dos dados: 3",
+        "ok: a tarefa do grupo virou atividade: [\"Lista de exercícios\"]",
+        "ok: a disciplina escrita virou cadastro, e a atividade fica direto nela, sem o conteúdo \"Geral\" (versão 3): [[\"Física\"],0,\"\",true]",
+        "ok: o primeiro membro virou organizador (RN07): \"organizador\"",
+        "ok: a antiga sem grupo continua guardada: 2",
+        "ok: o aviso aparece uma vez só: 0",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT37",
+      "titulo": "Editar e excluir atividade",
+      "ok": true,
+      "obs": [
+        "ok: Banco de Dados antes: 3 de 7 de peso: 43",
+        "ok: o detalhe mostra o título novo: \"Resolver a lista de SELECT e JOIN\"",
+        "ok: peso gravado: 4",
+        "ok: Banco de Dados com o peso novo: 3 de 9: 33",
+        "ok: pede confirmação: \"Excluir atividade?\"",
+        "ok: saiu da lista: 0",
+        "ok: situação na tela: \"13 atividades encontradas\"",
+        "ok: saiu do armazenamento: 13",
+        "ok: Banco de Dados sem ela: 3 de 5: 60"
+      ]
+    },
+    {
+      "id": "CT38",
+      "titulo": "Excluir o grupo",
+      "ok": true,
+      "obs": [
+        "conquistas do grupo antes da exclusão: 2",
+        "a seção termina em 937 px, numa tela de 1000 px",
+        "ok: a exclusão fica no pé da página, mesmo com poucos membros: true",
+        "ok: pede confirmação: \"Excluir o grupo?\"",
+        "ok: voltou à tela de acesso: \"Acesse seu grupo\"",
+        "ok: grupo, membros, disciplinas, conteúdos, atividades, eventos e conquistas removidos: [0,0,0,0,0,0,0]",
+        "ok: sessão encerrada: null",
+        "ok: o painel não abre mais: \"/entrar\""
+      ]
+    },
+    {
+      "id": "CT39",
+      "titulo": "Editor de foto: o que é enquadrado é o que fica gravado",
+      "ok": true,
+      "obs": [
+        "ok: o foco começa na área da foto: \"Enquadramento da foto\"",
+        "ok: sem mexer: o quadrado do meio (verde no canto, vermelho à esquerda, azul à direita): [\"verde\",\"vermelho\",\"azul\"]",
+        "ok: arrastada para a direita: o vermelho ocupa dois terços: [[\"verde\",\"vermelho\",\"azul\"],true]",
+        "ok: com zoom 2: o miolo, sem o canto verde: [\"vermelho\",\"vermelho\",\"azul\"]",
+        "ok: cancelar mantém a foto anterior: true",
+        "foto grande: apareceu no editor em 218 ms; o \"Aplicar\" levou 543 ms",
+        "ok: a foto grande aparece no editor em menos de 3 s: true",
+        "tarefas longas na página (ms): 126",
+        "ok: gravada em 256 × 256, JPEG: [\"data:image/jpeg\",[256,256]]",
+        "tamanho gravado: 9 KB",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT40",
+      "titulo": "Foto do grupo: na criação e na edição, e as iniciais quando não há foto",
+      "ok": true,
+      "obs": [
+        "moldura: {\"quadrado\":true,\"raio\":\"16px\",\"largura\":318.74371337890625}",
+        "ok: a moldura do grupo é um quadrado de cantos arredondados: true",
+        "ok: a prévia mostra a foto escolhida: true",
+        "ok: a barra do topo mostra a foto do grupo: 1",
+        "ok: sem foto, voltam as iniciais do nome: true",
+        "ok: nome, descrição e foto gravados: [\"Física II\",\"Turma da noite\",\"\"]",
+        "ok: a tela de acesso mostra a foto do grupo: 1",
+        "ok: a participante não vê \"Editar grupo\": 0",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT41",
+      "titulo": "Criar conteúdo sem sair do cadastro de atividade",
+      "ok": true,
+      "obs": [
+        "ok: a lista começa em \"Sem conteúdo\" e termina com \"Criar novo conteúdo\": [\"Sem conteúdo\",\"Modelagem\",\"SQL\",\"Criar novo conteúdo\"]",
+        "ok: a janela já sabe a disciplina: true",
+        "ok: o que já estava preenchido continua, com o conteúdo novo escolhido: [\"Exercícios de JOIN\",\"Lista 3 do professor.\",\"Banco de Dados\",\"Joins\",\"Peso 3 de 5\"]",
+        "ok: nenhum erro apareceu no formulário: 0",
+        "ok: a atividade ficou no conteúdo novo, que entrou por último na disciplina: {\"ordem\":2,\"mesmoConteudo\":true}",
+        "ok: a dica avisa que é opcional e oferece o atalho: \"Opcional. Física ainda não tem conteúdos. Criar um\"",
+        "ok: o primeiro conteúdo já fica escolhido: \"Cinemática\"",
+        "ok: para o participante, sem \"Criar novo conteúdo\": [\"Sem conteúdo\",\"Modelagem\",\"SQL\",\"Joins\"]",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT42",
+      "titulo": "Só o responsável muda o status da atividade (RN20)",
+      "ok": true,
+      "obs": [
+        "ok: Bruno só tem o botão de concluir nas atividades dele: 5",
+        "ok: nas dos outros, o círculo só mostra a situação: 9",
+        "ok: sem \"Concluir\", sem mudar o status, sem editar e sem excluir: [0,0,0,0]",
+        "ok: a tela diz quem muda o status: true",
+        "ok: nem pelo endereço de edição: \"Você não pode editar esta atividade\"",
+        "ok: Bruno conclui a própria e o aviso fala com ele: true",
+        "ok: a organizadora edita e exclui, mas não conclui a do Bruno: [0,0,1,1]",
+        "ok: no formulário, o status fica travado: true",
+        "ok: com a explicação: \"Só Bruno, que é responsável, muda o status.\"",
+        "ok: o título mudou e o status continua \"fazendo\": \"fazendo\"",
+        "ok: para si mesma, o status abre: false",
+        "ok: ao passar para a Carla, o status trava e volta ao vazio: [true,\"Selecione o status\"]",
+        "ok: gravada em \"a fazer\": \"a fazer\"",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT43",
+      "titulo": "Calendário: troca de mês com animação, também deslizando o dedo",
+      "ok": true,
+      "obs": [
+        "ok: avançar: a página nova entra pela direita: [\"mes-proximo\"]",
+        "ok: voltar: entra pela esquerda: [\"mes-anterior\"]",
+        "ok: e o título volta ao mês de antes: \"Novembro de 2026\"",
+        "ok: na semana também: [\"mes-proximo\"]",
+        "ok: nenhum erro no console: []",
+        "ok: deslizar para a esquerda vai ao próximo mês: \"Dezembro de 2026\"",
+        "ok: deslizar para a direita volta: \"Novembro de 2026\"",
+        "ok: um toque curto não troca de mês: \"Novembro de 2026\"",
+        "ok: com \"reduzir movimento\", a animação é instantânea: true",
+        "ok: nenhum erro no console, nos três navegadores: []"
+      ]
+    },
+    {
+      "id": "CT44",
+      "titulo": "Campo de data com o calendário do sistema",
+      "ok": true,
+      "obs": [
+        "ok: abre no mês de hoje, com o foco em hoje: \"2026-11-08\"",
+        "ok: hoje vem marcado: true",
+        "ok: as setas andam um dia e uma semana: \"2026-11-16\"",
+        "PageDown levou de 2026-11-16 a 2026-12-16",
+        "ok: PageDown vai ao mês seguinte: true",
+        "ok: Enter escolhe o dia: true",
+        "dia escolhido: Segunda-feira, 16 de novembro de 2026",
+        "ok: Limpar volta ao campo vazio: \"Selecione a data\"",
+        "ok: e o prazo continua obrigatório: \"Defina um prazo de entrega.\"",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT45",
+      "titulo": "Marca do Vértice: dá um terço de volta enquanto o grupo abre e uma volta ao passar o mouse",
+      "ok": true,
+      "obs": [
+        "ok: ao entrar, a cortina diz qual grupo abre: \"Abrindo Trio do TCC…\"",
+        "ok: a tela de acesso não muda enquanto a cortina chega: \"/entrar\"",
+        "ok: a marca só anima transform e opacity: [\"opacity\",\"transform\"]",
+        "ok: e para depois de um terço de volta: \"scale(1) rotate(120deg)\"",
+        "ok: num ritmo calmo, abaixo de 1 s: true",
+        "ok: com a tela coberta, o painel já montou por baixo: \"/painel\"",
+        "passagem inteira: 1432 ms",
+        "ok: a passagem inteira leva menos de 1,5 s: true",
+        "ok: depois, a cortina sai e fica o painel: true",
+        "ok: parada, a marca não gira: 0",
+        "ok: com o mouse em cima, dá uma volta só, rápida: [[\"girar\",1,600]]",
+        "ok: nenhum erro no console: []",
+        "ok: com \"reduzir movimento\", a marca não gira: false",
+        "ok: e a cortina some em menos de 1 s: true"
+      ]
+    },
+    {
+      "id": "CT46",
+      "titulo": "Barra de seções no topo, também no celular",
+      "ok": true,
+      "obs": [
+        "ok: sem barra lateral: 0",
+        "ok: as sete seções na barra do topo: [\"Painel\",\"Calendário\",\"Eventos\",\"Disciplinas\",\"Atividades\",\"Membros\",\"Conquistas\"]",
+        "ok: a seção aberta fica marcada: \"page\"",
+        "ok: o menu da conta diz quem está usando e o perfil: true",
+        "ok: /painel em 1024 px sem rolagem lateral: false",
+        "ok: /atividades em 1024 px sem rolagem lateral: false",
+        "ok: /calendario em 1024 px sem rolagem lateral: false",
+        "ok: /eventos em 1024 px sem rolagem lateral: false",
+        "ok: nenhum erro no console: []",
+        "ok: no celular, o menu desce do topo e ocupa a largura: [0,390]",
+        "ok: e leva à seção: \"/atividades\"",
+        "ok: nenhum erro no console (celular): []"
+      ]
+    },
+    {
+      "id": "CT47",
+      "titulo": "Avatar: dois estilos (Rabisco e Ilustrado) para escolher e sortear",
+      "ok": true,
+      "obs": [
+        "ok: dois estilos: [\"Rabisco\",\"Ilustrado\"]",
+        "ok: o primeiro vem marcado: \"true\"",
+        "ok: sortear troca o avatar da prévia: true",
+        "ok: as setas trocam o estilo: \"true\"",
+        "ok: trocar o estilo muda a prévia: true",
+        "ok: gravou o estilo e a semente sorteada: [\"notionists\",true]",
+        "ok: o cartão mostra o avatar escolhido, desenhado no próprio sistema: true",
+        "ok: com foto, a dica avisa que a foto aparece no lugar: 1",
+        "ok: sem a foto, volta o avatar escolhido: true",
+        "ok: nenhum pedido à DiceBear: 0",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT48",
+      "titulo": "Atividade sem conteúdo: só a disciplina é obrigatória, e ela conta no progresso da disciplina",
+      "ok": true,
+      "obs": [
+        "ok: sem disciplina, o erro aparece na disciplina: \"Escolha a disciplina da atividade.\"",
+        "ok: o conteúdo não é cobrado: 0",
+        "ok: o conteúdo mostra \"Sem conteúdo\": \"Sem conteúdo\"",
+        "ok: gravada com a disciplina e sem conteúdo: [true,\"\"]",
+        "ok: o detalhe mostra o progresso da disciplina: 1",
+        "ok: o retorno mostra a disciplina subindo: true",
+        "ok: a disciplina lista as atividades sem conteúdo: \"Atividades\"",
+        "ok: com as três: 3",
+        "ok: progresso da disciplina: 5 de 6 pontos: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT49",
+      "titulo": "Excluir um conteúdo não apaga as atividades: elas ficam na disciplina, sem conteúdo",
+      "ok": true,
+      "obs": [
+        "ok: a confirmação diz que a atividade continua: true",
+        "ok: a atividade continua gravada, sem conteúdo: [true,\"\"]",
+        "ok: aparece no bloco \"Sem conteúdo\": \"Sem conteúdo\"",
+        "ok: e na lista do bloco: 1",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT50",
+      "titulo": "Migração para a versão 3: disciplina na atividade, \"Geral\" automático sai, estilo antigo de avatar vira o padrão",
+      "ok": true,
+      "obs": [
+        "ok: as duas atividades ganharam a disciplina: [\"d1\",\"d1\"]",
+        "ok: a do \"Geral\" ficou sem conteúdo; a de Limites continua: [\"\",\"c2\"]",
+        "ok: o \"Geral\" automático saiu: [\"Limites\"]",
+        "ok: o estilo Pixel virou Rabisco: \"croodles-neutral\"",
+        "ok: marcador na versão 3: 3",
+        "ok: Cálculo em 60% (3 de 5 pontos): true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT51",
+      "titulo": "Evento: cadastro com validação, página de eventos, painel, edição e exclusão",
+      "ok": true,
+      "obs": [
+        "ok: a aba Próximos lista os quatro do exemplo: 4",
+        "ok: a prova que cai no feriado ganha aviso: 0",
+        "ok: sem nome: \"Dê um nome ao evento.\"",
+        "ok: sem tipo: \"Escolha o tipo do evento.\"",
+        "ok: sem dia: \"Escolha o dia do evento.\"",
+        "ok: fim antes do início é barrado: \"O fim precisa ser depois do início.\"",
+        "ok: o evento entra na lista: 1",
+        "ok: com horário, local e disciplina: true",
+        "ok: e \"Em 3 dias\": true",
+        "ok: gravado com quem cadastrou: \"8782b11c-0203-433f-9e1d-e07910045f9e\"",
+        "ok: Carla edita a reunião que ela cadastrou: 1",
+        "ok: mas não a palestra que a Ana cadastrou: 0",
+        "ok: a edição aparece: true",
+        "ok: o painel mostra os próximos eventos: true",
+        "ok: excluído: 0",
+        "ok: a prova que já passou fica em Passados: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT52",
+      "titulo": "Eventos no calendário: no dia, no painel do dia e cadastrados a partir do dia escolhido",
+      "ok": true,
+      "obs": [
+        "ok: a palestra aparece na célula do dia: 1",
+        "ok: a célula conta o evento para o leitor de tela: true",
+        "ok: o painel do dia mostra o evento: true",
+        "ok: o cadastro já vem com o dia: true",
+        "ok: entra no mesmo dia, o dia todo: true",
+        "ok: gravado no dia certo: \"2026-11-12\"",
+        "ok: o botão Eventos da legenda esconde os eventos: 0",
+        "ok: na semana, o evento aparece com a hora: true",
+        "ok: na lista do mês também: 1",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT53",
+      "titulo": "Acesso ao grupo: grupos existentes numa coluna, criar grupo na outra",
+      "ok": true,
+      "obs": [
+        "ok: sem grupo, a coluna explica e oferece o exemplo: 1",
+        "ok: no computador, lado a lado: true",
+        "ok: a coluna dos grupos lista o Trio do TCC: 1",
+        "ok: nenhum erro no console: []",
+        "ok: no celular, uma embaixo da outra (grupos primeiro): true"
+      ]
+    },
+    {
+      "id": "CT54",
+      "titulo": "Página inicial com movimento: aparece ao rolar, segue o mouse, demonstra no hover e respeita \"reduzir movimento\"",
+      "ok": true,
+      "obs": [
+        "ok: o topo entra animado: 1",
+        "ok: as três barras da prévia enchem: [\"1\",\"1\",\"1\"]",
+        "ok: e os números contam até o valor: true",
+        "ok: a prévia inclina com o mouse (para a direita): [\"dentro\",true]",
+        "ok: antes de rolar, o cartão está escondido: \"nao\"",
+        "ok: rolando, ele aparece: \"sim\"",
+        "ok: a demonstração está parada: \"0 1\"",
+        "ok: o mouse em cima liga a demonstração: \"1\"",
+        "ok: nenhum erro no console: []",
+        "ok: com \"reduzir movimento\", o topo não anima: \"none\"",
+        "ok: nem a prévia inclina: \"none\"",
+        "ok: os blocos de baixo não estão deslocados (só esperam aparecer): \"none\"",
+        "ok: no celular, a demonstração liga quando o cartão aparece: \"1\""
+      ]
+    },
+    {
+      "id": "CT55",
+      "titulo": "Textos sem travessão em nenhuma tela",
+      "ok": true,
+      "obs": [
+        "ok: nenhuma tela com \"—\": []",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT56",
+      "titulo": "Feedback: seção na página inicial, link no topo e no rodapé, e item no menu da conta",
+      "ok": true,
+      "obs": [
+        "ok: o link do topo leva à seção: true",
+        "ok: a seção explica e faz as três perguntas: true",
+        "ok: o botão abre o formulário anônimo em outra aba: [\"https://forms.gle/QpAtRSGux4XKd67T6\",\"_blank\",true]",
+        "ok: nenhum botão \"em breve\" sobrou: 0",
+        "ok: o rodapé também leva ao formulário: [1,\"https://forms.gle/QpAtRSGux4XKd67T6\"]",
+        "ok: no sistema, o menu da conta leva ao formulário: [1,null,\"https://forms.gle/QpAtRSGux4XKd67T6\",\"_blank\"]",
+        "ok: no menu do celular também: \"https://forms.gle/QpAtRSGux4XKd67T6\"",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT67",
+      "titulo": "Tutorial opcional: convite no painel, passos, atalho para a tela e menu da conta",
+      "ok": true,
+      "obs": [
+        "ok: o painel convida na primeira visita: 1",
+        "ok: começa no passo 1 de 6: 1",
+        "ok: os seis passos: [\"Painel\",\"Disciplinas e conteúdos\",\"Atividades\",\"Calendário e eventos\",\"Membros\",\"Conquistas\"]",
+        "ok: volta um passo: \"Membros\"",
+        "ok: \"Abrir esta tela\" leva à tela do passo: \"/membros\"",
+        "ok: depois de aberto, o convite não volta: 0",
+        "ok: o menu da conta abre de novo: 1",
+        "ok: dispensado, o convite não volta: 0",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT68",
+      "titulo": "Evolução do progresso na tela da disciplina, com a demonstração",
+      "ok": true,
+      "obs": [
+        "ok: linha de 0% até o progresso atual: true",
+        "ok: um dia por linha na tabela para leitor de tela (15 dias): 15",
+        "ok: passar o mouse mostra o dia e o valor: true",
+        "ok: nenhum erro no console: []"
+      ]
+    },
+    {
+      "id": "CT57",
+      "titulo": "Sem conta: a tela de acesso pede login ou demonstração",
+      "ok": true,
+      "obs": [
+        "ok: com o banco, \"Grupo por convite\" sem \"Em breve\": true",
+        "ok: a página inicial explica o teste sem conta: true",
+        "ok: título: \"Entre no Vértice\"",
+        "ok: botão do Google: 1",
+        "ok: atalho da demonstração: 1",
+        "ok: valida o e-mail: \"E-mail inválido.\"",
+        "ok: conta que não existe: \"E-mail ou senha incorretos.\"",
+        "ok: rota privada manda para o acesso: \"/entrar\""
+      ]
+    },
+    {
+      "id": "CT58",
+      "titulo": "Criar conta e criar grupo: o grupo e o organizador vão para o banco",
+      "ok": true,
+      "obs": [
+        "ok: nome da conta já preenchido: \"Ana Souza\"",
+        "ok: e-mail no topo: 1",
+        "ok: campo do código de convite: 1",
+        "ok: sem \"Carregar dados de exemplo\" com conta: 0",
+        "ok: grupo no banco: [\"Turma da Conta\"]",
+        "ok: organizador ligado à conta: [{\"nome\":\"Ana Souza\",\"perfil\":\"organizador\",\"email\":\"ana@teste.com\"}]",
+        "ok: nada no localStorage: null"
+      ]
+    },
+    {
+      "id": "CT59",
+      "titulo": "Disciplina, atividade e conclusão vão para o banco e voltam depois de recarregar",
+      "ok": true,
+      "obs": [
+        "ok: atividade concluída no banco: {\"titulo\":\"Modelar o diagrama ER\",\"status\":\"concluido\",\"concluida\":true}",
+        "ok: histórico de progresso gravado pelo banco (RF12): [100]",
+        "ok: conquista gravada: true",
+        "ok: depois de recarregar, a atividade continua lá: true",
+        "ok: evolução com um dia só: 1",
+        "ok: linha da evolução com as fotos do banco: true"
+      ]
+    },
+    {
+      "id": "CT60",
+      "titulo": "Convite: o organizador gera código e link",
+      "ok": true,
+      "obs": [
+        "ok: código com 8 letras e números: true",
+        "ok: link: \"http://localhost:4174/convite/VN7ENCQQ\"",
+        "ok: convite no banco, valendo 7 dias: {\"codigo\":\"VN7ENCQQ\",\"sete_dias\":true}"
+      ]
+    },
+    {
+      "id": "CT61",
+      "titulo": "Convite pelo link: quem não tem conta cria e cai direto no grupo",
+      "ok": true,
+      "obs": [
+        "ok: vai para o acesso: \"/entrar\"",
+        "ok: explica o convite: 1",
+        "ok: Bruno entrou como participante: [{\"nome\":\"Ana Souza\",\"perfil\":\"organizador\"},{\"nome\":\"Bruno Lima\",\"perfil\":\"participante\"}]",
+        "ok: Bruno vê a atividade de Ana: true",
+        "ok: participante não convida: 0"
+      ]
+    },
+    {
+      "id": "CT62",
+      "titulo": "Código digitado e código inválido",
+      "ok": true,
+      "obs": [
+        "ok: código inválido: \"Código de convite inválido ou vencido.\"",
+        "ok: quem já é membro só volta ao grupo: 2"
+      ]
+    },
+    {
+      "id": "CT63",
+      "titulo": "O que um faz, o outro vê ao voltar para a aba",
+      "ok": true,
+      "obs": [
+        "ok: Bruno vê a disciplina nova sem recarregar: true"
+      ]
+    },
+    {
+      "id": "CT64",
+      "titulo": "Recusa do banco: alteração em algo que já não existe avisa e recarrega",
+      "ok": true,
+      "obs": [
+        "ok: aviso: true",
+        "ok: volta ao que está no banco (atividade sumiu): 0"
+      ]
+    },
+    {
+      "id": "CT65",
+      "titulo": "Sair da conta e demonstração",
+      "ok": true,
+      "obs": [
+        "ok: e-mail no menu: 1",
+        "ok: demonstração com exemplo: 1",
+        "ok: de volta com a conta: true"
+      ]
+    },
+    {
+      "id": "CT66",
+      "titulo": "Foto de perfil vai para o Storage e o banco guarda o endereço",
+      "ok": true,
+      "obs": [
+        "ok: banco guarda o endereço do Storage: true",
+        "ok: um arquivo no bucket: 1",
+        "ok: a foto aparece pelo endereço: 256",
+        "ok: nenhum erro de página em todo o roteiro com conta: []"
+      ]
+    }
+  ],
+  "navegador": "Chromium (Playwright)",
+  "duracaoSegundos": 341,
+  "errosDeConsole": {
+    "cenario1": [],
+    "cenario2": [
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED"
+    ]
+  },
+  "execucao": "08/11/2026, 13h56 às 14h02 (horário de Brasília)"
+}

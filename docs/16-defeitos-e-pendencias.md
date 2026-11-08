@@ -1,11 +1,11 @@
 # 16 · Defeitos e Pendências
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 06/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026
 
 ---
 
-Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
+Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. O ciclo de 27/11, executado em 08/11/2026 sobre a versão com o banco de dados, encontrou os defeitos D11 a D13, corrigidos no mesmo dia. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
 
 Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando reteste** e **Fechado**.
 
@@ -25,12 +25,64 @@ Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando retes
 | D08 | Telas e filtros atualizados um instante depois, após a atualização do React Router | Média | CT13, CT22 e CT33 de 06/11 | Matheus | CT13, CT22 e CT33 (aprovados) | Fechado |
 | D09 | Tela de Conquistas em branco num grupo sem membros | Média | Revisão do UC09 em 28/10 | Andrey | CT31 (aprovado) | Fechado |
 | D10 | Participante consegue excluir atividade de outro integrante | Média | Revisão do Doc. 04 em 28/10 | Andrey | CT21 e CT42 (aprovados) | Fechado |
+| D11 | Com conta, as conquistas não eram gravadas no banco | Alta | CT59 de 27/11 | Matheus | CT59 (aprovado) | Fechado |
+| D12 | A tela de login gravava coleções vazias no navegador | Baixa | CT58 de 27/11 | Matheus | CT58 (aprovado) | Fechado |
+| D13 | Roteiro do CT30 escolhia um domingo que é feriado | Baixa | CT30 de 27/11 | Andrey | CT30 (aprovado) | Fechado |
 
-Todos os defeitos foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11, em 01/11/2026 e em 06/11/2026.
+Os defeitos D01 a D10 foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11. Os defeitos D11 a D13 foram corrigidos em 08/11/2026, e a execução completa do ciclo de 27/11 foi feita depois das correções.
 
 ---
 
 ## Detalhamento
+
+### D13
+
+**Roteiro do CT30 escolhia um domingo que é feriado**
+
+- **Requisito afetado:** nenhum; o defeito era do roteiro de teste, não do sistema
+- **Gravidade:** Baixa
+- **Como reproduzir:** executar o CT30 entre 09/11 e 14/11/2026. O roteiro pega o próximo domingo, 15/11, que é feriado da Proclamação da República.
+- **Esperado:** o roteiro testa o aviso de fim de semana num domingo comum.
+- **Observado:** o formulário mostrou o aviso de feriado, que tem prioridade sobre o de fim de semana (o comportamento certo), e o roteiro, que esperava o aviso de fim de semana, reprovou o caso.
+- **Correção:** o roteiro passou a pular os feriados ao escolher o sábado, o domingo e a segunda-feira do caso.
+- **Responsável:** Andrey
+- **Situação:** Fechado
+- **Novo teste:** CT30, aprovado
+
+### D12
+
+**A tela de login gravava coleções vazias no navegador**
+
+- **Requisito afetado:** RNF02
+- **Gravidade:** Baixa: não perdia dado, mas deixava no navegador, para quem nunca usou a demonstração, coleções vazias que não deviam existir
+- **Como reproduzir:**
+  1. Abrir o sistema num navegador limpo, com o banco configurado.
+  2. Na tela de login, conferir o armazenamento do navegador.
+- **Esperado:** antes de a pessoa entrar com a conta ou escolher a demonstração, nada é gravado no navegador.
+- **Observado:** as coleções `grupos`, `membros` e as demais apareciam gravadas como listas vazias.
+- **Causa:** sem conta e fora da demonstração, a camada de dados ficava no modo do navegador e gravava o estado inicial.
+- **Correção:** a gravação no navegador só acontece no modo de demonstração.
+- **Responsável:** Matheus
+- **Situação:** Fechado
+- **Novo teste:** CT58, aprovado
+
+### D11
+
+**Com conta, as conquistas não eram gravadas no banco**
+
+- **Requisito afetado:** RF17, RN12
+- **Gravidade:** Alta: a conquista aparecia na tela e sumia ao recarregar a página
+- **Como reproduzir:**
+  1. Entrar com a conta e criar um grupo.
+  2. Cadastrar uma atividade e concluí-la: o aviso de conquista aparece.
+  3. Recarregar a página e abrir Conquistas.
+- **Esperado:** a conquista "Primeiro Passo" está gravada em `membro_conquista` e continua concedida.
+- **Observado:** a tabela `membro_conquista` ficou vazia.
+- **Causa:** no navegador, as conquistas ficam na coleção `conquistasMembro`; a camada de dados do banco procurava a coleção pelo nome `conquistas` e não achava o que enviar.
+- **Correção:** a camada de dados traduz o nome da coleção, e o caso de teste passou a conferir a tabela no banco.
+- **Responsável:** Matheus
+- **Situação:** Fechado
+- **Novo teste:** CT59, aprovado
 
 ### D01
 
@@ -199,13 +251,11 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 
 | Item | Situação | Para quando |
 |---|---|---|
-| Conferir na versão publicada na Vercel os feriados reais da BrasilAPI | A fazer | 06/11/2026 |
-| Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto | A fazer | 06/11/2026 |
-| Testar nos navegadores Firefox e Edge (RNF05) | A fazer | 27/11/2026 |
-| Ler as respostas do formulário de feedback dos usuários de teste e transformar o que vier em tarefas | A fazer | 20/11/2026 |
-| Eventos no banco de dados, junto com as demais tabelas (a tabela `evento` já está no modelo lógico) | Planejado, com a T47 | 27/11/2026 |
-| Banco de dados no Supabase, acesso com conta Google ou e-mail, convite para o grupo e fotos no armazenamento de arquivos | Planejado (T46 a T50) | 27/11/2026 |
-| Histórico de progresso (RF12) | Planejado (T35) | 27/11/2026 |
+| Conferir na versão publicada na Vercel os feriados reais da BrasilAPI | A fazer | 24/11/2026 |
+| Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto | A fazer | 24/11/2026 |
+| Testar nos navegadores Firefox e Edge (RNF05) | A fazer (T51) | 26/11/2026 |
+| Conferir no sistema publicado, com o projeto real do Supabase, o login com o Google, o convite entre duas contas e o envio de uma foto | A fazer | 24/11/2026 |
+| Ler as respostas do formulário de feedback dos usuários de teste e transformar o que vier em tarefas | A fazer (T77) | 20/11/2026 |
 
 ---
 
@@ -220,6 +270,9 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Testar RF07 e RF21 | CT29, com as respostas da BrasilAPI simuladas no ambiente de teste |
 | Conferir os avatares reais da DiceBear na versão publicada | Desde 01/11 os avatares são desenhados pelo próprio sistema, e não há mais serviço a conferir. Verificado no CT27 e no CT47 |
 | Testar a responsividade (RNF01) | CT34, em tela de celular |
+| Banco de dados no Supabase, acesso com conta Google ou e-mail, convite para o grupo e fotos no armazenamento de arquivos | Implementados para 27/11 (T46 a T50). Verificados do CT57 ao CT66 e nas 40 verificações do banco |
+| Eventos no banco de dados | A tabela `evento` está no banco com as demais, com a regra de edição do RN21 no próprio banco. Verificado no CT63 e nas verificações do banco |
+| Histórico de progresso (RF12) | Implementado para 27/11 (T35). Verificado no CT59 e no CT68 |
 
 ---
 

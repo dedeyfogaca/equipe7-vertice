@@ -1,0 +1,53 @@
+$ psql -d vertice -f 06-apoio-teste-local.sql
+$ psql -d vertice -f 04-script-criacao.sql
+$ psql -d vertice -f 05-verificacoes.sql
+
+ok     sem conta não cria grupo: new row violates row-level security policy for table "grupo" (esperado new row violates row-level security policy for table "grupo")
+ok     quem cria entra como organizador: organizador (esperado organizador)
+ok     código errado é recusado: Código de convite inválido ou vencido. (esperado Código de convite inválido ou vencido.)
+ok     antes do convite, Bruno não vê o grupo: 0 (esperado 0)
+ok     com o código, Bruno entra no grupo: 01d84719-a411-494c-9e2b-c557e3fb9358 (esperado 01d84719-a411-494c-9e2b-c557e3fb9358)
+ok     e entra como participante: participante (esperado participante)
+ok     Carla, já cadastrada pelo e-mail, é ligada ao cadastro existente: 1 (esperado 1)
+ok     sem criar um membro repetido: 3 (esperado 3)
+ok     ninguém entra sozinho num grupo que já tem membros: new row violates row-level security policy for table "membro" (esperado new row violates row-level security policy for table "membro")
+ok     a intrusa só vê o próprio grupo: 1 (esperado 1)
+ok     e nenhum membro do Trio: 0 (esperado 0)
+ok     participante não cadastra disciplina: new row violates row-level security policy for table "disciplina" (esperado new row violates row-level security policy for table "disciplina")
+ok     nome de disciplina repetido (RN03): duplicate key value violates unique constraint "uk_disciplina_nome" (esperado duplicate key value violates unique constraint "uk_disciplina_nome")
+ok     conteúdo de outra disciplina é recusado (RN13): Esse conteúdo é de outra disciplina. (esperado Esse conteúdo é de outra disciplina.)
+ok     título com menos de 3 letras (RN06): new row for relation "atividade" violates check constraint "atividade_titulo_check" (esperado new row for relation "atividade" violates check constraint "atividade_titulo_check")
+ok     a organizadora não conclui a atividade do Bruno (RN20): Só o responsável muda o status da atividade. (esperado Só o responsável muda o status da atividade.)
+ok     mas edita o título dela (RN07): 1 (esperado 1)
+ok     outra participante não edita a atividade do Bruno (nada muda): 0 (esperado 0)
+ok     Bruno conclui a dele, e a data de conclusão é gravada: t (esperado t)
+ok     o histórico registra 3 de 4 pontos de peso (RF12): 75.00 (esperado 75.00)
+ok     reabrir apaga a data de conclusão: <NULL> (esperado <NULL>)
+ok     e o histórico do dia é atualizado, sem linha nova: 0.00 (esperado 0.00)
+ok     o autor do evento é quem está logado: Carla Dias (esperado Carla Dias)
+ok     fim antes do início é recusado: new row for relation "evento" violates check constraint "evento_check" (esperado new row for relation "evento" violates check constraint "evento_check")
+ok     outro participante não edita o evento da Carla: <NULL> (esperado <NULL>)
+ok     a organizadora edita qualquer evento: Biblioteca (esperado Biblioteca)
+ok     a única organizadora não vira participante: O grupo precisa de pelo menos um organizador. (esperado O grupo precisa de pelo menos um organizador.)
+ok     participante não se promove a organizador: Só o organizador muda o perfil dos membros. (esperado Só o organizador muda o perfil dos membros.)
+ok     mas edita o próprio cadastro: Back-end (esperado Back-end)
+ok     participante não remove membro (nada muda): 1 (esperado 1)
+ok     remover o Bruno com atividades, sem passá-las a alguém, é recusado (RN02): update or delete on table "membro" violates foreign key constraint "atividade_id_responsavel_fkey" on table "atividade" (esperado update or delete on table "membro" violates foreign key constraint "atividade_id_responsavel_fkey" on table "atividade")
+ok     a atividade do Bruno passou para a Carla: Carla Dias (esperado Carla Dias)
+ok     e o Bruno saiu do grupo: 0 (esperado 0)
+ok     membro grava foto na pasta do grupo: (não deu erro) (esperado (não deu erro))
+ok     quem é de fora não grava na pasta do grupo: new row violates row-level security policy for table "objects" (esperado new row violates row-level security policy for table "objects")
+ok     excluir o conteúdo mantém a atividade na disciplina, sem conteúdo: <NULL> (esperado <NULL>)
+ok     excluir a disciplina leva as atividades junto: 0 (esperado 0)
+ok     o evento da disciplina excluída fica no grupo, sem disciplina: <NULL> (esperado <NULL>)
+ok     excluir o grupo leva membros, eventos e convites: 0 (esperado 0)
+ok     a intrusa continua com o grupo dela: 1 (esperado 1)
+           resultado            
+--------------------------------
+ 40 de 40 conferências passaram
+(1 row)
+
+ falhou 
+--------
+(0 rows)
+

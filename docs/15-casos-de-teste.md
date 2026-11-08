@@ -1,13 +1,15 @@
 # 15 · Casos de Teste
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 06/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026
 
 ---
 
-Este documento registra os testes executados sobre a versão da entrega de 06/11, já com a revisão de 03/11. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. As evidências estão em [`testes/evidencias-06-11/`](../testes/evidencias-06-11/), com o nome do caso no arquivo.
+Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. As evidências da execução de 08/11 estão em [`testes/evidencias-27-11/`](../testes/evidencias-27-11/), com o nome do caso no arquivo, e as observações de cada caso, em [`casos-de-teste-27-11.json`](../testes/registros/casos-de-teste-27-11.json).
 
-A rodada anterior deste ciclo, de 01/11, e o ciclo de testes da entrega de 20/10 estão resumidos no [fim deste documento](#rodada-de-0111). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
+Os casos CT01 a CT56 vêm da entrega de 06/11 e foram executados de novo, sem mudança nos passos, sobre esta versão, no modo de demonstração; a descrição detalhada deles, abaixo, mantém o resultado observado e as evidências da execução de 06/11, em [`testes/evidencias-06-11/`](../testes/evidencias-06-11/), e o resultado de 08/11 está na visão geral e no registro. Os casos CT57 a CT68 são novos e cobrem o modo com conta, o convite, as fotos no armazenamento de arquivos, a evolução do progresso e o tutorial.
+
+Os ciclos anteriores (06/11, a rodada de 01/11 e 20/10) estão resumidos no [fim deste documento](#ciclo-de-0611). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
 
 ---
 
@@ -15,6 +17,18 @@ A rodada anterior deste ciclo, de 01/11, e o ciclo de testes da entrega de 20/10
 
 | Item | Valor |
 |---|---|
+| Data da execução | 08/11/2026, das 13h56 às 14h02 |
+| Versão testada | O código de `src/` desta entrega (Vértice 2.0.0 com o banco de dados) |
+| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67 e CT68), e com elas, para o modo com conta (CT57 a CT66). As duas versões foram servidas com `npm run preview` |
+| Banco de dados | PostgreSQL 16 local, com `06-apoio-teste-local.sql` e `04-script-criacao.sql`, zerado antes da execução. O sistema falou com ele por um servidor de teste que responde como o Supabase nas chamadas que o sistema usa (login por e-mail, consulta, inclusão, alteração e exclusão de linhas, a função do convite e o envio de arquivos), executando cada consulta no banco como a conta conectada, com as regras de acesso por linha valendo |
+| Ambiente | Node.js 22.23, npm 10.9, Chromium 153, tela de 1440 × 1000. No CT34, no CT53 e em parte do CT43, do CT46, do CT54 e do CT56, 390 × 844, tamanho de celular (no CT43, no CT46 e no CT54, também com tela de toque); no CT46, também 1024 × 900 |
+| Forma de execução | Roteiro automatizado no navegador (Playwright), seguindo os passos de cada caso; as capturas de tela são da própria execução. Do CT61 ao CT64, dois navegadores ao mesmo tempo, um para cada conta |
+| Dados | Fictícios, cadastrados durante o próprio teste. CT28 a CT30, CT34, CT37 a CT39, CT41 a CT46, CT48, CT49, CT51 a CT56, CT67 e CT68 usam os dados de exemplo do sistema; CT31, CT35, CT36 e CT50 partem de dados gravados no formato das versões anteriores. As fotos são uma imagem PNG de 640 × 480, uma imagem de 400 × 300 dividida em cores, para conferir o recorte, e uma foto de celular de 4000 × 3000, com 4,9 MB |
+| Rede | O ambiente de teste não acessa a internet. As respostas da BrasilAPI foram simuladas com a relação de feriados nacionais de 2026 e 2027, no formato do serviço; a Nager.Date ficou indisponível o tempo todo. O CT27 derruba também a BrasilAPI, para verificar as alternativas locais. O login com o Google e o projeto real do Supabase não foram usados (ver [o que não foi testado](#o-que-não-foi-testado-nesta-entrega)) |
+
+Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte do estado deixado pelo anterior. CT28 a CT30 seguem um segundo cenário, com os dados de exemplo, CT37 e CT38 um terceiro, CT57 a CT66 um quarto, com o banco, e CT67 e CT68 um quinto. Os demais começam com o navegador limpo. Em todos os cenários, o roteiro também conferiu que o console do navegador não registrou nenhum erro, com exceção do CT27, que derruba os serviços externos de propósito. As datas de prazo dos casos são contadas a partir do dia da execução, 08/11/2026.
+
+---|---|
 | Data da execução | 06/11/2026, das 14h41 às 14h46 |
 | Versão testada | Vértice 2.0.0 com a revisão de 03/11: o código de `src/` na versão marcada pela tag `entrega-06-11-2026` |
 | Como a aplicação foi executada | `npm ci`, `npm run build` e `npm run preview`, dentro de `src/` |
@@ -33,19 +47,20 @@ Os casos CT01 a CT47 já existiam na rodada de 01/11 e foram executados de novo,
 
 | Situação | Casos |
 |---|---|
-| Aprovado | 56 |
+| Aprovado | 68 |
 | Reprovado | 0 |
-| **Total executado** | **56** |
+| **Total executado** | **68** |
 
 Além dos casos de teste, foram executadas as verificações automatizadas do projeto:
 
 | Verificação | Comando | Resultado | Registro |
 |---|---|---|---|
-| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto e avatares | `npm run verificar` | 221 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
+| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto, avatares, gravação no banco e evolução do progresso | `npm run verificar` | 240 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
+| Regras do banco: acesso por grupo e por perfil, último organizador, status só pelo responsável, eventos, convite, histórico, exclusões em cascata e pasta das fotos | `05-verificacoes.sql` num PostgreSQL local | 40 conferências, todas passaram | [`verificacoes-banco.txt`](../testes/registros/verificacoes-banco.txt) |
 | Instalação e geração da versão de produção | `npm ci` e `npm run build` | Concluído sem erro, sem vulnerabilidades nas dependências | [`build.txt`](../testes/registros/build.txt) |
-| Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-06-11.json`](../testes/registros/casos-de-teste-06-11.json) |
+| Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-27-11.json`](../testes/registros/casos-de-teste-27-11.json) |
 
-Os defeitos do ciclo de 20/10 foram corrigidos e testados de novo neste ciclo; a relação de cada defeito com o seu novo teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
+Os defeitos D11 a D13, encontrados nas primeiras execuções deste ciclo, foram corrigidos antes da execução registrada aqui; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
 
 ---
 
@@ -109,6 +124,18 @@ Os defeitos do ciclo de 20/10 foram corrigidos e testados de novo neste ciclo; a
 | CT54 | RF26, RNF06 | Página inicial com movimento: aparece ao rolar, segue o mouse, demonstra no hover e respeita "reduzir movimento" | Aprovado |
 | CT55 | RNF06 | Textos sem travessão em nenhuma tela | Aprovado |
 | CT56 | RF32 | Feedback: seção na página inicial, link no topo e no rodapé, e item no menu da conta | Aprovado |
+| CT57 | RF27, RF20, RNF03 | Sem conta: a tela de acesso pede login ou demonstração | Aprovado |
+| CT58 | RF27, RF01, RN07 | Criar conta e criar grupo: o grupo e o organizador vão para o banco | Aprovado |
+| CT59 | RNF02, RF12, RF17, RN23 | Disciplina, atividade e conclusão vão para o banco e voltam depois de recarregar | Aprovado |
+| CT60 | RF28, RN22 | Convite: o organizador gera código e link | Aprovado |
+| CT61 | RF28, RF27, RN22 | Convite pelo link: quem não tem conta cria e cai direto no grupo | Aprovado |
+| CT62 | RF28, RN22, RNF03 | Código digitado e código inválido | Aprovado |
+| CT63 | RNF02, RN01 | O que um faz, o outro vê ao voltar para a aba | Aprovado |
+| CT64 | RNF02, RNF11, RN20 | Recusa do banco: alteração em algo que já não existe avisa e recarrega | Aprovado |
+| CT65 | RF09, RF20, RF27 | Sair da conta e demonstração | Aprovado |
+| CT66 | RF24, RN19, RNF11 | Foto de perfil vai para o Storage e o banco guarda o endereço | Aprovado |
+| CT67 | RF33 | Tutorial opcional: convite no painel, passos, atalho para a tela e menu da conta | Aprovado |
+| CT68 | RF12, RNF09 | Evolução do progresso na tela da disciplina, com a demonstração | Aprovado |
 
 ---
 
@@ -731,23 +758,168 @@ Os defeitos do ciclo de 20/10 foram corrigidos e testados de novo neste ciclo; a
 - **Situação:** Aprovado
 - **Evidência:** [CT56a.png](../testes/evidencias-06-11/CT56a.png) (seção na página inicial), [CT56b.png](../testes/evidencias-06-11/CT56b.png) (menu da conta)
 
+
+### CT57: Sem conta: a tela de acesso pede login ou demonstração
+
+- **Requisito:** RF27, RF20, RNF03
+- **Pré-condição:** navegador limpo; sistema com o banco configurado
+- **Passos:** abrir a página inicial; abrir **Entrar**; clicar em **Entrar** sem preencher; entrar com um e-mail que não tem conta; abrir `/painel` direto pelo endereço
+- **Entrada:** e-mail `ninguem@teste.com`, senha `errada1`
+- **Esperado:** a página inicial mostra "Grupo por convite" sem o aviso "Em breve"; o acesso mostra o login, o botão do Google e o atalho da demonstração; o e-mail vazio é recusado no campo; a conta inexistente é recusada; a rota privada leva ao acesso
+- **Observado:** a página inicial mostrou o cartão do convite sem "Em breve" e a pergunta "Dá para testar sem criar conta?". O acesso abriu com o título "Entre no Vértice", o botão **Continuar com o Google** e **Experimentar sem conta**. Sem e-mail, o campo mostrou "E-mail inválido."; com a conta inexistente, "E-mail ou senha incorretos.". O endereço `/painel` levou de volta a `/entrar`
+- **Situação:** Aprovado
+- **Evidência:** [CT57.png](../testes/evidencias-27-11/CT57.png)
+
+### CT58: Criar conta e criar grupo: o grupo e o organizador vão para o banco
+
+- **Requisito:** RF27, RF01, RN07
+- **Pré-condição:** CT57
+- **Passos:** escolher **Criar conta**, informar nome, e-mail e senha; na tela de acesso, criar o grupo; conferir as tabelas `grupo` e `membro` e o armazenamento do navegador
+- **Entrada:** Ana Souza, `ana@teste.com`, senha `segredo1`; grupo "Turma da Conta"
+- **Esperado:** depois de criar a conta, a tela de acesso mostra o e-mail, o campo do código de convite e o nome da conta já preenchido; o grupo e a Ana, como organizadora ligada à conta, estão no banco; nada é gravado no navegador
+- **Observado:** o campo "Seu nome" veio com "Ana Souza", o topo mostrou `ana@teste.com` e "Sair da conta", e o botão "Carregar dados de exemplo" não apareceu. No banco: o grupo "Turma da Conta" e o membro Ana Souza, organizadora, ligado à conta `ana@teste.com`. A coleção `grupos` não existia no armazenamento do navegador (defeito D12 corrigido)
+- **Situação:** Aprovado
+- **Evidência:** [CT58a.png](../testes/evidencias-27-11/CT58a.png)
+
+### CT59: Disciplina, atividade e conclusão vão para o banco e voltam depois de recarregar
+
+- **Requisito:** RNF02, RF03, RF12, RF13, RF17, RN12, RN23
+- **Pré-condição:** CT58
+- **Passos:** cadastrar a disciplina Banco de Dados; cadastrar a atividade "Modelar o diagrama ER", com prazo em 3 dias e a Ana como responsável; concluí-la; conferir as tabelas; recarregar a lista de atividades; abrir a disciplina; acrescentar no banco um registro de progresso de 3 dias antes e recarregar
+- **Entrada:** os dados acima
+- **Esperado:** a atividade fica concluída no banco, com a data de conclusão; o banco grava o progresso do dia (100%); a conquista "Primeiro Passo" fica gravada; depois de recarregar, a atividade continua lá; com um dia só, a evolução explica que a linha aparece depois; com dois dias, a linha aparece
+- **Observado:** no banco, a atividade com status `concluido` e data de conclusão preenchida, o registro de progresso de 100% do dia e a conquista em `membro_conquista` (defeito D11 corrigido). Depois de recarregar, a atividade apareceu na lista. A evolução mostrou "A linha da evolução aparece a partir do segundo dia de atividades nesta disciplina."; com o registro de 3 dias antes, mostrou a linha "de 0% para 100%"
+- **Situação:** Aprovado
+- **Evidência:** [CT59.png](../testes/evidencias-27-11/CT59.png)
+
+### CT60: Convite: o organizador gera código e link
+
+- **Requisito:** RF28, RN22
+- **Pré-condição:** CT59
+- **Passos:** em Membros, clicar em **Convidar**; conferir o código, o link e a tabela `convite`
+- **Entrada:** nenhuma
+- **Esperado:** código de 8 letras e números, sem I, O, 0 e 1; link `/convite/CODIGO`; convite gravado com validade de 7 dias
+- **Observado:** a janela mostrou um código de 8 caracteres do alfabeto do sistema e o link com o mesmo código. No banco, o convite com o código e vencimento 7 dias depois
+- **Situação:** Aprovado
+- **Evidência:** [CT60.png](../testes/evidencias-27-11/CT60.png)
+
+### CT61: Convite pelo link: quem não tem conta cria e cai direto no grupo
+
+- **Requisito:** RF28, RF27, RN22, RN07
+- **Pré-condição:** CT60; um segundo navegador, limpo
+- **Passos:** abrir o link do convite; criar a conta do Bruno; conferir os membros no banco, a lista de atividades e a tela de membros
+- **Entrada:** Bruno Lima, `bruno@teste.com`
+- **Esperado:** o link leva ao login, com o aviso do convite; depois de criar a conta, o Bruno cai no painel do grupo, como participante; ele vê a atividade da Ana e não vê o botão **Convidar**
+- **Observado:** o endereço virou `/entrar`, com "Entre para aceitar o convite do seu grupo.". Depois de criar a conta, o Bruno chegou ao painel. No banco, Ana Souza (organizadora) e Bruno Lima (participante). A lista mostrou "Modelar o diagrama ER", e Membros não mostrou **Convidar**
+- **Situação:** Aprovado
+- **Evidência:** [CT61.png](../testes/evidencias-27-11/CT61.png)
+
+### CT62: Código digitado e código inválido
+
+- **Requisito:** RF28, RN22, RNF03
+- **Pré-condição:** CT61
+- **Passos:** pelo menu da conta, **Trocar de grupo**; digitar um código que não existe e confirmar; digitar o código válido em minúsculas e confirmar
+- **Entrada:** `ABCD2345`; o código do CT60 em minúsculas
+- **Esperado:** o código inexistente é recusado no campo; o válido abre o grupo sem criar outro membro
+- **Observado:** "Código de convite inválido ou vencido." no campo. Com o código válido, o Bruno voltou ao painel do grupo, e a tabela `membro` continuou com 2 linhas
+- **Situação:** Aprovado
+- **Evidência:** registro da execução, em [`casos-de-teste-27-11.json`](../testes/registros/casos-de-teste-27-11.json)
+
+### CT63: O que um faz, o outro vê ao voltar para a aba
+
+- **Requisito:** RNF02, RN01
+- **Pré-condição:** CT62; a Ana e o Bruno com o sistema aberto, cada um no seu navegador
+- **Passos:** o Bruno abre Disciplinas; a Ana cadastra a disciplina Engenharia de Software; a aba do Bruno volta a ficar visível
+- **Entrada:** nenhuma
+- **Esperado:** a disciplina nova aparece para o Bruno sem recarregar a página
+- **Observado:** "Engenharia de Software" apareceu na lista do Bruno
+- **Situação:** Aprovado
+- **Evidência:** registro da execução
+
+### CT64: Recusa do banco: alteração em algo que já não existe avisa e recarrega
+
+- **Requisito:** RNF02, RNF11, RN20
+- **Pré-condição:** CT63; a atividade passada para o Bruno e reaberta
+- **Passos:** o Bruno abre a atividade; ela é excluída no banco; o Bruno, com a tela antiga, clica em **Concluir**
+- **Entrada:** nenhuma
+- **Esperado:** o banco não acha a linha, e a tela avisa e volta ao que está gravado
+- **Observado:** o aviso "Não foi possível salvar" com "Você não tem permissão para essa alteração."; em seguida, a tela recarregou do banco, que não tinha mais a atividade
+- **Situação:** Aprovado
+- **Evidência:** [CT64.png](../testes/evidencias-27-11/CT64.png)
+
+### CT65: Sair da conta e demonstração
+
+- **Requisito:** RF09, RF20, RF27
+- **Pré-condição:** CT64, no navegador da Ana
+- **Passos:** abrir o menu da conta e **Sair da conta**; escolher **Experimentar sem conta**; clicar em **Entrar com conta** no aviso da demonstração; entrar com o e-mail e a senha da Ana
+- **Entrada:** `ana@teste.com`, `segredo1`
+- **Esperado:** o menu mostra o e-mail; sair volta ao login; a demonstração mostra o aviso e os dados de exemplo; entrar de novo mostra o grupo da conta
+- **Observado:** o menu mostrou `ana@teste.com`. Depois de sair, o login. Na demonstração, "Modo de demonstração." e **Carregar dados de exemplo**. Depois de entrar de novo, "1 grupo na sua conta"
+- **Situação:** Aprovado
+- **Evidência:** [CT65.png](../testes/evidencias-27-11/CT65.png)
+
+### CT66: Foto de perfil vai para o Storage e o banco guarda o endereço
+
+- **Requisito:** RF24, RN19, RNF11
+- **Pré-condição:** CT65
+- **Passos:** abrir o grupo; em Membros, editar a Ana, enviar uma foto, aplicar o enquadramento e salvar; conferir o banco e o armazenamento de arquivos; recarregar a tela
+- **Entrada:** imagem PNG de 640 × 480
+- **Esperado:** a foto vai para a pasta do grupo no bucket `fotos`, e o banco guarda só o endereço; a foto aparece pelo endereço depois de recarregar
+- **Observado:** `membro.foto` com o endereço `.../storage/v1/object/public/fotos/<id do grupo>/membro-<id do membro>-<data>.jpg`, um arquivo no bucket, e a imagem de 256 pixels de largura carregada pelo endereço. Nenhum erro de página em todo o roteiro com conta (CT57 a CT66)
+- **Situação:** Aprovado
+- **Evidência:** [CT66.png](../testes/evidencias-27-11/CT66.png)
+
+### CT67: Tutorial opcional: convite no painel, passos, atalho para a tela e menu da conta
+
+- **Requisito:** RF33
+- **Pré-condição:** navegador limpo; demonstração com os dados de exemplo
+- **Passos:** no painel, clicar em **Ver tutorial**; avançar pelos seis passos; voltar um; clicar em **Abrir esta tela**; voltar ao painel; abrir **Tutorial** no menu da conta; em outro navegador, dispensar o convite
+- **Entrada:** nenhuma
+- **Esperado:** o convite aparece na primeira visita; os seis passos são Painel, Disciplinas e conteúdos, Atividades, Calendário e eventos, Membros e Conquistas; o atalho leva à tela do passo; aberto ou dispensado, o convite não volta; o menu abre o tutorial de novo
+- **Observado:** como esperado: o passo 5 levou a `/membros`, e o convite não voltou nem depois de aberto, nem depois de dispensado. Nenhum erro no console
+- **Situação:** Aprovado
+- **Evidência:** [CT67a.png](../testes/evidencias-27-11/CT67a.png) (convite no painel), [CT67b.png](../testes/evidencias-27-11/CT67b.png) (último passo)
+
+### CT68: Evolução do progresso na tela da disciplina, com a demonstração
+
+- **Requisito:** RF12, RNF09
+- **Pré-condição:** CT67
+- **Passos:** abrir a disciplina Estatística; conferir a linha, a tabela para leitor de tela e o valor ao passar o mouse
+- **Entrada:** nenhuma
+- **Esperado:** a linha vai de 0% ao progresso atual, com um ponto por dia desde o cadastro das atividades; o valor aparece em número ao passar o mouse
+- **Observado:** a linha "de 0% para 67%", 15 dias na tabela para leitor de tela e "67%" ao passar o mouse no fim da linha. Nenhum erro no console
+- **Situação:** Aprovado
+- **Evidência:** [CT68.png](../testes/evidencias-27-11/CT68.png)
+
 ---
 
 ## O que não foi testado nesta entrega
 
 | Item | Motivo |
 |---|---|
-| RF12: histórico de progresso | Ainda não implementado; previsto para 27/11 no [backlog](12-backlog.md) |
-| RF27 e RF28: acesso com conta Google ou e-mail e convite para o grupo | Previstos para 27/11, junto com o banco de dados |
+| Login com a conta Google | Depende do Google e do projeto real do Supabase, que o ambiente de teste não acessa. A conferência é feita no sistema publicado |
+| Projeto real do Supabase | Os casos com conta usaram o PostgreSQL local, com o mesmo script de criação, e um servidor de teste no lugar das chamadas do Supabase. A conferência no sistema publicado (criar conta, convite entre duas contas e foto) está nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | BrasilAPI e Nager.Date reais | O ambiente de teste não acessa a internet; as respostas foram simuladas no formato de cada serviço. A conferência com os serviços reais é feita na versão publicada na Vercel |
-| RNF05: Firefox e Edge | Executado apenas no Chromium |
+| RNF05: Firefox e Edge | Executado apenas no Chromium; a execução no Firefox e no Edge é a tarefa T51, até 26/11 |
 | Arrastar a foto com o mouse ou o dedo e o gesto de pinça no editor de foto | O roteiro moveu a foto pelo teclado e mudou o zoom pelo controle deslizante, que usam o mesmo cálculo de enquadramento. O arraste com o mouse foi conferido só durante o desenvolvimento, e a pinça precisa de um celular de verdade |
+
+---
+
+## Ciclo de 06/11
+
+Os casos CT01 a CT56 foram executados em 06/11/2026, das 14h41 às 14h46, sobre a versão marcada pela tag `entrega-06-11-2026`, e os 56 foram aprovados. As evidências estão em [`testes/evidencias-06-11/`](../testes/evidencias-06-11/) e o registro em [`casos-de-teste-06-11.json`](../testes/registros/casos-de-teste-06-11.json).
+
+| Situação | Casos |
+|---|---|
+| Aprovado | 56 |
+| Reprovado | 0 |
+| **Total executado** | **56** |
 
 ---
 
 ## Rodada de 01/11
 
-Antes da revisão de 03/11, os casos CT01 a CT47 foram executados em 01/11/2026, das 22h59 às 23h03, sobre a versão anterior do código (a que a tag `entrega-06-11-2026` marcava até então, no commit `3770bf7`), e os 47 foram aprovados. O registro daquela rodada está no histórico do repositório; os casos foram executados de novo nesta rodada, e as evidências e o registro foram substituídos pelos de 06/11.
+Antes da revisão de 03/11, os casos CT01 a CT47 foram executados em 01/11/2026, das 22h59 às 23h03, sobre a versão anterior do código (a que a tag `entrega-06-11-2026` marcava até então, no commit `3770bf7`), e os 47 foram aprovados. O registro daquela rodada está no histórico do repositório; os casos foram executados de novo em 06/11, e as evidências e o registro foram substituídos pelos daquela data.
 
 | Situação | Casos |
 |---|---|
