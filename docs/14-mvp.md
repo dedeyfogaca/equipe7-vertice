@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 06/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 08/11/2026
 
 ---
 
@@ -106,7 +106,7 @@ As 24 tarefas do 1º bimestre no [backlog](12-backlog.md) estão concluídas. As
 | T18, T19 | Progresso por conteúdo e por disciplina, por razão de pesos somados (RN08, RN14) |
 | T21 | Crédito e estorno de experiência, `peso × 10` (RN10) |
 
-As vinte e uma regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
+As vinte e três regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
 
 A **T24**, que estava parcial, foi absorvida pela nova identidade visual (T27), aplicada a todas as telas.
 
@@ -119,6 +119,31 @@ A conversão cria uma disciplina para cada nome distinto que aparecia nas ativid
 A revisão de 28/10 acrescentou um segundo passo: a atividade sem responsável passa para o organizador do grupo (RN06), e a cor de disciplina que saiu da paleta vira a equivalente (RN18). Atividade antiga cujo grupo não existe mais não é convertida nem apagada, e a pessoa é avisada uma vez.
 
 A revisão de 03/11 acrescentou o terceiro passo: cada atividade passa a guardar a sua disciplina (RN13); o conteúdo "Geral" criado automaticamente pelo primeiro passo sai, e as atividades dele ficam direto na disciplina; e o estilo de avatar que saiu da lista vira Rabisco (RN15). Nenhuma atividade é apagada.
+
+## Recorte da entrega de 27/11/2026
+
+Para 27/11 o manual pede o software funcionando e a apresentação de todos os integrantes. É a versão final: o que ficou de fora em 06/11, por depender do banco de dados, foi implementado, e o sistema passou a funcionar com conta, com os dados do grupo compartilhados entre os integrantes. Os 33 requisitos funcionais estão implementados.
+
+### O que funciona e será demonstrado
+
+| Passo da demonstração | Requisitos e regras | Testes |
+|---|---|---|
+| Criar a conta e entrar, com e-mail e senha ou com o Google | RF27, RNF11 | CT57 e CT58 |
+| Criar o grupo, que vai para o banco com quem criou como organizador | RF01, RN07 | CT58 |
+| Cadastrar disciplina e atividade, concluir e recarregar a página: tudo continua lá | RF03, RF13, RNF02 | CT59 |
+| Gerar o convite em Membros e entrar no grupo pelo link, com outra conta, num segundo navegador | RF28, RN22 | CT60 e CT61 |
+| Mostrar que o que um integrante faz aparece para o outro | RNF02 | CT63 |
+| Mostrar a evolução do progresso da disciplina | RF12, RN23 | CT59 e CT68 |
+| Trocar a foto de perfil, que vai para o armazenamento de arquivos | RF24, RN19 | CT66 |
+| Sair da conta e mostrar o modo de demonstração, com o tutorial | RF09, RF20, RF33 | CT65 e CT67 |
+
+Tudo o que foi demonstrado em 06/11 continua funcionando, agora também com conta: os casos CT01 a CT56 foram executados de novo sobre esta versão.
+
+O sistema está publicado na Vercel, e o endereço está no [README](../README.md).
+
+### O que fica fora desta versão
+
+O que o [Escopo](05-escopo.md) já deixava de fora: banco de questões e simulados, ranking entre grupos, notificações por e-mail, aplicativo nativo, exportação de relatórios e integração com sistemas acadêmicos.
 
 ## Recorte da entrega de 20/10/2026
 
@@ -176,7 +201,7 @@ O sistema está publicado na Vercel, e o endereço está no [README](../README.m
 
 ### Em desenvolvimento
 
-Na página inicial, o **grupo por convite** aparece marcado como "Em breve": ele depende do acesso com conta, previsto para 27/11. Até lá, o acesso continua sendo a escolha do grupo e de quem é a pessoa dentro dele, sem senha.
+Na página inicial, o **grupo por convite** aparecia marcado como "Em breve": ele dependia do acesso com conta, que entrou para 27/11. Desde então o aviso só aparece quando o sistema roda sem o banco configurado.
 
 ---
 

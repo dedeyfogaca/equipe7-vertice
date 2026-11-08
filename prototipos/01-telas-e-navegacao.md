@@ -1,11 +1,62 @@
 # Telas e Navegação
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 06/11/2026
+> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 08/11/2026
 
 ---
 
-Este documento reúne as telas do Vértice em dois momentos: as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+Este documento reúne as telas do Vértice em três momentos: as telas que entraram para a **entrega final de 27/11**, com o banco de dados, o acesso com conta e o convite; as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, que continuam valendo; e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+
+---
+
+## Entrega final: 27/11/2026
+
+As telas da versão 2, mais abaixo, continuam as mesmas. Para 27/11 entraram as telas do acesso com conta e do convite, a evolução do progresso na tela da disciplina e o tutorial. Em tamanho original, estão em [`telas-v2/`](telas-v2/).
+
+| Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
+|---|---|---|---|---|
+| RF27, RF20 | Entrar com e-mail e senha ou com o Google, criar conta, ou experimentar sem conta | Login | `/entrar` | Qualquer visitante |
+| RF01, RF28 | Os grupos da conta, o código de convite e a criação de grupo | Acesso com conta | `/entrar` | Qualquer estudante com conta |
+| RF28 | Gerar o código e o link do convite | Convidar | janela, em Membros | Organizador |
+| RF28 | Aceitar o convite pelo link | Login com convite | `/convite/:codigo` | Quem recebeu o convite |
+| RF12 | Evolução do progresso dia a dia | Disciplina | `/disciplina/:id` | Ambos |
+| RF33 | Tutorial em seis passos | Conheça o Vértice | janela, no Painel e no menu da conta | Ambos |
+
+#### Login
+
+![Tela de login](telas-v2/login.png)
+
+Entrar ou criar conta, com o e-mail e a senha ou com a conta Google. Ao lado, "Experimentar sem conta" abre o modo de demonstração, com os dados só no navegador e o grupo de exemplo a um clique.
+
+#### Acesso com conta
+
+![Tela de acesso com conta](telas-v2/acesso-conta.png)
+
+As mesmas duas colunas da versão 2. À esquerda, os grupos da conta e o campo do código de convite; à direita, a criação de um grupo, com o nome de quem cria já preenchido pelo nome da conta. No topo, o e-mail da conta e "Sair da conta". Não há mais "Quem é você": a conta já diz quem é a pessoa.
+
+#### Convidar
+
+![Janela do convite, com o código e o link](telas-v2/convite.png)
+
+Em Membros, o organizador aciona "Convidar". O código e o link aparecem com botões para copiar e valem por 7 dias, para quantas pessoas o usarem (RN22). O participante não vê o botão.
+
+#### Login com convite
+
+![Tela de login aberta pelo link do convite](telas-v2/convite-link.png)
+
+Quem abre o link vê o login com o aviso do convite. Depois de entrar ou criar a conta, cai direto no painel do grupo.
+
+#### Evolução do progresso
+
+![Tela da disciplina com a linha da evolução](telas-v2/evolucao.png)
+
+Abaixo da barra de progresso da disciplina, a linha mostra o percentual dia a dia, em degraus, porque o progresso muda quando uma atividade é concluída. Passar o mouse ou o dedo mostra o dia e o valor. Com menos de dois dias de atividades, a tela explica que a linha aparece depois (RF12, RN23).
+
+#### Tutorial
+
+![Tutorial, no segundo passo](telas-v2/tutorial.png)
+
+O painel convida na primeira visita, com um aviso que some ao abrir ou dispensar. São seis passos, um por seção, cada um com o atalho "Abrir esta tela". O menu da conta abre o tutorial de novo quando a pessoa quiser (RF33).
 
 ---
 
@@ -39,11 +90,11 @@ As telas abaixo são capturas do próprio sistema, carregado com os dados de exe
 
 ### Mapa de navegação
 
-![Mapa de navegação da versão 2](../diagramas/png/mapa-navegacao-v2.png)
+![Mapa de navegação](../diagramas/png/mapa-navegacao-v2.png)
 
 > Desenho-fonte: [`../diagramas/svg/mapa-navegacao-v2.svg`](../diagramas/svg/mapa-navegacao-v2.svg)
 
-As páginas públicas levam ao acesso, e o acesso leva ao Painel. Dentro da sessão, a barra do topo liga o Painel às outras seis seções, e cada seção abre as telas que dependem dela. A linha violeta de volta ao Painel é a mesma do mapa do MVP: concluir uma atividade muda o progresso, a experiência, a ofensiva e as conquistas que o Painel mostra.
+As páginas públicas levam ao acesso, e o acesso leva ao Painel. O mapa já mostra a versão final: o Entrar começa pelo login ou pela demonstração, e o link do convite também leva a ele. Dentro da sessão, a barra do topo liga o Painel às outras seis seções, e cada seção abre as telas que dependem dela. A linha violeta de volta ao Painel é a mesma do mapa do MVP: concluir uma atividade muda o progresso, a experiência, a ofensiva e as conquistas que o Painel mostra.
 
 ### As telas
 
@@ -194,7 +245,7 @@ Na tela de celular, a barra do topo vira um menu que desce do topo, e os filtros
 |---|---|
 | Seções numa barra no topo | Pedido da equipe: a barra lateral confundia. No topo ficam a marca, o grupo, as seis seções, o tema e a conta, e o conteúdo ganha a largura toda. No celular, o mesmo menu desce do topo. A barra lateral já tinha substituído o layout de três colunas, cuja coluna da direita terminava no meio da tela (D05) |
 | Marca nova do Vértice | Arte da equipe, redesenhada com o traço mais grosso para continuar legível em 24 px. Ao abrir o grupo, aparece no centro e dá um terço de volta enquanto a tela se dissolve no painel; dá uma volta rápida quando o mouse passa por cima; fica parada para quem pede menos movimento no sistema |
-| Avatares desenhados no próprio sistema, em cinco estilos | O sorteio não mudava nada onde a imagem externa era bloqueada, como na versão de demonstração. Desenhado no navegador, o avatar sempre aparece, e a pessoa escolhe entre cinco estilos |
+| Avatares desenhados no próprio sistema, em dois estilos | O sorteio não mudava nada onde a imagem externa era bloqueada, como na versão de demonstração. Desenhado no navegador, o avatar sempre aparece, e a pessoa escolhe entre dois estilos (eram cinco até 03/11) |
 | Fotos da equipe enquadradas pela cabeça | Na página inicial, o círculo cortava a cabeça; agora mostra a cabeça inteira e os ombros |
 | Cores mantidas | Pedido da professora: o ciano da marca e o violeta da gamificação continuam os mesmos |
 | Calendário como tela própria | Pedido da professora. O mês inteiro, com as entregas nas cores das disciplinas, no lugar do calendário pequeno do painel |

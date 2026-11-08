@@ -8,7 +8,7 @@
 | ID | Descrição | Categoria | Prioridade | Dependência |
 |---|---|---|---|---|
 | **RNF01** | O sistema deve ser responsivo, adaptando o layout a telas de celular, tablet e computador. | Responsividade | Alta | Nenhuma |
-| **RNF02** | O sistema deve preservar todos os dados cadastrados após o recarregamento ou fechamento da página. | Disponibilidade | Alta | Nenhuma |
+| **RNF02** | O sistema deve preservar todos os dados cadastrados após o recarregamento ou fechamento da página e, com conta, apresentar os mesmos dados do grupo em qualquer aparelho. | Disponibilidade | Alta | RF27 |
 | **RNF03** | O sistema deve apresentar mensagem de erro específica por campo sempre que um formulário for enviado com dados inválidos. | Usabilidade | Alta | RF02, RF03 |
 | **RNF04** | O sistema deve responder às ações de busca, filtro e ordenação em até 1 segundo. | Desempenho | Alta | RF04 |
 | **RNF05** | O sistema deve funcionar nas versões atuais dos navegadores Chrome, Firefox e Edge. | Compatibilidade | Média | Nenhuma |
@@ -17,6 +17,7 @@
 | **RNF08** | O sistema deve recalcular e exibir o progresso, a experiência e a ofensiva em até 1 segundo após a alteração do status de uma atividade. | Desempenho | Alta | RF10, RF15, RF16 |
 | **RNF09** | O sistema deve representar o progresso e o status com valor textual ou numérico além da cor, permitindo a leitura por usuários com daltonismo. | Acessibilidade | Média | RF10, RF11 |
 | **RNF10** | O sistema deve permanecer utilizável quando um serviço externo estiver indisponível, substituindo o recurso afetado por alternativa local e informando o usuário quando a substituição for perceptível. | Disponibilidade | Alta | RF07, RF21 |
+| **RNF11** | As regras de acesso aos dados (cada conta só lê e altera os grupos de que é membro, e só conforme o seu perfil) devem ser garantidas pelo banco de dados, e não apenas pelas telas, e a senha das contas nunca deve ser guardada pelo sistema. | Segurança | Alta | RF27, RN01, RN07, RN20 |
 
 ---
 

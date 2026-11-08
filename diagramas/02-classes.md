@@ -1,11 +1,11 @@
 # Diagrama de Classes
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 06/11/2026
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 08/11/2026
 
 ---
 
-O diagrama apresenta as nove classes do domínio, seus atributos principais e os relacionamentos com cardinalidade. Os losangos preenchidos indicam **composição**: a existência da parte depende do todo, o que corresponde à cascata de exclusão descrita na RN02.
+O diagrama apresenta as dez classes do domínio, seus atributos principais e os relacionamentos com cardinalidade. Os losangos preenchidos indicam **composição**: a existência da parte depende do todo, o que corresponde à cascata de exclusão descrita na RN02.
 
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Space Grotesk", "themeVariables": {"fontFamily": "Space Grotesk, Segoe UI, sans-serif", "fontSize": "14px", "primaryColor": "#F5F7FC", "primaryTextColor": "#0B1220", "primaryBorderColor": "#0891B2", "lineColor": "#5B6678", "classText": "#0B1220", "textColor": "#0B1220", "mainBkg": "#F5F7FC", "nodeBorder": "#0891B2", "edgeLabelBackground": "#FFFFFF", "titleColor": "#0E7490"}}}%%
@@ -23,6 +23,7 @@ classDiagram
 
     class Membro {
         +String id
+        +String idUsuario
         +String nome
         +String funcao
         +String email
@@ -33,6 +34,7 @@ classDiagram
         +experienciaAcumulada() Integer
         +ofensivaAtual() Integer
         +ehOrganizador() Boolean
+        +temConta() Boolean
     }
 
     class Disciplina {
@@ -92,7 +94,6 @@ classDiagram
     }
 
     class Conquista {
-        +String id
         +String codigo
         +String nome
         +String descricao
@@ -104,6 +105,16 @@ classDiagram
 
     class MembroConquista {
         +Date obtidaEm
+    }
+
+    class Convite {
+        +String id
+        +String codigo
+        +Date criadoEm
+        +Date expiraEm
+        +Boolean ativo
+        +link() String
+        +estaValido() Boolean
     }
 
     class StatusAtividade {
@@ -156,6 +167,8 @@ classDiagram
     Membro "1" --> "0..*" Atividade : responsavel por
     Membro "1" -- "0..*" MembroConquista
     Conquista "1" -- "0..*" MembroConquista
+    Grupo "1" *-- "0..*" Convite : chamado por
+    Membro "0..1" --> "0..*" Convite : gerou
 
     Atividade ..> StatusAtividade
     Atividade ..> Prioridade
@@ -172,6 +185,7 @@ classDiagram
     style ProgressoHistorico fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style Conquista fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style MembroConquista fill:#EEF7DD,stroke:#4D7C0F,stroke-width:2.5px,color:#3F6212
+    style Convite fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style StatusAtividade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style Prioridade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style PerfilUsuario fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
@@ -187,6 +201,7 @@ classDiagram
     style ProgressoHistorico fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style Conquista fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style MembroConquista fill:#EEF7DD,stroke:#4D7C0F,stroke-width:2.5px,color:#3F6212
+    style Convite fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style StatusAtividade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style Prioridade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style PerfilUsuario fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
@@ -212,6 +227,8 @@ classDiagram
 | Disciplina e Evento | 0..1 : 0..N | Um evento pode ser de uma disciplina; excluída a disciplina, o evento fica no grupo, sem disciplina (RN02) |
 | Membro e Evento | 0..1 : 0..N | O evento guarda quem o cadastrou; ele e o organizador editam e excluem (RN21) |
 | Disciplina e ProgressoHistorico | 1 : 0..N | Uma disciplina acumula vários registros de progresso ao longo do tempo (RF12) |
+| Grupo e Convite | 1 : 0..N | Um grupo tem vários convites; cada convite leva a um único grupo e vence em 7 dias (RF28, RN22) |
+| Membro e Convite | 0..1 : 0..N | O convite guarda o organizador que o gerou (RN22) |
 | Membro e Conquista | 0..N : 0..N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros. A associação é resolvida pela classe associativa **MembroConquista**, que guarda a data de obtenção (RN12) |
 
 ---
@@ -229,6 +246,8 @@ classDiagram
 **O grupo também tem foto.** `Grupo.foto` guarda a foto do grupo, enquadrada do mesmo jeito (RF29, RN19); sem ela, as telas mostram as iniciais do nome do grupo.
 
 **Evento não é atividade.** A atividade é trabalho de alguém e entra no progresso; o evento é algo que acontece num dia, sem responsável, peso nem status. `Evento.eFuturo()` decide se ele aparece em Próximos ou em Passados, e `Evento.podeEditar(Membro)` é verdadeiro para quem o cadastrou e para o organizador (RN21).
+
+**A conta fica fora do domínio.** `Membro.idUsuario` aponta para a conta de acesso, guardada pelo serviço de autenticação; vazio, o membro foi só cadastrado pelo organizador e ainda não entrou com a própria conta (`temConta()` falso). Ao usar um convite com o mesmo e-mail, a conta é ligada a esse cadastro (RN22).
 
 **Só o responsável muda o status.** `Atividade.podeMudarStatus(Membro)` só é verdadeiro para o membro responsável pela atividade (RN20): é a ele que `concluir()` e `reabrir()` são oferecidos, porque é ele quem recebe a experiência (RN10).
 

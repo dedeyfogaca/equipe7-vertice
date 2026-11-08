@@ -1,7 +1,7 @@
 # 08 · Regras de Negócio
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 06/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 08/11/2026
 
 ---
 
@@ -28,6 +28,8 @@
 | **RN19** | A foto de perfil e a foto do grupo devem ser imagens JPG, PNG ou WebP de até 8 MB. Antes de gravá-la, o sistema permite ajustar o enquadramento (posição e zoom de até 4 vezes, sem deixar área vazia na moldura) e reduz a área enquadrada para 256 × 256 pixels. Sem foto, o grupo é identificado pelas iniciais do seu nome. | Média | RF24, RF29 |
 | **RN20** | Somente o responsável por uma atividade pode alterar o seu status, o que inclui concluí-la e reabri-la; nenhum outro integrante, nem o organizador, altera o status da atividade de outra pessoa. Uma atividade cadastrada para outro integrante inicia como "a fazer". | Alta | RF03, RF05, RF15 |
 | **RN21** | Todo evento deve ter nome, tipo e dia. O horário de fim só pode ser informado junto com o de início e deve ser posterior a ele; sem horário, o evento vale para o dia todo. Qualquer integrante pode cadastrar eventos; editar e excluir um evento cabe a quem o cadastrou e ao organizador. O evento passa para a lista de passados no dia seguinte à sua data. | Média | RF31 |
+| **RN22** | Somente o organizador gera convites para o grupo. O código do convite tem 8 caracteres, entre letras maiúsculas e números, sem os que se confundem (I, O, 0 e 1), e vale por 7 dias para quantas pessoas o usarem. Quem entra pelo convite passa a ser participante; se o organizador já tinha cadastrado a pessoa com o mesmo e-mail da conta, o cadastro existente é vinculado à conta em vez de criar outro membro. Uma conta participa no máximo uma vez de cada grupo. | Alta | RF27, RF28 |
+| **RN23** | O histórico de progresso guarda um registro por disciplina por dia, com o percentual do fim desse dia, atualizado sempre que uma atividade da disciplina é cadastrada, excluída ou muda de status ou de peso. Os dias sem mudança repetem o último percentual registrado. O dia é contado no horário de Brasília. | Média | RF12 |
 
 ---
 

@@ -1,11 +1,11 @@
 # 09 · Histórico de Alterações
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 06/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 08/11/2026
 
 ---
 
-Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, as de 29/10 e 01/11/2026, com os ajustes que a equipe pediu ao revisar a versão 2, e a de 03/11/2026, com os pedidos da equipe para a entrega de 06/11. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
+Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, as de 29/10 e 01/11/2026, com os ajustes que a equipe pediu ao revisar a versão 2, a de 03/11/2026, com os pedidos da equipe para a entrega de 06/11, e a de 08/11/2026, com o banco de dados e o acesso com conta para a entrega de 27/11. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
 
 ---
 
@@ -244,11 +244,29 @@ Ao usar a versão 2 no dia a dia, a equipe pediu: só dois estilos de avatar, o 
 
 ---
 
+## 2º bimestre: revisão de 08/11/2026
+
+Com o banco de dados, o acesso com conta e o convite implementados para a entrega de 27/11, a equipe revisou os documentos para descrever o sistema como ele ficou. A equipe pediu que o sistema continuasse podendo ser conhecido sem conta e ganhasse um tutorial opcional. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 08/11/2026 | RF27, RF09 | O acesso com conta foi detalhado: e-mail e senha ou conta Google, os grupos da conta na tela de acesso e quem entrou reconhecido como o membro vinculado à conta. Sair da conta entrou junto com o encerramento da sessão do grupo | UC15 novo, UC01, classes, modelo de dados (`membro.id_usuario`) e testes (CC01, CC02 e CC09) |
+| 08/11/2026 | RF28, RN22 | O convite foi detalhado: só o organizador gera; código de 8 caracteres e link, válidos por 7 dias; quem entra fica como participante, e o cadastro feito antes pelo organizador com o mesmo e-mail é vinculado à conta | UC16 novo, modelo de dados (tabela `convite`) e testes (CC04 a CC06) |
+| 08/11/2026 | RF12, RN23 | O histórico de progresso é mostrado na tela de cada disciplina, e não no painel: uma linha por disciplina é legível, e cinco linhas juntas no painel não seriam. A regra nova define quando o banco grava o registro do dia | UC08, modelo de dados (tabela `progresso_historico`) e testes (CC03) |
+| 08/11/2026 | RF20 | A carga de dados de exemplo passou a fazer parte do modo de demonstração, em que o sistema é usado sem conta, com os dados no navegador | UC12 e testes (CC09 e a execução completa no modo de demonstração) |
+| 08/11/2026 | RF33 | Requisito novo, pedido da equipe: tutorial opcional que apresenta as telas principais, sugerido no painel e disponível no menu da conta | Testes |
+| 08/11/2026 | RNF02, RNF11 | Com conta, os dados do grupo aparecem iguais em qualquer aparelho. O requisito novo de segurança registra que as regras de acesso valem no banco, e não só nas telas | Arquitetura, script do banco e verificações do banco (`05-verificacoes.sql`) |
+| 08/11/2026 | Doc. 05 | As restrições de persistência, acesso e integração descrevem o sistema com o banco e o modo de demonstração | Nenhum |
+| 08/11/2026 | Modelo de dados | O script de criação passou a ser o do PostgreSQL do Supabase, com identificadores UUID, regras de acesso por linha, gatilhos para as regras que dependem de quem está conectado, a tabela `convite` e o espaço das fotos | Docs. do banco, diagrama de classes e arquitetura |
+| 08/11/2026 | Docs. 05 a 16, diagramas, modelo de dados e protótipos | Requisitos, regras e casos de uso novos; matriz com RF27, RF28, RF33, RN22 e RN23; tarefas T74 a T77; arquitetura com o Supabase; casos de teste do modo com conta; telas de acesso, convite, evolução e tutorial | Exigência do manual |
+
+---
+
 ## Pendência registrada
 
 | Item | Situação |
 |---|---|
-| Persistência em banco de dados relacional | A Entrega 2 apresenta o modelo conceitual, o modelo lógico e o dicionário de dados completos. A implementação da primeira versão mantém a persistência no navegador, replicando a estrutura definida no modelo lógico, conforme a restrição do Doc. 05. A troca para o banco de dados está prevista para a entrega de 27/11, no PostgreSQL do Supabase (T46 e T47). |
+| Persistência em banco de dados relacional | Resolvida para 27/11. A Entrega 2 apresentou o modelo conceitual, o modelo lógico e o dicionário de dados; até 06/11 a implementação guardava os dados no navegador, replicando a estrutura do modelo lógico. Com a T46 e a T47, os dados com conta passaram para o PostgreSQL do Supabase, e o navegador ficou só para o modo de demonstração. |
 
 ---
 

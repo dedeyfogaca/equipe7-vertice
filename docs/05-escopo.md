@@ -13,7 +13,7 @@
 - Cadastro, edição e exclusão de membros do grupo, com foto de perfil enquadrada num editor
 - Cadastro, edição e exclusão de disciplinas, com cor escolhida numa paleta
 - Cadastro, edição e exclusão de conteúdos vinculados a uma disciplina, opcionais, para quem quer separar a disciplina por assunto
-- Acesso com conta Google ou e-mail e entrada no grupo por convite, com link e código
+- Acesso com conta Google ou com e-mail e senha, e entrada no grupo por convite, com link e código
 
 **Atividades**
 
@@ -33,7 +33,7 @@
 - Painel com totais por status, atividades atrasadas, próximas entregas e próximos feriados nacionais
 - Calendário do mês, da semana ou em lista, com as entregas e os eventos de cada dia, nas cores das disciplinas, e transição animada entre os meses
 - Cálculo e exibição do progresso por conteúdo e por disciplina
-- Registro e visualização do histórico de progresso ao longo do tempo
+- Registro do histórico de progresso de cada disciplina e linha da evolução dia a dia
 - Pontos de experiência atribuídos por atividade concluída, proporcionais ao peso
 - Ofensiva de dias consecutivos com pelo menos uma atividade concluída
 - Conquistas concedidas ao atingir marcos de progresso e de constância
@@ -46,7 +46,8 @@
 - Foto de perfil enviada pelo membro ou avatar sorteado e trocável, em dois estilos de desenho
 - Páginas públicas de apresentação: início, com elementos que reagem à rolagem e ao mouse, e sobre a equipe
 - Formulário anônimo de feedback para os usuários de teste, aberto pela página inicial e pelo menu da conta
-- Carga de dados de exemplo para conhecer o sistema sem cadastrar nada
+- Modo de demonstração sem conta, com carga de dados de exemplo para conhecer o sistema sem cadastrar nada
+- Tutorial opcional que apresenta as telas principais
 
 ---
 
@@ -68,9 +69,9 @@
 | **Prazo** | O planejamento e os protótipos foram concluídos no 1º bimestre, em 25/09/2026. No 2º bimestre, o sistema precisa estar parcialmente funcional em 06/11/2026 e concluído em 27/11/2026 |
 | **Equipe** | Dois integrantes, ambos conciliando o projeto com as demais disciplinas do curso |
 | **Tecnologia** | Interface em React 18 com Vite, Tailwind CSS e Radix UI; banco PostgreSQL no Supabase e hospedagem na Vercel |
-| **Persistência** | Até a entrega de 06/11/2026 os dados ficam no navegador do usuário, seguindo a estrutura definida no modelo lógico do banco de dados. Isso restringe o acesso ao dispositivo utilizado e impede o compartilhamento automático entre integrantes. Para a entrega final, os dados passam para o banco PostgreSQL do Supabase, e as fotos de perfil e dos grupos para o armazenamento de arquivos dele |
-| **Acesso** | Até a entrega de 06/11/2026 o acesso ocorre pela seleção do grupo, sem autenticação; a identificação do perfil depende da escolha do próprio usuário. Para a entrega final, o acesso passa a ser pela conta Google ou por e-mail, e o perfil fica vinculado à conta |
-| **Integração** | O sistema depende de dois serviços externos gratuitos, sujeitos a indisponibilidade: **BrasilAPI** e **Nager.Date**, para os feriados nacionais. Nenhum deles tem contrato de nível de serviço, e por isso há alternativa local prevista (RNF10, RN17). Os avatares são desenhados pelo próprio sistema, com a biblioteca da **DiceBear**, e as fontes tipográficas são servidas junto com o sistema: nenhum dos dois depende de serviço externo. Na entrega final entram o **Supabase** (banco, autenticação e arquivos) e o login do **Google** |
+| **Persistência** | Com conta, os dados ficam no banco PostgreSQL do Supabase e as fotos de perfil e dos grupos no armazenamento de arquivos dele, e o grupo inteiro vê os mesmos dados. No modo de demonstração, sem conta, os dados ficam só no navegador do usuário, seguindo a mesma estrutura, e não são compartilhados. Até a entrega de 06/11/2026 esse era o único modo |
+| **Acesso** | O acesso é pela conta Google ou por e-mail e senha, e o perfil fica vinculado à conta. No modo de demonstração continua a seleção do grupo, sem autenticação, e a identificação do perfil depende da escolha do próprio usuário |
+| **Integração** | O sistema depende de dois serviços externos gratuitos, sujeitos a indisponibilidade: **BrasilAPI** e **Nager.Date**, para os feriados nacionais. Nenhum deles tem contrato de nível de serviço, e por isso há alternativa local prevista (RNF10, RN17). Os avatares são desenhados pelo próprio sistema, com a biblioteca da **DiceBear**, e as fontes tipográficas são servidas junto com o sistema: nenhum dos dois depende de serviço externo. O **Supabase** (banco, autenticação e arquivos) e o login do **Google** são serviços externos também; sem eles, o modo com conta fica indisponível, e o de demonstração continua funcionando |
 
 ---
 

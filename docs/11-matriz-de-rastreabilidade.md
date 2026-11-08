@@ -1,7 +1,7 @@
 # 11 · Matriz de Rastreabilidade
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 06/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 08/11/2026
 
 ---
 
@@ -21,10 +21,10 @@ A matriz demonstra que os artefatos não foram produzidos separadamente. Cada li
 | **RF06**: Painel com totais, atrasadas e próximas entregas | UC08 · Acompanhar progresso | atividade | Painel | Sim |
 | **RF07**: Sinalizar prazo em feriado nacional | UC06 · Consultar atividades / UC08 · Acompanhar progresso / UC13 · Consultar calendário | atividade *(atores externos: BrasilAPI e Nager.Date)* | Painel, Atividades e Calendário | Não |
 | **RF08**: Alternar tema claro e escuro | UC10 · Alternar tema | *nenhuma; preferência local do dispositivo* | Barra do topo, menu das páginas públicas e tela de acesso | Sim |
-| **RF09**: Encerrar a sessão do grupo | UC11 · Encerrar sessão | grupo | Menu da conta, na barra do topo, em todas as telas | Sim |
+| **RF09**: Encerrar a sessão do grupo e sair da conta | UC11 · Encerrar sessão / UC15 · Entrar com conta | grupo, membro | Menu da conta, na barra do topo, em todas as telas, e tela de acesso | Sim |
 | **RF10**: Calcular e exibir progresso do conteúdo | UC08 · Acompanhar progresso | conteudo, atividade | Disciplinas e Painel | Sim |
 | **RF11**: Barra de progresso por disciplina | UC08 · Acompanhar progresso | disciplina, atividade | Painel | Sim |
-| **RF12**: Registrar e exibir histórico de progresso | UC07 · Concluir atividade / UC08 · Acompanhar progresso | progresso_historico, disciplina | Painel | Não |
+| **RF12**: Registrar e exibir histórico de progresso | UC07 · Concluir atividade / UC08 · Acompanhar progresso | progresso_historico, disciplina, atividade | Detalhe da disciplina | Não |
 | **RF13**: Gerenciar disciplinas | UC03 · Gerenciar disciplinas | grupo, disciplina | Disciplinas | Sim |
 | **RF14**: Gerenciar conteúdos | UC04 · Gerenciar conteúdos | disciplina, conteudo | Disciplinas, seção de conteúdos | Sim |
 | **RF15**: Atribuir experiência por atividade concluída | UC07 · Concluir atividade | atividade, membro | Detalhe da atividade e Conquistas | Sim |
@@ -39,14 +39,15 @@ A matriz demonstra que os artefatos não foram produzidos separadamente. Cada li
 | **RF24**: Foto de perfil do membro | UC02 · Gerenciar membros | membro | Membros | Não |
 | **RF25**: Paleta de cores das disciplinas | UC03 · Gerenciar disciplinas | disciplina | Disciplinas | Não |
 | **RF26**: Páginas públicas de apresentação | UC01 · Gerenciar grupo de estudo | *nenhuma; conteúdo fixo de apresentação* | Início e Sobre nós | Não |
-| **RF27**: Acesso com conta Google ou e-mail | UC01 · Gerenciar grupo de estudo | membro, com a conta de acesso a definir no banco | Acesso | Não |
-| **RF28**: Convite para o grupo por link ou código | UC02 · Gerenciar membros | grupo, membro, com o convite a definir no banco | Membros e Acesso | Não |
+| **RF27**: Acesso com conta Google ou e-mail | UC15 · Entrar com conta / UC01 · Gerenciar grupo de estudo | membro (`id_usuario`), conta do Supabase Auth | Login e Acesso | Não |
+| **RF28**: Convite para o grupo por link ou código | UC16 · Convidar para o grupo | convite, grupo, membro | Membros (Convidar), Acesso (código) e link do convite | Não |
 | **RF29**: Foto do grupo | UC01 · Gerenciar grupo de estudo | grupo | Acesso e Editar grupo | Não |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | UC05 · Cadastrar atividade | conteudo, disciplina | Formulário de atividade | Não |
 | **RF31**: Eventos do grupo | UC14 · Gerenciar eventos / UC13 · Consultar calendário | evento, grupo, disciplina, membro | Eventos, Painel e Calendário | Não |
 | **RF32**: Formulário de feedback dos usuários de teste | UC01 · Gerenciar grupo de estudo | *nenhuma; o formulário é externo* | Início, rodapé das páginas públicas e menu da conta | Não |
+| **RF33**: Tutorial opcional | UC12 · Carregar dados de exemplo | *nenhuma; a escolha de ter visto o tutorial é do dispositivo* | Painel (convite) e menu da conta | Não |
 
-Os trinta e dois requisitos funcionais possuem caso de uso e tela. Quatro não possuem entidade de dados, e nos quatro o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF32 as respostas ficam no formulário externo, anônimas, fora do sistema. A conta de acesso do RF27 e o convite do RF28 entram no modelo de dados junto com o banco, na entrega de 27/11.
+Os trinta e três requisitos funcionais possuem caso de uso e tela. Cinco não possuem entidade de dados, e nos cinco o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF32 as respostas ficam no formulário externo, anônimas, fora do sistema; no RF33 o tutorial tem conteúdo fixo, e ter visto ou não é preferência do dispositivo. A conta do RF27 fica no serviço de autenticação do Supabase, e o membro aponta para ela pelo `id_usuario`.
 
 ---
 
@@ -54,13 +55,13 @@ Os trinta e dois requisitos funcionais possuem caso de uso e tela. Quatro não p
 
 | Regra | Onde é aplicada | Artefato que a representa |
 |---|---|---|
-| **RN01**: isolamento por grupo | Consultas de todas as telas privadas | Modelo lógico: encadeamento das chaves estrangeiras até `grupo` |
+| **RN01**: isolamento por grupo | Consultas de todas as telas privadas | Modelo lógico: encadeamento das chaves estrangeiras até `grupo`; regras de acesso por linha no script do banco (função `eh_membro`) |
 | **RN02**: exclusão em cascata e troca de responsável | UC01, UC02, UC03, UC14 | Modelo lógico: `ON DELETE CASCADE`, `ON DELETE SET NULL` em `atividade.id_conteudo` e `evento.id_disciplina`, e `ON DELETE RESTRICT` em `atividade.id_responsavel` |
 | **RN03**: responsável do mesmo grupo | UC05, passo 5B | Validação na aplicação, registrada no modelo lógico |
 | **RN04**: status válido e padrão | UC05, passos 2 e 7 | Modelo lógico: `CHECK` e valor padrão em `atividade.status` |
 | **RN05**: atividade atrasada | UC08, passo 2 | Consulta de referência no script de criação |
 | **RN06**: título, disciplina, prazo e responsável obrigatórios | UC05, passo 6 | Modelo lógico: `NOT NULL` e `CHECK` de comprimento |
-| **RN07**: permissões do organizador e organizador do grupo | UC01, UC02, UC03, UC04; UC05, fluxos 4A e 1C | Modelo lógico: `CHECK` em `membro.perfil` |
+| **RN07**: permissões do organizador e organizador do grupo | UC01, UC02, UC03, UC04, UC16; UC05, fluxos 4A e 1C | Modelo lógico: `CHECK` em `membro.perfil`; regras de acesso por linha (função `eh_organizador`) e gatilho `conferir_membro` (último organizador) |
 | **RN08**: progresso do conteúdo | UC07, passo 5; UC08, passo 3 | Diagrama de atividades "Concluir atividade" e consulta de referência |
 | **RN09**: faixa e padrão do peso | UC05, passos 2 e 7 | Modelo lógico: `CHECK (peso BETWEEN 1 AND 5)` |
 | **RN10**: crédito e estorno da experiência | UC07, passo 4 e fluxo alternativo 2A | Diagrama de atividades "Concluir atividade", incluindo o fluxo de reversão |
@@ -74,7 +75,9 @@ Os trinta e dois requisitos funcionais possuem caso de uso e tela. Quatro não p
 | **RN18**: cor da paleta | UC03, passo 4 | Campo `disciplina.cor` no dicionário de dados |
 | **RN19**: formato, tamanho e enquadramento das fotos | UC01, passo 5 e fluxo 3C; UC02, passo 5 e fluxos 5B e 5C | Campos `membro.foto` e `grupo.foto` no dicionário de dados |
 | **RN21**: dados e permissões do evento | UC14, passo 6 e fluxo 3A | Modelo lógico: `NOT NULL` em `evento.titulo`, `evento.tipo` e `evento.data_evento`, `CHECK` em `evento.tipo` e no horário, e `evento.id_criador` |
-| **RN20**: só o responsável muda o status | UC05, fluxo 5D; UC07, pré-condição e fluxo 1A | Diagramas de atividades "Concluir atividade" e "Cadastrar atividade"; método `Atividade.podeMudarStatus` no diagrama de classes |
+| **RN20**: só o responsável muda o status | UC05, fluxo 5D; UC07, pré-condição e fluxo 1A | Diagramas de atividades "Concluir atividade" e "Cadastrar atividade"; método `Atividade.podeMudarStatus` no diagrama de classes; gatilho `conferir_atividade` no banco |
+| **RN22**: convite | UC16, passos 2 e 7 e fluxos 7A a 7C | Tabela `convite` e função `entrar_com_codigo` no script do banco |
+| **RN23**: registro diário do progresso | UC08, passo 9 | Tabela `progresso_historico` e gatilho `registrar_progresso` no script do banco |
 
 ---
 
@@ -83,7 +86,7 @@ Os trinta e dois requisitos funcionais possuem caso de uso e tela. Quatro não p
 | Requisito | Onde é verificado |
 |---|---|
 | **RNF01**: responsividade | Todas as telas, em larguras de celular, tablet e computador |
-| **RNF02**: persistência entre sessões | Recarregar a página após qualquer cadastro |
+| **RNF02**: persistência entre sessões | Recarregar a página após qualquer cadastro; com conta, abrir o grupo em outro navegador |
 | **RNF03**: mensagem de erro por campo | UC01 fluxo 6A, UC03 fluxo 5A, UC05 fluxo 6A |
 | **RNF04**: resposta em até 1 segundo na busca | UC06 |
 | **RNF05**: compatibilidade entre navegadores | Chrome, Firefox e Edge |
@@ -91,19 +94,20 @@ Os trinta e dois requisitos funcionais possuem caso de uso e tela. Quatro não p
 | **RNF07**: mensagem em listagem vazia | UC01 fluxo 2A, UC03 fluxo 2A, UC08 fluxo 2A, UC09 fluxo 1A, UC13 fluxo 2A |
 | **RNF08**: recálculo em até 1 segundo | UC07, pós-condições |
 | **RNF09**: progresso legível sem depender da cor | UC08, passo 5: percentual exibido em número junto à barra |
-| **RNF10**: degradação com serviço externo fora do ar | UC02 fluxo 4A (avatar vira iniciais), UC08 fluxos 4A e 4B (fonte reserva e reaproveitamento) |
+| **RNF10**: degradação com serviço externo fora do ar | UC02 fluxo 4A (avatar vira iniciais), UC08 fluxos 4A e 4B (fonte reserva e reaproveitamento), UC15 fluxo 4C (sem conexão com o servidor) |
+| **RNF11**: segurança no banco | UC15, pós-condições; UC16, fluxo 1A; verificações do banco (`banco-de-dados/05-verificacoes.sql`) |
 
 ---
 
 ## Implementação e testes
 
-Atualizado em 06/11/2026, sobre a versão da entrega de 06/11 (tag `entrega-06-11-2026`). Os caminhos são relativos a `src/src/`. Os testes estão em [Casos de Teste](15-casos-de-teste.md) e os defeitos em [Defeitos e Pendências](16-defeitos-e-pendencias.md).
+Atualizado em 08/11/2026, sobre a versão da entrega de 27/11 (tag `entrega-27-11-2026`). Os caminhos são relativos a `src/src/`. Os testes estão em [Casos de Teste](15-casos-de-teste.md) e os defeitos em [Defeitos e Pendências](16-defeitos-e-pendencias.md).
 
 ### Requisitos funcionais
 
 | Requisito | Implementação | Teste | Estado atual |
 |---|---|---|---|
-| **RF01**: Criar, editar, selecionar e excluir grupos | `pages/publicas/Entrar.jsx`, `pages/Membros.jsx`, `components/layout/AppShell.jsx`, `components/grupos/FormGrupo.jsx`, `context/AuthContext.jsx`, `context/DataContext.jsx` | CT01, CT02, CT38, CT40, CT53 | Implementado e testado |
+| **RF01**: Criar, editar, selecionar e excluir grupos | `pages/publicas/Entrar.jsx`, `pages/Membros.jsx`, `components/layout/AppShell.jsx`, `components/grupos/FormGrupo.jsx`, `context/AuthContext.jsx`, `context/DataContext.jsx`, `lib/remoto.js` | CT01, CT02, CT38, CT40, CT53, CT58 | Implementado e testado |
 | **RF02**: Gerenciar membros | `pages/Membros.jsx`, `components/membros/FormMembro.jsx`, `lib/validacao.js` | CT03, CT04, CT21, CT22, CT23, CT31 | Implementado e testado |
 | **RF03**: Cadastrar, editar e excluir atividades | `pages/AtividadeForm.jsx`, `pages/AtividadeDetalhe.jsx`, `components/ui/campo-data.jsx`, `components/ui/selecao.jsx`, `lib/validacao.js` | CT09, CT10, CT17, CT21, CT37, CT44, CT48 | Implementado e testado |
 | **RF04**: Listar com busca, filtros e ordenação | `pages/Atividades.jsx`, `components/ui/selecao.jsx`, `components/opcoes.jsx`, `components/atividades/CartoesSituacao.jsx`, `lib/situacoes.js` | CT13 | Implementado e testado |
@@ -111,10 +115,10 @@ Atualizado em 06/11/2026, sobre a versão da entrega de 06/11 (tag `entrega-06-1
 | **RF06**: Painel com totais, atrasadas e próximas entregas | `pages/Painel.jsx`, `lib/situacoes.js` | CT14 | Implementado e testado |
 | **RF07**: Sinalizar prazo em feriado nacional | `lib/feriados.js`, `hooks/useFeriados.js`, `pages/AtividadeForm.jsx`, `pages/AtividadeDetalhe.jsx`, `pages/Painel.jsx` | CT27, CT29 | Implementado e testado, com a BrasilAPI simulada |
 | **RF08**: Alternar tema claro e escuro | `context/TemaContext.jsx`, `components/BotaoTema.jsx`, `components/layout/AppShell.jsx`, `components/layout/LayoutPublico.jsx`, `index.css` | CT25 | Implementado e testado |
-| **RF09**: Encerrar a sessão do grupo | `components/layout/AppShell.jsx`, `routes/ProtectedRoute.jsx` | CT24 | Implementado e testado |
+| **RF09**: Encerrar a sessão do grupo e sair da conta | `components/layout/AppShell.jsx`, `routes/ProtectedRoute.jsx`, `context/ContaContext.jsx` | CT24, CT65 | Implementado e testado |
 | **RF10**: Progresso do conteúdo | `lib/progresso.js`, `pages/DisciplinaDetalhe.jsx` | CT11, CT12, CT37, CT48; `verificacoes/progresso.js` | Implementado e testado |
 | **RF11**: Progresso por disciplina | `lib/progresso.js`, `pages/Disciplinas.jsx`, `pages/Painel.jsx` | CT11, CT14, CT37, CT48, CT50; `verificacoes/progresso.js` | Implementado e testado |
-| **RF12**: Histórico de progresso | Ainda não | Ainda não | Planejado para 27/11 (T35) |
+| **RF12**: Histórico de progresso | `lib/historico.js`, `components/disciplinas/HistoricoProgresso.jsx`, `components/disciplinas/GraficoProgresso.jsx`; gatilho `registrar_progresso` no banco | CT59, CT68; `verificacoes/banco.js`, `05-verificacoes.sql` | Implementado e testado |
 | **RF13**: Gerenciar disciplinas | `pages/Disciplinas.jsx`, `components/disciplinas/FormDisciplina.jsx`, `lib/validacao.js` | CT06, CT07, CT26 | Implementado e testado |
 | **RF14**: Gerenciar conteúdos | `pages/DisciplinaDetalhe.jsx`, `components/disciplinas/FormConteudo.jsx`, `lib/validacao.js` | CT08, CT49 | Implementado e testado |
 | **RF15**: Experiência por atividade concluída | `lib/gamificacao.js`, `components/atividades/RetornoConclusao.jsx` | CT11, CT12; `verificacoes/gamificacao.js` | Implementado e testado |
@@ -122,34 +126,36 @@ Atualizado em 06/11/2026, sobre a versão da entrega de 06/11 (tag `entrega-06-1
 | **RF17**: Conquistas | `lib/gamificacao.js`, `context/DataContext.jsx`, `pages/Conquistas.jsx` | CT11, CT12, CT18; `verificacoes/conquistas.js` | Implementado e testado |
 | **RF18**: Painel de desempenho do grupo | `pages/Conquistas.jsx` | CT18 | Implementado e testado |
 | **RF19**: Avatar do membro | `lib/avatar.js`, `components/ui/avatar-membro.jsx`, `components/membros/FormMembro.jsx`, `components/membros/SeletorAvatar.jsx`, `lib/migracao.js` | CT05, CT27, CT47, CT50; `verificacoes/avatar.js` | Implementado e testado |
-| **RF20**: Carregar dados de exemplo | `lib/seed.js`, `pages/publicas/Entrar.jsx` | CT28 | Implementado e testado |
+| **RF20**: Demonstração e dados de exemplo | `lib/seed.js`, `pages/publicas/Entrar.jsx`, `components/conta/PainelLogin.jsx`, `context/ContaContext.jsx` | CT28, CT65 | Implementado e testado |
 | **RF21**: Próximos feriados nacionais | `components/ProximosFeriados.jsx`, `pages/Painel.jsx`, `lib/feriados.js` | CT27, CT29 | Implementado e testado, com a BrasilAPI simulada |
 | **RF22**: Sinalizar prazo em fim de semana | `lib/datas.js`, `pages/AtividadeForm.jsx`, `pages/AtividadeDetalhe.jsx` | CT30 | Implementado e testado |
 | **RF23**: Calendário | `pages/Calendario.jsx`, `index.css` | CT15, CT16, CT17, CT29, CT43, CT52 | Implementado e testado |
-| **RF24**: Foto de perfil | `lib/foto.js`, `components/ui/editor-foto.jsx`, `components/membros/FormMembro.jsx`, `components/ui/avatar-membro.jsx` | CT04, CT05, CT19, CT39; `verificacoes/foto.js` | Implementado e testado |
+| **RF24**: Foto de perfil | `lib/foto.js`, `lib/fotosRemotas.js`, `components/ui/editor-foto.jsx`, `components/membros/FormMembro.jsx`, `components/ui/avatar-membro.jsx` | CT04, CT05, CT19, CT39, CT66; `verificacoes/foto.js`, `verificacoes/banco.js` | Implementado e testado |
 | **RF25**: Paleta de cores das disciplinas | `lib/constants.js`, `components/disciplinas/SeletorCor.jsx` | CT06, CT35 | Implementado e testado |
 | **RF26**: Páginas públicas | `pages/publicas/Inicio.jsx`, `pages/publicas/Sobre.jsx`, `components/layout/LayoutPublico.jsx`, `components/publicas/movimento.jsx`, `index.css` | CT25, CT33, CT54 | Implementado e testado |
-| **RF27**: Acesso com conta Google ou e-mail | Ainda não | Ainda não | Planejado para 27/11 (T48) |
-| **RF28**: Convite para o grupo | Ainda não | Ainda não | Planejado para 27/11 (T49) |
+| **RF27**: Acesso com conta Google ou e-mail | `context/ContaContext.jsx`, `components/conta/PainelLogin.jsx`, `pages/publicas/Entrar.jsx`, `context/AuthContext.jsx`, `lib/supabase.js` | CT57, CT58, CT65 | Implementado e testado com e-mail e senha; o login com Google é conferido no sistema publicado |
+| **RF28**: Convite para o grupo | `lib/convite.js`, `components/membros/DialogoConvite.jsx`, `components/conta/EntrarComCodigo.jsx`, `pages/publicas/Convite.jsx`; função `entrar_com_codigo` no banco | CT60, CT61, CT62; `05-verificacoes.sql` | Implementado e testado |
 | **RF29**: Foto do grupo | `components/ui/avatar-grupo.jsx`, `components/ui/editor-foto.jsx`, `components/grupos/FormGrupo.jsx`, `pages/publicas/Entrar.jsx` | CT40 | Implementado e testado |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | `pages/AtividadeForm.jsx`, `components/disciplinas/FormConteudo.jsx` | CT41 | Implementado e testado |
 | **RF31**: Eventos do grupo | `pages/Eventos.jsx`, `components/eventos/`, `pages/Calendario.jsx`, `pages/Painel.jsx`, `context/DataContext.jsx`, `lib/validacao.js`, `lib/permissoes.js` | CT51, CT52; `verificacoes/atividades.js`, `verificacoes/permissoes.js` | Implementado e testado |
 | **RF32**: Formulário de feedback | `lib/feedback.js`, `components/feedback/SecaoFeedback.jsx`, `components/layout/LayoutPublico.jsx`, `components/layout/AppShell.jsx` | CT56 | Implementado e testado |
+| **RF33**: Tutorial opcional | `components/tutorial/Tutorial.jsx`, `pages/Painel.jsx`, `components/layout/AppShell.jsx` | CT67 | Implementado e testado |
 
-**Resumo:** 29 requisitos funcionais implementados e testados; 3 planejados para 27/11 (RF12, RF27 e RF28).
+**Resumo:** os 33 requisitos funcionais estão implementados e testados.
 
 ### Requisitos não funcionais verificados nesta entrega
 
 | Requisito | Implementação | Teste | Estado atual |
 |---|---|---|---|
 | **RNF01**: responsividade | Classes responsivas em todas as telas; `components/layout/AppShell.jsx` | CT34, CT43 | Implementado e testado |
-| **RNF02**: persistência entre sessões | `lib/storage.js`, `context/DataContext.jsx`, `lib/migracao.js` | CT19, CT32, CT35, CT36, CT50 | Implementado e testado |
+| **RNF02**: persistência entre sessões | `lib/remoto.js`, `context/DataContext.jsx`, `lib/storage.js`, `lib/migracao.js` | CT19, CT32, CT35, CT36, CT50, CT59, CT63, CT64 | Implementado e testado |
 | **RNF03**: mensagem de erro por campo | `lib/validacao.js`, `components/ui/campos.jsx` | CT01, CT03, CT05, CT07, CT09, CT44, CT51 | Implementado e testado |
 | **RNF05**: compatibilidade entre navegadores | Ainda não | Executado no Chromium | Firefox e Edge pendentes (T51) |
 | **RNF06**: padronização visual e menos movimento | `index.css`, `components/ui/`, `components/publicas/movimento.jsx` | CT45, CT46, CT54, CT55 | Implementado e testado |
 | **RNF07**: mensagem em listagem vazia | `components/ui/basicos.jsx` | CT02 | Implementado e testado |
 | **RNF09**: progresso legível sem depender da cor | `components/ui/progresso.jsx` | CT11, CT14 | Implementado e testado |
 | **RNF10**: serviço externo fora do ar | `lib/feriados.js`, `components/ui/avatar-membro.jsx` | CT27 | Implementado e testado |
+| **RNF11**: segurança no banco | `banco-de-dados/04-script-criacao.sql` (regras de acesso por linha e gatilhos) | CT64, CT66; 40 conferências em `05-verificacoes.sql` | Implementado e testado |
 
 ---
 
@@ -157,9 +163,9 @@ Atualizado em 06/11/2026, sobre a versão da entrega de 06/11 (tag `entrega-06-1
 
 - Todo caso de uso tem origem em pelo menos um requisito funcional.
 - Todo requisito funcional aparece em pelo menos um caso de uso e em pelo menos uma tela.
-- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31).
-- Todo serviço externo consumido pelo sistema está representado como ator secundário no diagrama de casos de uso e tem comportamento previsto para a sua indisponibilidade: BrasilAPI e Nager.Date (RN17). A DiceBear deixou de ser serviço externo em 01/11/2026: os avatares passaram a ser desenhados pelo próprio sistema (RN15).
-- Nenhuma tela apresenta funcionalidade que não esteja documentada como requisito. Esta verificação foi refeita em 17/09/2026, percorrendo o código tela a tela; as funcionalidades encontradas sem requisito correspondente originaram os requisitos RF19 a RF22 e as regras RN15 a RN17. Foi refeita de novo em 28/10/2026, na revisão pedida pela professora, que originou os requisitos RF23 a RF28 e as regras RN18 e RN19, em 29/10/2026, nos ajustes da versão 2, que originaram os requisitos RF29 e RF30 e a regra RN20, e em 03/11/2026, que originou os requisitos RF31 e RF32 e a regra RN21.
+- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31), `convite` (RF28).
+- Todo serviço externo consumido pelo sistema está representado como ator secundário no diagrama de casos de uso e tem comportamento previsto para a sua indisponibilidade: BrasilAPI e Nager.Date (RN17), Supabase e Google (sem eles, o modo com conta fica indisponível e o de demonstração continua, RNF10). A DiceBear deixou de ser serviço externo em 01/11/2026: os avatares passaram a ser desenhados pelo próprio sistema (RN15).
+- Nenhuma tela apresenta funcionalidade que não esteja documentada como requisito. Esta verificação foi refeita em 17/09/2026, percorrendo o código tela a tela; as funcionalidades encontradas sem requisito correspondente originaram os requisitos RF19 a RF22 e as regras RN15 a RN17. Foi refeita de novo em 28/10/2026, na revisão pedida pela professora, que originou os requisitos RF23 a RF28 e as regras RN18 e RN19, em 29/10/2026, nos ajustes da versão 2, que originaram os requisitos RF29 e RF30 e a regra RN20, em 03/11/2026, que originou os requisitos RF31 e RF32 e a regra RN21, e em 08/11/2026, com o banco e o acesso com conta, que originou o requisito RF33 e as regras RN22 e RN23.
 - Os nomes usados nos requisitos, nos casos de uso, nas classes, nas tabelas e nas telas são os mesmos: grupo, membro, disciplina, conteúdo, atividade, evento, progresso, conquista.
 - Todo requisito marcado como **Sim** na coluna do MVP tem tela prototipada em [`prototipos/`](../prototipos/01-telas-e-navegacao.md). As telas da versão 2, que cobrem também os requisitos desejáveis, estão no mesmo documento.
 - Toda tarefa de desenvolvimento do [backlog](12-backlog.md) cita o requisito que a origina; as que não citam são de organização do projeto: revisão da documentação, publicação e atualização das dependências. Não há requisito do MVP sem tarefa.

@@ -1,7 +1,7 @@
 # 12 · Backlog do Projeto
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 06/11/2026 para a entrega de 06/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 08/11/2026 para a entrega de 27/11/2026
 
 ---
 
@@ -9,22 +9,22 @@ O backlog reúne as tarefas de desenvolvimento, cada uma ligada ao requisito que
 
 Situações usadas: **A fazer**, **Em andamento** e **Concluída**.
 
-As tarefas T01 a T24 são do 1º bimestre e construíram o MVP. As tarefas a partir da T25 são do 2º bimestre. A T36 entrou depois da T35 por ter sido aberta a partir de um defeito encontrado nos testes, as tarefas T37 a T51 vieram da revisão de 28/10, com os pedidos da professora depois da entrega de 20/10, as tarefas T52 a T61, da revisão de 29/10, com os ajustes que a equipe pediu ao revisar a versão 2, as tarefas T62 a T65, da revisão de 01/11, e as tarefas T66 a T73, da revisão de 03/11; a numeração não indica ordem de execução.
+As tarefas T01 a T24 são do 1º bimestre e construíram o MVP. As tarefas a partir da T25 são do 2º bimestre. A T36 entrou depois da T35 por ter sido aberta a partir de um defeito encontrado nos testes, as tarefas T37 a T51 vieram da revisão de 28/10, com os pedidos da professora depois da entrega de 20/10, as tarefas T52 a T61, da revisão de 29/10, com os ajustes que a equipe pediu ao revisar a versão 2, as tarefas T62 a T65, da revisão de 01/11, as tarefas T66 a T73, da revisão de 03/11, e as tarefas T74 a T77, da revisão de 08/11; a numeração não indica ordem de execução.
 
 ---
 
 ## Situação geral
 
-| Situação | 1º bimestre (T01–T24) | 2º bimestre (T25–T73) | Total |
+| Situação | 1º bimestre (T01–T24) | 2º bimestre (T25–T77) | Total |
 |---|---|---|---|
-| Concluída | 24 | 41 | 65 |
-| Em andamento | 0 | 1 | 1 |
-| A fazer | 0 | 7 | 7 |
-| **Total** | **24** | **49** | **73** |
+| Concluída | 24 | 50 | 74 |
+| Em andamento | 0 | 2 | 2 |
+| A fazer | 0 | 1 | 1 |
+| **Total** | **24** | **53** | **77** |
 
-**O que estava previsto para 06/11 está implementado e testado.** As correções dos defeitos, a ofensiva, as conquistas, a tela de desempenho, a nova identidade visual, os pedidos da professora de 28/10 (responsável obrigatório, calendário, paleta de cores e foto de perfil), os ajustes de 29/10 (tema claro em todas as telas, listas e data com a identidade visual, editor de foto, foto do grupo, conteúdo criado na hora e conclusão só pelo responsável) e os da revisão de 03/11 (conteúdo opcional, eventos, avatares em dois estilos, página inicial com movimento, acesso em duas colunas e feedback dos usuários de teste) passaram nos 56 [casos de teste](15-casos-de-teste.md) desta entrega.
+**O que estava previsto para 27/11 está implementado e testado.** O banco de dados no PostgreSQL do Supabase, com as regras de acesso garantidas pelo próprio banco (T46), a troca do armazenamento do navegador pelo banco (T47), o acesso com conta (T48), o convite por link e código (T49), as fotos no armazenamento de arquivos (T50) e a evolução do progresso (T35), além do modo de demonstração sem conta (T74) e do tutorial opcional (T75), passaram nos 68 [casos de teste](15-casos-de-teste.md) desta entrega e nas verificações do banco (T76).
 
-A **T34** continua em andamento: falta o teste no Firefox e no Edge (RNF05). Para 27/11 ficam o banco de dados, o acesso com conta, o convite para o grupo, as fotos no armazenamento de arquivos e o histórico de progresso.
+A **T34** e a **T51** continuam em andamento: falta executar os casos de teste no Firefox e no Edge (RNF05). A **T77** é ler as respostas do formulário de feedback dos usuários de teste até 20/11 e registrar o que for ajustado.
 
 ---
 
@@ -164,13 +164,17 @@ A decisão da T14 foi revista em 28/10: a pedido da professora, o responsável v
 
 | ID | Tarefa | Requisito | Prioridade | Responsável | Prazo | Situação |
 |---|---|---|---|---|---|---|
-| T35 | Registrar e exibir o histórico de progresso ao longo do tempo | RF12 | Média | Matheus | 27/11/2026 | A fazer |
-| T46 | Criar o banco PostgreSQL no Supabase a partir do script do modelo lógico, com acesso restrito aos membros de cada grupo | RNF02, RN01 | Alta | Matheus | 20/11/2026 | A fazer |
-| T47 | Trocar o armazenamento do navegador pelo banco, mantendo as regras de negócio em `lib/` | RNF02 | Alta | Matheus | 20/11/2026 | A fazer |
-| T48 | Acesso com conta Google e com e-mail | RF27 | Alta | Andrey | 20/11/2026 | A fazer |
-| T49 | Convite para o grupo por link e por código de acesso | RF28 | Alta | Andrey | 24/11/2026 | A fazer |
-| T50 | Guardar as fotos de perfil e dos grupos no armazenamento de arquivos do Supabase | RF24, RF29 | Média | Andrey | 24/11/2026 | A fazer |
-| T51 | Reexecutar os casos de teste na versão final, incluindo Firefox e Edge, e registrar os resultados | RNF05 | Alta | Andrey e Matheus | 26/11/2026 | A fazer |
+| T35 | Registrar e exibir o histórico de progresso ao longo do tempo | RF12, RN23 | Média | Matheus | 27/11/2026 | Concluída |
+| T46 | Criar o banco PostgreSQL no Supabase a partir do script do modelo lógico, com acesso restrito aos membros de cada grupo | RNF02, RNF11, RN01 | Alta | Matheus | 20/11/2026 | Concluída |
+| T47 | Trocar o armazenamento do navegador pelo banco, mantendo as regras de negócio em `lib/` | RNF02 | Alta | Matheus | 20/11/2026 | Concluída |
+| T48 | Acesso com conta Google e com e-mail | RF27, RF09 | Alta | Andrey | 20/11/2026 | Concluída |
+| T49 | Convite para o grupo por link e por código de acesso | RF28, RN22 | Alta | Andrey | 24/11/2026 | Concluída |
+| T50 | Guardar as fotos de perfil e dos grupos no armazenamento de arquivos do Supabase | RF24, RF29 | Média | Andrey | 24/11/2026 | Concluída |
+| T51 | Reexecutar os casos de teste na versão final, incluindo Firefox e Edge, e registrar os resultados | RNF05 | Alta | Andrey e Matheus | 26/11/2026 | Em andamento |
+| T74 | Modo de demonstração sem conta, com o atalho na tela de login e o aviso para voltar a usar conta | RF20 | Média | Andrey | 27/11/2026 | Concluída |
+| T75 | Tutorial opcional com os seis passos, convite no painel e item no menu da conta | RF33 | Baixa | Andrey | 27/11/2026 | Concluída |
+| T76 | Verificações do banco em SQL (regras de acesso, gatilhos, convite e fotos) e da gravação no banco em `npm run verificar` | RNF11, RN01, RN07, RN20, RN22 | Alta | Matheus | 26/11/2026 | Concluída |
+| T77 | Ler as respostas do formulário de feedback dos usuários de teste e registrar o que entra nesta versão | RF32 | Média | Andrey e Matheus | 20/11/2026 | A fazer |
 
 ---
 
@@ -199,9 +203,13 @@ Uma tarefa só passa para **Concluída** quando todos os critérios abaixo forem
 | T67 | Uma atividade é criada só com a disciplina, sem conteúdo, e conta no progresso da disciplina; excluir um conteúdo deixa as atividades dele na disciplina; dados da versão 2 são migrados sem perder atividade (CT48 a CT50); há verificação automatizada da migração |
 | T68 | O evento sem nome, tipo ou dia é recusado com mensagem no campo; fim antes do início é recusado; só quem cadastrou e o organizador editam e excluem; o evento aparece na página Eventos, no painel e no calendário (CT51 e CT52) |
 | T59 | Ninguém além do responsável conclui ou muda o status, nem pela lista, nem pelo detalhe, nem pelo formulário; o participante não edita as atividades dos outros nem pelo endereço; há verificação automatizada da regra (CT42) |
-| T46 | As tabelas do modelo lógico existem no banco, e um membro só lê e altera os dados do próprio grupo |
-| T48 | Uma pessoa entra com a conta Google ou com o e-mail e é reconhecida como o membro do grupo vinculado a ela |
-| T49 | Quem recebe o link ou o código entra no grupo como participante |
+| T35 | O banco grava o percentual do dia a cada mudança nas atividades; a tela da disciplina mostra a linha da evolução, com conta e na demonstração (CT59 e CT68); há verificação automatizada do histórico |
+| T46 | As tabelas do modelo lógico existem no banco, e um membro só lê e altera os dados do próprio grupo, conferido por verificações em SQL que tentam o acesso como outra conta |
+| T47 | O que é cadastrado vai para o banco e volta depois de recarregar; o que outro membro muda aparece ao voltar para a aba; o que o banco recusa é avisado e desfeito na tela (CT59, CT63 e CT64) |
+| T48 | Uma pessoa entra com a conta Google ou com o e-mail e é reconhecida como o membro do grupo vinculado a ela (CT57, CT58 e CT65) |
+| T49 | Quem recebe o link ou o código entra no grupo como participante; código vencido ou inválido é recusado (CT60 a CT62) |
+| T50 | A foto enviada vai para o armazenamento de arquivos, na pasta do grupo, e o banco guarda só o endereço; quem não é do grupo não grava na pasta dele (CT66 e verificações do banco) |
+| T51 | Os casos de teste foram executados sobre a versão de 27/11 no Chromium, no Firefox e no Edge, com data e versão registradas |
 
 ---
 
@@ -231,8 +239,8 @@ As seis foram executadas nessa ordem, e foi ela que ditou o ritmo: a disciplina 
 
 | Integrante | Frente | Tarefas |
 |---|---|---|
-| **Andrey Fogaça** | Interface, telas e experiência de uso | 1º bimestre: T01, T02, T03, T04, T05, T08, T09, T10, T11, T14, T15, T16, T17, T20, T22, T23, T24 · 2º bimestre: T25, T26, T27, T29, T32, T34, T36, T39, T40, T41, T43, T44, T48, T49, T50, T51, T52, T53, T54, T55, T56, T60, T61, T62, T63, T65, T68, T69, T70, T71, T72, T73 |
-| **Matheus Saraiva Faustin** | Modelo de dados e regras de cálculo | 1º bimestre: T06, T07, T12, T13, T18, T19, T21 · 2º bimestre: T28, T30, T31, T33, T34, T35, T37, T38, T42, T45, T46, T47, T51, T57, T58, T59, T64, T66, T67, T72 |
+| **Andrey Fogaça** | Interface, telas e experiência de uso | 1º bimestre: T01, T02, T03, T04, T05, T08, T09, T10, T11, T14, T15, T16, T17, T20, T22, T23, T24 · 2º bimestre: T25, T26, T27, T29, T32, T34, T36, T39, T40, T41, T43, T44, T48, T49, T50, T51, T52, T53, T54, T55, T56, T60, T61, T62, T63, T65, T68, T69, T70, T71, T72, T73, T74, T75, T77 |
+| **Matheus Saraiva Faustin** | Modelo de dados e regras de cálculo | 1º bimestre: T06, T07, T12, T13, T18, T19, T21 · 2º bimestre: T28, T30, T31, T33, T34, T35, T37, T38, T42, T45, T46, T47, T51, T57, T58, T59, T64, T66, T67, T72, T76, T77 |
 
 A divisão indica quem conduz a tarefa, não quem é o único a conhecê-la. No 2º bimestre, as regras novas (ofensiva, conquistas, responsável obrigatório, quem muda o status) e o banco de dados seguem com o Matheus, e as telas que as exibem, o acesso com conta e a publicação, com o Andrey. As tarefas do Matheus concentram as regras que sustentam o progresso (RN08, RN09, RN13, RN14 e RN10); as do Andrey concentram a tradução dessas regras em tela.
 

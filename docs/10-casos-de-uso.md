@@ -1,11 +1,11 @@
 # 10 · Especificação dos Casos de Uso
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 06/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 08/11/2026
 
 ---
 
-Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de casos de uso](../diagramas/01-casos-de-uso.md) apresenta os catorze casos identificados e sua correspondência com os requisitos.
+Estão especificados a seguir os doze casos de uso prioritários. O [diagrama de casos de uso](../diagramas/01-casos-de-uso.md) apresenta os dezesseis casos identificados e sua correspondência com os requisitos.
 
 ---
 
@@ -15,23 +15,24 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 |---|---|
 | **Ator principal** | Estudante Organizador |
 | **Objetivo** | Criar, editar, selecionar ou excluir um grupo de estudo, definindo o contexto de trabalho da sessão |
-| **Pré-condições** | Nenhuma. É o ponto de entrada do sistema |
+| **Pré-condições** | O estudante entrou com a conta (UC15) ou escolheu o modo de demonstração (UC12) |
 | **Requisitos** | RF01, RF26, RF27, RF29 |
 | **Regras** | RN01, RN02, RN07, RN19 |
 
 **Fluxo principal**
 
-1. O estudante abre a página inicial do Vértice e escolhe entrar (RF26).
-2. O sistema exibe a tela de acesso, com os grupos já cadastrados no dispositivo.
+1. O estudante abre a página inicial do Vértice, escolhe entrar (RF26) e entra com a conta (UC15).
+2. O sistema exibe a tela de acesso, com os grupos de que a conta participa e o campo do código de convite (UC16).
 3. O estudante escolhe criar um grupo novo.
-4. O sistema apresenta o formulário com o nome do grupo, o nome de quem cria, a descrição e a foto do grupo.
+4. O sistema apresenta o formulário com o nome do grupo, o nome de quem cria (já preenchido com o nome da conta), a descrição e a foto do grupo.
 5. O estudante preenche o nome do grupo e o próprio nome e, se quiser, envia uma foto do grupo e a enquadra no editor (RF29, RN19). Depois, confirma.
-6. O sistema valida os dados, cria o grupo, registra a data de criação e cadastra quem criou como o primeiro membro, com perfil de organizador (RN07).
-7. O sistema abre a sessão com o grupo criado e a pessoa identificada e direciona o estudante ao painel.
+6. O sistema valida os dados, cria o grupo, registra a data de criação e cadastra quem criou como o primeiro membro, vinculado à conta, com perfil de organizador (RN07).
+7. O sistema abre a sessão com o grupo criado e direciona o estudante ao painel.
 
 **Fluxos alternativos**
 
-- **(3A) Selecionar grupo existente:** o estudante escolhe um grupo da lista e, em seguida, o próprio nome entre os membros dele; o sistema abre a sessão e segue para o passo 7. Num grupo de versão anterior que ainda não tem membros, a sessão abre sem a escolha do nome, e o primeiro membro cadastrado entra como organizador (RN07).
+- **(3A) Selecionar grupo existente:** o estudante escolhe um grupo da lista; o sistema o reconhece como o membro vinculado à conta, abre a sessão e segue para o passo 7.
+- **(3D) Modo de demonstração:** os grupos listados são os guardados no navegador. Depois de escolher o grupo, o estudante escolhe o próprio nome entre os membros dele. Num grupo de versão anterior que ainda não tem membros, a sessão abre sem a escolha do nome, e o primeiro membro cadastrado entra como organizador (RN07).
 - **(3B) Excluir grupo:** no pé da tela de membros, o organizador escolhe excluir o grupo; o sistema pede confirmação, informando que membros, disciplinas, conteúdos e atividades serão removidos junto (RN02). Confirmada a exclusão, o sistema remove tudo em cascata, inclusive as conquistas, encerra a sessão e volta à tela de acesso.
 - **(3C) Editar grupo:** no seletor de grupos da barra do topo, o organizador escolhe "Editar grupo"; o sistema abre o formulário com nome, descrição e foto. O organizador altera os dados, troca a foto ou a remove, e confirma. Sem foto, o grupo volta a ser identificado pelas iniciais do nome (RF01, RF29, RN07). O participante não vê essa opção.
 - **(6A) Nome inválido:** se o nome do grupo ou o nome de quem cria estiver vazio, o sistema exibe a mensagem de erro em cada campo e mantém o formulário aberto (RNF03).
@@ -39,9 +40,7 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 
 **Pós-condições**
 
-- Existe um grupo ativo na sessão, com a pessoa identificada, e o estudante tem acesso às telas privadas do sistema.
-
-**Evolução prevista para 27/11 (RF27):** o acesso passa a começar pela conta Google ou pelo e-mail, e a pessoa é reconhecida como o membro vinculado à conta, sem precisar escolher o próprio nome. Este caso de uso será revisto quando a funcionalidade for implementada.
+- Existe um grupo ativo na sessão, com a pessoa identificada, e o estudante tem acesso às telas privadas do sistema. Com conta, o grupo e o membro estão gravados no banco e aparecem para a mesma conta em qualquer aparelho.
 
 ---
 
@@ -202,7 +201,7 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 | **Objetivo** | Visualizar o quanto o grupo já avançou em cada disciplina e conteúdo, e o que está por vencer |
 | **Pré-condições** | Existe um grupo ativo na sessão |
 | **Requisitos** | RF06, RF07, RF10, RF11, RF12, RF21, RF22 |
-| **Regras** | RN05, RN08, RN14, RN16, RN17 |
+| **Regras** | RN05, RN08, RN14, RN16, RN17, RN23 |
 | **Atores secundários** | BrasilAPI e Nager.Date (feriados nacionais) |
 
 **Fluxo principal**
@@ -211,9 +210,11 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 2. O sistema calcula o total de atividades por status e a quantidade de atividades atrasadas (RN05).
 3. O sistema calcula o progresso de cada conteúdo (RN08) e de cada disciplina (RN14).
 4. O sistema consulta a BrasilAPI para obter os feriados nacionais dos anos presentes nos prazos e guarda a relação obtida para reutilização (RN17).
-5. O sistema exibe os totais, as barras de progresso por disciplina com o percentual em número, a lista de próximas entregas e o gráfico de evolução do histórico de progresso.
+5. O sistema exibe os totais, as barras de progresso por disciplina com o percentual em número e a lista de próximas entregas.
 6. O sistema destaca as atividades cujo prazo coincide com um feriado nacional (RF07) ou com um fim de semana (RF22).
 7. O sistema exibe a relação dos próximos feriados nacionais a partir da data atual (RF21).
+8. O estudante abre uma disciplina.
+9. O sistema exibe a barra de progresso da disciplina e a linha da evolução dia a dia, a partir do histórico (RF12, RN23); passando o mouse ou o dedo sobre a linha, mostra o dia e o percentual.
 
 **Fluxos alternativos**
 
@@ -221,7 +222,7 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 - **(4A) BrasilAPI indisponível ou lenta:** decorrido o tempo limite de espera, o sistema consulta a fonte reserva, a Nager.Date, e segue o fluxo principal (RN17).
 - **(4B) As duas fontes indisponíveis:** o sistema reutiliza a última relação de feriados obtida com sucesso; não havendo nenhuma, omite a sinalização de feriados e a relação dos próximos, informa que estão indisponíveis no momento e mantém o restante do painel funcional (RN17, RNF10).
 - **(2A) Grupo sem atividades:** o sistema exibe mensagem orientativa e o atalho para cadastrar a primeira atividade (RNF07).
-- **(5A) Histórico com menos de dois registros:** o sistema exibe a barra de progresso atual e informa que a evolução aparecerá conforme o uso.
+- **(9A) Histórico com menos de dois dias:** o sistema exibe a barra de progresso atual e informa que a linha da evolução aparece a partir do segundo dia de atividades na disciplina.
 
 **Pós-condições**
 
@@ -305,18 +306,20 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 
 **Fluxo principal**
 
-1. O usuário aciona a carga de dados de exemplo na tela de entrada.
-2. O sistema cria um grupo de demonstração já preenchido, com membros, disciplinas, conteúdos e atividades em diferentes status e prazos.
-3. O sistema inicia a sessão nesse grupo e pede que a pessoa escolha qual dos membros de exemplo ela é.
-4. O sistema apresenta o painel.
+1. Na tela de entrada, o usuário escolhe "Experimentar sem conta", e o sistema passa ao modo de demonstração, com os dados guardados só no navegador.
+2. O usuário aciona a carga de dados de exemplo.
+3. O sistema cria um grupo de demonstração já preenchido, com membros, disciplinas, conteúdos e atividades em diferentes status e prazos.
+4. O sistema inicia a sessão nesse grupo e pede que a pessoa escolha qual dos membros de exemplo ela é.
+5. O sistema apresenta o painel, com o convite para o tutorial (RF33).
 
 **Fluxos alternativos**
 
-- **(2A) Já existe um grupo de demonstração:** o sistema cria um novo grupo, sem alterar nem sobrescrever os grupos existentes (RN01).
+- **(3A) Já existe um grupo de demonstração:** o sistema cria um novo grupo, sem alterar nem sobrescrever os grupos existentes (RN01).
+- **(1A) Voltar a usar conta:** no aviso do modo de demonstração, o usuário escolhe "Entrar com conta", e o sistema volta à tela de login (UC15).
 
 **Pós-condições**
 
-- O grupo de demonstração passa a existir como qualquer outro grupo: pode ser usado, editado e excluído pelo usuário.
+- O grupo de demonstração passa a existir como qualquer outro grupo do modo de demonstração: pode ser usado, editado e excluído pelo usuário, e fica só neste navegador.
 
 ---
 
@@ -353,6 +356,76 @@ Estão especificados a seguir os dez casos de uso prioritários. O [diagrama de 
 **Pós-condições**
 
 - O evento existe, aparece na página de eventos, no painel e no calendário. Se a disciplina dele for excluída, o evento continua no grupo, sem disciplina (RN02).
+
+---
+
+## UC15 · Entrar com conta
+
+| | |
+|---|---|
+| **Ator principal** | Estudante Participante |
+| **Objetivo** | Entrar no sistema com a própria conta, para ver e alterar os grupos de que participa em qualquer aparelho |
+| **Pré-condições** | Nenhuma |
+| **Requisitos** | RF09, RF27 |
+| **Regras** | RN01, RN07 |
+| **Atores secundários** | Supabase (autenticação) e Google (login com a conta Google) |
+
+**Fluxo principal**
+
+1. O estudante escolhe entrar na página inicial.
+2. O sistema exibe a tela de login, com a entrada por e-mail e senha, o botão "Continuar com o Google" e o atalho "Experimentar sem conta".
+3. O estudante informa o e-mail e a senha e confirma.
+4. O sistema valida o formato do e-mail e o tamanho mínimo da senha (6 caracteres) e confere os dados no serviço de autenticação.
+5. O sistema carrega do banco os grupos de que a conta participa, e só eles (RN01), e exibe a tela de acesso (UC01).
+
+**Fluxos alternativos**
+
+- **(3A) Criar conta:** o estudante escolhe "Criar conta", informa nome, e-mail e senha; o sistema cria a conta e segue para o passo 5. Se já existe conta com o e-mail, o sistema avisa e pede para entrar com ela.
+- **(3B) Conta Google:** o estudante escolhe "Continuar com o Google", escolhe a conta na tela do Google e autoriza; o sistema volta para o passo 5.
+- **(4A) E-mail ou senha incorretos:** o sistema avisa "E-mail ou senha incorretos." e mantém o formulário preenchido.
+- **(4B) Dados inválidos:** o sistema exibe a mensagem no campo com problema (RNF03).
+- **(4C) Sem conexão com o servidor:** o sistema avisa que não há conexão e mantém o formulário.
+- **(2A) Experimentar sem conta:** o estudante escolhe o modo de demonstração (UC12).
+- **(5A) Sair da conta:** no menu da conta, o estudante escolhe "Sair da conta"; o sistema encerra a sessão do grupo e a da conta e volta à tela de login (RF09).
+
+**Pós-condições**
+
+- A conta está conectada e o sistema exibe só os grupos dela. A senha não é guardada pelo sistema, só pelo serviço de autenticação (RNF11).
+
+---
+
+## UC16 · Convidar para o grupo
+
+| | |
+|---|---|
+| **Ator principal** | Estudante Organizador |
+| **Objetivo** | Chamar a turma para o grupo, sem precisar cadastrar cada pessoa |
+| **Pré-condições** | O organizador está numa sessão com conta; quem recebe o convite tem ou cria uma conta |
+| **Requisitos** | RF27, RF28 |
+| **Regras** | RN07, RN22 |
+
+**Fluxo principal**
+
+1. Na tela de membros, o organizador aciona "Convidar".
+2. O sistema gera um código de 8 caracteres, grava o convite com validade de 7 dias e exibe o código e o link do convite, com botões para copiar (RN22).
+3. O organizador envia o link ou o código para a turma.
+4. A pessoa convidada abre o link.
+5. O sistema guarda o código e exibe a tela de login, informando que é para aceitar o convite.
+6. A pessoa entra com a conta, ou cria uma (UC15).
+7. O sistema confere o código, inclui a pessoa no grupo como participante e abre a sessão no painel do grupo.
+
+**Fluxos alternativos**
+
+- **(4A) Código digitado:** a pessoa, já com conta, digita o código na tela de acesso e aciona "Entrar com o código"; o sistema segue para o passo 7.
+- **(7A) Código inválido ou vencido:** o sistema avisa "Código de convite inválido ou vencido." e mantém a pessoa na tela de acesso.
+- **(7B) Pessoa já cadastrada pelo organizador:** se existe no grupo um membro com o mesmo e-mail da conta e ainda sem conta vinculada, o sistema vincula a conta a esse membro, mantendo o perfil e as atividades dele (RN22).
+- **(7C) Pessoa que já é do grupo:** o sistema só abre a sessão no grupo, sem criar outro membro.
+- **(2A) Gerar outro código:** o organizador aciona "Gerar outro código", e o sistema grava um convite novo. Os anteriores continuam valendo até vencer.
+- **(1A) Participante:** o botão "Convidar" não aparece, e o banco recusa a gravação de convite por quem não é organizador (RN07, RNF11).
+
+**Pós-condições**
+
+- A pessoa convidada é membro do grupo, vinculada à própria conta, e vê os mesmos dados que o resto do grupo.
 
 ---
 
