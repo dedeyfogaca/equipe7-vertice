@@ -49,9 +49,9 @@ export function salvarColecao(chave, valor) {
 //
 // O membro entrou por causa do RN07: sem saber quem é a pessoa não dá para
 // comparar com o perfil dela. Continua sem senha: é seleção, como o grupo.
-export function lerSessao() {
+export function lerSessao(chave = CHAVES.sessao) {
   try {
-    const bruto = localStorage.getItem(CHAVES.sessao);
+    const bruto = localStorage.getItem(chave);
     if (!bruto) return null;
     const dados = JSON.parse(bruto);
 
@@ -68,15 +68,15 @@ export function lerSessao() {
   }
 }
 
-export function salvarSessao(sessao) {
+export function salvarSessao(sessao, chave = CHAVES.sessao) {
   try {
     if (sessao?.grupoId) {
       localStorage.setItem(
-        CHAVES.sessao,
+        chave,
         JSON.stringify({ grupoId: sessao.grupoId, membroId: sessao.membroId ?? null })
       );
     } else {
-      localStorage.removeItem(CHAVES.sessao);
+      localStorage.removeItem(chave);
     }
   } catch {
     /* silencioso de propósito */

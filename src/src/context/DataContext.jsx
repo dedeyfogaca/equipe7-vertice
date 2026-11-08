@@ -15,24 +15,147 @@ import {
   xpDoMembro as calcularXpDoMembro,
 } from '../lib/gamificacao.js';
 import { ESTILO_AVATAR_PADRAO, estiloAvatarValido, novaSeedAvatar } from '../lib/avatar.js';
+import { aplicar, carregarTudo, diferenca, mensagemDoErro, semMudancas } from '../lib/remoto.js';
+import { supabase } from '../lib/supabase.js';
+import { separarFotos, subirFoto } from '../lib/fotosRemotas.js';
+import { toast } from 'sonner';
+import { useConta } from './ContaContext.jsx';
 
 // Guarda as coleções (grupos, membros, disciplinas, conteúdos, atividades,
-// eventos e conquistas) e expõe as operações de cadastro, edição e exclusão. Tudo fica
-// em useState e é espelhado no armazenamento do navegador por useEffect, então
-// recarregar a página não perde nada.
+// eventos e conquistas) e expõe as operações de cadastro, edição e exclusão.
+// Tudo fica em useState; cada mudança é espelhada por useEffect:
+//   * com conta, no banco de dados (Supabase), por lib/remoto.js;
+//   * no modo de demonstração, no armazenamento do navegador.
+// As telas só conhecem estas funções, não o lugar onde os dados ficam.
 //
-// Esta é a camada que troca quando o sistema passar a ter banco de dados: as
-// telas só conhecem estas funções, não o armazenamento.
+// O provider é montado de novo quando o modo ou a conta mudam (ver main.jsx),
+// então cada sessão começa com as coleções certas.
 const DataContext = createContext(null);
 
 export function DataProvider({ children }) {
-  const [grupos, setGrupos] = useState(() => lerColecao(CHAVES.grupos));
-  const [membros, setMembros] = useState(() => lerColecao(CHAVES.membros));
-  const [disciplinas, setDisciplinas] = useState(() => lerColecao(CHAVES.disciplinas));
-  const [conteudos, setConteudos] = useState(() => lerColecao(CHAVES.conteudos));
-  const [atividades, setAtividades] = useState(() => lerColecao(CHAVES.atividades));
-  const [conquistas, setConquistas] = useState(() => lerColecao(CHAVES.conquistas));
-  const [eventos, setEventos] = useState(() => lerColecao(CHAVES.eventos));
+  const { modo, usuario } = useConta();
+  const remoto = modo === 'conta';
+  const inicial = (chave) => (remoto ? [] : lerColecao(chave));
+
+  const [grupos, setGrupos] = useState(() => inicial(CHAVES.grupos));
+  const [membros, setMembros] = useState(() => inicial(CHAVES.membros));
+  const [disciplinas, setDisciplinas] = useState(() => inicial(CHAVES.disciplinas));
+  const [conteudos, setConteudos] = useState(() => inicial(CHAVES.conteudos));
+  const [atividades, setAtividades] = useState(() => inicial(CHAVES.atividades));
+  const [conquistas, setConquistas] = useState(() => inicial(CHAVES.conquistas));
+  const [eventos, setEventos] = useState(() => inicial(CHAVES.eventos));
+  const definir = useRef(null);
+  definir.current = {
+    grupos: setGrupos,
+    membros: setMembros,
+    disciplinas: setDisciplinas,
+    conteudos: setConteudos,
+    atividades: setAtividades,
+    conquistas: setConquistas,
+    eventos: setEventos,
+  };
+
+  // Conquistas: quem já recebeu o quê, e se a próxima concessão avisa ou não
+  // (detalhes mais abaixo, na concessão).
+  const silenciar = useRef(true);
+  const concedidas = useRef(null);
+
+  // ----- Com conta: o banco de dados -----
+  // `servidor` é a última versão que o banco confirmou. Cada mudança nas
+  // coleções entra num lote; o lote vai para o banco como diferença em
+  // relação a `servidor`, um de cada vez, na ordem em que aconteceram.
+  const [carregando, setCarregando] = useState(remoto);
+  const servidor = useRef(null);
+  const lote = useRef({});
+  const agendado = useRef(false);
+  const fila = useRef(Promise.resolve());
+
+  const recarregar = useCallback(async () => {
+    if (!remoto) return;
+    try {
+      const dados = await carregarTudo(supabase);
+      servidor.current = dados;
+      concedidas.current = dados.conquistas.map(({ membroId, codigo }) => ({ membroId, codigo }));
+      silenciar.current = true;
+      Object.entries(dados).forEach(([chave, valor]) => definir.current[chave](valor));
+      return dados;
+    } catch (erro) {
+      toast.error('Não foi possível carregar os dados', { description: mensagemDoErro(erro) });
+    } finally {
+      setCarregando(false);
+    }
+  }, [remoto]);
+
+  useEffect(() => {
+    recarregar();
+  }, [recarregar]);
+
+  // Volta para a aba: busca o que o resto do grupo mudou nesse meio-tempo.
+  useEffect(() => {
+    if (!remoto) return undefined;
+    const aoVoltar = () => {
+      if (document.visibilityState !== 'visible') return;
+      fila.current = fila.current.then(recarregar);
+    };
+    document.addEventListener('visibilitychange', aoVoltar);
+    return () => document.removeEventListener('visibilitychange', aoVoltar);
+  }, [remoto, recarregar]);
+
+  const enviar = useCallback(
+    async (pacote) => {
+      // Fotos novas sobem depois de a linha existir (ver lib/fotosRemotas.js).
+      const { semFotos, fotos } = separarFotos(pacote, servidor.current);
+      const mudancas = diferenca(servidor.current, semFotos);
+      try {
+        if (!semMudancas(mudancas)) {
+          await aplicar(supabase, mudancas);
+          servidor.current = { ...servidor.current, ...semFotos };
+        }
+      } catch (erro) {
+        // Algo foi recusado: avisa e volta tudo ao que está no banco.
+        toast.error('Não foi possível salvar', { description: mensagemDoErro(erro) });
+        await recarregar();
+        return;
+      }
+      for (const foto of fotos) {
+        let endereco = null;
+        try {
+          endereco = await subirFoto(supabase, foto);
+        } catch {
+          toast.error('Não foi possível enviar a foto', { description: 'Confira a internet e tente de novo.' });
+        }
+        // Com a foto no Storage, o endereço entra no lugar da imagem e segue
+        // para o banco na próxima gravação. Se a subida falhou, volta a foto
+        // que estava no banco.
+        const antiga = (servidor.current[foto.chave] || []).find((o) => o.id === foto.id)?.foto || '';
+        definir.current[foto.chave]((atual) =>
+          atual.map((o) => (o.id === foto.id && o.foto === foto.dataUrl ? { ...o, foto: endereco ?? antiga } : o))
+        );
+      }
+    },
+    [recarregar]
+  );
+
+  // Fechar a aba com alteração ainda a caminho do banco perderia essa
+  // alteração: o navegador pergunta antes.
+  const pendentes = useRef(0);
+  useEffect(() => {
+    if (!remoto) return undefined;
+    const antesDeSair = (evento) => {
+      if (pendentes.current > 0 || agendado.current) {
+        evento.preventDefault();
+        evento.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', antesDeSair);
+    return () => window.removeEventListener('beforeunload', antesDeSair);
+  }, [remoto]);
+
+  // Espera o que ainda está indo para o banco (antes de sair, por exemplo).
+  const aguardarGravacao = useCallback(
+    () => new Promise((ok) => setTimeout(() => fila.current.then(ok), 0)),
+    []
+  );
 
   // D02: gravação recusada pelo navegador (armazenamento cheio ou
   // bloqueado). Cada coleção responde por si: a casca do sistema mostra o
@@ -40,6 +163,29 @@ export function DataProvider({ children }) {
   // sozinho quando a gravação volta a funcionar.
   const [falhas, setFalhas] = useState(() => new Set());
   const gravar = useCallback((chave, valor) => {
+    if (remoto) {
+      if (!servidor.current) return; // ainda carregando do banco
+      // No navegador as conquistas ficam em "conquistasMembro"; no banco, a
+      // coleção se chama "conquistas" (ver lib/remoto.js).
+      lote.current[chave === CHAVES.conquistas ? 'conquistas' : chave] = valor;
+      if (!agendado.current) {
+        agendado.current = true;
+        // Junta as coleções que mudaram na mesma ação (uma exclusão em
+        // cascata mexe em várias) e manda tudo de uma vez.
+        setTimeout(() => {
+          agendado.current = false;
+          const pacote = lote.current;
+          lote.current = {};
+          pendentes.current += 1;
+          fila.current = fila.current.then(() => enviar(pacote)).finally(() => {
+            pendentes.current -= 1;
+          });
+        }, 0);
+      }
+      return;
+    }
+    // Na tela de login (sem conta e fora da demonstração) não há o que gravar.
+    if (!modo) return;
     const ok = salvarColecao(chave, valor);
     setFalhas((atual) => {
       if (ok !== atual.has(chave)) return atual;
@@ -48,7 +194,7 @@ export function DataProvider({ children }) {
       else proximo.add(chave);
       return proximo;
     });
-  }, []);
+  }, [remoto, modo, enviar]);
 
   useEffect(() => gravar(CHAVES.grupos, grupos), [grupos, gravar]);
   useEffect(() => gravar(CHAVES.membros, membros), [membros, gravar]);
@@ -138,8 +284,10 @@ export function DataProvider({ children }) {
         id: novoId(),
         nome: criador.trim(),
         grupoId: grupo.id,
+        // Com conta, quem cria fica ligado ao grupo pela própria conta (RF27).
+        usuarioId: usuario?.id || '',
         funcao: '',
-        email: '',
+        email: usuario?.email || '',
         avatar: novaSeedAvatar(),
         estiloAvatar: ESTILO_AVATAR_PADRAO,
         foto: '',
@@ -148,7 +296,7 @@ export function DataProvider({ children }) {
       setMembros((atual) => [...atual, membro]);
     }
     return { grupo, membro };
-  }, []);
+  }, [usuario]);
 
   // Nome, descrição e foto do grupo. Só o organizador chega aqui (RN07).
   const atualizarGrupo = useCallback((id, dados) => {
@@ -496,13 +644,11 @@ export function DataProvider({ children }) {
   // As concessões feitas por ações da pessoa vão para `novasConquistas`, que
   // a casca do sistema transforma em aviso. As da carga inicial (abrir o
   // sistema, importar o exemplo) entram em silêncio.
-  const silenciar = useRef(true);
   const [novasConquistas, setNovasConquistas] = useState([]);
 
   // Conquistas já concedidas. Fica num ref, atualizado na hora, para a mesma
   // conquista nunca ser concedida duas vezes, nem quando o React roda o
   // efeito em dobro no modo de desenvolvimento.
-  const concedidas = useRef(null);
   if (concedidas.current === null) {
     concedidas.current = conquistas.map(({ membroId, codigo }) => ({ membroId, codigo }));
   }
@@ -516,7 +662,14 @@ export function DataProvider({ children }) {
       });
     });
 
-    const novas = conquistasNovas(concedidas.current, alcancadas);
+    // Com conta, cada pessoa grava só as próprias conquistas (o banco não
+    // deixa gravar a de outro membro). As dos colegas aparecem quando eles
+    // abrem o sistema e o mesmo cálculo roda para eles.
+    const minhas = remoto ? new Set(membros.filter((m) => m.usuarioId === usuario?.id).map((m) => m.id)) : null;
+    const novas = conquistasNovas(
+      concedidas.current,
+      minhas ? alcancadas.filter((a) => minhas.has(a.membroId)) : alcancadas
+    );
     concedidas.current.push(...novas);
 
     if (novas.length > 0) {
@@ -561,6 +714,10 @@ export function DataProvider({ children }) {
 
   const valor = useMemo(
     () => ({
+      modo,
+      carregando,
+      recarregar,
+      aguardarGravacao,
       grupos,
       membros,
       disciplinas,
@@ -615,6 +772,10 @@ export function DataProvider({ children }) {
       importarExemplo,
     }),
     [
+      modo,
+      carregando,
+      recarregar,
+      aguardarGravacao,
       grupos,
       membros,
       disciplinas,

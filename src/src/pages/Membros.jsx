@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Ellipsis, Lock, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
+import { Ellipsis, Link2, Lock, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -15,6 +15,7 @@ import { opcoesMembros } from '../components/opcoes.jsx';
 import { Confirmacao } from '../components/ui/dialogo.jsx';
 import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz } from '../components/ui/flutuantes.jsx';
 import { FormMembro } from '../components/membros/FormMembro.jsx';
+import { DialogoConvite } from '../components/membros/DialogoConvite.jsx';
 import { PERFIL, rotuloPerfil } from '../lib/constants.js';
 import { ultimoOrganizador } from '../lib/validacao.js';
 import { plural, primeiroNome } from '../lib/utils.js';
@@ -40,7 +41,10 @@ export default function Membros() {
     atualizarMembro,
     removerMembro,
     removerGrupo,
+    modo,
   } = useData();
+  const comConta = modo === 'conta';
+  const [convidando, setConvidando] = useState(false);
 
   const membros = membrosDoGrupo(grupoAtivo.id);
   const atividades = atividadesDoGrupo(grupoAtivo.id);
@@ -116,13 +120,24 @@ export default function Membros() {
         subtitulo={`${plural(membros.length, 'pessoa')} no grupo`}
         acoes={
           ehOrganizador && (
-            <Button onClick={() => setFormulario({})}>
-              <UserPlus aria-hidden="true" />
-              Adicionar membro
-            </Button>
+            <>
+              {comConta && (
+                <Button onClick={() => setConvidando(true)}>
+                  <Link2 aria-hidden="true" />
+                  Convidar
+                </Button>
+              )}
+              <Button variante={comConta ? 'secundaria' : 'primaria'} onClick={() => setFormulario({})}>
+                <UserPlus aria-hidden="true" />
+                Adicionar membro
+              </Button>
+            </>
           )
         }
       />
+      {comConta && ehOrganizador && (
+        <DialogoConvite aberto={convidando} aoMudar={setConvidando} grupoId={grupoAtivo.id} membroId={membroAtivo?.id} />
+      )}
 
       {!ehOrganizador && (
         <Aviso icone={Lock} className="mb-5">

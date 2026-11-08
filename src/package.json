@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "verificar": "node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js"
+    "verificar": "node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js"
   },
   "dependencies": {
     "@dicebear/core": "9.4.3",
@@ -23,6 +23,7 @@
     "@radix-ui/react-select": "^2.4.1",
     "@radix-ui/react-slot": "^1.5.0",
     "@radix-ui/react-tooltip": "^1.4.1",
+    "@supabase/supabase-js": "^2.119.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.63.0",

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { temBanco } from '../../lib/supabase.js';
 import {
   ArrowRight,
   CalendarDays,
@@ -42,7 +43,7 @@ const PERGUNTAS = [
   {
     pergunta: 'Como eu entro num grupo?',
     resposta:
-      'Quem cria o grupo cadastra as outras pessoas, e cada uma escolhe o próprio nome ao entrar. Na próxima versão chegam o convite por link ou código e o login com Google ou e-mail.',
+      'Com a sua conta, de e-mail ou do Google. Quem organiza o grupo manda um link ou um código de convite, e quem recebe cai direto no grupo certo.',
   },
   {
     pergunta: 'Como o progresso é calculado?',
@@ -66,7 +67,12 @@ const PERGUNTAS = [
   {
     pergunta: 'Onde ficam os dados do grupo?',
     resposta:
-      'Por enquanto, no navegador do aparelho em que o grupo usa o sistema. Na próxima versão eles passam para um banco de dados na nuvem, e cada pessoa acessa do próprio aparelho.',
+      'Num banco de dados na nuvem. Cada pessoa entra com a própria conta, de qualquer aparelho, e o grupo inteiro vê as mesmas disciplinas, atividades e eventos.',
+  },
+  {
+    pergunta: 'Dá para testar sem criar conta?',
+    resposta:
+      'Dá. Na tela de entrar, "Experimentar sem conta" abre um grupo de exemplo já preenchido. Nesse modo, os dados ficam só no seu navegador.',
   },
 ];
 
@@ -404,7 +410,8 @@ const FUNCIONALIDADES = [
     titulo: 'Grupo por convite',
     texto: 'O organizador manda um link ou código, e quem recebe já cai no grupo certo.',
     demo: DemoConvite,
-    emBreve: true,
+    // Sem o banco configurado, o convite não existe: o cartão avisa.
+    emBreve: !temBanco,
   },
 ];
 

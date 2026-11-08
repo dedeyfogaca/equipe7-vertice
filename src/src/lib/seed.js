@@ -78,7 +78,9 @@ export function gerarDadosExemplo() {
     id: novoId(),
     descricao: '',
     prioridade: '',
-    criadaEm: agora,
+    // Criadas duas semanas atrás, para a evolução das disciplinas (RF12) ter
+    // o que mostrar: o progresso sobe nos dias das conclusões.
+    criadaEm: emISO(-14),
     dataConclusao: null,
     conteudoId: '',
     ...dados,

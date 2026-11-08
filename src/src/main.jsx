@@ -10,6 +10,7 @@ import './index.css';
 
 import App from './App.jsx';
 import { TemaProvider } from './context/TemaContext.jsx';
+import { ContaProvider, useConta } from './context/ContaContext.jsx';
 import { DataProvider } from './context/DataContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ProvedorDicas } from './components/ui/flutuantes.jsx';
@@ -20,9 +21,22 @@ import { migrarDados } from './lib/migracao.js';
 // ler as coleções. Roda uma vez só: o marcador de versão barra a segunda.
 const migracao = migrarDados();
 
+// Os dados e a sessão dependem da conta (e do modo de demonstração): quando
+// a pessoa entra, sai ou troca de conta, tudo isso é montado de novo, e as
+// coleções da conta anterior não vazam para a próxima.
+function DadosDaConta({ children }) {
+  const { modo, usuario } = useConta();
+  return (
+    <DataProvider key={`${modo}:${usuario?.id || ''}`}>
+      <AuthProvider>{children}</AuthProvider>
+    </DataProvider>
+  );
+}
+
 // Ponto de entrada da aplicação.
-// TemaProvider aplica o tema (escuro/claro). DataProvider guarda as coleções
-// e o AuthProvider (sessão) as lê para resolver quem está usando o sistema.
+// TemaProvider aplica o tema (escuro/claro). ContaProvider sabe quem entrou
+// (ou se é a demonstração). DataProvider guarda as coleções, e o
+// AuthProvider (sessão) as lê para resolver quem está usando o sistema.
 //
 // useTransitions={false}: a partir do React Router 7, cada troca de endereço
 // vira uma transição do React e chega à tela um instante depois. Os filtros
@@ -31,16 +45,16 @@ const migracao = migrarDados();
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <TemaProvider>
-      <DataProvider>
-        <AuthProvider>
+      <ContaProvider>
+        <DadosDaConta>
           <BrowserRouter useTransitions={false}>
             <ProvedorDicas delayDuration={300}>
               <App />
               <Avisos />
             </ProvedorDicas>
           </BrowserRouter>
-        </AuthProvider>
-      </DataProvider>
+        </DadosDaConta>
+      </ContaProvider>
     </TemaProvider>
   </React.StrictMode>
 );

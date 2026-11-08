@@ -28,6 +28,7 @@ export default defineConfig({
             'lucide-react',
             'sonner',
           ],
+          banco: ['@supabase/supabase-js'],
         },
       },
     },

@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Sparkles, UsersRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, LogOut, Sparkles, UsersRound } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
+import { useConta } from '../../context/ContaContext.jsx';
 import { useTitulo } from '../../hooks/useTitulo.js';
 import { BotaoTema } from '../../components/BotaoTema.jsx';
+import { TelaCarregando } from '../../components/TelaCarregando.jsx';
+import { PainelLogin } from '../../components/conta/PainelLogin.jsx';
+import { EntrarComCodigo } from '../../components/conta/EntrarComCodigo.jsx';
 import { DICA_FOTO_GRUPO } from '../../components/grupos/FormGrupo.jsx';
 import { RodapePublico } from '../../components/layout/LayoutPublico.jsx';
 import { Avatar } from '../../components/ui/avatar-membro.jsx';
@@ -19,15 +23,19 @@ import { MarcaVertice } from '../../components/ui/marca.jsx';
 import { useTransicaoGrupo } from '../../components/layout/TransicaoGrupo.jsx';
 import { rotuloPerfil } from '../../lib/constants.js';
 import { gerarDadosExemplo } from '../../lib/seed.js';
+import { lerConvitePendente } from '../../lib/convite.js';
 import { semErros, validarGrupo } from '../../lib/validacao.js';
 import { cn, plural, semErroEm } from '../../lib/utils.js';
 
-// Tela de acesso, em dois passos: primeiro o grupo, depois quem você é
-// dentro dele. Nenhum dos dois tem senha (são seleções). O login com Google
-// e e-mail chega com o banco de dados, na próxima etapa do projeto.
+// Tela de acesso. Três situações:
+//   * sem conta e fora da demonstração: login (RF27) ou "experimentar sem conta";
+//   * com conta: os grupos da conta, o código de convite (RF28) e o cadastro
+//     de um grupo novo. Quem é a pessoa no grupo vem da própria conta;
+//   * demonstração: os grupos deste navegador e, depois de escolher o grupo,
+//     quem você é dentro dele (seleção, sem senha).
 //
-// No primeiro passo, duas colunas (revisão de 06/11/2026): à esquerda os
-// grupos que já existem, à direita o cadastro de um grupo novo.
+// Duas colunas: à esquerda os grupos que já existem, à direita o cadastro de
+// um grupo novo.
 
 const classeOpcao =
   'group flex w-full items-center gap-3 rounded-2xl border border-borda bg-superficie-2 p-3 text-left transition-colors hover:border-primaria-barra/60 hover:bg-superficie-3';
@@ -35,7 +43,9 @@ const classeOpcao =
 export default function Entrar() {
   const { autenticado, precisaIdentificar, grupoAtivo, membrosDoGrupoAtivo, entrar, identificar, sair } =
     useAuth();
-  const { grupos, membros, criarGrupo, importarExemplo } = useData();
+  const { grupos, membros, criarGrupo, importarExemplo, carregando } = useData();
+  const { modo, temBanco, verificando, usuario, nomeDaConta, sairDaConta, sairDaDemonstracao } = useConta();
+  const comConta = modo === 'conta';
   const location = useLocation();
   const destino = location.state?.de || '/painel';
   useTitulo(precisaIdentificar ? 'Quem é você?' : 'Entrar');
@@ -43,6 +53,13 @@ export default function Entrar() {
   const [form, setForm] = useState({ nome: '', criador: '', descricao: '', foto: '' });
   const [erros, setErros] = useState({});
   const { abrirGrupo, emCurso } = useTransicaoGrupo();
+
+  // Com conta, o "Seu nome" do grupo novo já vem com o nome da conta.
+  useEffect(() => {
+    if (nomeDaConta) setForm((atual) => (atual.criador ? atual : { ...atual, criador: nomeDaConta }));
+  }, [nomeDaConta]);
+
+  if (verificando || (comConta && carregando)) return <TelaCarregando />;
 
   // Sessão completa: grupo escolhido e pessoa identificada. (Durante a
   // passagem para o painel, quem navega é a transição.)
@@ -64,7 +81,7 @@ export default function Entrar() {
   // Grupo vazio (dado antigo) entra direto: alguém tem que poder montá-lo.
   const entrarNoGrupo = (id) => {
     const temMembros = membros.some((m) => m.grupoId === id);
-    if (temMembros) entrar(id);
+    if (temMembros && !comConta) entrar(id);
     else abrir(grupos.find((g) => g.id === id)?.nome, () => entrar(id));
   };
 
@@ -110,6 +127,17 @@ export default function Entrar() {
           <MarcaVertice />
         </Link>
         <div className="flex items-center gap-1.5">
+          {comConta && (
+            <span className="mr-1 hidden max-w-[220px] truncate text-[13px] text-sutil sm:inline" title={usuario?.email}>
+              {usuario?.email}
+            </span>
+          )}
+          {comConta && (
+            <Button variante="fantasma" tamanho="sm" onClick={sairDaConta}>
+              <LogOut aria-hidden="true" />
+              Sair da conta
+            </Button>
+          )}
           <Link to="/" className="inline-flex items-center gap-1.5 px-2 text-sm font-medium text-suave hover:text-primaria">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Voltar ao início
@@ -122,22 +150,42 @@ export default function Entrar() {
         id="conteudo"
         className={cn(
           'relative mx-auto flex w-full flex-1 justify-center px-4 pb-16 pt-6',
-          precisaIdentificar ? 'max-w-[492px] sm:items-center sm:pt-2' : 'max-w-[1080px] lg:pt-10'
+          precisaIdentificar && modo ? 'max-w-[492px] sm:items-center sm:pt-2' : 'max-w-[1080px] lg:pt-10'
         )}
       >
         <div className="w-full">
           <div className="mb-7 text-center">
             <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.04em] text-forte">
-              {precisaIdentificar ? 'Quem é você?' : 'Acesse seu grupo'}
+              {!modo ? 'Entre no Vértice' : precisaIdentificar ? 'Quem é você?' : 'Acesse seu grupo'}
             </h1>
             <p className="mt-2 text-balance text-[15px] text-sutil">
-              {precisaIdentificar
-                ? 'Escolha o seu nome para entrar. É ele que decide o que você pode gerenciar.'
-                : 'Entre num grupo que já existe ou crie um novo.'}
+              {!modo
+                ? 'Com a sua conta, o grupo inteiro vê as mesmas disciplinas, atividades e eventos.'
+                : precisaIdentificar
+                  ? 'Escolha o seu nome para entrar. É ele que decide o que você pode gerenciar.'
+                  : comConta
+                    ? 'Entre num grupo seu, use um código de convite ou crie um grupo novo.'
+                    : 'Entre num grupo que já existe ou crie um novo.'}
             </p>
           </div>
 
-          {precisaIdentificar ? (
+          {modo === 'demo' && temBanco && !precisaIdentificar && (
+            <div className="mb-5 flex flex-col items-start gap-3 rounded-2xl border border-borda bg-superficie px-4 py-3 text-[14px] text-sutil sm:flex-row sm:items-center sm:justify-between">
+              <p>
+                <strong className="font-semibold text-texto">Modo de demonstração.</strong>{' '}
+                {lerConvitePendente()
+                  ? 'Para aceitar o convite do seu grupo, entre com uma conta.'
+                  : 'Os dados ficam só neste navegador.'}
+              </p>
+              <Button variante="secundaria" tamanho="sm" onClick={sairDaDemonstracao}>
+                Entrar com conta
+              </Button>
+            </div>
+          )}
+
+          {!modo ? (
+            <PainelLogin convite={Boolean(lerConvitePendente())} />
+          ) : precisaIdentificar ? (
             <Card className="p-6 shadow-flutuante sm:p-7">
               <p className="mb-3 text-sm text-sutil">
                 Em <strong className="font-semibold text-texto">{grupoAtivo?.nome}</strong>
@@ -181,7 +229,9 @@ export default function Entrar() {
                       Seus grupos
                     </h2>
                     <p className="text-[13px] text-sutil">
-                      {grupos.length > 0 ? `${plural(grupos.length, 'grupo')} neste navegador` : 'Nenhum grupo ainda'}
+                      {grupos.length > 0
+                        ? `${plural(grupos.length, 'grupo')} ${comConta ? 'na sua conta' : 'neste navegador'}`
+                        : 'Nenhum grupo ainda'}
                     </p>
                   </div>
                 </div>
@@ -212,16 +262,21 @@ export default function Entrar() {
                   </ul>
                 ) : (
                   <p className="rounded-2xl border border-dashed border-borda px-4 py-5 text-[14px] leading-relaxed text-sutil">
-                    Os grupos que você criar aparecem aqui. Quer só conhecer o sistema? Carregue um grupo de exemplo,
-                    com disciplinas, atividades e eventos prontos.
+                    {comConta
+                      ? 'Os grupos que você criar ou em que for convidado aparecem aqui.'
+                      : 'Os grupos que você criar aparecem aqui. Quer só conhecer o sistema? Carregue um grupo de exemplo, com disciplinas, atividades e eventos prontos.'}
                   </p>
                 )}
 
                 <div className="mt-5 border-t border-divisor pt-4">
-                  <Button variante="secundaria" className="w-full" onClick={carregarExemplo}>
-                    <Sparkles aria-hidden="true" />
-                    Carregar dados de exemplo
-                  </Button>
+                  {comConta ? (
+                    <EntrarComCodigo aoEntrar={(id, nome) => abrir(nome, () => entrar(id))} />
+                  ) : (
+                    <Button variante="secundaria" className="w-full" onClick={carregarExemplo}>
+                      <Sparkles aria-hidden="true" />
+                      Carregar dados de exemplo
+                    </Button>
+                  )}
                 </div>
               </Card>
 

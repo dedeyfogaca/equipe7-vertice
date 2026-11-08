@@ -14,6 +14,7 @@ import { BarraProgresso } from '../components/ui/progresso.jsx';
 import { FormConteudo } from '../components/disciplinas/FormConteudo.jsx';
 import { FormDisciplina } from '../components/disciplinas/FormDisciplina.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
+import { HistoricoProgresso } from '../components/disciplinas/HistoricoProgresso.jsx';
 import { porPrazo } from '../lib/formatos.js';
 import { plural } from '../lib/utils.js';
 
@@ -142,6 +143,7 @@ export default function DisciplinaDetalhe() {
           progresso={progressoDaDisciplina(disciplina.id)}
           cor={disciplina.cor}
         />
+        <HistoricoProgresso disciplina={disciplina} percentualAtual={progressoDaDisciplina(disciplina.id)?.percentual ?? null} />
       </Card>
 
       {/* Atividades direto na disciplina, sem conteúdo. Desde 06/11/2026 o

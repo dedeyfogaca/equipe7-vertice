@@ -13,6 +13,7 @@ import { CartoesSituacao } from '../components/atividades/CartoesSituacao.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
 import { SeuRitmo } from '../components/gamificacao/SeuRitmo.jsx';
 import { ProximosFeriados } from '../components/ProximosFeriados.jsx';
+import { ConviteTutorial } from '../components/tutorial/Tutorial.jsx';
 import { CartaoEvento } from '../components/eventos/CartaoEvento.jsx';
 import { eventoFuturo } from '../components/eventos/tipos.jsx';
 import { STATUS } from '../lib/constants.js';
@@ -154,6 +155,8 @@ export default function Painel() {
           </Button>
         </div>
       </header>
+
+      <ConviteTutorial />
 
       <CartoesSituacao contagem={contagem} ativa={filtro} aoEscolher={escolherSituacao} />
 

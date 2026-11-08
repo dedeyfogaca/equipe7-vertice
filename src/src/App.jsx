@@ -8,6 +8,7 @@ import { TransicaoGrupoProvider } from './components/layout/TransicaoGrupo.jsx';
 import Inicio from './pages/publicas/Inicio.jsx';
 import Sobre from './pages/publicas/Sobre.jsx';
 import Entrar from './pages/publicas/Entrar.jsx';
+import Convite from './pages/publicas/Convite.jsx';
 import NaoEncontrada from './pages/publicas/NaoEncontrada.jsx';
 
 import Painel from './pages/Painel.jsx';
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/" element={<Inicio />} />
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/entrar" element={<Entrar />} />
+        <Route path="/convite/:codigo" element={<Convite />} />
         {/* Endereço antigo da tela de acesso. */}
         <Route path="/login" element={<Navigate to="/entrar" replace />} />
 

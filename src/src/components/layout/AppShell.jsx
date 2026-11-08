@@ -3,12 +3,14 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import {
+  ArrowLeftRight,
   BookOpen,
   CalendarClock,
   CalendarDays,
   Check,
   ChevronDown,
   ChevronsUpDown,
+  Compass,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -24,6 +26,7 @@ import {
 
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
+import { useConta } from '../../context/ContaContext.jsx';
 import { BotaoTema } from '../BotaoTema.jsx';
 import { Avatar } from '../ui/avatar-membro.jsx';
 import { AvatarGrupo } from '../ui/avatar-grupo.jsx';
@@ -32,6 +35,7 @@ import { Button } from '../ui/botao.jsx';
 import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz, MenuRotulo, MenuSeparador } from '../ui/flutuantes.jsx';
 import { MarcaVertice } from '../ui/marca.jsx';
 import { FormGrupo } from '../grupos/FormGrupo.jsx';
+import { TutorialProvider, useTutorial } from '../tutorial/Tutorial.jsx';
 import { obterConquista } from '../../lib/gamificacao.js';
 import { rotuloPerfil } from '../../lib/constants.js';
 import { LINK_FEEDBACK, temFormularioFeedback } from '../../lib/feedback.js';
@@ -177,8 +181,11 @@ function ItemFeedback() {
 }
 
 function MenuUsuario() {
-  const { membroAtivo } = useAuth();
+  const { membroAtivo, sair } = useAuth();
+  const { modo, usuario, sairDaConta } = useConta();
   const sairDoGrupo = useSairDoGrupo();
+  const navigate = useNavigate();
+  const { abrirTutorial } = useTutorial();
 
   return (
     <MenuRaiz>
@@ -202,12 +209,37 @@ function MenuUsuario() {
             </span>
           </span>
         </div>
+        {modo === 'conta' && <p className="truncate px-2.5 pb-2 text-[12px] text-sutil">{usuario?.email}</p>}
         <MenuSeparador />
-        <ItemFeedback />
-        <MenuItem onSelect={sairDoGrupo}>
-          <LogOut aria-hidden="true" />
-          Sair do grupo
+        <MenuItem onSelect={abrirTutorial}>
+          <Compass aria-hidden="true" />
+          Tutorial
         </MenuItem>
+        <ItemFeedback />
+        {modo === 'conta' && (
+          <MenuItem onSelect={sairDoGrupo}>
+            <ArrowLeftRight aria-hidden="true" />
+            Trocar de grupo
+          </MenuItem>
+        )}
+        {modo === 'conta' && (
+          <MenuItem
+            onSelect={async () => {
+              sair();
+              await sairDaConta();
+              navigate('/entrar');
+            }}
+          >
+            <LogOut aria-hidden="true" />
+            Sair da conta
+          </MenuItem>
+        )}
+        {modo !== 'conta' && (
+          <MenuItem onSelect={sairDoGrupo}>
+            <LogOut aria-hidden="true" />
+            Sair do grupo
+          </MenuItem>
+        )}
       </MenuConteudo>
     </MenuRaiz>
   );
@@ -283,6 +315,7 @@ function MenuCelular({ aberto, aoMudar }) {
   const { pathname } = useLocation();
   const { membroAtivo } = useAuth();
   const sairDoGrupo = useSairDoGrupo();
+  const { abrirTutorial } = useTutorial();
 
   return (
     <DialogPrimitive.Root open={aberto} onOpenChange={aoMudar}>
@@ -333,6 +366,18 @@ function MenuCelular({ aberto, aoMudar }) {
                 </span>
               </span>
               <BotaoTema />
+              <Button
+                variante="fantasma"
+                tamanho="icone"
+                aria-label="Tutorial"
+                title="Tutorial"
+                onClick={() => {
+                  aoMudar(false);
+                  abrirTutorial();
+                }}
+              >
+                <Compass className="!size-[18px]" />
+              </Button>
               {temFormularioFeedback() && (
                 <Button variante="fantasma" tamanho="icone" asChild>
                   <a href={LINK_FEEDBACK} target="_blank" rel="noopener noreferrer" aria-label="Enviar feedback (abre em outra aba)" title="Enviar feedback">
@@ -403,35 +448,37 @@ export function AppShell() {
   }, [pathname]);
 
   return (
-    <div className="min-h-dvh bg-fundo">
-      <a
-        href="#conteudo"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primaria focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primaria-fg"
-      >
-        Pular para o conteúdo
-      </a>
+    <TutorialProvider>
+      <div className="min-h-dvh bg-fundo">
+        <a
+          href="#conteudo"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primaria focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primaria-fg"
+        >
+          Pular para o conteúdo
+        </a>
 
-      <BarraTopo menuAberto={menuAberto} aoAbrirMenu={() => setMenuAberto(true)} />
-      <MenuCelular aberto={menuAberto} aoMudar={setMenuAberto} />
+        <BarraTopo menuAberto={menuAberto} aoAbrirMenu={() => setMenuAberto(true)} />
+        <MenuCelular aberto={menuAberto} aoMudar={setMenuAberto} />
 
-      {/* Coluna que ocupa a altura da tela: a página pode guardar algo para o
-          pé dela (a exclusão do grupo, em Membros). */}
-      <main
-        id="conteudo"
-        tabIndex={-1}
-        className="flex min-h-[calc(100dvh-4rem)] min-w-0 flex-col px-4 pb-16 pt-6 outline-none sm:px-6 lg:px-10 lg:pt-8"
-      >
-        <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col">
-          {falhaGravacao && (
-            <Aviso tom="perigo" icone={TriangleAlert} className="mb-6">
-              <strong className="font-semibold">Não foi possível salvar no navegador.</strong> O
-              armazenamento está cheio ou bloqueado, e o que você cadastrar agora pode se perder ao
-              recarregar a página.
-            </Aviso>
-          )}
-          <Outlet />
-        </div>
-      </main>
-    </div>
+        {/* Coluna que ocupa a altura da tela: a página pode guardar algo para o
+            pé dela (a exclusão do grupo, em Membros). */}
+        <main
+          id="conteudo"
+          tabIndex={-1}
+          className="flex min-h-[calc(100dvh-4rem)] min-w-0 flex-col px-4 pb-16 pt-6 outline-none sm:px-6 lg:px-10 lg:pt-8"
+        >
+          <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col">
+            {falhaGravacao && (
+              <Aviso tom="perigo" icone={TriangleAlert} className="mb-6">
+                <strong className="font-semibold">Não foi possível salvar no navegador.</strong> O
+                armazenamento está cheio ou bloqueado, e o que você cadastrar agora pode se perder ao
+                recarregar a página.
+              </Aviso>
+            )}
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </TutorialProvider>
   );
 }
