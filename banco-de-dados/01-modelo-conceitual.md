@@ -1,11 +1,11 @@
 # Modelo Conceitual do Banco de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 06/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 08/11/2026
 
 ---
 
-O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12) e conquista (RF17).
+O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17) e convite (RF28). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro aponta para ela.
 
 ---
 
@@ -26,6 +26,8 @@ erDiagram
     DISCIPLINA ||--o{ PROGRESSO_HISTORICO : "registra"
     MEMBRO ||--o{ MEMBRO_CONQUISTA : "obtem"
     CONQUISTA ||--o{ MEMBRO_CONQUISTA : "e obtida em"
+    GRUPO ||--o{ CONVITE : "e chamado por"
+    MEMBRO |o--o{ CONVITE : "gera"
 
 ```
 
@@ -38,14 +40,15 @@ erDiagram
 | Entidade | Atributos | Origem |
 |---|---|---|
 | **GRUPO** | identificador, nome, descrição, foto do grupo, data de criação | RF01, RF29 |
-| **MEMBRO** | identificador, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil | RF02, RF19, RF24 |
+| **MEMBRO** | identificador, conta de acesso, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil, data de criação | RF02, RF19, RF24, RF27 |
 | **DISCIPLINA** | identificador, nome, cor de identificação, data de criação | RF13 |
 | **CONTEUDO** | identificador, nome, descrição, ordem de apresentação | RF14 |
 | **ATIVIDADE** | identificador, título, descrição, prazo, peso, prioridade, status, data de criação, data de conclusão | RF03, RN09 |
 | **EVENTO** | identificador, título, tipo, data, hora de início, hora de fim, local, descrição, data de criação | RF31, RN21 |
 | **PROGRESSO_HISTORICO** | identificador, data do registro, percentual | RF12 |
-| **CONQUISTA** | identificador, código, nome, descrição, ícone, tipo de critério, valor do critério | RF17 |
+| **CONQUISTA** | código, nome, descrição, ícone, tipo de critério, valor do critério | RF17 |
 | **MEMBRO_CONQUISTA** | data de obtenção | RN12 |
+| **CONVITE** | identificador, código, data de criação, data de vencimento, ativo | RF28, RN22 |
 
 ---
 
@@ -64,6 +67,8 @@ erDiagram
 | DISCIPLINA **é assunto de** EVENTO | 1 : N, opcional | Um evento pode ser de uma disciplina (uma prova, por exemplo) ou de nenhuma (uma reunião); se a disciplina sai, o evento fica sem disciplina (RN02) |
 | MEMBRO **cadastra** EVENTO | 1 : N, opcional | Cada evento guarda quem o cadastrou, para a regra de edição (RN21); eventos do exemplo e de membros removidos ficam sem autor |
 | MEMBRO **obtém** CONQUISTA | N : N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros |
+| GRUPO **é chamado por** CONVITE | 1 : N | Um grupo tem zero ou muitos convites; cada convite leva a exatamente um grupo |
+| MEMBRO **gera** CONVITE | 1 : N, opcional | Cada convite guarda o organizador que o gerou; se ele sai do grupo, o convite continua valendo até vencer |
 
 ---
 
@@ -80,6 +85,10 @@ erDiagram
 **Por que existe MEMBRO_CONQUISTA.** O relacionamento entre membro e conquista é muitos-para-muitos e carrega um dado próprio: a data em que a conquista foi obtida. Esse dado não pertence nem ao membro nem à conquista, e sim ao encontro dos dois, o que exige a entidade associativa.
 
 **Por que o progresso histórico é uma entidade.** O percentual atual de uma disciplina pode ser calculado a qualquer momento a partir das atividades. Já a evolução ao longo do tempo (RF12) não pode: não há como saber, olhando o estado de hoje, qual era o percentual há duas semanas. Por isso o valor diário precisa ser gravado.
+
+**Por que a conta não é uma entidade do modelo.** Quem guarda o e-mail, a senha e o vínculo com o Google é o serviço de autenticação do Supabase, que tem as próprias tabelas. O modelo do Vértice só precisa saber qual membro é de qual conta, e por isso o membro ganhou o atributo "conta de acesso". Ele fica vazio enquanto a pessoa foi só cadastrada pelo organizador e ainda não entrou com a própria conta. Uma mesma conta pode ser membro de vários grupos, uma vez em cada.
+
+**Por que o convite é uma entidade.** O código precisa ser conferido quando alguém o usa, e ele vence: o banco precisa saber de que grupo é, quando foi criado e até quando vale (RN22).
 
 **O que não virou entidade.** Experiência, ofensiva e percentual de progresso atual são valores derivados das atividades concluídas e das suas datas, calculados no momento da consulta. Não receberam entidade nem campo próprio para evitar uma segunda fonte de verdade, que precisaria ser corrigida a cada estorno previsto na RN10.
 
