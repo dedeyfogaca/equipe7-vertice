@@ -286,12 +286,28 @@ create or replace function enviar_lembretes(p_remetente text, p_nome_remetente t
                                  p_site text default 'https://equipe7-vertice.vercel.app')
 returns integer language plpgsql security definer set search_path = public as $$
 declare
-  v_hoje   date := (now() at time zone 'America/Sao_Paulo')::date;
-  v_chave  text;
-  v_pessoa record;
-  v_html   text;
-  v_texto  text;
-  v_total  integer := 0;
+  v_hoje      date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_site      text := rtrim(p_site, '/');
+  v_semana    text[] := array['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  v_curta     text[] := array['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  v_meses     text[] := array['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  v_fonte     text := 'Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif';
+  v_chave     text;
+  v_pessoa    record;
+  v_item      record;
+  v_cor       text;
+  v_fundo     text;
+  v_rotulo    text;
+  v_cartao    text;
+  v_atrasadas text;
+  v_proximas  text;
+  v_texto     text;
+  v_resumo    text;
+  v_chips     text;
+  v_secoes    text;
+  v_html      text;
+  v_assunto   text;
+  v_total     integer := 0;
 begin
   select decrypted_secret into v_chave from vault.decrypted_secrets where name = 'brevo_api_key';
   if v_chave is null then
@@ -299,47 +315,126 @@ begin
   end if;
 
   for v_pessoa in
-    with itens as (
-      select l.*,
-             case when l.prazo < v_hoje then 'Venceu em ' || to_char(l.prazo, 'DD/MM')
-                  when l.prazo = v_hoje then 'Vence hoje'
-                  when l.prazo = v_hoje + 1 then 'Vence amanhã'
-                  else 'Vence em ' || to_char(l.prazo, 'DD/MM') end as situacao,
-             concat_ws(' · ', l.onde, l.disciplina) as lugar
-        from lembretes_do_dia(v_hoje) l
-    )
     select id_usuario, min(email) as email, min(nome) as nome, count(*) as total,
            count(*) filter (where prazo < v_hoje) as atrasadas,
-           string_agg(format(
-             '<tr><td style="padding:10px 12px;border-top:1px solid #e2e8f0;white-space:nowrap;font-weight:600;color:%s">%s</td>'
-             '<td style="padding:10px 12px;border-top:1px solid #e2e8f0"><div style="font-weight:600;color:#0f172a">%s</div>'
-             '<div style="font-size:13px;color:#64748b">%s</div></td></tr>',
-             case when prazo < v_hoje then '#dc2626' when prazo = v_hoje then '#d97706' else '#0e7490' end,
-             situacao, escapar_html(titulo), escapar_html(lugar)), '' order by prazo, titulo) as linhas,
-           string_agg(format('- %s: %s (%s)', situacao, titulo, lugar), E'\n' order by prazo, titulo) as linhas_texto
-      from itens
+           count(*) filter (where prazo = v_hoje) as hoje,
+           count(*) filter (where prazo > v_hoje) as proximas
+      from lembretes_do_dia(v_hoje)
      group by id_usuario
   loop
+    v_atrasadas := ''; v_proximas := ''; v_texto := '';
+
+    for v_item in
+      select * from lembretes_do_dia(v_hoje) where id_usuario = v_pessoa.id_usuario order by prazo, titulo
+    loop
+      if v_item.prazo < v_hoje then
+        v_cor := '#be123c'; v_fundo := '#fff1f2';
+        v_rotulo := case when v_hoje - v_item.prazo = 1 then 'Venceu ontem'
+                         else format('Venceu há %s dias', v_hoje - v_item.prazo) end;
+      elsif v_item.prazo = v_hoje then
+        v_cor := '#b45309'; v_fundo := '#fffbeb'; v_rotulo := 'Vence hoje';
+      elsif v_item.prazo = v_hoje + 1 then
+        v_cor := '#0e7490'; v_fundo := '#ecfeff'; v_rotulo := 'Vence amanhã';
+      else
+        v_cor := '#0e7490'; v_fundo := '#ecfeff'; v_rotulo := format('Em %s dias', v_item.prazo - v_hoje);
+      end if;
+
+      v_cartao := format(
+        '<tr><td style="padding:0 0 10px">'
+        '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid %s;border-radius:12px">'
+        '<tr><td style="padding:14px 16px">'
+        '<div style="font-size:15px;line-height:1.35;font-weight:700;color:#0b1220">%s</div>'
+        '<div style="font-size:13px;line-height:1.4;color:#64748b;padding-top:3px">%s</div>'
+        '</td><td align="right" style="padding:14px 16px 14px 0;white-space:nowrap;vertical-align:top">'
+        '<span style="display:inline-block;padding:4px 10px;border-radius:999px;background:%s;color:%s;font-size:12px;font-weight:700">%s</span>'
+        '<div style="font-size:12px;color:#94a3b8;padding-top:6px">%s, %s</div>'
+        '</td></tr></table></td></tr>',
+        v_cor, escapar_html(v_item.titulo), escapar_html(concat_ws(' · ', v_item.onde, v_item.disciplina)),
+        v_fundo, v_cor, v_rotulo,
+        v_curta[extract(dow from v_item.prazo)::int + 1], to_char(v_item.prazo, 'DD/MM'));
+
+      if v_item.prazo < v_hoje then
+        v_atrasadas := v_atrasadas || v_cartao;
+      else
+        v_proximas := v_proximas || v_cartao;
+      end if;
+      v_texto := v_texto || format(E'- %s: %s (%s)\n', v_rotulo, v_item.titulo,
+                                   concat_ws(' · ', v_item.onde, v_item.disciplina));
+    end loop;
+
+    -- o resumo vira a frase de cima e o texto da prévia, na caixa de entrada
+    v_resumo := case
+      when v_pessoa.total = 1 and v_pessoa.atrasadas = 1 then 'Uma atividade sua está atrasada.'
+      when v_pessoa.total = 1 and v_pessoa.hoje = 1 then 'Uma atividade sua vence hoje.'
+      when v_pessoa.total = 1 then 'Uma atividade sua está chegando no prazo.'
+      else format('%s atividades suas precisam de atenção.', v_pessoa.total) end;
+
+    v_chips := '';
+    if v_pessoa.atrasadas > 0 then
+      v_chips := v_chips || format('<span style="display:inline-block;margin:0 6px 6px 0;padding:5px 11px;border-radius:999px;background:#fff1f2;color:#be123c;font-size:13px;font-weight:700">%s %s</span>',
+        v_pessoa.atrasadas, case when v_pessoa.atrasadas = 1 then 'atrasada' else 'atrasadas' end);
+    end if;
+    if v_pessoa.hoje > 0 then
+      v_chips := v_chips || format('<span style="display:inline-block;margin:0 6px 6px 0;padding:5px 11px;border-radius:999px;background:#fffbeb;color:#b45309;font-size:13px;font-weight:700">%s para hoje</span>', v_pessoa.hoje);
+    end if;
+    if v_pessoa.proximas > 0 then
+      v_chips := v_chips || format('<span style="display:inline-block;margin:0 6px 6px 0;padding:5px 11px;border-radius:999px;background:#ecfeff;color:#0e7490;font-size:13px;font-weight:700">%s nos próximos dias</span>', v_pessoa.proximas);
+    end if;
+
+    v_secoes := '';
+    if v_atrasadas <> '' then
+      v_secoes := v_secoes || '<tr><td style="padding:22px 0 10px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#be123c">Atrasadas</td></tr>' || v_atrasadas;
+    end if;
+    if v_proximas <> '' then
+      v_secoes := v_secoes || '<tr><td style="padding:22px 0 10px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748b">Hoje e próximos dias</td></tr>' || v_proximas;
+    end if;
+
     v_html := format(
-      '<div style="background:#f1f5f9;padding:24px 12px;font-family:Arial,Helvetica,sans-serif">'
-      '<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">'
-      '<div style="background:#0e7490;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:700">Vértice</div>'
-      '<div style="padding:24px">'
-      '<p style="margin:0 0 6px;font-size:17px;color:#0f172a">Oi, %s!</p>'
-      '<p style="margin:0 0 18px;font-size:15px;color:#334155">%s</p>'
-      '<table style="width:100%%;border-collapse:collapse;font-size:14px">%s</table>'
-      '<p style="margin:22px 0 0"><a href="%s/atividades" style="display:inline-block;background:#0e7490;color:#ffffff;text-decoration:none;padding:11px 18px;border-radius:10px;font-weight:600">Abrir as minhas atividades</a></p>'
-      '</div>'
-      '<div style="padding:14px 24px;background:#f8fafc;font-size:12px;color:#64748b">'
-      'Você recebe este lembrete porque ele está ligado no seu perfil. Para não receber mais, desligue em Meu perfil, no Vértice.'
-      '</div></div></div>',
-      escapar_html(split_part(v_pessoa.nome, ' ', 1)),
-      case when v_pessoa.total = 1 then 'Uma atividade sua está perto do prazo ou atrasada:'
-           else format('%s atividades suas estão perto do prazo ou atrasadas:', v_pessoa.total) end,
-      v_pessoa.linhas, rtrim(p_site, '/'));
-    v_texto := format(E'Oi, %s!\n\nAtividades suas perto do prazo ou atrasadas:\n%s\n\nAbrir: %s/atividades\n\n'
-                      'Para não receber mais, desligue o lembrete em Meu perfil, no Vértice.',
-                      split_part(v_pessoa.nome, ' ', 1), v_pessoa.linhas_texto, rtrim(p_site, '/'));
+      '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"></head>'
+      '<body style="margin:0;padding:0;background:#eef2f7">'
+      '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>'
+      '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#eef2f7;font-family:%s">'
+      '<tr><td align="center" style="padding:28px 12px">'
+      '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:560px;border-collapse:separate">'
+      -- topo escuro, como o app
+      '<tr><td style="background:#0b1220;border-radius:16px 16px 0 0;padding:20px 24px">'
+      '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0"><tr>'
+      '<td style="vertical-align:middle"><img src="%s/email-marca.png" width="28" height="28" alt="" style="display:inline-block;vertical-align:middle;border:0">'
+      '<span style="display:inline-block;vertical-align:middle;padding-left:10px;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.2px">Vértice</span></td>'
+      '<td align="right" style="vertical-align:middle;font-size:12px;color:#94a3b8;white-space:nowrap">%s, %s de %s</td>'
+      '</tr></table>'
+      '<div style="height:3px;margin-top:18px;border-radius:3px;background:#22d3ee;background-image:linear-gradient(90deg,#22d3ee,#0e7490)"></div>'
+      '</td></tr>'
+      -- corpo
+      '<tr><td style="background:#ffffff;padding:28px 24px 8px">'
+      '<div style="font-size:24px;line-height:1.25;font-weight:700;color:#0b1220">Oi, %s!</div>'
+      '<div style="font-size:15px;line-height:1.5;color:#334155;padding:6px 0 14px">%s</div>'
+      '<div>%s</div>'
+      '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0">%s</table>'
+      '</td></tr>'
+      '<tr><td style="background:#ffffff;padding:14px 24px 30px">'
+      '<a href="%s/atividades" style="display:inline-block;background:#0e7490;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:10px;font-size:15px;font-weight:700">Abrir minhas atividades &rarr;</a>'
+      '</td></tr>'
+      -- rodapé
+      '<tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;padding:16px 24px;font-size:12px;line-height:1.55;color:#64748b">'
+      'Você recebe este lembrete porque ele está ligado no seu perfil. '
+      '<a href="%s/perfil" style="color:#0e7490;text-decoration:underline">Desligar em Meu perfil</a>.'
+      '</td></tr>'
+      '<tr><td align="center" style="padding:16px 0 0;font-size:11px;color:#94a3b8">Vértice · Plataforma de Acompanhamento de Aprendizagem</td></tr>'
+      '</table></td></tr></table></body></html>',
+      v_resumo, v_fonte, v_site,
+      v_semana[extract(dow from v_hoje)::int + 1], extract(day from v_hoje)::int, v_meses[extract(month from v_hoje)::int],
+      escapar_html(split_part(v_pessoa.nome, ' ', 1)), v_resumo, v_chips, v_secoes,
+      v_site, v_site);
+
+    v_assunto := case
+      when v_pessoa.atrasadas > 0 and v_pessoa.atrasadas = v_pessoa.total then
+        case when v_pessoa.total = 1 then 'Você tem 1 atividade atrasada' else format('Você tem %s atividades atrasadas', v_pessoa.total) end
+      when v_pessoa.atrasadas > 0 then format('%s atrasada%s e %s perto do prazo', v_pessoa.atrasadas,
+        case when v_pessoa.atrasadas = 1 then '' else 's' end, v_pessoa.total - v_pessoa.atrasadas)
+      when v_pessoa.total = 1 and v_pessoa.hoje = 1 then '1 atividade vence hoje'
+      when v_pessoa.total = 1 then '1 atividade perto do prazo'
+      else format('%s atividades perto do prazo', v_pessoa.total) end;
 
     perform net.http_post(
       url     := 'https://api.brevo.com/v3/smtp/email',
@@ -347,11 +442,11 @@ begin
       body    := jsonb_build_object(
         'sender', jsonb_build_object('name', p_nome_remetente, 'email', p_remetente),
         'to', jsonb_build_array(jsonb_build_object('email', v_pessoa.email, 'name', v_pessoa.nome)),
-        'subject', case when v_pessoa.atrasadas > 0 then 'Vértice: atividades atrasadas ou perto do prazo'
-                        when v_pessoa.total = 1 then 'Vértice: 1 atividade perto do prazo'
-                        else format('Vértice: %s atividades perto do prazo', v_pessoa.total) end,
+        'subject', v_assunto,
         'htmlContent', v_html,
-        'textContent', v_texto));
+        'textContent', format(E'Oi, %s!\n\n%s\n\n%s\nAbrir: %s/atividades\n\n'
+                              'Para não receber mais, desligue o lembrete em Meu perfil: %s/perfil',
+                              split_part(v_pessoa.nome, ' ', 1), v_resumo, v_texto, v_site, v_site)));
     update perfil set ultimo_lembrete = v_hoje where id_usuario = v_pessoa.id_usuario;
     v_total := v_total + 1;
   end loop;

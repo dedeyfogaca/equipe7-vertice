@@ -443,9 +443,9 @@ insert into vault.decrypted_secrets values ('brevo_api_key', 'chave-de-teste');
 select teste.confere('o lembrete sai só para quem tem atividade perto do prazo',
   enviar_lembretes('vertice@exemplo.com'), 1);
 select teste.confere('para a Eva, com as 3 atividades do intervalo e o assunto de atraso',
-  (select body -> 'to' -> 0 ->> 'email' || ' ' || (length(body ->> 'htmlContent') - length(replace(body ->> 'htmlContent', '<tr>', ''))) / 4
+  (select body -> 'to' -> 0 ->> 'email' || ' ' || (length(body ->> 'htmlContent') - length(replace(body ->> 'htmlContent', 'border-left:4px', ''))) / 15
           || ' ' || (body ->> 'subject') from net.chamadas),
-  'eva@exemplo.com 3 Vértice: atividades atrasadas ou perto do prazo');
+  'eva@exemplo.com 3 1 atrasada e 2 perto do prazo');
 select teste.confere('com a chave do Brevo no cabeçalho, vinda do Vault',
   (select headers ->> 'api-key' from net.chamadas), 'chave-de-teste');
 select teste.confere('e o título com < e & não quebra o e-mail',
