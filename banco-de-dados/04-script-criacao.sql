@@ -2,10 +2,16 @@
 -- Vértice · Plataforma de Acompanhamento de Aprendizagem
 -- Banco de dados no Supabase (PostgreSQL)
 -- Equipe 7 · criado em 08/11/2026 para a entrega de 27/11 (T46, T49, T50)
+-- Revisado em 11/11/2026: espaço pessoal, perfil da conta, atividade "A definir",
+-- evento de vários dias, conquista que sai junto com a experiência e lembrete
+-- por e-mail.
 --
--- Como usar: no painel do Supabase, abrir "SQL Editor", colar este
--- arquivo inteiro e executar. Ele pode ser executado de novo: apaga o
--- que criou antes (seção 0) e cria tudo outra vez.
+-- Como usar num projeto NOVO: no painel do Supabase, abrir "SQL Editor",
+-- colar este arquivo inteiro e executar.
+--
+-- ATENÇÃO: este arquivo apaga tudo antes de criar (seção 0). Num banco que já
+-- tem dados, não rode este arquivo: rode o script de atualização
+-- (07-atualizacao-11-11.sql), que só acrescenta.
 --
 -- O que muda em relação ao script MySQL da Entrega 2
 --   * chaves em UUID, geradas pelo próprio banco;
@@ -23,11 +29,14 @@
 -- 0. Limpeza (permite executar o arquivo de novo)
 -- =====================================================================
 drop table if exists membro_conquista, conquista, progresso_historico, convite,
-  evento, atividade, conteudo, disciplina, membro, grupo cascade;
+  evento, atividade, conteudo, disciplina, perfil, membro, grupo cascade;
 drop function if exists eh_membro(uuid), eh_organizador(uuid), membro_atual(uuid),
-  grupo_da_disciplina(uuid), grupo_sem_membros(uuid), entrar_com_codigo(text, text),
-  conferir_atividade(), conferir_membro(), conferir_remocao_membro(),
-  conferir_evento(), registrar_progresso(), progresso_da_disciplina(uuid) cascade;
+  grupo_da_disciplina(uuid), grupo_sem_membros(uuid), grupo_pessoal(uuid),
+  entrar_com_codigo(text, text), garantir_espaco_pessoal(),
+  conferir_grupo(), conferir_perfil(), conferir_atividade(), conferir_membro(),
+  conferir_remocao_membro(), conferir_evento(), registrar_progresso(),
+  progresso_da_disciplina(uuid), escapar_html(text), lembretes_do_dia(date),
+  enviar_lembretes(text, text, text) cascade;
 
 
 -- =====================================================================
@@ -35,11 +44,15 @@ drop function if exists eh_membro(uuid), eh_organizador(uuid), membro_atual(uuid
 -- =====================================================================
 
 -- grupo: raiz da estrutura (RF01, RF29)
+-- pessoal = o espaço pessoal da conta (RF34): um grupo de uma pessoa só,
+-- criado pelo próprio banco (garantir_espaco_pessoal), sem convite e sem
+-- outros membros.
 create table grupo (
   id_grupo      uuid primary key default gen_random_uuid(),
   nome          varchar(80)  not null check (char_length(btrim(nome)) > 0),
   descricao     varchar(255),
   foto          text,                       -- caminho no Storage (RF29)
+  pessoal       boolean      not null default false,
   data_criacao  timestamptz  not null default now()
 );
 
@@ -64,6 +77,22 @@ create table membro (
 );
 create index ix_membro_usuario on membro (id_usuario);
 
+-- perfil: nome e foto da conta, que valem em todos os grupos (RF35), e a
+-- escolha do lembrete por e-mail (RF36). Uma linha por conta, criada por
+-- garantir_espaco_pessoal() no primeiro acesso.
+create table perfil (
+  id_usuario        uuid primary key references auth.users (id) on delete cascade,
+  nome              varchar(80) not null check (char_length(btrim(nome)) > 0),
+  avatar            varchar(60),
+  estilo_avatar     varchar(20) not null default 'croodles-neutral'
+                    check (estilo_avatar in ('croodles-neutral', 'notionists')),
+  foto              text,                   -- caminho no Storage (RF35)
+  lembrete_email    boolean     not null default true,
+  id_grupo_pessoal  uuid unique references grupo (id_grupo) on delete set null,
+  ultimo_lembrete   date,                   -- o lembrete sai no máximo uma vez por dia
+  data_criacao      timestamptz not null default now()
+);
+
 -- disciplina (RF13, RF25)
 create table disciplina (
   id_disciplina uuid primary key default gen_random_uuid(),
@@ -87,13 +116,17 @@ create table conteudo (
 create unique index uk_conteudo_nome on conteudo (id_disciplina, lower(btrim(nome)));
 
 -- atividade (RF03, RN06, RN09, RN13, RN20)
+-- id_grupo: onde a atividade mora. A disciplina é obrigatória nos grupos e
+-- opcional no espaço pessoal (RN24); sem responsável, a atividade fica
+-- "A definir" (RN06) e não sai de "a fazer" enquanto ninguém a assume.
 create table atividade (
   id_atividade    uuid primary key default gen_random_uuid(),
-  id_disciplina   uuid not null references disciplina (id_disciplina) on delete cascade,
+  id_grupo        uuid not null references grupo (id_grupo) on delete cascade,
+  id_disciplina   uuid references disciplina (id_disciplina) on delete cascade,
   id_conteudo     uuid references conteudo (id_conteudo) on delete set null,
   -- "no action" (e não "restrict"): a conferência fica para o fim do comando,
   -- e assim a exclusão do grupo inteiro, em cascata, não é barrada
-  id_responsavel  uuid not null references membro (id_membro) on delete no action,
+  id_responsavel  uuid references membro (id_membro) on delete no action,
   titulo          varchar(120) not null check (char_length(btrim(titulo)) >= 3),
   descricao       text,
   prazo           date         not null,
@@ -104,8 +137,11 @@ create table atividade (
   data_criacao    timestamptz  not null default now(),
   data_conclusao  timestamptz,
   -- a data de conclusão acompanha o status
-  check ((status = 'concluido') = (data_conclusao is not null))
+  check ((status = 'concluido') = (data_conclusao is not null)),
+  -- "A definir": ninguém começa nem conclui antes de alguém assumir
+  constraint ck_atividade_a_definir check (id_responsavel is not null or status = 'a fazer')
 );
+create index ix_atividade_grupo       on atividade (id_grupo);
 create index ix_atividade_disciplina  on atividade (id_disciplina);
 create index ix_atividade_responsavel on atividade (id_responsavel, data_conclusao);
 create index ix_atividade_prazo       on atividade (prazo);
@@ -120,12 +156,16 @@ create table evento (
   tipo           varchar(12)  not null
                  check (tipo in ('prova', 'apresentacao', 'palestra', 'reuniao', 'outro')),
   data_evento    date         not null,
+  data_fim       date,                      -- evento de vários dias (RF31)
   hora_inicio    time,
   hora_fim       time,
   local_evento   varchar(120),
   descricao      text,
   data_criacao   timestamptz  not null default now(),
-  check (hora_fim is null or (hora_inicio is not null and hora_fim > hora_inicio))
+  constraint ck_evento_periodo check (data_fim is null or data_fim >= data_evento),
+  -- no mesmo dia, o fim vem depois do início; em vários dias, vale qualquer hora
+  constraint ck_evento_horas check (hora_fim is null or (hora_inicio is not null
+    and (hora_fim > hora_inicio or coalesce(data_fim, data_evento) > data_evento)))
 );
 create index ix_evento_data on evento (id_grupo, data_evento);
 
@@ -162,7 +202,9 @@ create table conquista (
   criterio_valor integer      not null check (criterio_valor > 0)
 );
 
--- membro_conquista: N:N; a chave composta impede a concessão duplicada (RN12)
+-- membro_conquista: N:N; a chave composta impede a concessão duplicada (RN12).
+-- Quando a pessoa desfaz a conclusão e a regra deixa de valer, o próprio
+-- sistema apaga a linha (RN12 revisada).
 create table membro_conquista (
   id_membro        uuid        not null references membro (id_membro) on delete cascade,
   codigo_conquista varchar(30) not null references conquista (codigo) on delete cascade,
@@ -213,38 +255,78 @@ language sql stable security definer set search_path = public as $$
   select id_grupo from disciplina where id_disciplina = p_disciplina
 $$;
 
+create function grupo_pessoal(p_grupo uuid) returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select pessoal from grupo where id_grupo = p_grupo), false)
+$$;
+
 
 -- =====================================================================
 -- 3. Regras de negócio conferidas pelo banco (gatilhos)
 -- As mensagens são as mesmas que o sistema mostra na tela.
 -- =====================================================================
 
--- Atividade: RN13 (conteúdo da mesma disciplina), RN03 (responsável do mesmo
--- grupo), RN20 (só o responsável muda o status) e a data de conclusão.
+-- Atividade: o grupo e a disciplina combinam (RN24), RN13 (conteúdo da mesma
+-- disciplina), RN03 (responsável do mesmo grupo), RN06 ("A definir": quem não
+-- organiza o grupo só pode assumir), RN20 (só o responsável muda o status) e
+-- a data de conclusão.
 create function conferir_atividade() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare
-  v_grupo uuid := grupo_da_disciplina(new.id_disciplina);
+  v_pessoal boolean;
 begin
+  -- Com disciplina, o grupo é o dele. (Uma versão anterior do sistema não
+  -- manda o grupo; nesse caso ele sai da disciplina.)
+  if new.id_disciplina is not null then
+    new.id_grupo := coalesce(new.id_grupo, grupo_da_disciplina(new.id_disciplina));
+    if grupo_da_disciplina(new.id_disciplina) is distinct from new.id_grupo then
+      raise exception 'A disciplina escolhida não pertence a este grupo.' using errcode = 'check_violation';
+    end if;
+  end if;
+  if tg_op = 'UPDATE' and new.id_grupo is distinct from old.id_grupo then
+    raise exception 'A atividade não muda de grupo.' using errcode = 'check_violation';
+  end if;
+
+  -- RN24: a disciplina só é opcional no espaço pessoal, e lá a atividade é
+  -- sempre de quem é dono do espaço.
+  v_pessoal := grupo_pessoal(new.id_grupo);
+  if new.id_disciplina is null and not v_pessoal then
+    raise exception 'Escolha a disciplina da atividade.' using errcode = 'check_violation';
+  end if;
+  if v_pessoal then
+    new.id_responsavel := (select id_membro from membro where id_grupo = new.id_grupo
+                            order by data_criacao limit 1);
+  end if;
+
   if new.id_conteudo is not null and not exists (
        select 1 from conteudo where id_conteudo = new.id_conteudo and id_disciplina = new.id_disciplina) then
     raise exception 'Esse conteúdo é de outra disciplina.' using errcode = 'check_violation';
   end if;
 
-  if not exists (select 1 from membro where id_membro = new.id_responsavel and id_grupo = v_grupo) then
+  if new.id_responsavel is not null
+     and not exists (select 1 from membro where id_membro = new.id_responsavel and id_grupo = new.id_grupo) then
     raise exception 'O responsável precisa ser membro do grupo.' using errcode = 'check_violation';
   end if;
 
-  -- RN20: só o responsável muda o status. Na criação, só quem é o próprio
-  -- responsável pode criar a atividade já fora de "a fazer". Quando não há
-  -- conta logada (auth.uid() nulo: carga feita pelo próprio painel), não se aplica.
+  -- Quando não há conta logada (auth.uid() nulo: carga feita pelo próprio
+  -- painel), as regras de quem pode o quê não se aplicam.
   if auth.uid() is not null then
+    -- RN06: numa atividade "A definir", quem não é organizador só assume
+    -- para si e não muda mais nada.
+    if tg_op = 'UPDATE' and old.id_responsavel is null and not eh_organizador(new.id_grupo)
+       and (new.id_responsavel is distinct from membro_atual(new.id_grupo)
+            or (to_jsonb(new) - 'id_responsavel') <> (to_jsonb(old) - 'id_responsavel')) then
+      raise exception 'Assuma a atividade antes de mudar outra coisa nela.' using errcode = 'insufficient_privilege';
+    end if;
+
+    -- RN20: só o responsável muda o status. Na criação, só quem é o próprio
+    -- responsável pode criar a atividade já fora de "a fazer".
     if tg_op = 'INSERT' and new.status <> 'a fazer'
-       and membro_atual(v_grupo) is distinct from new.id_responsavel then
+       and membro_atual(new.id_grupo) is distinct from new.id_responsavel then
       raise exception 'Só o responsável muda o status da atividade.' using errcode = 'insufficient_privilege';
     end if;
     if tg_op = 'UPDATE' and new.status is distinct from old.status
-       and membro_atual(v_grupo) is distinct from old.id_responsavel then
+       and membro_atual(new.id_grupo) is distinct from old.id_responsavel then
       raise exception 'Só o responsável muda o status da atividade.' using errcode = 'insufficient_privilege';
     end if;
   end if;
@@ -261,6 +343,35 @@ end $$;
 create trigger tg_conferir_atividade
   before insert or update on atividade
   for each row execute function conferir_atividade();
+
+-- Grupo: o espaço pessoal continua pessoal (e o grupo comum não vira pessoal)
+create function conferir_grupo() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.pessoal := old.pessoal;
+  return new;
+end $$;
+
+create trigger tg_conferir_grupo
+  before update on grupo
+  for each row execute function conferir_grupo();
+
+-- Perfil: a ligação com o espaço pessoal e o dia do último lembrete são do
+-- próprio banco; a pessoa muda o nome, a foto, o avatar e o lembrete.
+create function conferir_perfil() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null and coalesce(current_setting('vertice.sistema', true), '') <> 'sim' then
+    new.id_usuario := old.id_usuario;
+    new.id_grupo_pessoal := old.id_grupo_pessoal;
+    new.ultimo_lembrete := old.ultimo_lembrete;
+  end if;
+  return new;
+end $$;
+
+create trigger tg_conferir_perfil
+  before update on perfil
+  for each row execute function conferir_perfil();
 
 -- Membro: o grupo não fica sem organizador (RN07) e ninguém se promove
 -- a organizador sozinho.
@@ -364,36 +475,99 @@ create trigger tg_registrar_progresso
 -- 4. Entrada por convite (chamada pelo sistema)
 -- =====================================================================
 
+-- Espaço pessoal (RF34) e perfil da conta (RF35). O sistema chama esta
+-- função toda vez que a conta entra; ela só cria o que ainda não existe e
+-- devolve o id do espaço pessoal. Quem já tinha conta antes da revisão de
+-- 11/11 ganha o espaço e o perfil no primeiro acesso, sem perder nada: o
+-- perfil nasce do cadastro da conta e do cadastro mais recente nos grupos
+-- (o que tiver foto), e a partir daí o nome e a foto valem em todos os grupos.
+create function garantir_espaco_pessoal() returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  v_uid    uuid := auth.uid();
+  v_email  text;
+  v_meta   jsonb;
+  v_base   membro;
+  v_perfil perfil;
+  v_grupo  uuid;
+begin
+  if v_uid is null then
+    raise exception 'Entre com a sua conta.' using errcode = 'insufficient_privilege';
+  end if;
+
+  select email, coalesce(raw_user_meta_data, '{}'::jsonb) into v_email, v_meta from auth.users where id = v_uid;
+  select * into v_base from membro where id_usuario = v_uid
+   order by (foto is not null) desc, data_criacao desc limit 1;
+
+  insert into perfil (id_usuario, nome, avatar, estilo_avatar, foto)
+  values (v_uid,
+          left(coalesce(nullif(btrim(v_meta ->> 'nome'), ''), nullif(btrim(v_meta ->> 'full_name'), ''),
+                        nullif(btrim(v_meta ->> 'name'), ''), v_base.nome,
+                        nullif(split_part(coalesce(v_email, ''), '@', 1), ''), 'Você'), 80),
+          coalesce(v_base.avatar, substr(md5(v_uid::text), 1, 8)),
+          coalesce(v_base.estilo_avatar, 'croodles-neutral'),
+          v_base.foto)
+  on conflict (id_usuario) do nothing;
+
+  -- "for update": duas abas abrindo juntas não criam dois espaços
+  select * into v_perfil from perfil where id_usuario = v_uid for update;
+  if v_perfil.id_grupo_pessoal is not null then
+    return v_perfil.id_grupo_pessoal;
+  end if;
+
+  insert into grupo (nome, pessoal) values ('Pessoal', true) returning id_grupo into v_grupo;
+  insert into membro (id_grupo, id_usuario, nome, email, avatar, estilo_avatar, foto, perfil)
+  values (v_grupo, v_uid, v_perfil.nome, v_email, v_perfil.avatar, v_perfil.estilo_avatar, v_perfil.foto, 'organizador');
+  perform set_config('vertice.sistema', 'sim', true);
+  update perfil set id_grupo_pessoal = v_grupo where id_usuario = v_uid;
+  perform set_config('vertice.sistema', '', true);
+
+  -- o nome e a foto da conta passam a valer em todos os grupos
+  update membro set nome = v_perfil.nome, avatar = v_perfil.avatar,
+                    estilo_avatar = v_perfil.estilo_avatar, foto = v_perfil.foto
+   where id_usuario = v_uid and id_grupo <> v_grupo;
+  return v_grupo;
+end $$;
+
 -- Entrar com código de convite (RF28). Se o organizador já tinha
 -- cadastrado a pessoa com o mesmo e-mail, a conta é ligada a esse cadastro.
+-- Nos dois casos, o membro fica com o nome e a foto do perfil da conta (RF35).
 create function entrar_com_codigo(p_codigo text, p_nome text)
 returns uuid language plpgsql security definer set search_path = public as $$
 declare
   v_convite convite;
   v_email   text := (select email from auth.users where id = auth.uid());
+  v_perfil  perfil;
   v_membro  uuid;
 begin
   if auth.uid() is null then
     raise exception 'Entre com a sua conta para usar o convite.' using errcode = 'insufficient_privilege';
   end if;
   select * into v_convite from convite where codigo = upper(btrim(p_codigo));
-  if not found or not v_convite.ativo or v_convite.expira_em < now() then
+  if not found or not v_convite.ativo or v_convite.expira_em < now() or grupo_pessoal(v_convite.id_grupo) then
     raise exception 'Código de convite inválido ou vencido.' using errcode = 'no_data_found';
   end if;
   if eh_membro(v_convite.id_grupo) then
     return v_convite.id_grupo;
   end if;
+  select * into v_perfil from perfil where id_usuario = auth.uid();
   select id_membro into v_membro from membro
    where id_grupo = v_convite.id_grupo and id_usuario is null
      and v_email is not null and lower(email) = lower(v_email)
    limit 1;
   if v_membro is not null then
     perform set_config('vertice.ligando_conta', 'sim', true);
-    update membro set id_usuario = auth.uid() where id_membro = v_membro;
+    update membro set id_usuario = auth.uid(),
+                      nome = coalesce(v_perfil.nome, nome),
+                      avatar = coalesce(v_perfil.avatar, avatar),
+                      estilo_avatar = coalesce(v_perfil.estilo_avatar, estilo_avatar),
+                      foto = case when v_perfil.id_usuario is null then foto else v_perfil.foto end
+     where id_membro = v_membro;
     perform set_config('vertice.ligando_conta', '', true);
   else
-    insert into membro (id_grupo, id_usuario, nome, email, perfil)
-      values (v_convite.id_grupo, auth.uid(), btrim(p_nome), v_email, 'participante');
+    insert into membro (id_grupo, id_usuario, nome, email, avatar, estilo_avatar, foto, perfil)
+      values (v_convite.id_grupo, auth.uid(), coalesce(v_perfil.nome, btrim(p_nome)), v_email,
+              v_perfil.avatar, coalesce(v_perfil.estilo_avatar, 'croodles-neutral'), v_perfil.foto, 'participante');
   end if;
   return v_convite.id_grupo;
 end $$;
@@ -403,6 +577,7 @@ end $$;
 -- =====================================================================
 alter table grupo               enable row level security;
 alter table membro              enable row level security;
+alter table perfil              enable row level security;
 alter table disciplina          enable row level security;
 alter table conteudo            enable row level security;
 alter table atividade           enable row level security;
@@ -412,23 +587,31 @@ alter table progresso_historico enable row level security;
 alter table conquista           enable row level security;
 alter table membro_conquista    enable row level security;
 
--- grupo: qualquer conta cria; vê quem é membro; edita e exclui o organizador
-create policy grupo_criar   on grupo for insert to authenticated with check (auth.uid() is not null);
+-- grupo: qualquer conta cria; vê quem é membro; edita e exclui o organizador.
+-- O espaço pessoal só o banco cria (garantir_espaco_pessoal) e não é excluído.
+create policy grupo_criar   on grupo for insert to authenticated with check (auth.uid() is not null and not pessoal);
 create policy grupo_ver     on grupo for select to authenticated using (eh_membro(id_grupo));
 create policy grupo_editar  on grupo for update to authenticated using (eh_organizador(id_grupo));
-create policy grupo_excluir on grupo for delete to authenticated using (eh_organizador(id_grupo));
+create policy grupo_excluir on grupo for delete to authenticated using (eh_organizador(id_grupo) and not pessoal);
+
+-- perfil: cada conta vê e edita só o próprio (quem cria é garantir_espaco_pessoal)
+create policy perfil_ver    on perfil for select to authenticated using (id_usuario = auth.uid());
+create policy perfil_editar on perfil for update to authenticated using (id_usuario = auth.uid());
 
 -- membro: o organizador cadastra, edita e remove; cada um edita o próprio
 -- cadastro. Num grupo recém-criado, quem cria entra como organizador (RN07).
 -- Remover um membro com atividades exige passá-las antes a outro (RN02):
 -- o sistema atualiza as atividades e depois exclui o membro.
 create policy membro_ver       on membro for select to authenticated using (eh_membro(id_grupo));
+-- O espaço pessoal não recebe ninguém além do dono.
 create policy membro_cadastrar on membro for insert to authenticated
-  with check (eh_organizador(id_grupo)
-              or (grupo_sem_membros(id_grupo) and id_usuario = auth.uid() and perfil = 'organizador'));
+  with check (not grupo_pessoal(id_grupo)
+              and (eh_organizador(id_grupo)
+                   or (grupo_sem_membros(id_grupo) and id_usuario = auth.uid() and perfil = 'organizador')));
 create policy membro_editar    on membro for update to authenticated
   using (eh_organizador(id_grupo) or id_usuario = auth.uid());
-create policy membro_excluir   on membro for delete to authenticated using (eh_organizador(id_grupo));
+create policy membro_excluir   on membro for delete to authenticated
+  using (eh_organizador(id_grupo) and not grupo_pessoal(id_grupo));
 
 -- disciplina e conteúdo: estrutura do grupo, gerida pelo organizador (RN07)
 create policy disciplina_ver     on disciplina for select to authenticated using (eh_membro(id_grupo));
@@ -446,18 +629,16 @@ create policy conteudo_excluir on conteudo for delete to authenticated
   using (eh_organizador(grupo_da_disciplina(id_disciplina)));
 
 -- atividade: qualquer membro cadastra; editar e excluir, o organizador ou o
--- responsável (RN07); mudar o status, só o responsável (RN20, no gatilho)
-create policy atividade_ver       on atividade for select to authenticated
-  using (eh_membro(grupo_da_disciplina(id_disciplina)));
-create policy atividade_cadastrar on atividade for insert to authenticated
-  with check (eh_membro(grupo_da_disciplina(id_disciplina)));
+-- responsável (RN07); mudar o status, só o responsável (RN20, no gatilho).
+-- A atividade "A definir" qualquer membro pode assumir (RN06, no gatilho).
+create policy atividade_ver       on atividade for select to authenticated using (eh_membro(id_grupo));
+create policy atividade_cadastrar on atividade for insert to authenticated with check (eh_membro(id_grupo));
 create policy atividade_editar    on atividade for update to authenticated
-  using (eh_organizador(grupo_da_disciplina(id_disciplina))
-         or id_responsavel = membro_atual(grupo_da_disciplina(id_disciplina)))
-  with check (eh_membro(grupo_da_disciplina(id_disciplina)));
+  using (eh_organizador(id_grupo) or id_responsavel = membro_atual(id_grupo)
+         or (id_responsavel is null and eh_membro(id_grupo)))
+  with check (eh_membro(id_grupo));
 create policy atividade_excluir   on atividade for delete to authenticated
-  using (eh_organizador(grupo_da_disciplina(id_disciplina))
-         or id_responsavel = membro_atual(grupo_da_disciplina(id_disciplina)));
+  using (eh_organizador(id_grupo) or id_responsavel = membro_atual(id_grupo));
 
 -- evento: qualquer membro cadastra; editar e excluir, o autor ou o organizador (RN21)
 create policy evento_ver       on evento for select to authenticated using (eh_membro(id_grupo));
@@ -467,9 +648,11 @@ create policy evento_editar    on evento for update to authenticated
 create policy evento_excluir   on evento for delete to authenticated
   using (eh_organizador(id_grupo) or id_criador = membro_atual(id_grupo));
 
--- convite: só o organizador vê e gera (a entrada é por entrar_com_codigo())
+-- convite: só o organizador vê e gera (a entrada é por entrar_com_codigo());
+-- o espaço pessoal não tem convite
 create policy convite_ver     on convite for select to authenticated using (eh_organizador(id_grupo));
-create policy convite_criar   on convite for insert to authenticated with check (eh_organizador(id_grupo));
+create policy convite_criar   on convite for insert to authenticated
+  with check (eh_organizador(id_grupo) and not grupo_pessoal(id_grupo));
 create policy convite_editar  on convite for update to authenticated using (eh_organizador(id_grupo));
 create policy convite_excluir on convite for delete to authenticated using (eh_organizador(id_grupo));
 
@@ -478,24 +661,30 @@ create policy progresso_ver on progresso_historico for select to authenticated
   using (eh_membro(grupo_da_disciplina(id_disciplina)));
 
 -- conquistas: o catálogo é público para quem está logado; a conquista de um
--- membro é vista pelo grupo e gravada pela própria pessoa (quem conclui a
--- atividade é o responsável, que é quem ganha a conquista)
+-- membro é vista pelo grupo e gravada (ou retirada, RN12) pela própria pessoa
+-- (quem conclui a atividade é o responsável, que é quem ganha a conquista)
 create policy conquista_ver on conquista for select to authenticated using (true);
 create policy membro_conquista_ver on membro_conquista for select to authenticated
   using (eh_membro((select id_grupo from membro m where m.id_membro = membro_conquista.id_membro)));
 create policy membro_conquista_gravar on membro_conquista for insert to authenticated
   with check (exists (select 1 from membro m
                       where m.id_membro = membro_conquista.id_membro and m.id_usuario = auth.uid()));
+create policy membro_conquista_retirar on membro_conquista for delete to authenticated
+  using (exists (select 1 from membro m
+                 where m.id_membro = membro_conquista.id_membro and m.id_usuario = auth.uid()));
 
--- A entrada por convite fica disponível só para quem está logado
+-- A entrada por convite e o espaço pessoal ficam disponíveis só para quem está logado
 revoke execute on function entrar_com_codigo(text, text) from public, anon;
+revoke execute on function garantir_espaco_pessoal() from public, anon;
 grant execute on function entrar_com_codigo(text, text) to authenticated;
+grant execute on function garantir_espaco_pessoal() to authenticated;
 
 -- =====================================================================
 -- 6. Fotos (RF24, RF29): bucket "fotos" no Storage
 -- =====================================================================
 -- Leitura pública (a foto aparece pelo endereço). Gravar, só na pasta de um
--- grupo de que a conta é membro: fotos/<id do grupo>/<arquivo>.jpg
+-- grupo de que a conta é membro: fotos/<id do grupo>/<arquivo>.jpg. A foto
+-- do perfil fica na pasta do espaço pessoal.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('fotos', 'fotos', true, 1048576, array['image/jpeg'])
 on conflict (id) do update set public = true, file_size_limit = 1048576, allowed_mime_types = array['image/jpeg'];
@@ -503,3 +692,135 @@ on conflict (id) do update set public = true, file_size_limit = 1048576, allowed
 drop policy if exists fotos_enviar on storage.objects;
 create policy fotos_enviar on storage.objects for insert to authenticated
   with check (bucket_id = 'fotos' and public.eh_membro(((storage.foldername(name))[1])::uuid));
+
+-- =====================================================================
+-- 7. Lembrete diário por e-mail (RF36, RN25)
+-- =====================================================================
+-- Uma vez por dia, cada conta que não desligou o lembrete recebe um e-mail
+-- com as atividades sob a responsabilidade dela que vencem hoje ou nos
+-- próximos 2 dias, ou que venceram nos últimos 7 dias, e ainda não foram
+-- concluídas. Quem não tem nada nesse intervalo não recebe e-mail.
+--
+-- Quem envia é o Brevo (api.brevo.com), chamado pelo próprio banco com a
+-- extensão pg_net; quem dispara todo dia é a extensão pg_cron. A chave do
+-- Brevo fica guardada no Vault do Supabase com o nome "brevo_api_key" e não
+-- aparece em nenhum arquivo do projeto. O passo a passo está no README,
+-- na seção "Lembrete por e-mail".
+
+create function escapar_html(p_texto text) returns text
+language sql immutable as $$
+  select replace(replace(replace(replace(coalesce(p_texto, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), '"', '&quot;')
+$$;
+
+-- As atividades de cada conta que entram no lembrete do dia.
+create function lembretes_do_dia(p_hoje date default (now() at time zone 'America/Sao_Paulo')::date)
+returns table (id_usuario uuid, email text, nome text, titulo text, prazo date, onde text, disciplina text)
+language sql stable security definer set search_path = public as $$
+  select p.id_usuario, u.email::text, p.nome::text, a.titulo::text, a.prazo,
+         case when g.pessoal then 'Pessoal' else g.nome::text end, d.nome::text
+    from perfil p
+    join auth.users u on u.id = p.id_usuario
+    join membro m     on m.id_usuario = p.id_usuario
+    join atividade a  on a.id_responsavel = m.id_membro
+    join grupo g      on g.id_grupo = a.id_grupo
+    left join disciplina d on d.id_disciplina = a.id_disciplina
+   where p.lembrete_email
+     and u.email is not null
+     and (p.ultimo_lembrete is null or p.ultimo_lembrete < p_hoje)
+     and a.status <> 'concluido'
+     and a.prazo between p_hoje - 7 and p_hoje + 2
+   order by p.id_usuario, a.prazo, a.titulo
+$$;
+
+-- Monta e envia os e-mails do dia. Devolve quantos foram enviados. Rodar de
+-- novo no mesmo dia não manda nada repetido (perfil.ultimo_lembrete).
+create function enviar_lembretes(p_remetente text, p_nome_remetente text default 'Vértice',
+                                 p_site text default 'https://equipe7-vertice.vercel.app')
+returns integer language plpgsql security definer set search_path = public as $$
+declare
+  v_hoje   date := (now() at time zone 'America/Sao_Paulo')::date;
+  v_chave  text;
+  v_pessoa record;
+  v_html   text;
+  v_texto  text;
+  v_total  integer := 0;
+begin
+  select decrypted_secret into v_chave from vault.decrypted_secrets where name = 'brevo_api_key';
+  if v_chave is null then
+    raise exception 'Guarde a chave do Brevo no Vault com o nome brevo_api_key.';
+  end if;
+
+  for v_pessoa in
+    with itens as (
+      select l.*,
+             case when l.prazo < v_hoje then 'Venceu em ' || to_char(l.prazo, 'DD/MM')
+                  when l.prazo = v_hoje then 'Vence hoje'
+                  when l.prazo = v_hoje + 1 then 'Vence amanhã'
+                  else 'Vence em ' || to_char(l.prazo, 'DD/MM') end as situacao,
+             concat_ws(' · ', l.onde, l.disciplina) as lugar
+        from lembretes_do_dia(v_hoje) l
+    )
+    select id_usuario, min(email) as email, min(nome) as nome, count(*) as total,
+           count(*) filter (where prazo < v_hoje) as atrasadas,
+           string_agg(format(
+             '<tr><td style="padding:10px 12px;border-top:1px solid #e2e8f0;white-space:nowrap;font-weight:600;color:%s">%s</td>'
+             '<td style="padding:10px 12px;border-top:1px solid #e2e8f0"><div style="font-weight:600;color:#0f172a">%s</div>'
+             '<div style="font-size:13px;color:#64748b">%s</div></td></tr>',
+             case when prazo < v_hoje then '#dc2626' when prazo = v_hoje then '#d97706' else '#0e7490' end,
+             situacao, escapar_html(titulo), escapar_html(lugar)), '' order by prazo, titulo) as linhas,
+           string_agg(format('- %s: %s (%s)', situacao, titulo, lugar), E'\n' order by prazo, titulo) as linhas_texto
+      from itens
+     group by id_usuario
+  loop
+    v_html := format(
+      '<div style="background:#f1f5f9;padding:24px 12px;font-family:Arial,Helvetica,sans-serif">'
+      '<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">'
+      '<div style="background:#0e7490;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:700">Vértice</div>'
+      '<div style="padding:24px">'
+      '<p style="margin:0 0 6px;font-size:17px;color:#0f172a">Oi, %s!</p>'
+      '<p style="margin:0 0 18px;font-size:15px;color:#334155">%s</p>'
+      '<table style="width:100%%;border-collapse:collapse;font-size:14px">%s</table>'
+      '<p style="margin:22px 0 0"><a href="%s/atividades" style="display:inline-block;background:#0e7490;color:#ffffff;text-decoration:none;padding:11px 18px;border-radius:10px;font-weight:600">Abrir as minhas atividades</a></p>'
+      '</div>'
+      '<div style="padding:14px 24px;background:#f8fafc;font-size:12px;color:#64748b">'
+      'Você recebe este lembrete porque ele está ligado no seu perfil. Para não receber mais, desligue em Meu perfil, no Vértice.'
+      '</div></div></div>',
+      escapar_html(split_part(v_pessoa.nome, ' ', 1)),
+      case when v_pessoa.total = 1 then 'Uma atividade sua está perto do prazo ou atrasada:'
+           else format('%s atividades suas estão perto do prazo ou atrasadas:', v_pessoa.total) end,
+      v_pessoa.linhas, rtrim(p_site, '/'));
+    v_texto := format(E'Oi, %s!\n\nAtividades suas perto do prazo ou atrasadas:\n%s\n\nAbrir: %s/atividades\n\n'
+                      'Para não receber mais, desligue o lembrete em Meu perfil, no Vértice.',
+                      split_part(v_pessoa.nome, ' ', 1), v_pessoa.linhas_texto, rtrim(p_site, '/'));
+
+    perform net.http_post(
+      url     := 'https://api.brevo.com/v3/smtp/email',
+      headers := jsonb_build_object('api-key', v_chave, 'Content-Type', 'application/json', 'Accept', 'application/json'),
+      body    := jsonb_build_object(
+        'sender', jsonb_build_object('name', p_nome_remetente, 'email', p_remetente),
+        'to', jsonb_build_array(jsonb_build_object('email', v_pessoa.email, 'name', v_pessoa.nome)),
+        'subject', case when v_pessoa.atrasadas > 0 then 'Vértice: atividades atrasadas ou perto do prazo'
+                        when v_pessoa.total = 1 then 'Vértice: 1 atividade perto do prazo'
+                        else format('Vértice: %s atividades perto do prazo', v_pessoa.total) end,
+        'htmlContent', v_html,
+        'textContent', v_texto));
+    update perfil set ultimo_lembrete = v_hoje where id_usuario = v_pessoa.id_usuario;
+    v_total := v_total + 1;
+  end loop;
+  return v_total;
+end $$;
+
+-- =====================================================================
+-- 8. Acesso pela API do Supabase
+-- =====================================================================
+-- O Supabase pode criar as tabelas novas sem acesso pela API (depende da
+-- configuração do projeto). As permissões ficam explícitas aqui; quem limita
+-- o que cada conta vê e altera continuam sendo as regras de acesso por linha.
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant select on conquista to anon;
+grant execute on all functions in schema public to authenticated;
+
+-- Só o agendamento (pg_cron, que roda como dono do banco) chama o envio.
+revoke execute on function lembretes_do_dia(date) from public, anon, authenticated;
+revoke execute on function enviar_lembretes(text, text, text) from public, anon, authenticated;

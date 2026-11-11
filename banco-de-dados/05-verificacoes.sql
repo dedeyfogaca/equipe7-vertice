@@ -7,6 +7,8 @@
 -- No repositório de trabalho os mesmos arquivos estão em supabase/:
 -- stub-supabase.sql, schema.sql e testes.sql.
 -- Cada conferência imprime "ok" ou "FALHOU"; no fim, o total.
+-- As conferências do fim (espaço pessoal, "A definir", evento de vários dias,
+-- conquista retirada e lembrete) entraram na revisão de 11/11/2026.
 -- =====================================================================
 \set ON_ERROR_STOP 1
 \o /dev/null
@@ -191,7 +193,7 @@ select teste.confere('o autor do evento é quem está logado',
 select teste.recusa('fim antes do início é recusado',
   format($$ insert into evento (id_grupo, titulo, tipo, data_evento, hora_inicio, hora_fim)
             values (%L, 'Prova', 'prova', current_date, '20:00', '19:00') $$, (select grupo from ids)),
-  'new row for relation "evento" violates check constraint "evento_check"');
+  'new row for relation "evento" violates check constraint "ck_evento_horas"');
 
 select teste.como('00000000-0000-0000-0000-00000000000b');
 update evento set local_evento = 'Sala do Bruno' where titulo = 'Reunião do grupo';
@@ -265,6 +267,193 @@ select teste.confere('excluir o grupo leva membros, eventos e convites',
 reset role;
 select teste.como(null);
 select teste.confere('a intrusa continua com o grupo dela', (select count(*) from grupo), 1::bigint);
+
+-- =====================================================================
+-- Revisão de 11/11/2026
+-- =====================================================================
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-00000000000e', 'eva@exemplo.com', '{"nome": "Eva Melo"}'),
+  ('00000000-0000-0000-0000-00000000000f', 'fabio@exemplo.com', '{}'),
+  ('00000000-0000-0000-0000-000000000010', 'gil@exemplo.com', '{"full_name": "Gil Prado"}');
+set role authenticated;
+
+-- ---------------------------------------------------------------------
+-- Espaço pessoal e perfil da conta (RF34, RF35, RN24)
+-- ---------------------------------------------------------------------
+select teste.como('00000000-0000-0000-0000-00000000000e');
+reset role;
+create temp table ids4 (pessoal uuid);
+grant all on ids4 to authenticated;
+set role authenticated;
+insert into ids4 select garantir_espaco_pessoal();
+select teste.confere('o primeiro acesso cria o espaço pessoal',
+  (select pessoal from grupo where id_grupo = (select pessoal from ids4)), true);
+select garantir_espaco_pessoal();
+select teste.confere('e o segundo acesso devolve o mesmo espaço, sem criar outro',
+  (select count(*) from grupo where pessoal), 1::bigint);
+select teste.confere('o perfil nasce com o nome do cadastro da conta',
+  (select nome from perfil), 'Eva Melo'::varchar);
+select teste.confere('e a pessoa é a organizadora do próprio espaço',
+  (select perfil from membro where id_grupo = (select pessoal from ids4)), 'organizador'::varchar);
+select teste.recusa('ninguém cria um espaço pessoal por fora',
+  $$ insert into grupo (nome, pessoal) values ('Outro pessoal', true) $$,
+  'new row violates row-level security policy for table "grupo"');
+update grupo set pessoal = false where pessoal;
+select teste.confere('o espaço pessoal não deixa de ser pessoal', (select count(*) from grupo where pessoal), 1::bigint);
+delete from grupo where pessoal;
+select teste.confere('e não é excluído', (select count(*) from grupo where pessoal), 1::bigint);
+select teste.recusa('o espaço pessoal não tem convite',
+  $$ insert into convite (id_grupo, codigo) values (garantir_espaco_pessoal(), 'PESS2345') $$,
+  'new row violates row-level security policy for table "convite"');
+select teste.recusa('nem recebe outro membro',
+  $$ insert into membro (id_grupo, nome) values (garantir_espaco_pessoal(), 'Visita') $$,
+  'new row violates row-level security policy for table "membro"');
+
+insert into atividade (id_grupo, titulo, prazo) values (garantir_espaco_pessoal(), 'Pagar a conta de luz', current_date + 1);
+select teste.confere('atividade pessoal sem disciplina fica com a dona do espaço (RN24)',
+  (select m.nome from atividade a join membro m on m.id_membro = a.id_responsavel where a.titulo = 'Pagar a conta de luz'),
+  'Eva Melo'::varchar);
+
+update perfil set nome = 'Eva M. Melo', id_grupo_pessoal = null, ultimo_lembrete = current_date;
+select teste.confere('o perfil muda o nome, mas não a ligação com o espaço nem o lembrete',
+  (select nome = 'Eva M. Melo' and id_grupo_pessoal is not null and ultimo_lembrete is null from perfil), true);
+update perfil set nome = 'Eva Melo';
+
+-- grupo comum da Eva, com disciplina e convite
+reset role;
+create temp table ids3 as select gen_random_uuid() as grupo;
+grant all on ids3 to authenticated;
+set role authenticated;
+insert into grupo (id_grupo, nome) select grupo, 'Turma de Redes' from ids3;
+insert into membro (id_grupo, id_usuario, nome, email, perfil) select grupo, auth.uid(), 'Eva Melo', 'eva@exemplo.com', 'organizador' from ids3;
+insert into disciplina (id_grupo, nome) select grupo, 'Redes' from ids3;
+insert into convite (id_grupo, codigo) select grupo, 'REDE2345' from ids3;
+insert into membro (id_grupo, nome, email) select grupo, 'Gil (cadastrado)', 'gil@exemplo.com' from ids3;
+
+select teste.recusa('no grupo, a atividade precisa de disciplina (RN24)',
+  format($$ insert into atividade (id_grupo, titulo, prazo) values (%L, 'Sem disciplina', current_date) $$, (select grupo from ids3)),
+  'Escolha a disciplina da atividade.');
+
+select teste.como('00000000-0000-0000-0000-00000000000f');
+select garantir_espaco_pessoal();
+select teste.confere('sem nome no cadastro, o perfil usa o começo do e-mail', (select nome from perfil), 'fabio'::varchar);
+update perfil set nome = 'Fábio Reis', avatar = 'fabio1';
+select teste.confere('outra conta não vê o espaço pessoal da Eva',
+  (select count(*) from grupo where pessoal), 1::bigint);
+select entrar_com_codigo('REDE2345', 'qualquer nome');
+select teste.confere('quem entra por convite fica com o nome e o avatar do perfil (RF35)',
+  (select nome || '/' || avatar from membro where id_usuario = auth.uid() and id_grupo = (select grupo from ids3)),
+  'Fábio Reis/fabio1');
+
+-- Gil já estava cadastrado pela Eva; entra e muda a foto no grupo antes da revisão
+select teste.como('00000000-0000-0000-0000-000000000010');
+reset role;
+-- (o membro dele é ligado como se fosse antes da revisão, sem perfil)
+set vertice.ligando_conta = 'sim';
+update membro set id_usuario = '00000000-0000-0000-0000-000000000010', foto = 'https://exemplo.com/gil.jpg'
+ where nome = 'Gil (cadastrado)';
+reset vertice.ligando_conta;
+set role authenticated;
+select garantir_espaco_pessoal();
+select teste.confere('quem já tinha conta ganha o perfil com o nome da conta e a foto do grupo',
+  (select nome || ' ' || foto from perfil), 'Gil Prado https://exemplo.com/gil.jpg');
+select teste.confere('e o nome e a foto passam a valer em todos os grupos',
+  (select count(*) from membro where id_usuario = auth.uid() and nome = 'Gil Prado' and foto = 'https://exemplo.com/gil.jpg'),
+  2::bigint);
+
+-- ---------------------------------------------------------------------
+-- Atividade "A definir" (RN06 revisada)
+-- ---------------------------------------------------------------------
+select teste.como('00000000-0000-0000-0000-00000000000e');
+insert into atividade (id_grupo, id_disciplina, titulo, prazo)
+  select grupo, (select id_disciplina from disciplina where nome = 'Redes'), 'Montar a topologia', current_date + 2 from ids3;
+select teste.confere('a atividade pode ficar sem responsável',
+  (select id_responsavel from atividade where titulo = 'Montar a topologia'), null::uuid);
+select teste.recusa('mas não é concluída sem alguém assumir',
+  $$ insert into atividade (id_grupo, id_disciplina, titulo, prazo, status)
+     select id_grupo, id_disciplina, 'Já pronta', current_date, 'concluido' from disciplina where nome = 'Redes' $$,
+  'Só o responsável muda o status da atividade.');
+reset role;
+select teste.como(null);
+select teste.recusa('nem mesmo pela carga direta do painel',
+  $$ insert into atividade (id_grupo, id_disciplina, titulo, prazo, status, data_conclusao)
+     select id_grupo, id_disciplina, 'Já pronta', current_date, 'concluido', now() from disciplina where nome = 'Redes' $$,
+  'new row for relation "atividade" violates check constraint "ck_atividade_a_definir"');
+set role authenticated;
+
+select teste.como('00000000-0000-0000-0000-00000000000f');
+select teste.confere('qualquer membro vê a atividade "A definir"',
+  (select count(*) from atividade where titulo = 'Montar a topologia'), 1::bigint);
+select teste.recusa('o participante não muda o título sem assumir',
+  $$ update atividade set titulo = 'Outro título' where titulo = 'Montar a topologia' $$,
+  'Assuma a atividade antes de mudar outra coisa nela.');
+select teste.recusa('nem passa a atividade para outra pessoa',
+  $$ update atividade set id_responsavel = (select id_membro from membro where nome = 'Gil Prado')
+     where titulo = 'Montar a topologia' $$,
+  'Assuma a atividade antes de mudar outra coisa nela.');
+update atividade set id_responsavel = membro_atual(id_grupo) where titulo = 'Montar a topologia';
+select teste.confere('mas assume para si',
+  (select m.nome from atividade a join membro m on m.id_membro = a.id_responsavel where a.titulo = 'Montar a topologia'),
+  'Fábio Reis'::varchar);
+update atividade set status = 'concluido' where titulo = 'Montar a topologia';
+select teste.confere('e, depois de assumir, conclui',
+  (select status from atividade where titulo = 'Montar a topologia'), 'concluido'::varchar);
+select teste.recusa('a atividade não muda de grupo',
+  $$ update atividade set id_grupo = garantir_espaco_pessoal() where titulo = 'Montar a topologia' $$,
+  'A disciplina escolhida não pertence a este grupo.');
+
+-- ---------------------------------------------------------------------
+-- Conquista retirada junto com a experiência (RN12 revisada)
+-- ---------------------------------------------------------------------
+insert into membro_conquista (id_membro, codigo_conquista)
+  select membro_atual(grupo), 'PRIMEIRO_PASSO' from ids3;
+select teste.como('00000000-0000-0000-0000-00000000000e');
+delete from membro_conquista;
+select teste.confere('ninguém retira a conquista de outra pessoa', (select count(*) from membro_conquista), 1::bigint);
+select teste.como('00000000-0000-0000-0000-00000000000f');
+delete from membro_conquista;
+select teste.confere('a própria pessoa retira a dela', (select count(*) from membro_conquista), 0::bigint);
+
+-- ---------------------------------------------------------------------
+-- Evento de vários dias (RF31)
+-- ---------------------------------------------------------------------
+select teste.recusa('o fim do evento não vem antes do começo',
+  format($$ insert into evento (id_grupo, titulo, tipo, data_evento, data_fim) values (%L, 'Semana acadêmica', 'palestra', current_date + 5, current_date + 1) $$,
+         (select grupo from ids3)),
+  'new row for relation "evento" violates check constraint "ck_evento_periodo"');
+insert into evento (id_grupo, titulo, tipo, data_evento, data_fim, hora_inicio, hora_fim)
+  select grupo, 'Semana acadêmica', 'palestra', current_date + 1, current_date + 3, '19:00', '10:00' from ids3;
+select teste.confere('em vários dias, a hora do fim pode ser menor que a do começo',
+  (select data_fim - data_evento from evento where titulo = 'Semana acadêmica'), 2);
+
+-- ---------------------------------------------------------------------
+-- Lembrete por e-mail (RF36, RN25)
+-- ---------------------------------------------------------------------
+select teste.recusa('uma conta não dispara o lembrete',
+  $$ select enviar_lembretes('vertice@exemplo.com') $$, 'permission denied for function enviar_lembretes');
+
+select teste.como('00000000-0000-0000-0000-00000000000e');
+insert into atividade (id_grupo, titulo, prazo) values
+  (garantir_espaco_pessoal(), 'Renovar a matrícula', current_date - 3),
+  (garantir_espaco_pessoal(), 'Comprar o <livro> & caderno', current_date),
+  (garantir_espaco_pessoal(), 'Viagem de fim de ano', current_date + 20);
+select teste.como(null);
+reset role;
+insert into vault.decrypted_secrets values ('brevo_api_key', 'chave-de-teste');
+select teste.confere('o lembrete sai só para quem tem atividade perto do prazo',
+  enviar_lembretes('vertice@exemplo.com'), 1);
+select teste.confere('para a Eva, com as 3 atividades do intervalo e o assunto de atraso',
+  (select body -> 'to' -> 0 ->> 'email' || ' ' || (length(body ->> 'htmlContent') - length(replace(body ->> 'htmlContent', '<tr>', ''))) / 4
+          || ' ' || (body ->> 'subject') from net.chamadas),
+  'eva@exemplo.com 3 Vértice: atividades atrasadas ou perto do prazo');
+select teste.confere('com a chave do Brevo no cabeçalho, vinda do Vault',
+  (select headers ->> 'api-key' from net.chamadas), 'chave-de-teste');
+select teste.confere('e o título com < e & não quebra o e-mail',
+  (select position('Comprar o &lt;livro&gt; &amp; caderno' in body ->> 'htmlContent') > 0 from net.chamadas), true);
+select teste.confere('rodar de novo no mesmo dia não manda nada repetido',
+  enviar_lembretes('vertice@exemplo.com'), 0);
+update perfil set ultimo_lembrete = null, lembrete_email = false where nome = 'Eva Melo';
+select teste.confere('quem desligou o lembrete não recebe', enviar_lembretes('vertice@exemplo.com'), 0);
 
 \o
 -- ---------------------------------------------------------------------
