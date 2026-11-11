@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 08/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 11/11/2026
 
 ---
 
@@ -49,12 +49,20 @@ O que **não** entrou no MVP não entrou por ser menos importante, e sim por nã
 | **RF28**: Convite para o grupo por link ou código | Desejável | Não | Depende do acesso com conta (RF27) |
 | **RF29**: Foto do grupo | Desejável | Não | As iniciais do nome já identificam o grupo |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | Desejável | Não | Atalho: o conteúdo pode ser cadastrado antes, na tela de disciplinas |
+| **RF31**: Eventos | Desejável | Não | Complementam o calendário; o ciclo de medição não depende deles |
+| **RF32**: Formulário de feedback | Desejável | Não | Serve aos testes com usuários, não ao ciclo |
+| **RF33**: Tutorial opcional | Desejável | Não | Ajuda quem chega, mas as telas se explicam sem ele |
+| **RF34**: Espaço pessoal | Desejável | Não | Pedido da equipe em 11/11, depois de usar o sistema; o ciclo funciona dentro de um grupo |
+| **RF35**: Perfil da conta | Desejável | Não | Depende do acesso com conta (RF27) |
+| **RF36**: Lembrete por e-mail | Desejável | Não | Depende do acesso com conta e do banco; avisa fora do sistema o que o painel já mostra |
+| **RF37**: Atividades em lote | Desejável | Não | Atalho para o cadastro, que já existe uma a uma |
+| **RF38**: Responsável "A definir" e Assumir | Desejável | Não | Pedido dos usuários de teste; o ciclo funciona com o responsável escolhido no cadastro |
 | Persistência em banco de dados | Desejável | Não | O modelo lógico já existe; a troca da camada de acesso para o PostgreSQL do Supabase está planejada para 27/11 |
-| Notificações por e-mail ou push | Futura | Não | Exige servidor, que esta versão não tem |
+| Notificações push e e-mails além do lembrete diário | Futura | Não | O lembrete diário (RF36) entrou em 11/11, enviado pelo próprio banco; avisar a cada mudança exigiria um servidor, que esta versão não tem |
 | Exportação de relatórios | Futura | Não | Nenhum requisito do bimestre depende disso |
 | Aplicativo móvel nativo | Futura | Não | A interface responsiva (RNF01) já cobre o uso em celular |
 
-**Resumo:** 15 requisitos no MVP, 15 requisitos desejáveis, a persistência em banco de dados e 3 itens de escopo deixados para o futuro.
+**Resumo:** 15 requisitos no MVP, 23 requisitos desejáveis, a persistência em banco de dados e 3 itens de escopo deixados para o futuro.
 
 ---
 
@@ -106,7 +114,7 @@ As 24 tarefas do 1º bimestre no [backlog](12-backlog.md) estão concluídas. As
 | T18, T19 | Progresso por conteúdo e por disciplina, por razão de pesos somados (RN08, RN14) |
 | T21 | Crédito e estorno de experiência, `peso × 10` (RN10) |
 
-As vinte e três regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
+As vinte e seis regras de negócio estão implementadas. A **RN11** (ofensiva) e a **RN12** (conquistas), que ficaram fora do MVP, entraram para 06/11; a ofensiva usa a data de conclusão que a atividade já gravava.
 
 A **T24**, que estava parcial, foi absorvida pela nova identidade visual (T27), aplicada a todas as telas.
 
@@ -119,6 +127,8 @@ A conversão cria uma disciplina para cada nome distinto que aparecia nas ativid
 A revisão de 28/10 acrescentou um segundo passo: a atividade sem responsável passa para o organizador do grupo (RN06), e a cor de disciplina que saiu da paleta vira a equivalente (RN18). Atividade antiga cujo grupo não existe mais não é convertida nem apagada, e a pessoa é avisada uma vez.
 
 A revisão de 03/11 acrescentou o terceiro passo: cada atividade passa a guardar a sua disciplina (RN13); o conteúdo "Geral" criado automaticamente pelo primeiro passo sai, e as atividades dele ficam direto na disciplina; e o estilo de avatar que saiu da lista vira Rabisco (RN15). Nenhuma atividade é apagada.
+
+A revisão de 11/11 acrescentou o quarto passo, na versão 4 dos dados: cada atividade passa a guardar o seu grupo, tirado da disciplina, e o membro que estava aberto na sessão é marcado como a pessoa da demonstração. Na primeira abertura, a pessoa confirma o nome e ganha o espaço pessoal, com os grupos antigos como estavam (D15). Com conta, o mesmo passo é a atualização do banco de 11/11 (`07-atualizacao-11-11.sql`), que só acrescenta.
 
 ## Recorte da entrega de 27/11/2026
 
@@ -136,14 +146,21 @@ Para 27/11 o manual pede o software funcionando e a apresentação de todos os i
 | Mostrar a evolução do progresso da disciplina | RF12, RN23 | CT59 e CT68 |
 | Trocar a foto de perfil, que vai para o armazenamento de arquivos | RF24, RN19 | CT66 |
 | Sair da conta e mostrar o modo de demonstração, com o tutorial | RF09, RF20, RF33 | CT65 e CT67 |
+| Entrar e cair no espaço pessoal; anotar uma tarefa do dia a dia sem disciplina e ver as atividades de todos os grupos num lugar só | RF34, RN24 | CT69, CT70 e CT73 |
+| Criar um grupo e entrar com código pelo seletor de espaço, sem sair do sistema | RF01, RF28 | CT71 e CT72 |
+| Trocar a foto em Meu perfil e ver a mudança em todos os grupos | RF35, RN26 | CT76 |
+| Cadastrar uma atividade "A definir" e outra pessoa assumi-la; concluir por engano e desfazer, com a conquista saindo junto | RF38, RF17, RN06, RN12 | CT73 e CT74 |
+| Cadastrar várias atividades de uma vez e trocar o responsável de várias | RF37 | CT78 e CT79 |
+| Filtrar o calendário e cadastrar um evento de vários dias | RF23, RF31 | CT77, CT82 e CT83 |
+| Mostrar o lembrete por e-mail ligado em Meu perfil e um e-mail recebido | RF36, RN25 | CT80 |
 
-Tudo o que foi demonstrado em 06/11 continua funcionando, agora também com conta: os casos CT01 a CT56 foram executados de novo sobre esta versão.
+Tudo o que foi demonstrado em 06/11 continua funcionando, agora também com conta: os casos CT01 a CT68 foram executados de novo sobre esta versão, com a revisão de 11/11.
 
 O sistema está publicado na Vercel, e o endereço está no [README](../README.md).
 
 ### O que fica fora desta versão
 
-O que o [Escopo](05-escopo.md) já deixava de fora: banco de questões e simulados, ranking entre grupos, notificações por e-mail, aplicativo nativo, exportação de relatórios e integração com sistemas acadêmicos.
+O que o [Escopo](05-escopo.md) já deixava de fora: banco de questões e simulados, ranking entre grupos, notificações além do lembrete diário, aplicativo nativo, exportação de relatórios e integração com sistemas acadêmicos.
 
 ## Recorte da entrega de 20/10/2026
 

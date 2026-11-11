@@ -1,17 +1,96 @@
 # Telas e Navegação
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 08/11/2026
+> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 11/11/2026
 
 ---
 
-Este documento reúne as telas do Vértice em três momentos: as telas que entraram para a **entrega final de 27/11**, com o banco de dados, o acesso com conta e o convite; as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, que continuam valendo; e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+Este documento reúne as telas do Vértice em quatro momentos: as da **revisão de 11/11**, com o espaço pessoal, o perfil da conta e os pedidos dos usuários de teste; as telas que entraram para a **entrega final de 27/11**, com o banco de dados, o acesso com conta e o convite; as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, que continuam valendo; e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+
+---
+
+## Revisão de 11/11/2026
+
+Quem entra cai no **espaço pessoal**, e os grupos ficam no seletor de espaço, no topo. A tela de acesso das duas colunas e a escolha "Quem é você" deixaram de fazer parte do caminho normal: a primeira só aparece se o banco ainda não recebeu a atualização de 11/11, e a segunda só para um grupo antigo da demonstração. Em tamanho original, as telas estão em [`telas-v2/`](telas-v2/).
+
+| Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
+|---|---|---|---|---|
+| RF20, RF34 | Começar a demonstração pelo nome, com ou sem os dados de exemplo | Seu nome | `/entrar` | Qualquer visitante |
+| RF34, RF06 | O que é da pessoa e o que está com ela nos grupos, e o atalho para cada grupo | Painel do espaço pessoal | `/painel` | Qualquer estudante |
+| RF01, RF28, RF34 | Trocar de espaço, criar grupo, entrar com código ou carregar o grupo de exemplo | Seletor de espaço | menu, na barra do topo | Qualquer estudante; editar o grupo, só o organizador |
+| RF04, RF34 | As atividades pessoais e as dos grupos, com o nome do grupo | Atividades do espaço pessoal | `/atividades` | Qualquer estudante |
+| RF38 | Atividade "A definir", com o botão Assumir | Atividades | `/atividades` | Ambos |
+| RF37 | Selecionar várias atividades e trocar o responsável | Atividades, em seleção | `/atividades` | Organizador |
+| RF37 | Várias atividades de uma vez, com a lista colada e a linha "Para todas" | Várias de uma vez | `/atividades/lote` | Ambos |
+| RF23 | Barra de filtros: o que aparece, disciplina, grupo ou só as minhas, e o resumo | Calendário | `/calendario` | Ambos |
+| RF31 | Evento de vários dias | Novo evento | janela, em Eventos e no Calendário | Ambos |
+| RF35, RF36 | Nome, avatar e foto em todos os grupos, e o lembrete por e-mail | Meu perfil | `/perfil` | Qualquer estudante (o lembrete, com conta) |
+
+#### Seu nome
+
+![Tela do nome, no começo da demonstração](telas-v2/demo-nome.png)
+
+Na demonstração, a pessoa diz só o nome. "Começar" abre o espaço pessoal vazio; "Começar com dados de exemplo" traz algumas tarefas do dia a dia e um grupo de TCC pronto, em que ela é a organizadora.
+
+#### Painel do espaço pessoal
+
+![Painel do espaço pessoal](telas-v2/espaco-pessoal.png)
+
+As próximas entregas misturam o que é pessoal e o que está com a pessoa nos grupos, cada uma com o lugar de onde vem. À direita, "Seus grupos", com quantas atividades estão com a pessoa e quantas estão "A definir" em cada um, e os próximos eventos de todos os grupos.
+
+#### Seletor de espaço
+
+![Seletor de espaço aberto](telas-v2/seletor-espaco.png)
+
+No topo, à esquerda: o espaço pessoal, os grupos e as ações. Criar grupo e entrar com código acontecem ali mesmo, sem sair do sistema. Na demonstração, no lugar do código, "Carregar grupo de exemplo".
+
+#### Atividades do espaço pessoal
+
+![Lista de atividades no espaço pessoal](telas-v2/atividades-pessoal.png)
+
+As atividades pessoais aparecem como "Pessoal", e as dos grupos, com o nome do grupo na frente da disciplina. O filtro "Onde" separa por espaço.
+
+#### "A definir" e Assumir
+
+![Atividade A definir com o botão Assumir](telas-v2/assumir.png)
+
+A atividade sem responsável mostra o círculo vazio e o botão **Assumir**, para qualquer integrante. Quem assume passa a ser o responsável e pode concluí-la.
+
+#### Trocar o responsável de várias
+
+![Seleção de atividades com a barra do pé da tela](telas-v2/selecao-lote.png)
+
+O organizador aciona **Selecionar**, marca as atividades e escolhe o novo responsável na barra que fica presa no pé da tela.
+
+#### Várias de uma vez
+
+![Cadastro de várias atividades de uma vez](telas-v2/lote.png)
+
+Uma linha por atividade, com o essencial. A lista de títulos pode ser colada de uma vez, e a linha "Para todas as linhas" aplica a mesma disciplina, prazo, peso ou responsável a todas.
+
+#### Calendário com a barra de filtros
+
+![Calendário com a barra de filtros](telas-v2/calendario-filtros.png)
+
+No lugar dos botões de cada disciplina, uma barra só: o que aparece (atividades, eventos e feriados), a disciplina numa lista, "Só as minhas atividades" (ou o grupo, no espaço pessoal), o resumo do que está na tela e "Limpar filtros". O evento de vários dias aparece em cada dia do período.
+
+#### Evento de vários dias
+
+![Janela de novo evento com o período](telas-v2/evento-varios-dias.png)
+
+"Dura mais de um dia" mostra o último dia. O horário de início vale para o primeiro dia, e o de fim, para o último.
+
+#### Meu perfil
+
+![Tela Meu perfil, com o lembrete por e-mail](telas-v2/perfil.png)
+
+O nome, o avatar e a foto que aparecem em todos os grupos da pessoa. Com conta, ao lado, o lembrete diário por e-mail, que vem ligado e pode ser desligado.
 
 ---
 
 ## Entrega final: 27/11/2026
 
-As telas da versão 2, mais abaixo, continuam as mesmas. Para 27/11 entraram as telas do acesso com conta e do convite, a evolução do progresso na tela da disciplina e o tutorial. Em tamanho original, estão em [`telas-v2/`](telas-v2/).
+As telas da versão 2, mais abaixo, continuam valendo, com o que mudou na revisão de 11/11, acima. Para 27/11 entraram as telas do acesso com conta e do convite, a evolução do progresso na tela da disciplina e o tutorial. Em tamanho original, estão em [`telas-v2/`](telas-v2/).
 
 | Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
 |---|---|---|---|---|
@@ -20,7 +99,7 @@ As telas da versão 2, mais abaixo, continuam as mesmas. Para 27/11 entraram as 
 | RF28 | Gerar o código e o link do convite | Convidar | janela, em Membros | Organizador |
 | RF28 | Aceitar o convite pelo link | Login com convite | `/convite/:codigo` | Quem recebeu o convite |
 | RF12 | Evolução do progresso dia a dia | Disciplina | `/disciplina/:id` | Ambos |
-| RF33 | Tutorial em seis passos | Conheça o Vértice | janela, no Painel e no menu da conta | Ambos |
+| RF33 | Tutorial em seis passos (sete desde 11/11) | Conheça o Vértice | janela, no Painel e no menu da conta | Ambos |
 
 #### Login
 
@@ -32,7 +111,7 @@ Entrar ou criar conta, com o e-mail e a senha ou com a conta Google. Ao lado, "E
 
 ![Tela de acesso com conta](telas-v2/acesso-conta.png)
 
-As mesmas duas colunas da versão 2. À esquerda, os grupos da conta e o campo do código de convite; à direita, a criação de um grupo, com o nome de quem cria já preenchido pelo nome da conta. No topo, o e-mail da conta e "Sair da conta". Não há mais "Quem é você": a conta já diz quem é a pessoa.
+Desde 11/11, esta tela só aparece se o banco ainda não recebeu a atualização de 11/11; no caminho normal, quem entra cai no espaço pessoal. As mesmas duas colunas da versão 2. À esquerda, os grupos da conta e o campo do código de convite; à direita, a criação de um grupo, com o nome de quem cria já preenchido pelo nome da conta. No topo, o e-mail da conta e "Sair da conta". Não há mais "Quem é você": a conta já diz quem é a pessoa.
 
 #### Convidar
 

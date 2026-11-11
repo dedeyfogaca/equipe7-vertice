@@ -1,7 +1,7 @@
 # 12 · Backlog do Projeto
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 08/11/2026 para a entrega de 27/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 11/11/2026 para a entrega de 27/11/2026
 
 ---
 
@@ -9,22 +9,24 @@ O backlog reúne as tarefas de desenvolvimento, cada uma ligada ao requisito que
 
 Situações usadas: **A fazer**, **Em andamento** e **Concluída**.
 
-As tarefas T01 a T24 são do 1º bimestre e construíram o MVP. As tarefas a partir da T25 são do 2º bimestre. A T36 entrou depois da T35 por ter sido aberta a partir de um defeito encontrado nos testes, as tarefas T37 a T51 vieram da revisão de 28/10, com os pedidos da professora depois da entrega de 20/10, as tarefas T52 a T61, da revisão de 29/10, com os ajustes que a equipe pediu ao revisar a versão 2, as tarefas T62 a T65, da revisão de 01/11, as tarefas T66 a T73, da revisão de 03/11, e as tarefas T74 a T77, da revisão de 08/11; a numeração não indica ordem de execução.
+As tarefas T01 a T24 são do 1º bimestre e construíram o MVP. As tarefas a partir da T25 são do 2º bimestre. A T36 entrou depois da T35 por ter sido aberta a partir de um defeito encontrado nos testes, as tarefas T37 a T51 vieram da revisão de 28/10, com os pedidos da professora depois da entrega de 20/10, as tarefas T52 a T61, da revisão de 29/10, com os ajustes que a equipe pediu ao revisar a versão 2, as tarefas T62 a T65, da revisão de 01/11, as tarefas T66 a T73, da revisão de 03/11, as tarefas T74 a T77, da revisão de 08/11, e as tarefas T78 a T89, da revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste; a numeração não indica ordem de execução.
 
 ---
 
 ## Situação geral
 
-| Situação | 1º bimestre (T01–T24) | 2º bimestre (T25–T77) | Total |
+| Situação | 1º bimestre (T01–T24) | 2º bimestre (T25–T89) | Total |
 |---|---|---|---|
-| Concluída | 24 | 50 | 74 |
-| Em andamento | 0 | 2 | 2 |
-| A fazer | 0 | 1 | 1 |
-| **Total** | **24** | **53** | **77** |
+| Concluída | 24 | 62 | 86 |
+| Em andamento | 0 | 3 | 3 |
+| A fazer | 0 | 0 | 0 |
+| **Total** | **24** | **65** | **89** |
 
-**O que estava previsto para 27/11 está implementado e testado.** O banco de dados no PostgreSQL do Supabase, com as regras de acesso garantidas pelo próprio banco (T46), a troca do armazenamento do navegador pelo banco (T47), o acesso com conta (T48), o convite por link e código (T49), as fotos no armazenamento de arquivos (T50) e a evolução do progresso (T35), além do modo de demonstração sem conta (T74) e do tutorial opcional (T75), passaram nos 68 [casos de teste](15-casos-de-teste.md) desta entrega e nas verificações do banco (T76).
+**O que estava previsto para 27/11 está implementado e testado.** O banco de dados no PostgreSQL do Supabase, com as regras de acesso garantidas pelo próprio banco (T46), a troca do armazenamento do navegador pelo banco (T47), o acesso com conta (T48), o convite por link e código (T49), as fotos no armazenamento de arquivos (T50) e a evolução do progresso (T35), além do modo de demonstração sem conta (T74) e do tutorial opcional (T75), passaram nos [casos de teste](15-casos-de-teste.md) desta entrega e nas verificações do banco (T76).
 
-A **T34** e a **T51** continuam em andamento: falta executar os casos de teste no Firefox e no Edge (RNF05). A **T77** é ler as respostas do formulário de feedback dos usuários de teste até 20/11 e registrar o que for ajustado.
+**A revisão de 11/11 também está implementada e testada.** O espaço pessoal (T78 a T80), o perfil da conta (T81), o lembrete por e-mail (T82), o evento de vários dias (T83), os filtros do calendário (T84), o responsável "A definir" (T85), as ações em lote (T86), a retirada da conquista ao desfazer (T87) e os ajustes de uso (T88) passaram nos 85 casos de teste e nas verificações do banco (T89). A atualização do banco foi testada sobre dados no formato anterior, sem perder nenhum registro.
+
+A **T34** e a **T51** continuam em andamento: falta executar os casos de teste no Firefox e no Edge (RNF05). A **T77** também: os comentários dos usuários de teste recebidos até 11/11 entraram na revisão de 11/11, e as respostas que chegarem até 20/11 ainda serão lidas.
 
 ---
 
@@ -174,7 +176,24 @@ A decisão da T14 foi revista em 28/10: a pedido da professora, o responsável v
 | T74 | Modo de demonstração sem conta, com o atalho na tela de login e o aviso para voltar a usar conta | RF20 | Média | Andrey | 27/11/2026 | Concluída |
 | T75 | Tutorial opcional com os seis passos, convite no painel e item no menu da conta | RF33 | Baixa | Andrey | 27/11/2026 | Concluída |
 | T76 | Verificações do banco em SQL (regras de acesso, gatilhos, convite e fotos) e da gravação no banco em `npm run verificar` | RNF11, RN01, RN07, RN20, RN22 | Alta | Matheus | 26/11/2026 | Concluída |
-| T77 | Ler as respostas do formulário de feedback dos usuários de teste e registrar o que entra nesta versão | RF32 | Média | Andrey e Matheus | 20/11/2026 | A fazer |
+| T77 | Ler as respostas do formulário de feedback dos usuários de teste e registrar o que entra nesta versão | RF32 | Média | Andrey e Matheus | 20/11/2026 | Em andamento |
+
+### Revisão de 11/11/2026: considerações da equipe e dos usuários de teste
+
+| ID | Tarefa | Requisito | Prioridade | Responsável | Prazo | Situação |
+|---|---|---|---|---|---|---|
+| T78 | Espaço pessoal e perfil no banco (`grupo.pessoal`, `atividade.id_grupo`, tabela `perfil`), criados no primeiro acesso, e a atualização do banco sem perder os dados das contas existentes | RF34, RF35, RN24 | Alta | Matheus | 20/11/2026 | Concluída |
+| T79 | Seletor de espaço no topo: espaço pessoal, grupos, criar grupo e entrar com código sem sair do sistema | RF01, RF09, RF34 | Alta | Andrey | 20/11/2026 | Concluída |
+| T80 | Telas do espaço pessoal: os grupos no painel, as atividades e os eventos da pessoa em todos os grupos, e o ritmo e as conquistas somados | RF34, RN01, RN24 | Alta | Andrey | 20/11/2026 | Concluída |
+| T81 | Tela Meu perfil: nome, avatar e foto que valem em todos os grupos | RF35, RF24, RN26 | Alta | Andrey | 20/11/2026 | Concluída |
+| T82 | Lembrete diário por e-mail, enviado pelo Brevo e agendado no próprio banco | RF36, RN25 | Média | Matheus | 20/11/2026 | Concluída |
+| T83 | Evento de vários dias no formulário, no calendário e na página de eventos, e o filtro por disciplina dos eventos | RF31, RN21 | Média | Andrey | 20/11/2026 | Concluída |
+| T84 | Barra de filtros do calendário, com o resumo do que aparece e "Limpar filtros" | RF23 | Média | Andrey | 20/11/2026 | Concluída |
+| T85 | Responsável "A definir" e botão Assumir, com a regra conferida no banco | RF38, RN06 | Média | Matheus | 20/11/2026 | Concluída |
+| T86 | Cadastro de várias atividades de uma vez e troca do responsável de várias atividades | RF37 | Média | Andrey | 20/11/2026 | Concluída |
+| T87 | Retirada da conquista quando a conclusão que a sustentava é desfeita | RF17, RN12 | Média | Matheus | 20/11/2026 | Concluída |
+| T88 | Volta à tela anterior depois de cadastrar, conclusão discreta no detalhe e telas mais largas no computador | RF03, RF05, RNF01 | Média | Andrey | 20/11/2026 | Concluída |
+| T89 | Casos de teste CT69 a CT85, verificações do banco da revisão e versão 4 dos dados da demonstração | RNF02, RNF11 | Alta | Matheus | 20/11/2026 | Concluída |
 
 ---
 
@@ -210,6 +229,12 @@ Uma tarefa só passa para **Concluída** quando todos os critérios abaixo forem
 | T49 | Quem recebe o link ou o código entra no grupo como participante; código vencido ou inválido é recusado (CT60 a CT62) |
 | T50 | A foto enviada vai para o armazenamento de arquivos, na pasta do grupo, e o banco guarda só o endereço; quem não é do grupo não grava na pasta dele (CT66 e verificações do banco) |
 | T51 | Os casos de teste foram executados sobre a versão de 27/11 no Chromium, no Firefox e no Edge, com data e versão registradas |
+| T78 | Toda conta, nova ou antiga, ganha um espaço pessoal e um perfil no primeiro acesso, uma vez só; a atualização do banco roda sobre os dados existentes sem perder registro e pode ser rodada de novo sem efeito (CT69 e verificações do banco) |
+| T79 | Criar grupo, entrar com código e voltar ao espaço pessoal funcionam pelo seletor, sem passar por outra tela (CT53, CT71 e CT72) |
+| T81 | Mudar o nome ou a foto em Meu perfil muda em todos os grupos da pessoa; o organizador não muda o nome nem a foto de um membro com conta (CT05 e CT76) |
+| T82 | O e-mail sai para quem tem atividade no intervalo da RN25 e o lembrete ligado, e não sai para quem desligou nem duas vezes no mesmo dia (CT80 e verificações do banco) |
+| T85 | A atividade "A definir" aparece para todos, fica em "a fazer" e só é concluída depois que alguém a assume; quem não é organizador não muda mais nada nela (CT73 e verificações do banco) |
+| T87 | Desfazer a conclusão retira a experiência e a conquista que ela tinha dado, com aviso; uma ofensiva já encerrada não retira conquista (CT74 e verificações automatizadas) |
 
 ---
 
@@ -239,8 +264,8 @@ As seis foram executadas nessa ordem, e foi ela que ditou o ritmo: a disciplina 
 
 | Integrante | Frente | Tarefas |
 |---|---|---|
-| **Andrey Fogaça** | Interface, telas e experiência de uso | 1º bimestre: T01, T02, T03, T04, T05, T08, T09, T10, T11, T14, T15, T16, T17, T20, T22, T23, T24 · 2º bimestre: T25, T26, T27, T29, T32, T34, T36, T39, T40, T41, T43, T44, T48, T49, T50, T51, T52, T53, T54, T55, T56, T60, T61, T62, T63, T65, T68, T69, T70, T71, T72, T73, T74, T75, T77 |
-| **Matheus Saraiva Faustin** | Modelo de dados e regras de cálculo | 1º bimestre: T06, T07, T12, T13, T18, T19, T21 · 2º bimestre: T28, T30, T31, T33, T34, T35, T37, T38, T42, T45, T46, T47, T51, T57, T58, T59, T64, T66, T67, T72, T76, T77 |
+| **Andrey Fogaça** | Interface, telas e experiência de uso | 1º bimestre: T01, T02, T03, T04, T05, T08, T09, T10, T11, T14, T15, T16, T17, T20, T22, T23, T24 · 2º bimestre: T25, T26, T27, T29, T32, T34, T36, T39, T40, T41, T43, T44, T48, T49, T50, T51, T52, T53, T54, T55, T56, T60, T61, T62, T63, T65, T68, T69, T70, T71, T72, T73, T74, T75, T77, T79, T80, T81, T83, T84, T86, T88 |
+| **Matheus Saraiva Faustin** | Modelo de dados e regras de cálculo | 1º bimestre: T06, T07, T12, T13, T18, T19, T21 · 2º bimestre: T28, T30, T31, T33, T34, T35, T37, T38, T42, T45, T46, T47, T51, T57, T58, T59, T64, T66, T67, T72, T76, T77, T78, T82, T85, T87, T89 |
 
 A divisão indica quem conduz a tarefa, não quem é o único a conhecê-la. No 2º bimestre, as regras novas (ofensiva, conquistas, responsável obrigatório, quem muda o status) e o banco de dados seguem com o Matheus, e as telas que as exibem, o acesso com conta e a publicação, com o Andrey. As tarefas do Matheus concentram as regras que sustentam o progresso (RN08, RN09, RN13, RN14 e RN10); as do Andrey concentram a tradução dessas regras em tela.
 
