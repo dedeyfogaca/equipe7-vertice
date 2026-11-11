@@ -1,5 +1,6 @@
-// Dados de exemplo, usados pelo botão "Carregar dados de exemplo" na tela de
-// acesso. Servem para conhecer o sistema sem cadastrar tudo do zero.
+// Dados de exemplo do modo de demonstração: um grupo pronto e algumas
+// atividades do dia a dia para o espaço pessoal. Servem para conhecer o
+// sistema sem cadastrar tudo do zero.
 // Os prazos e as conclusões são relativos a hoje, para o calendário, a
 // ofensiva e o painel sempre parecerem realistas.
 
@@ -23,7 +24,9 @@ function emISO(offset) {
   return d.toISOString();
 }
 
-export function gerarDadosExemplo() {
+// `usuarioId`: quem está usando a demonstração. Ela entra no grupo de
+// exemplo no lugar da organizadora, a Ana.
+export function gerarDadosExemplo({ usuarioId = '' } = {}) {
   const agora = new Date().toISOString();
   const grupoId = novoId();
 
@@ -32,13 +35,14 @@ export function gerarDadosExemplo() {
     nome: 'Trio do TCC',
     descricao: 'Grupo de exemplo para você conhecer o sistema.',
     foto: '',
+    pessoal: false,
     criadoEm: agora,
   };
 
   // RN07: quem cria o grupo é o organizador; os demais, participantes.
-  const ana = { id: novoId(), nome: 'Ana Souza', grupoId, funcao: 'Introdução e revisão', email: 'ana@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.ORGANIZADOR };
-  const bruno = { id: novoId(), nome: 'Bruno Lima', grupoId, funcao: 'Desenvolvimento', email: '', avatar: novaSeedAvatar(), estiloAvatar: 'croodles-neutral', foto: '', perfil: PERFIL.PARTICIPANTE };
-  const carla = { id: novoId(), nome: 'Carla Dias', grupoId, funcao: 'Slides e apresentação', email: 'carla@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.PARTICIPANTE };
+  const ana = { id: novoId(), nome: 'Ana Souza', grupoId, usuarioId, funcao: 'Introdução e revisão', email: 'ana@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.ORGANIZADOR };
+  const bruno = { id: novoId(), nome: 'Bruno Lima', grupoId, usuarioId: '', funcao: 'Desenvolvimento', email: '', avatar: novaSeedAvatar(), estiloAvatar: 'croodles-neutral', foto: '', perfil: PERFIL.PARTICIPANTE };
+  const carla = { id: novoId(), nome: 'Carla Dias', grupoId, usuarioId: '', funcao: 'Slides e apresentação', email: 'carla@exemplo.com', avatar: novaSeedAvatar(), estiloAvatar: 'notionists', foto: '', perfil: PERFIL.PARTICIPANTE };
   const membros = [ana, bruno, carla];
 
   const disciplinas = [
@@ -71,7 +75,8 @@ export function gerarDadosExemplo() {
   const disciplinaDoConteudo = new Map(conteudos.map((c) => [c.id, c.disciplinaId]));
 
   // Cada atividade pertence a uma disciplina e, se a pessoa quiser, a um
-  // conteúdo dela (RN13). Tem responsável (RN06) e um peso de 1 a 5 (RN09).
+  // conteúdo dela (RN13). Tem responsável ou fica "A definir" (RN06) e tem
+  // um peso de 1 a 5 (RN09).
   // Os pesos variam de propósito: é a razão entre eles que o progresso mede.
   // Estatística ficou sem conteúdo nenhum, para mostrar que ele é opcional.
   const atividade = ({ disciplina, ...dados }) => ({
@@ -84,6 +89,7 @@ export function gerarDadosExemplo() {
     dataConclusao: null,
     conteudoId: '',
     ...dados,
+    grupoId,
     disciplinaId: disciplina?.id || disciplinaDoConteudo.get(dados.conteudoId) || '',
   });
 
@@ -102,6 +108,7 @@ export function gerarDadosExemplo() {
     atividade({ titulo: 'Formatar as citações', conteudoId: normasAbnt.id, prazo: emDias(15), peso: 1, status: STATUS.A_FAZER, prioridade: PRIORIDADE.BAIXA, responsavelId: ana.id }),
     atividade({ titulo: 'Lista de probabilidade', disciplina: estatistica, prazo: emDias(-3), peso: 2, status: STATUS.CONCLUIDO, prioridade: PRIORIDADE.MEDIA, responsavelId: ana.id, dataConclusao: emISO(-2) }),
     atividade({ titulo: 'Exercícios de variância', disciplina: estatistica, prazo: emDias(10), peso: 1, status: STATUS.A_FAZER, responsavelId: bruno.id }),
+    atividade({ titulo: 'Revisar o texto final do TCC', descricao: 'Quem tiver tempo na semana da entrega assume.', disciplina: tcc, prazo: emDias(14), peso: 2, status: STATUS.A_FAZER, responsavelId: '' }),
   ];
 
   // Eventos (RF31): o que acontece num dia e não é entrega de ninguém.
@@ -123,8 +130,52 @@ export function gerarDadosExemplo() {
     evento({ titulo: 'Reunião do grupo', tipo: TIPO_EVENTO.REUNIAO, data: emDias(2), horaInicio: '20:00', horaFim: '21:00', local: 'Google Meet', descricao: 'Dividir o que falta do TCC.', criadoPor: carla.id }),
     evento({ titulo: 'Palestra: carreira em dados', tipo: TIPO_EVENTO.PALESTRA, data: emDias(4), horaInicio: '19:30', local: 'Auditório', descricao: 'Vale hora complementar.' }),
     evento({ titulo: 'Prova de Banco de Dados', tipo: TIPO_EVENTO.PROVA, data: emDias(9), horaInicio: '19:00', horaFim: '20:40', local: 'Sala 204', disciplinaId: banco.id, descricao: 'Modelagem e SQL. Pode levar uma folha de consulta.', criadoPor: bruno.id }),
+    evento({ titulo: 'Semana acadêmica', tipo: TIPO_EVENTO.PALESTRA, data: emDias(6), dataFim: emDias(8), horaInicio: '19:00', horaFim: '22:00', local: 'Campus', descricao: 'Três noites de palestras. Vale hora complementar.' }),
     evento({ titulo: 'Banca do TCC', tipo: TIPO_EVENTO.APRESENTACAO, data: emDias(20), horaInicio: '14:00', horaFim: '15:00', local: 'Sala de defesas', disciplinaId: tcc.id }),
   ];
 
   return { grupo, membros, disciplinas, conteudos, atividades, eventos };
+}
+
+// Atividades e um evento do dia a dia, para o espaço pessoal: sem
+// disciplina, que lá é opcional (RN24).
+export function gerarExemploPessoal({ grupoId, membroId }) {
+  const atividade = (dados) => ({
+    id: novoId(),
+    grupoId,
+    disciplinaId: '',
+    conteudoId: '',
+    descricao: '',
+    prioridade: '',
+    peso: 1,
+    status: STATUS.A_FAZER,
+    responsavelId: membroId,
+    criadaEm: emISO(-7),
+    dataConclusao: null,
+    ...dados,
+  });
+  const atividades = [
+    atividade({ titulo: 'Pagar a fatura do cartão', prazo: emDias(1), prioridade: PRIORIDADE.ALTA }),
+    atividade({ titulo: 'Renovar os livros da biblioteca', prazo: emDias(-1), status: STATUS.CONCLUIDO, dataConclusao: emISO(-1) }),
+    atividade({ titulo: 'Marcar o dentista', prazo: emDias(5) }),
+    atividade({ titulo: 'Comprar o presente da Júlia', descricao: 'Aniversário no sábado.', prazo: emDias(9), prioridade: PRIORIDADE.MEDIA }),
+  ];
+  const eventos = [
+    {
+      id: novoId(),
+      grupoId,
+      titulo: 'Consulta médica',
+      tipo: TIPO_EVENTO.OUTRO,
+      data: emDias(3),
+      dataFim: '',
+      horaInicio: '10:00',
+      horaFim: '11:00',
+      local: 'Clínica do bairro',
+      disciplinaId: '',
+      descricao: '',
+      criadoPor: membroId,
+      criadoEm: new Date().toISOString(),
+    },
+  ];
+  return { atividades, eventos };
 }

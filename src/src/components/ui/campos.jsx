@@ -75,3 +75,33 @@ export function Field({ id, label, obrigatorio, dica, erro, className, children 
     </div>
   );
 }
+
+/**
+ * Liga e desliga (role="switch"). `ligado` e `aoMudar(boolean)`.
+ */
+export function Interruptor({ ligado, aoMudar, rotulo, id, className, disabled }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      id={id}
+      aria-checked={ligado}
+      aria-label={rotulo}
+      disabled={disabled}
+      onClick={() => aoMudar(!ligado)}
+      className={cn(
+        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaria-barra/20 disabled:cursor-not-allowed disabled:opacity-60',
+        ligado ? 'border-primaria-barra bg-primaria-barra' : 'border-borda-forte bg-superficie-3',
+        className
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'block size-[18px] rounded-full bg-white shadow-cartao transition-transform',
+          ligado ? 'translate-x-[22px]' : 'translate-x-[2px]'
+        )}
+      />
+    </button>
+  );
+}

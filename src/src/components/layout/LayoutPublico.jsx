@@ -63,8 +63,8 @@ export function RodapePublico() {
 
 export function LayoutPublico({ children }) {
   const { pathname, hash } = useLocation();
-  const { autenticado, precisaIdentificar } = useAuth();
-  const logado = autenticado && !precisaIdentificar;
+  const { autenticado, precisaIdentificar, precisaPerfil } = useAuth();
+  const logado = autenticado && !precisaIdentificar && !precisaPerfil;
   const [menuAberto, setMenuAberto] = useState(false);
 
   useEffect(() => {

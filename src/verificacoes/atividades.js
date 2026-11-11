@@ -2,13 +2,15 @@
 //
 // Roda com `npm run verificar`, sem instalar nada.
 //
-// O alvo principal é o RN06 revisado em 28/10/2026: toda atividade tem um
-// responsável, e ele é membro do grupo (RN03). Junto, as outras regras do
-// formulário: disciplina e conteúdo (RN13), peso (RN09), título e prazo.
+// O alvo principal é o RN06 (revisado em 28/10/2026 e de novo em 11/11/2026):
+// o responsável, quando há, é membro do grupo (RN03); sem responsável, a
+// atividade fica "A definir" e não sai de "a fazer". Junto, as outras regras
+// do formulário: disciplina e conteúdo (RN13), disciplina opcional no espaço
+// pessoal (RN24), peso (RN09), título e prazo, e o evento de vários dias.
 
-import { validarAtividade, validarEvento } from '../src/lib/validacao.js';
+import { validarAtividade, validarEvento, validarPerfil } from '../src/lib/validacao.js';
 import { dataValida } from '../src/lib/datas.js';
-import { gerarDadosExemplo } from '../src/lib/seed.js';
+import { gerarDadosExemplo, gerarExemploPessoal } from '../src/lib/seed.js';
 
 let falhas = 0;
 
@@ -48,12 +50,16 @@ console.log('\nAtividade completa passa\n');
 
 checar('sem erro nenhum', validarAtividade(valida, grupo), {});
 
-console.log('\nRN06: toda atividade tem responsável\n');
+console.log('\nRN06 (revisada em 11/11/2026): responsável ou "A definir"\n');
 
+checar('sem responsável, fica "A definir" e passa', validarAtividade({ ...valida, responsavelId: '' }, grupo), {});
 checar(
-  'sem responsável é barrada',
-  validarAtividade({ ...valida, responsavelId: '' }, grupo).responsavelId,
-  'Escolha o responsável pela atividade.'
+  'mas não começa nem conclui sem alguém assumir',
+  [
+    validarAtividade({ ...valida, responsavelId: '', status: 'fazendo' }, grupo).responsavelId,
+    validarAtividade({ ...valida, responsavelId: '', status: 'concluido' }, grupo).responsavelId,
+  ],
+  ['Escolha quem vai fazer antes de mudar o status.', 'Escolha quem vai fazer antes de mudar o status.']
 );
 checar(
   'responsável de outro grupo é barrado (RN03)',
@@ -124,13 +130,16 @@ checar('e em ano comum, não', dataValida('2026-02-29'), false);
 
 console.log('\nOs dados de exemplo seguem a regra\n');
 
-const exemplo = gerarDadosExemplo();
+const exemplo = gerarDadosExemplo({ usuarioId: 'demo' });
 const idsMembros = new Set(exemplo.membros.map((m) => m.id));
 checar(
-  'toda atividade de exemplo tem responsável do grupo',
-  exemplo.atividades.every((a) => idsMembros.has(a.responsavelId)),
+  'toda atividade de exemplo tem responsável do grupo ou está "A definir"',
+  exemplo.atividades.every((a) => idsMembros.has(a.responsavelId) || (!a.responsavelId && a.status === 'a fazer')),
   true
 );
+checar('o exemplo tem uma "A definir"', exemplo.atividades.filter((a) => !a.responsavelId).length, 1);
+checar('toda atividade de exemplo guarda o grupo', exemplo.atividades.every((a) => a.grupoId === exemplo.grupo.id), true);
+checar('quem usa a demonstração entra no lugar da organizadora', exemplo.membros.map((m) => m.usuarioId), ['demo', '', '']);
 checar(
   'e passa na validação',
   exemplo.atividades.filter(
@@ -149,6 +158,30 @@ checar(
 
 checar('exemplo tem atividade sem conteúdo', exemplo.atividades.some((a) => !a.conteudoId && a.disciplinaId), true);
 
+console.log('\nRN24: no espaço pessoal, a disciplina é opcional\n');
+
+checar(
+  'no grupo, sem disciplina é barrada',
+  validarAtividade({ ...valida, disciplinaId: '', conteudoId: '' }, grupo).disciplinaId,
+  'Escolha a disciplina da atividade.'
+);
+checar(
+  'no espaço pessoal, passa sem disciplina',
+  validarAtividade({ ...valida, disciplinaId: '', conteudoId: '' }, { ...grupo, pessoal: true }),
+  {}
+);
+const pessoal = gerarExemploPessoal({ grupoId: 'p1', membroId: 'eu' });
+checar(
+  'as atividades pessoais de exemplo passam, sem disciplina e com a dona do espaço',
+  pessoal.atividades.every(
+    (a) => !a.disciplinaId && a.responsavelId === 'eu' && a.grupoId === 'p1' &&
+      Object.keys(validarAtividade(a, { membros: [{ id: 'eu' }], disciplinas: [], pessoal: true })).length === 0
+  ),
+  true
+);
+checar('perfil sem nome', validarPerfil({ nome: '  ' }).nome, 'Informe o seu nome.');
+checar('perfil com nome', validarPerfil({ nome: 'Ana' }), {});
+
 console.log('\nRF31: eventos\n');
 
 const evento = { titulo: 'Prova de Cálculo', tipo: 'prova', data: '2026-11-20', horaInicio: '19:00', horaFim: '20:40' };
@@ -166,6 +199,19 @@ checar(
   validarEvento({ ...evento, disciplinaId: 'd9' }, { disciplinas }).disciplinaId,
   'A disciplina escolhida não pertence a este grupo.'
 );
+console.log('\nEvento de vários dias (revisão de 11/11/2026)\n');
+
+const semana = { ...evento, data: '2026-11-18', dataFim: '2026-11-20', horaInicio: '19:00', horaFim: '10:00' };
+checar('vários dias, com o fim do último dia antes do início do primeiro, passa', validarEvento(semana), {});
+checar('último dia antes do primeiro', validarEvento({ ...semana, dataFim: '2026-11-17' }).dataFim, 'O fim não pode ser antes do começo.');
+checar('último dia que não existe', validarEvento({ ...semana, dataFim: '2026-11-31' }).dataFim, 'O dia informado não é uma data válida.');
+checar(
+  'no mesmo dia, o fim antes do início continua barrado',
+  validarEvento({ ...semana, dataFim: '2026-11-18' }).horaFim,
+  'O fim precisa ser depois do início.'
+);
+checar('o exemplo tem um evento de vários dias', exemplo.eventos.filter((e) => e.dataFim && e.dataFim > e.data).length, 1);
+
 checar(
   'eventos de exemplo passam',
   exemplo.eventos.filter((e) => Object.keys(validarEvento(e, { disciplinas: exemplo.disciplinas })).length > 0).length,

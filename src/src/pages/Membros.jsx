@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Ellipsis, Link2, Lock, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
 
@@ -32,7 +32,7 @@ function Numero({ rotulo, valor, className }) {
 export default function Membros() {
   useTitulo('Membros');
   const navigate = useNavigate();
-  const { grupoAtivo, membroAtivo, ehOrganizador, identificar, sair } = useAuth();
+  const { grupoAtivo, membroAtivo, ehOrganizador, identificar, sair, noEspacoPessoal } = useAuth();
   const {
     membrosDoGrupo,
     atividadesDoGrupo,
@@ -68,7 +68,9 @@ export default function Membros() {
   const salvar = (dados) => {
     if (formulario?.membro) {
       atualizarMembro(formulario.membro.id, dados);
-      toast.success(formulario.proprio ? 'Perfil atualizado' : 'Membro atualizado', { description: dados.nome });
+      toast.success(formulario.proprio ? 'Dados atualizados' : 'Membro atualizado', {
+        description: dados.nome || formulario.membro.nome,
+      });
     } else {
       const criado = criarMembro({ ...dados, grupoId: grupoAtivo.id });
       toast.success('Membro adicionado', { description: criado.nome });
@@ -108,8 +110,11 @@ export default function Membros() {
     sair();
     removerGrupo(id);
     toast('Grupo excluído', { description: nome });
-    navigate('/entrar', { replace: true });
+    navigate('/painel', { replace: true });
   };
+
+  // O espaço pessoal só tem a própria pessoa (RF34): não há membros a gerir.
+  if (noEspacoPessoal) return <Navigate to="/painel" replace />;
 
   // A página ocupa a altura toda da tela, para a exclusão do grupo ficar
   // sempre no pé dela, longe das ações do dia a dia.

@@ -13,13 +13,13 @@ import { TelaCarregando } from '../components/TelaCarregando.jsx';
 // Com conta, os dados vêm do banco: enquanto chegam, a tela espera em vez de
 // mandar a pessoa de volta para o acesso.
 export function ProtectedRoute() {
-  const { autenticado, precisaIdentificar, carregando } = useAuth();
+  const { autenticado, precisaIdentificar, precisaPerfil, carregando } = useAuth();
   const { verificando } = useConta();
   const location = useLocation();
 
   if (verificando || carregando) return <TelaCarregando />;
 
-  if (!autenticado || precisaIdentificar) {
+  if (!autenticado || precisaIdentificar || precisaPerfil) {
     return <Navigate to="/entrar" replace state={{ de: location.pathname + location.search }} />;
   }
 

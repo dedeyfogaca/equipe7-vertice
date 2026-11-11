@@ -61,6 +61,14 @@ export function diasRestantes(iso) {
   return Math.round((d - hoje) / MS_DIA);
 }
 
+// Dias de `inicio` até `fim` (as duas em 'AAAA-MM-DD'); negativo se o fim vem antes.
+export function diasEntre(inicio, fim) {
+  const a = dataLocal(inicio);
+  const b = dataLocal(fim);
+  if (!a || !b) return null;
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
+}
+
 export function ehFimDeSemana(iso) {
   const d = dataLocal(iso);
   if (!d) return false;

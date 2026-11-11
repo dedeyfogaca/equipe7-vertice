@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CalendarDays, CalendarPlus, Plus } from 'lucide-react';
+import { CalendarDays, CalendarPlus, Layers, Plus } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -8,6 +8,9 @@ import { useFeriados } from '../hooks/useFeriados.js';
 import { useTitulo } from '../hooks/useTitulo.js';
 import { Button } from '../components/ui/botao.jsx';
 import { Card, EmptyState, PageHeader } from '../components/ui/basicos.jsx';
+import { Label } from '../components/ui/campos.jsx';
+import { IconeOpcao, SelectRico } from '../components/ui/selecao.jsx';
+import { opcoesDisciplinas } from '../components/opcoes.jsx';
 import { CartaoEvento } from '../components/eventos/CartaoEvento.jsx';
 import { eventoFuturo, iconeDoEvento } from '../components/eventos/tipos.jsx';
 import { useEventos } from '../components/eventos/useEventos.jsx';
@@ -19,6 +22,9 @@ import { cn } from '../lib/utils.js';
 // Eventos do grupo (RF31): provas, palestras, apresentações, reuniões. Não
 // têm responsável nem peso, então não entram no progresso nem na
 // experiência: servem para o grupo não esquecer do que tem dia marcado.
+// No espaço pessoal (RF34), aparecem os da pessoa e os de todos os grupos
+// dela, com o nome do grupo. O filtro por disciplina veio do feedback dos
+// testes (11/11/2026).
 
 const ABAS = [
   { valor: 'proximos', rotulo: 'Próximos' },
@@ -28,12 +34,14 @@ const ABAS = [
 export default function Eventos() {
   useTitulo('Eventos');
   const { grupoAtivo } = useAuth();
-  const { eventosDoGrupo, disciplinasDoGrupo } = useData();
+  const { eventosDoEspaco, disciplinasDoEspaco, grupos } = useData();
   const { novoEvento, menuDoEvento, janelas } = useEventos();
   const [params, setParams] = useSearchParams();
 
-  const eventos = eventosDoGrupo(grupoAtivo.id);
-  const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
+  const eventos = eventosDoEspaco(grupoAtivo.id);
+  const disciplinas = disciplinasDoEspaco(grupoAtivo.id);
+  const grupoDe = (evento) =>
+    evento.grupoId !== grupoAtivo.id ? grupos.find((g) => g.id === evento.grupoId && !g.pessoal) : undefined;
   const [aba, setAba] = useState('proximos');
   // Evento que cai em feriado nacional ganha um aviso (BrasilAPI, RF21).
   const anos = useMemo(
@@ -42,6 +50,7 @@ export default function Eventos() {
   );
   const { feriadoEm } = useFeriados(anos);
   const [tipo, setTipo] = useState('todos');
+  const [fDisciplina, setFDisciplina] = useState('todas');
 
   // `?novo=2026-11-20` (vindo do painel ou de um link) já abre o cadastro.
   useEffect(() => {
@@ -55,7 +64,11 @@ export default function Eventos() {
   const proximos = eventos.filter(eventoFuturo);
   const passados = eventos.filter((e) => !eventoFuturo(e)).reverse();
   const daAba = aba === 'proximos' ? proximos : passados;
-  const filtrados = tipo === 'todos' ? daAba : daAba.filter((e) => e.tipo === tipo);
+  const filtrados = daAba.filter(
+    (e) => (tipo === 'todos' || e.tipo === tipo) && (fDisciplina === 'todas' || e.disciplinaId === fDisciplina)
+  );
+  // Só as disciplinas que têm evento entram no filtro.
+  const disciplinasComEvento = disciplinas.filter((d) => eventos.some((e) => e.disciplinaId === d.id));
 
   // Agrupados por mês, na ordem da aba.
   const porMes = useMemo(() => {
@@ -114,6 +127,24 @@ export default function Eventos() {
           })}
         </div>
 
+        <div className="flex flex-wrap items-center gap-3">
+        {disciplinasComEvento.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Label htmlFor="f-disc-evento" className="sr-only">
+              Disciplina
+            </Label>
+            <SelectRico
+              id="f-disc-evento"
+              valor={fDisciplina}
+              aoMudar={setFDisciplina}
+              className="h-10 w-[220px]"
+              opcoes={[
+                { valor: 'todas', rotulo: 'Todas as disciplinas', icone: <IconeOpcao icone={Layers} /> },
+                ...opcoesDisciplinas(disciplinasComEvento),
+              ]}
+            />
+          </div>
+        )}
         {tiposUsados.length > 1 && (
           <div role="group" aria-label="Tipo de evento" className="flex flex-wrap gap-1.5">
             <button
@@ -149,11 +180,28 @@ export default function Eventos() {
             })}
           </div>
         )}
+        </div>
       </div>
 
       {filtrados.length === 0 ? (
         <Card>
-          {eventos.length === 0 ? (
+          {eventos.length > 0 && (tipo !== 'todos' || fDisciplina !== 'todas') ? (
+            <EmptyState
+              icone={CalendarDays}
+              titulo="Nenhum evento com esses filtros"
+              descricao="Troque a disciplina ou o tipo para ver os outros."
+            >
+              <Button
+                variante="secundaria"
+                onClick={() => {
+                  setTipo('todos');
+                  setFDisciplina('todas');
+                }}
+              >
+                Limpar filtros
+              </Button>
+            </EmptyState>
+          ) : eventos.length === 0 ? (
             <EmptyState
               icone={CalendarPlus}
               titulo="Nenhum evento ainda"
@@ -192,6 +240,7 @@ export default function Eventos() {
                     <CartaoEvento
                       evento={evento}
                       disciplina={disciplinas.find((d) => d.id === evento.disciplinaId)}
+                      grupo={grupoDe(evento)}
                       feriado={feriadoEm(evento.data)}
                       acoes={menuDoEvento(evento)}
                     />

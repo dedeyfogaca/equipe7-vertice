@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import {
-  ArrowLeftRight,
   BookOpen,
   CalendarClock,
   CalendarDays,
@@ -11,6 +10,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
   Compass,
+  House,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -18,8 +18,11 @@ import {
   Menu,
   Pencil,
   Plus,
+  Sparkles,
+  Ticket,
   TriangleAlert,
   Trophy,
+  UserRound,
   Users,
   X,
 } from 'lucide-react';
@@ -32,92 +35,149 @@ import { Avatar } from '../ui/avatar-membro.jsx';
 import { AvatarGrupo } from '../ui/avatar-grupo.jsx';
 import { Aviso } from '../ui/basicos.jsx';
 import { Button } from '../ui/botao.jsx';
+import { Dialogo } from '../ui/dialogo.jsx';
 import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz, MenuRotulo, MenuSeparador } from '../ui/flutuantes.jsx';
 import { MarcaVertice } from '../ui/marca.jsx';
 import { FormGrupo } from '../grupos/FormGrupo.jsx';
+import { EntrarComCodigo } from '../conta/EntrarComCodigo.jsx';
 import { TutorialProvider, useTutorial } from '../tutorial/Tutorial.jsx';
 import { obterConquista } from '../../lib/gamificacao.js';
 import { rotuloPerfil } from '../../lib/constants.js';
 import { LINK_FEEDBACK, temFormularioFeedback } from '../../lib/feedback.js';
+import { entrarComCodigo, lerConvitePendente, limparConvitePendente } from '../../lib/convite.js';
+import { gerarDadosExemplo } from '../../lib/seed.js';
 import { cn, plural } from '../../lib/utils.js';
 
 // Casca das telas internas: a barra no topo com as seções (no celular, um
-// menu que desce do topo) e o conteúdo da página embaixo. Também é quem dá os avisos que valem para
-// o sistema inteiro: conquista nova e falha ao salvar.
+// menu que desce do topo) e o conteúdo da página embaixo. Também é quem dá
+// os avisos que valem para o sistema inteiro: conquista nova ou retirada,
+// falha ao salvar e o convite guardado.
+//
+// O seletor à esquerda troca de espaço (RF34): o pessoal, onde a pessoa
+// cai ao entrar, e os grupos dela. Dali também se cria um grupo e se entra
+// com um código de convite, sem sair do sistema.
 
+// `soGrupo`: a seção não existe no espaço pessoal (que só tem a própria pessoa).
 const SECOES = [
   { para: '/painel', rotulo: 'Painel', icone: LayoutDashboard, prefixos: ['/painel'] },
   { para: '/calendario', rotulo: 'Calendário', icone: CalendarDays, prefixos: ['/calendario'] },
   { para: '/eventos', rotulo: 'Eventos', icone: CalendarClock, prefixos: ['/eventos'] },
   { para: '/disciplinas', rotulo: 'Disciplinas', icone: BookOpen, prefixos: ['/disciplina'] },
   { para: '/atividades', rotulo: 'Atividades', icone: ListChecks, prefixos: ['/atividade'] },
-  { para: '/membros', rotulo: 'Membros', icone: Users, prefixos: ['/membros'] },
+  { para: '/membros', rotulo: 'Membros', icone: Users, prefixos: ['/membros'], soGrupo: true },
   { para: '/conquistas', rotulo: 'Conquistas', icone: Trophy, prefixos: ['/conquistas'] },
 ];
 
+function useSecoes() {
+  const { noEspacoPessoal } = useAuth();
+  return SECOES.filter((s) => !(noEspacoPessoal && s.soGrupo));
+}
+
+// Ao trocar de espaço, a pessoa continua na mesma seção. A tela de um item
+// (uma atividade, uma disciplina) vira a lista, porque o item é do espaço
+// anterior; Membros, que o espaço pessoal não tem, vira o painel.
+function destinoAoTrocar(pathname, pessoal) {
+  const secao = SECOES.find((s) => s.prefixos.some((p) => pathname.startsWith(p)));
+  if (!secao || (pessoal && secao.soGrupo)) return '/painel';
+  return secao.para;
+}
+
+// O "rosto" do espaço: a pessoa, no pessoal; a foto ou as iniciais, no grupo.
+function IconeEspaco({ grupo, tamanho }) {
+  const { meuMembroEm } = useData();
+  if (grupo?.pessoal) return <Avatar membro={meuMembroEm(grupo.id)} tamanho={tamanho} decorativo />;
+  return <AvatarGrupo grupo={grupo} tamanho={tamanho} />;
+}
+
 function SeletorGrupo({ compacto = false }) {
-  const { grupoAtivo, membrosDoGrupoAtivo, ehOrganizador, entrar, sair } = useAuth();
-  const { grupos, membrosDoGrupo, atualizarGrupo } = useData();
+  const { grupoAtivo, membrosDoGrupoAtivo, ehOrganizador, noEspacoPessoal, espacoPessoal, entrar } = useAuth();
+  const { grupos, membrosDoGrupo, atualizarGrupo, criarGrupo, importarExemplo, meuUsuarioId } = useData();
+  const { modo } = useConta();
   const navigate = useNavigate();
-  const [editando, setEditando] = useState(false);
+  const { pathname } = useLocation();
+  const [dialogo, setDialogo] = useState(null); // 'editar' | 'criar' | 'codigo'
+  const outros = grupos.filter((g) => !g.pessoal);
 
-  const trocar = (grupoId) => {
-    if (grupoId === grupoAtivo.id) return;
-    entrar(grupoId);
-    navigate('/painel');
-  };
-
-  const outroGrupo = () => {
-    sair();
-    navigate('/entrar');
+  const trocar = (grupo) => {
+    if (grupo.id === grupoAtivo.id) return;
+    entrar(grupo.id);
+    navigate(destinoAoTrocar(pathname, grupo.pessoal));
   };
 
   const salvarGrupo = (dados) => {
     atualizarGrupo(grupoAtivo.id, dados);
     toast.success('Grupo atualizado', { description: dados.nome });
-    setEditando(false);
+    setDialogo(null);
   };
+
+  const criar = (dados) => {
+    const { grupo } = criarGrupo(dados);
+    setDialogo(null);
+    entrar(grupo.id);
+    navigate('/painel');
+    toast.success('Grupo criado', { description: `Você é o organizador de ${grupo.nome}. Chame a turma em Membros.` });
+  };
+
+  const carregarExemplo = () => {
+    const pacote = gerarDadosExemplo({ usuarioId: meuUsuarioId });
+    importarExemplo(pacote);
+    entrar(pacote.grupo.id);
+    navigate('/painel');
+    toast.success('Grupo de exemplo carregado', { description: 'Você entrou como organizador do Trio do TCC.' });
+  };
+
+  const titulo = noEspacoPessoal ? 'Pessoal' : grupoAtivo.nome;
+  const subtitulo = noEspacoPessoal ? 'Seu espaço' : plural(membrosDoGrupoAtivo.length, 'membro');
 
   return (
     <>
       <MenuRaiz>
         <MenuGatilho asChild>
           {compacto ? (
-            // Na barra do topo: a foto (ou as iniciais) do grupo e o nome, que
+            // Na barra do topo: a foto (ou as iniciais) do espaço e o nome, que
             // só aparece quando há espaço.
             <button
               type="button"
               className="flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-left transition-colors hover:bg-superficie-3 data-[state=open]:bg-superficie-3"
             >
-              <AvatarGrupo grupo={grupoAtivo} tamanho={28} />
-              <span className="hidden min-w-0 max-w-[180px] flex-col xl:flex">
-                <span className="truncate text-sm font-semibold leading-tight text-forte">{grupoAtivo.nome}</span>
-                <span className="text-[12px] leading-tight text-sutil">
-                  {plural(membrosDoGrupoAtivo.length, 'membro')}
-                </span>
+              <IconeEspaco grupo={grupoAtivo} tamanho={28} />
+              <span className="hidden min-w-0 max-w-[200px] flex-col xl:flex">
+                <span className="truncate text-sm font-semibold leading-tight text-forte">{titulo}</span>
+                <span className="text-[12px] leading-tight text-sutil">{subtitulo}</span>
               </span>
               <ChevronsUpDown className="size-4 shrink-0 text-sutil" aria-hidden="true" />
-              <span className="sr-only">Grupo {grupoAtivo.nome}. Trocar de grupo</span>
+              <span className="sr-only">Espaço atual: {titulo}. Trocar de espaço</span>
             </button>
           ) : (
             <button
               type="button"
               className="flex w-full items-center gap-2.5 rounded-[14px] border border-borda bg-superficie-2 px-3 py-2.5 text-left transition-colors hover:border-borda-forte data-[state=open]:border-borda-forte"
             >
-              <AvatarGrupo grupo={grupoAtivo} tamanho={30} />
+              <IconeEspaco grupo={grupoAtivo} tamanho={30} />
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-semibold text-forte">{grupoAtivo.nome}</span>
-                <span className="text-[12px] text-sutil">{plural(membrosDoGrupoAtivo.length, 'membro')}</span>
+                <span className="truncate text-sm font-semibold text-forte">{titulo}</span>
+                <span className="text-[12px] text-sutil">{subtitulo}</span>
               </span>
               <ChevronsUpDown className="size-4 shrink-0 text-sutil" aria-hidden="true" />
-              <span className="sr-only">Trocar de grupo</span>
+              <span className="sr-only">Trocar de espaço</span>
             </button>
           )}
         </MenuGatilho>
-        <MenuConteudo align="start" className={compacto ? 'w-[280px]' : 'w-[var(--radix-dropdown-menu-trigger-width)]'}>
-          <MenuRotulo>Seus grupos</MenuRotulo>
-          {grupos.map((grupo) => (
-            <MenuItem key={grupo.id} onSelect={() => trocar(grupo.id)}>
+        <MenuConteudo align="start" className={compacto ? 'w-[290px]' : 'w-[var(--radix-dropdown-menu-trigger-width)]'}>
+          {espacoPessoal && (
+            <MenuItem onSelect={() => trocar(espacoPessoal)}>
+              <IconeEspaco grupo={espacoPessoal} tamanho={24} />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate">Pessoal</span>
+                <span className="text-[12px] font-normal text-sutil">Suas atividades e as dos grupos</span>
+              </span>
+              {noEspacoPessoal && <Check className="!text-primaria-texto" aria-label="Espaço atual" />}
+            </MenuItem>
+          )}
+          <MenuRotulo>Grupos</MenuRotulo>
+          {outros.length === 0 && <p className="px-2.5 pb-2 text-[13px] text-sutil">Você ainda não está em nenhum grupo.</p>}
+          {outros.map((grupo) => (
+            <MenuItem key={grupo.id} onSelect={() => trocar(grupo)}>
               <AvatarGrupo grupo={grupo} tamanho={24} tom="neutro" />
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate">{grupo.nome}</span>
@@ -130,31 +190,62 @@ function SeletorGrupo({ compacto = false }) {
           ))}
           <MenuSeparador />
           {/* RN07: nome, descrição e foto do grupo são do organizador. */}
-          {ehOrganizador && (
-            <MenuItem onSelect={() => setEditando(true)}>
+          {ehOrganizador && !noEspacoPessoal && (
+            <MenuItem onSelect={() => setDialogo('editar')}>
               <Pencil aria-hidden="true" />
               Editar grupo
             </MenuItem>
           )}
-          <MenuItem onSelect={outroGrupo}>
+          <MenuItem onSelect={() => setDialogo('criar')}>
             <Plus aria-hidden="true" />
-            Criar ou entrar em outro grupo
+            Criar grupo
           </MenuItem>
+          {modo === 'conta' ? (
+            <MenuItem onSelect={() => setDialogo('codigo')}>
+              <Ticket aria-hidden="true" />
+              Entrar com código de convite
+            </MenuItem>
+          ) : (
+            <MenuItem onSelect={carregarExemplo}>
+              <Sparkles aria-hidden="true" />
+              Carregar grupo de exemplo
+            </MenuItem>
+          )}
         </MenuConteudo>
       </MenuRaiz>
-      {editando && (
-        <FormGrupo aberto aoMudar={(abrir) => !abrir && setEditando(false)} grupo={grupoAtivo} aoSalvar={salvarGrupo} />
+      {dialogo === 'editar' && (
+        <FormGrupo aberto aoMudar={(abrir) => !abrir && setDialogo(null)} grupo={grupoAtivo} aoSalvar={salvarGrupo} />
+      )}
+      {dialogo === 'criar' && <FormGrupo aberto aoMudar={(abrir) => !abrir && setDialogo(null)} aoSalvar={criar} />}
+      {dialogo === 'codigo' && (
+        <Dialogo
+          aberto
+          aoMudar={(abrir) => !abrir && setDialogo(null)}
+          titulo="Entrar num grupo"
+          descricao="Use o código de 8 letras e números que o organizador do grupo mandou."
+          largura={460}
+        >
+          <EntrarComCodigo
+            aoEntrar={(id, nome) => {
+              setDialogo(null);
+              entrar(id);
+              navigate('/painel');
+              toast.success('Você entrou no grupo', { description: nome });
+            }}
+          />
+        </Dialogo>
       )}
     </>
   );
 }
 
+// Volta ao espaço pessoal (sem conta e sem espaço pessoal, à tela de acesso).
 function useSairDoGrupo() {
-  const { sair } = useAuth();
+  const { sair, espacoPessoal } = useAuth();
   const navigate = useNavigate();
   return () => {
     sair();
-    navigate('/entrar');
+    navigate(espacoPessoal ? '/painel' : '/entrar');
   };
 }
 
@@ -180,10 +271,46 @@ function ItemFeedback() {
   );
 }
 
+// Quem está usando: no espaço pessoal, a pessoa; num grupo, com o perfil
+// que ela tem lá (RN07).
+function Identidade({ tamanho = 36 }) {
+  const { membroAtivo, noEspacoPessoal } = useAuth();
+  const { perfil } = useData();
+  const nome = perfil?.nome || membroAtivo?.nome || 'Grupo sem membros';
+  const detalhe = noEspacoPessoal
+    ? 'Seu espaço pessoal'
+    : membroAtivo
+      ? rotuloPerfil(membroAtivo.perfil)
+      : 'Cadastre o primeiro em Membros';
+  return (
+    <>
+      <Avatar membro={membroAtivo} nome={membroAtivo ? undefined : '?'} tamanho={tamanho} decorativo />
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-sm font-semibold text-forte">{nome}</span>
+        <span className="truncate text-[12px] text-sutil">{detalhe}</span>
+      </span>
+    </>
+  );
+}
+
+function useSairDaConta() {
+  const { sair } = useAuth();
+  const { modo, sairDaConta, sairDaDemonstracao } = useConta();
+  const navigate = useNavigate();
+  return async () => {
+    sair();
+    if (modo === 'conta') await sairDaConta();
+    else sairDaDemonstracao();
+    navigate('/entrar');
+  };
+}
+
 function MenuUsuario() {
-  const { membroAtivo, sair } = useAuth();
-  const { modo, usuario, sairDaConta } = useConta();
+  const { membroAtivo, noEspacoPessoal } = useAuth();
+  const { modo, usuario, temBanco } = useConta();
+  const { perfil } = useData();
   const sairDoGrupo = useSairDoGrupo();
+  const sairDaConta = useSairDaConta();
   const navigate = useNavigate();
   const { abrirTutorial } = useTutorial();
 
@@ -192,52 +319,41 @@ function MenuUsuario() {
       <MenuGatilho asChild>
         <button
           type="button"
-          aria-label={`Sua conta: ${membroAtivo?.nome ?? 'grupo sem membros'}`}
+          aria-label={`Sua conta: ${perfil?.nome || membroAtivo?.nome || 'grupo sem membros'}`}
           className="flex items-center gap-1.5 rounded-full p-0.5 pr-1.5 transition-colors hover:bg-superficie-3 data-[state=open]:bg-superficie-3"
         >
           <Avatar membro={membroAtivo} nome={membroAtivo ? undefined : '?'} tamanho={32} decorativo />
           <ChevronDown className="size-4 text-sutil" aria-hidden="true" />
         </button>
       </MenuGatilho>
-      <MenuConteudo align="end" className="w-[240px]">
+      <MenuConteudo align="end" className="w-[250px]">
         <div className="flex items-center gap-2.5 px-2.5 py-2">
-          <Avatar membro={membroAtivo} nome={membroAtivo ? undefined : '?'} tamanho={36} decorativo />
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate text-sm font-semibold text-forte">{membroAtivo?.nome ?? 'Grupo sem membros'}</span>
-            <span className="text-[12px] text-sutil">
-              {membroAtivo ? rotuloPerfil(membroAtivo.perfil) : 'Cadastre o primeiro em Membros'}
-            </span>
-          </span>
+          <Identidade />
         </div>
         {modo === 'conta' && <p className="truncate px-2.5 pb-2 text-[12px] text-sutil">{usuario?.email}</p>}
         <MenuSeparador />
+        {perfil && (
+          <MenuItem onSelect={() => navigate('/perfil')}>
+            <UserRound aria-hidden="true" />
+            Meu perfil
+          </MenuItem>
+        )}
         <MenuItem onSelect={abrirTutorial}>
           <Compass aria-hidden="true" />
           Tutorial
         </MenuItem>
         <ItemFeedback />
-        {modo === 'conta' && (
+        {!noEspacoPessoal && (
           <MenuItem onSelect={sairDoGrupo}>
-            <ArrowLeftRight aria-hidden="true" />
-            Trocar de grupo
+            <House aria-hidden="true" />
+            Voltar ao espaço pessoal
           </MenuItem>
         )}
-        {modo === 'conta' && (
-          <MenuItem
-            onSelect={async () => {
-              sair();
-              await sairDaConta();
-              navigate('/entrar');
-            }}
-          >
+        {/* Sem banco configurado, só existe a demonstração: não há para onde sair. */}
+        {temBanco && (
+          <MenuItem onSelect={sairDaConta}>
             <LogOut aria-hidden="true" />
-            Sair da conta
-          </MenuItem>
-        )}
-        {modo !== 'conta' && (
-          <MenuItem onSelect={sairDoGrupo}>
-            <LogOut aria-hidden="true" />
-            Sair do grupo
+            {modo === 'conta' ? 'Sair da conta' : 'Sair da demonstração'}
           </MenuItem>
         )}
       </MenuConteudo>
@@ -253,10 +369,11 @@ function secaoAtiva(pathname, prefixos) {
 // meio e, à direita, o tema e quem está usando.
 function BarraTopo({ aoAbrirMenu, menuAberto }) {
   const { pathname } = useLocation();
+  const secoes = useSecoes();
 
   return (
     <header className="sticky top-0 z-30 border-b border-borda bg-lateral/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:px-6">
+      <div className={cn('mx-auto flex h-16 items-center gap-3', LARGURA, MARGEM)}>
         <Link to="/painel" aria-label="Vértice, ir para o painel" className="shrink-0 rounded-lg">
           <MarcaVertice tamanho={26} />
         </Link>
@@ -266,7 +383,7 @@ function BarraTopo({ aoAbrirMenu, menuAberto }) {
         </div>
 
         <nav aria-label="Seções" className="hidden flex-1 items-center justify-center gap-0.5 lg:flex">
-          {SECOES.map(({ para, rotulo, icone: Icone, prefixos }) => {
+          {secoes.map(({ para, rotulo, icone: Icone, prefixos }) => {
             const ativa = secaoAtiva(pathname, prefixos);
             return (
               <Link
@@ -313,8 +430,13 @@ function BarraTopo({ aoAbrirMenu, menuAberto }) {
 // a saída.
 function MenuCelular({ aberto, aoMudar }) {
   const { pathname } = useLocation();
-  const { membroAtivo } = useAuth();
+  const { noEspacoPessoal } = useAuth();
+  const { perfil } = useData();
+  const { modo, temBanco } = useConta();
+  const secoes = useSecoes();
   const sairDoGrupo = useSairDoGrupo();
+  const sairDaConta = useSairDaConta();
+  const navigate = useNavigate();
   const { abrirTutorial } = useTutorial();
 
   return (
@@ -335,7 +457,7 @@ function MenuCelular({ aberto, aoMudar }) {
           <div className="flex flex-col gap-4 px-4 pb-5 sm:px-6">
             <SeletorGrupo />
             <nav aria-label="Seções" className="grid grid-cols-2 gap-1.5">
-              {SECOES.map(({ para, rotulo, icone: Icone, prefixos }) => {
+              {secoes.map(({ para, rotulo, icone: Icone, prefixos }) => {
                 const ativa = secaoAtiva(pathname, prefixos);
                 return (
                   <Link
@@ -358,14 +480,22 @@ function MenuCelular({ aberto, aoMudar }) {
               })}
             </nav>
             <div className="flex items-center gap-2.5 rounded-[14px] border border-borda p-3">
-              <Avatar membro={membroAtivo} nome={membroAtivo ? undefined : '?'} tamanho={36} decorativo />
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-semibold text-forte">{membroAtivo?.nome ?? 'Grupo sem membros'}</span>
-                <span className="text-[12px] text-sutil">
-                  {membroAtivo ? rotuloPerfil(membroAtivo.perfil) : 'Cadastre o primeiro'}
-                </span>
-              </span>
+              <Identidade />
               <BotaoTema />
+              {perfil && (
+                <Button
+                  variante="fantasma"
+                  tamanho="icone"
+                  aria-label="Meu perfil"
+                  title="Meu perfil"
+                  onClick={() => {
+                    aoMudar(false);
+                    navigate('/perfil');
+                  }}
+                >
+                  <UserRound className="!size-[18px]" />
+                </Button>
+              )}
               <Button
                 variante="fantasma"
                 tamanho="icone"
@@ -385,9 +515,28 @@ function MenuCelular({ aberto, aoMudar }) {
                   </a>
                 </Button>
               )}
-              <Button variante="fantasma" tamanho="icone" aria-label="Sair do grupo" title="Sair do grupo" onClick={sairDoGrupo}>
-                <LogOut className="!size-[18px]" />
-              </Button>
+              {!noEspacoPessoal && (
+                <Button
+                  variante="fantasma"
+                  tamanho="icone"
+                  aria-label="Voltar ao espaço pessoal"
+                  title="Voltar ao espaço pessoal"
+                  onClick={sairDoGrupo}
+                >
+                  <House className="!size-[18px]" />
+                </Button>
+              )}
+              {temBanco && (
+                <Button
+                  variante="fantasma"
+                  tamanho="icone"
+                  aria-label={modo === 'conta' ? 'Sair da conta' : 'Sair da demonstração'}
+                  title={modo === 'conta' ? 'Sair da conta' : 'Sair da demonstração'}
+                  onClick={sairDaConta}
+                >
+                  <LogOut className="!size-[18px]" />
+                </Button>
+              )}
             </div>
           </div>
         </DialogPrimitive.Content>
@@ -398,9 +547,17 @@ function MenuCelular({ aberto, aoMudar }) {
 
 // Conquista nova vira aviso no canto. Ela pode ser de outra pessoa (uma
 // atividade concluída que passou para ela), então o aviso diz de quem é.
+// A retirada (RN12: desfez a conclusão) também avisa, para a pessoa não
+// achar que perdeu a conquista por engano.
 function useAvisoDeConquistas() {
-  const { membroAtivo } = useAuth();
-  const { membros, novasConquistas, consumirNovasConquistas } = useData();
+  const {
+    membros,
+    meusMembros,
+    novasConquistas,
+    consumirNovasConquistas,
+    conquistasRetiradas,
+    consumirConquistasRetiradas,
+  } = useData();
 
   useEffect(() => {
     if (novasConquistas.length === 0) return;
@@ -408,7 +565,8 @@ function useAvisoDeConquistas() {
       const conquista = obterConquista(codigo);
       const membro = membros.find((m) => m.id === membroId);
       if (!conquista || !membro) return;
-      const quem = membroId === membroAtivo?.id ? 'Você conquistou' : `${membro.nome} conquistou`;
+      const minha = meusMembros.some((m) => m.id === membroId);
+      const quem = minha ? 'Você conquistou' : `${membro.nome} conquistou`;
       toast(`${quem}: ${conquista.nome}`, {
         description: conquista.descricao,
         icon: <Trophy className="size-4 text-gam" aria-hidden="true" />,
@@ -416,7 +574,58 @@ function useAvisoDeConquistas() {
       });
     });
     consumirNovasConquistas();
-  }, [novasConquistas, consumirNovasConquistas, membros, membroAtivo]);
+  }, [novasConquistas, consumirNovasConquistas, membros, meusMembros]);
+
+  useEffect(() => {
+    if (conquistasRetiradas.length === 0) return;
+    conquistasRetiradas.forEach(({ codigo }) => {
+      const conquista = obterConquista(codigo);
+      if (!conquista) return;
+      toast(`Conquista retirada: ${conquista.nome}`, {
+        description: 'Ela saiu junto com a experiência da conclusão desfeita. Volta quando o marco for atingido de novo.',
+        icon: <Trophy className="size-4 text-sutil" aria-hidden="true" />,
+        duration: 6000,
+      });
+    });
+    consumirConquistasRetiradas();
+  }, [conquistasRetiradas, consumirConquistasRetiradas]);
+}
+
+// Convite aberto pelo link (/convite/CODIGO) antes de a pessoa entrar: com a
+// conta aberta, ela entra no grupo sozinha (RF28). Sem conta, fica o aviso.
+function useConvitePendente() {
+  const { modo, usuario, sairDaDemonstracao } = useConta();
+  const { recarregar, perfil } = useData();
+  const { entrar } = useAuth();
+  const navigate = useNavigate();
+  const visto = useRef(false);
+
+  useEffect(() => {
+    const codigo = lerConvitePendente();
+    if (visto.current || !codigo) return;
+    visto.current = true;
+    if (modo !== 'conta') {
+      toast('Você abriu um convite', {
+        description: 'Para entrar no grupo do convite, entre com uma conta.',
+        icon: <Ticket className="size-4 text-primaria-texto" aria-hidden="true" />,
+        action: { label: 'Entrar com conta', onClick: sairDaDemonstracao },
+        duration: 12000,
+      });
+      return;
+    }
+    limparConvitePendente();
+    (async () => {
+      try {
+        const grupoId = await entrarComCodigo(codigo, perfil?.nome || usuario?.email?.split('@')[0] || 'Novo membro');
+        const dados = await recarregar();
+        entrar(grupoId);
+        navigate('/painel');
+        toast.success('Você entrou no grupo', { description: dados?.grupos.find((g) => g.id === grupoId)?.nome });
+      } catch (erro) {
+        toast.error('Não foi possível usar o convite', { description: erro.message });
+      }
+    })();
+  }, [modo, usuario, perfil, recarregar, entrar, navigate, sairDaDemonstracao]);
 }
 
 // D02: o navegador recusou gravar. Avisa uma vez no canto; a faixa no topo
@@ -435,6 +644,11 @@ function useAvisoDeFalha(falhaGravacao) {
   }, [falhaGravacao]);
 }
 
+// Largura das telas: o conteúdo aproveita a tela do computador (pedido da
+// equipe, 11/11/2026), com um limite para monitores muito largos.
+const LARGURA = 'w-full max-w-[1680px]';
+const MARGEM = 'px-4 sm:px-6 lg:px-8 2xl:px-12';
+
 export function AppShell() {
   const [menuAberto, setMenuAberto] = useState(false);
   const { pathname } = useLocation();
@@ -442,6 +656,7 @@ export function AppShell() {
 
   useAvisoDeConquistas();
   useAvisoDeFalha(falhaGravacao);
+  useConvitePendente();
 
   useEffect(() => {
     setMenuAberto(false);
@@ -465,9 +680,9 @@ export function AppShell() {
         <main
           id="conteudo"
           tabIndex={-1}
-          className="flex min-h-[calc(100dvh-4rem)] min-w-0 flex-col px-4 pb-16 pt-6 outline-none sm:px-6 lg:px-10 lg:pt-8"
+          className={cn('flex min-h-[calc(100dvh-4rem)] min-w-0 flex-col pb-16 pt-6 outline-none lg:pt-8', MARGEM)}
         >
-          <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col">
+          <div className={cn('mx-auto flex flex-1 flex-col', LARGURA)}>
             {falhaGravacao && (
               <Aviso tom="perigo" icone={TriangleAlert} className="mb-6">
                 <strong className="font-semibold">Não foi possível salvar no navegador.</strong> O

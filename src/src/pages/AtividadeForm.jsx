@@ -16,9 +16,12 @@ import { IconeOpcao, SelectRico } from '../components/ui/selecao.jsx';
 import { SeletorPeso } from '../components/atividades/SeletorPeso.jsx';
 import { FormConteudo } from '../components/disciplinas/FormConteudo.jsx';
 import {
+  A_DEFINIR,
+  OPCAO_A_DEFINIR,
   OPCOES_PRIORIDADE,
   OPCOES_STATUS,
   opcoesDisciplinas,
+  opcoesGrupos,
   opcoesMembros,
 } from '../components/opcoes.jsx';
 import { normalizarPeso, PESO } from '../lib/constants.js';
@@ -38,8 +41,8 @@ export default function AtividadeForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
-  const { grupoAtivo, membroAtivo, ehOrganizador } = useAuth();
-  const { quem, podeEditar } = usePermissoes();
+  const { grupoAtivo, noEspacoPessoal } = useAuth();
+  const { quemEm, podeEditar } = usePermissoes();
   const {
     obterAtividade,
     criarAtividade,
@@ -49,17 +52,37 @@ export default function AtividadeForm() {
     disciplinasDoGrupo,
     conteudosDoGrupo,
     conteudosDaDisciplina,
+    grupos,
+    meusMembros,
+    meuMembroEm,
+    ehPessoal,
   } = useData();
 
   const edicao = Boolean(id);
   useTitulo(edicao ? 'Editar atividade' : 'Nova atividade');
 
-  const membros = membrosDoGrupo(grupoAtivo.id);
-  const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
-  const conteudosDoGrupoAtivo = conteudosDoGrupo(grupoAtivo.id);
   const existente = edicao ? obterAtividade(id) : null;
-  // RN01: atividade de outro grupo é tratada como inexistente.
-  const atividade = existente && disciplinas.some((d) => d.id === existente.disciplinaId) ? existente : null;
+  // RN01: atividade de outro grupo é tratada como inexistente. No espaço
+  // pessoal, também valem as dos grupos da pessoa (RF34).
+  const atividade =
+    existente && (existente.grupoId === grupoAtivo.id || (noEspacoPessoal && meuMembroEm(existente.grupoId)))
+      ? existente
+      : null;
+
+  // RF34: onde a atividade vai morar. Do espaço pessoal ou de um grupo dá
+  // para cadastrar em qualquer um dos dois, sem trocar de espaço (pedido da
+  // equipe, 11/11/2026). Na edição, o lugar não muda.
+  const espacos = grupos.filter((g) => meusMembros.some((m) => m.grupoId === g.id));
+  const ondeInicial = espacos.some((g) => g.id === params.get('onde')) ? params.get('onde') : grupoAtivo.id;
+  const [onde, setOnde] = useState(() => (atividade ? atividade.grupoId : ondeInicial));
+  const pessoal = ehPessoal(onde);
+  const quem = quemEm(onde);
+  const euNoDestino = meuMembroEm(onde);
+  const ehOrganizador = quem.organizador;
+
+  const membros = membrosDoGrupo(onde);
+  const disciplinas = disciplinasDoGrupo(onde);
+  const conteudosDoGrupoAtivo = conteudosDoGrupo(onde);
 
   // Valores que chegam pelo endereço: o calendário manda o dia
   // (?prazo=2026-10-30) e a disciplina manda o conteúdo (?conteudo=...).
@@ -121,15 +144,25 @@ export default function AtividadeForm() {
   };
 
   // RN20: o status é de quem é responsável. Passar a atividade para outra
-  // pessoa devolve o status ao que era (ou ao vazio, na criação).
+  // pessoa devolve o status ao que era (ou ao vazio, na criação). "A definir"
+  // (RN06) fica sem responsável.
   const statusOriginal = atividade?.status || '';
-  const trocarResponsavel = (valor) => {
+  const trocarResponsavel = (bruto) => {
+    const valor = bruto === A_DEFINIR ? '' : bruto;
     setForm((atual) => ({
       ...atual,
       responsavelId: valor,
-      status: membroAtivo && valor === membroAtivo.id ? atual.status : statusOriginal,
+      status: euNoDestino && valor === euNoDestino.id ? atual.status : statusOriginal,
     }));
     setErros((atual) => semErroEm(atual, 'responsavelId'));
+  };
+
+  // Trocar o lugar (na criação) zera o que é de cada grupo.
+  const trocarOnde = (valor) => {
+    setOnde(valor);
+    setDisciplinaId('');
+    setForm((atual) => ({ ...atual, conteudoId: '', responsavelId: '', status: '' }));
+    setErros((atual) => semErroEm(semErroEm(atual, 'disciplinaId'), 'responsavelId'));
   };
 
   const voltar = () => {
@@ -171,8 +204,9 @@ export default function AtividadeForm() {
     );
   }
 
-  // RN13: sem disciplina não há onde pendurar a atividade.
-  if (disciplinas.length === 0) {
+  // RN13: sem disciplina não há onde pendurar a atividade (no grupo; no
+  // espaço pessoal ela é opcional, RN24).
+  if (!pessoal && disciplinas.length === 0 && espacos.length <= 1) {
     return (
       <>
         <PageHeader titulo="Nova atividade" />
@@ -191,14 +225,18 @@ export default function AtividadeForm() {
     );
   }
 
-  const responsavelEhVoce = Boolean(membroAtivo) && form.responsavelId === membroAtivo.id;
-  const responsavel = membros.find((m) => m.id === form.responsavelId);
+  // No espaço pessoal, a atividade é sempre da própria pessoa.
+  const responsavelEhVoce = pessoal || (Boolean(euNoDestino) && form.responsavelId === euNoDestino.id);
+  const responsavel = pessoal ? euNoDestino : membros.find((m) => m.id === form.responsavelId);
   const disciplinaEscolhida = disciplinas.find((d) => d.id === disciplinaId);
   const conteudosDaEscolhida = disciplinaId ? conteudosDaDisciplina(disciplinaId) : [];
 
   const enviar = (evento) => {
     evento.preventDefault();
-    const novosErros = validarAtividade({ ...form, disciplinaId }, { membros, conteudos: conteudosDoGrupoAtivo, disciplinas });
+    const novosErros = validarAtividade(
+      { ...form, disciplinaId },
+      { membros, conteudos: conteudosDoGrupoAtivo, disciplinas, pessoal }
+    );
     setErros(novosErros);
     if (!semErros(novosErros)) {
       // Leva o foco ao primeiro campo com erro.
@@ -208,14 +246,17 @@ export default function AtividadeForm() {
       return;
     }
 
+    const responsavelId = pessoal ? euNoDestino?.id || '' : form.responsavelId;
     const dados = {
       ...form,
+      grupoId: onde,
       disciplinaId,
+      responsavelId,
       peso: form.peso === '' ? PESO.PADRAO : form.peso,
       status: statusAoSalvar({
         statusEscolhido: form.status,
         statusAtual: statusOriginal,
-        responsavelId: form.responsavelId,
+        responsavelId,
         quem,
       }),
     };
@@ -225,10 +266,19 @@ export default function AtividadeForm() {
       toast.success('Alterações salvas', { description: dados.titulo.trim() });
       navigate(`/atividade/${id}`);
     } else {
-      // Sem grupoId: o grupo da atividade vem da disciplina escolhida.
+      // Depois de criar, a pessoa volta para onde estava (a lista, o
+      // calendário, a disciplina), e não para o detalhe: lá o botão de
+      // concluir parecia o fim do cadastro (feedback dos testes, 11/11/2026).
       const nova = criarAtividade(dados);
-      toast.success('Atividade criada', { description: nova.titulo });
-      navigate(`/atividade/${nova.id}`, { replace: true });
+      const fora = onde !== grupoAtivo.id && !noEspacoPessoal;
+      toast.success('Atividade criada', {
+        description: fora
+          ? `${nova.titulo}, em ${pessoal ? 'Pessoal' : grupos.find((g) => g.id === onde)?.nome}`
+          : nova.titulo,
+        action: fora ? undefined : { label: 'Abrir', onClick: () => navigate(`/atividade/${nova.id}`) },
+      });
+      if (location.key !== 'default') navigate(-1);
+      else navigate('/atividades', { replace: true });
     }
   };
 
@@ -293,6 +343,8 @@ export default function AtividadeForm() {
     dicaStatus = edicao ? undefined : 'Opcional. Sem escolha, a atividade começa em A fazer.';
   } else if (responsavel) {
     dicaStatus = `Só ${primeiroNome(responsavel.nome)}, que é responsável, muda o status.`;
+  } else if (!form.responsavelId) {
+    dicaStatus = 'Fica em A fazer até alguém assumir a atividade.';
   } else {
     dicaStatus = 'Só o responsável muda o status. A atividade começa em A fazer.';
   }
@@ -308,6 +360,22 @@ export default function AtividadeForm() {
 
       <Card as="form" onSubmit={enviar} noValidate className="max-w-[860px] overflow-hidden">
         <div className="grid gap-5 p-5 sm:p-7 md:grid-cols-2">
+          {/* RF34: na criação, onde a atividade vai morar. */}
+          {!edicao && espacos.length > 1 && (
+            <Field
+              id="onde"
+              label="Onde"
+              dica={
+                pessoal
+                  ? 'Só você vê. A disciplina é opcional.'
+                  : 'O grupo todo vê. Atividade sua aparece também no seu espaço pessoal.'
+              }
+              className="md:col-span-2"
+            >
+              <SelectRico valor={onde} aoMudar={trocarOnde} opcoes={opcoesGrupos(espacos)} />
+            </Field>
+          )}
+
           <Field id="titulo" label="Título" obrigatorio erro={erros.titulo} className="md:col-span-2">
             <Input
               value={form.titulo}
@@ -327,18 +395,39 @@ export default function AtividadeForm() {
             <Textarea
               value={form.descricao}
               onChange={atualizarCampo('descricao')}
-              placeholder="Anote o que for útil para o grupo."
+              placeholder={pessoal ? 'Anote o que for útil.' : 'Anote o que for útil para o grupo.'}
             />
           </Field>
 
           {/* RN13: a atividade pertence a uma disciplina; o conteúdo é
-              opcional (revisão de 06/11/2026). */}
-          <Field id="disciplinaId" label="Disciplina" obrigatorio erro={erros.disciplinaId}>
+              opcional (revisão de 06/11/2026). No espaço pessoal, a
+              disciplina também é (RN24). */}
+          <Field
+            id="disciplinaId"
+            label="Disciplina"
+            obrigatorio={!pessoal}
+            erro={erros.disciplinaId}
+            dica={
+              disciplinas.length === 0 ? (
+                pessoal ? (
+                  'Opcional. Para separar por matéria, cadastre em Disciplinas.'
+                ) : (
+                  'Este grupo ainda não tem disciplinas. O organizador cadastra em Disciplinas.'
+                )
+              ) : pessoal ? (
+                'Opcional.'
+              ) : undefined
+            }
+          >
             <SelectRico
-              valor={disciplinaId}
-              aoMudar={trocarDisciplina}
-              opcoes={opcoesDisciplinas(disciplinas)}
+              valor={disciplinaId || (pessoal ? SEM_CONTEUDO : '')}
+              aoMudar={(valor) => trocarDisciplina(valor === SEM_CONTEUDO ? '' : valor)}
+              opcoes={[
+                ...(pessoal ? [{ valor: SEM_CONTEUDO, rotulo: 'Sem disciplina', icone: <IconeOpcao icone={CircleSlash} /> }] : []),
+                ...opcoesDisciplinas(disciplinas),
+              ]}
               placeholder="Selecione a disciplina"
+              disabled={disciplinas.length === 0}
             />
           </Field>
           <Field id="conteudoId" label="Conteúdo" erro={erros.conteudoId} dica={dicaConteudo}>
@@ -374,35 +463,44 @@ export default function AtividadeForm() {
             <CampoData valor={form.prazo} aoMudar={(valor) => mudar('prazo', valor)} />
           </Field>
 
-          {/* RN06: toda atividade tem responsável (revisão de 28/10/2026).
-              É ele quem recebe a experiência na conclusão (RN10). */}
-          <Field
-            id="responsavelId"
-            label="Responsável"
-            obrigatorio
-            erro={erros.responsavelId}
-            dica={
-              membros.length > 0 ? (
-                'Quem faz a atividade, conclui e recebe a experiência.'
-              ) : (
-                <>
-                  O grupo ainda não tem membros.{' '}
-                  <Link to="/membros" className="font-medium text-primaria-texto hover:underline">
-                    Cadastre o primeiro
-                  </Link>{' '}
-                  para poder escolher o responsável.
-                </>
-              )
-            }
-          >
-            <SelectRico
-              valor={form.responsavelId}
-              aoMudar={trocarResponsavel}
-              opcoes={opcoesMembros(membros, { voceId: membroAtivo?.id })}
-              placeholder="Selecione o responsável"
-              disabled={membros.length === 0}
-            />
-          </Field>
+          {/* RN06 (revisada em 11/11/2026): o responsável pode ficar "A
+              definir": o grupo todo vê a atividade e alguém assume. Quem faz
+              conclui e recebe a experiência (RN10). No espaço pessoal, é
+              sempre a própria pessoa. */}
+          {!pessoal && (
+            <Field
+              id="responsavelId"
+              label="Responsável"
+              erro={erros.responsavelId}
+              dica={
+                membros.length > 0 ? (
+                  form.responsavelId ? (
+                    'Quem faz a atividade, conclui e recebe a experiência.'
+                  ) : (
+                    'A definir: o grupo todo vê e alguém assume depois.'
+                  )
+                ) : (
+                  <>
+                    O grupo ainda não tem membros.{' '}
+                    <Link to="/membros" className="font-medium text-primaria-texto hover:underline">
+                      Cadastre o primeiro
+                    </Link>{' '}
+                    para poder escolher o responsável.
+                  </>
+                )
+              }
+            >
+              <SelectRico
+                valor={form.responsavelId || A_DEFINIR}
+                aoMudar={trocarResponsavel}
+                opcoes={[
+                  ...(!statusOriginal || statusOriginal === 'a fazer' ? [OPCAO_A_DEFINIR] : []),
+                  ...opcoesMembros(membros, { voceId: euNoDestino?.id }),
+                ]}
+                disabled={membros.length === 0}
+              />
+            </Field>
+          )}
 
           {/* RN20: só o responsável mexe no status. */}
           <Field id="status" label="Status" dica={dicaStatus}>
@@ -430,7 +528,7 @@ export default function AtividadeForm() {
             <span>
               Ao concluir, vale{' '}
               <strong className="numero font-bold text-gam-texto">{pesoEfetivo * XP_POR_PESO} XP</strong>
-              {responsavel ? ` para ${primeiroNome(responsavel.nome)}` : ''}.
+              {responsavelEhVoce ? ' para você' : responsavel ? ` para ${primeiroNome(responsavel.nome)}` : ''}.
             </span>
           </p>
           <div className="flex gap-2.5">

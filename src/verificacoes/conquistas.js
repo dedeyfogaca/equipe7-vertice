@@ -2,10 +2,18 @@
 //
 // Roda com `npm run verificar`, sem instalar nada.
 //
-// Duas partes: (1) quando o marco de cada conquista é atingido e (2) a
-// concessão: uma vez só por membro e sem revogar depois.
+// Três partes: (1) quando o marco de cada conquista é atingido, (2) a
+// concessão: uma vez só por membro, e (3) a retirada (RN12 revisada em
+// 11/11/2026): a conquista sai junto com a experiência quando a pessoa
+// perde uma conclusão, e só o que a perda derrubou.
 
-import { CONQUISTAS, conquistasAlcancadas, conquistasNovas } from '../src/lib/gamificacao.js';
+import {
+  CONQUISTAS,
+  concluidasPorMembro,
+  conquistasAlcancadas,
+  conquistasNovas,
+  conquistasPerdidas,
+} from '../src/lib/gamificacao.js';
 
 let falhas = 0;
 
@@ -110,7 +118,7 @@ checar(
   true
 );
 
-console.log('\nConcessão: uma vez só e sem revogar\n');
+console.log('\nConcessão: uma vez só\n');
 
 const agora = '2026-10-28T12:00:00.000Z';
 const primeira = conquistasNovas([], [{ membroId: 'm1', codigos: ['PRIMEIRO_PASSO'] }], agora);
@@ -122,7 +130,7 @@ checar(
   []
 );
 checar(
-  'o marco deixou de valer (atividade reaberta): nada é retirado',
+  'a concessão não retira nada (quem retira é conquistasPerdidas)',
   conquistasNovas(primeira, [{ membroId: 'm1', codigos: [] }], agora),
   []
 );
@@ -135,6 +143,40 @@ checar(
   'código repetido na mesma rodada conta uma vez',
   conquistasNovas([], [{ membroId: 'm1', codigos: ['PRIMEIRO_PASSO', 'PRIMEIRO_PASSO'] }], agora).length,
   1
+);
+
+console.log('\nRetirada: sai junto com a experiência (RN12 revisada)\n');
+
+const ctx = (atividades) => ({ atividades, conteudos });
+const unica = atividade({ conteudo: 'c3', peso: 2 });
+const reaberta = { ...unica, status: 'a fazer', dataConclusao: null };
+checar(
+  'concluiu por engano e desfez: Primeiro Passo, Conteúdo Dominado e Disciplina Fechada saem',
+  conquistasPerdidas('m1', ctx([unica]), ctx([reaberta]), HOJE),
+  ['PRIMEIRO_PASSO', 'CONTEUDO_DOMINADO', 'DISCIPLINA_FECHADA']
+);
+const outra = atividade({ conteudo: 'c3', peso: 1 });
+checar(
+  'com outra conclusão, o Primeiro Passo fica; o conteúdo que voltou a ter pendência sai',
+  conquistasPerdidas('m1', ctx([outra, unica]), ctx([outra, reaberta]), HOJE),
+  ['CONTEUDO_DOMINADO', 'DISCIPLINA_FECHADA']
+);
+const antigas = Array.from({ length: 7 }, (_, i) => atividade({ conteudo: 'c1', diasAtras: 30 + i }));
+checar(
+  'a Semana Cheia de um mês atrás não sai por desfazer uma conclusão de hoje',
+  conquistasPerdidas('m1', ctx([...antigas, outra]), ctx([...antigas, { ...outra, status: 'a fazer', dataConclusao: null }]), HOJE).includes('SEMANA_CHEIA'),
+  false
+);
+checar(
+  'a conclusão de outra pessoa não tira nada de m1',
+  conquistasPerdidas('m1', ctx([outra, atividade({ membro: 'm2' })]), ctx([outra]), HOJE),
+  []
+);
+const mapa = concluidasPorMembro([outra, reaberta, atividade({ membro: 'm2' }), { ...atividade(), responsavelId: '' }]);
+checar(
+  'concluídas por membro (sem responsável não entra)',
+  [...mapa.entries()].map(([m, ids]) => [m, ids.size]),
+  [['m1', 1], ['m2', 1]]
 );
 
 console.log(

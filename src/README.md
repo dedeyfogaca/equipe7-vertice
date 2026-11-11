@@ -7,10 +7,12 @@ gerenciador de tarefas: toda atividade tem um **peso de 1 a 5**, e o progresso
 é a razão entre o peso concluído e o peso total. Concluir uma atividade não
 risca um item de uma lista: move uma barra e credita experiência a quem a fez.
 
-Quem entra no sistema entra como um **grupo**. O grupo organiza suas
-disciplinas e cadastra as atividades de cada uma (dividindo a disciplina em
-conteúdos, se quiser), além dos **eventos** com dia marcado, como provas e
-palestras.
+Quem entra no sistema cai no **espaço pessoal**: o lugar das atividades que
+são só da pessoa (da faculdade ou do dia a dia) e de tudo o que está com ela
+nos grupos. Dali ela cria um **grupo** ou entra num, por convite. O grupo
+organiza suas disciplinas e cadastra as atividades de cada uma (dividindo a
+disciplina em conteúdos, se quiser), além dos **eventos** com dia marcado,
+como provas e palestras.
 
 O sistema funciona de dois jeitos:
 
@@ -31,12 +33,14 @@ O sistema funciona de dois jeitos:
 Essa cadeia é a espinha do sistema, e o que permite medir progresso:
 
 ```
-grupo ──▶ disciplina ──▶ atividade (peso 1–5, com responsável)
+grupo ──▶ disciplina ──▶ atividade (peso 1–5, responsável ou "A definir")
                  └──▶ conteúdo (opcional) ──┘
 ```
 
-Uma atividade pertence a **exatamente uma** disciplina e tem um
-**responsável**. O **conteúdo é opcional** (desde 06/11/2026): quem quer ver o
+Num grupo, uma atividade pertence a **exatamente uma** disciplina e tem um
+**responsável** ou fica **"A definir"** até alguém assumir. No **espaço
+pessoal** (um grupo só da pessoa), a disciplina é opcional e a responsável é
+sempre a própria pessoa. O **conteúdo é opcional** (desde 06/11/2026): quem quer ver o
 progresso por assunto divide a disciplina em conteúdos, como "SQL" e
 "Modelagem" dentro de Banco de Dados, e põe a atividade num deles. Quem não
 quer cadastra a atividade direto na disciplina.
@@ -78,11 +82,15 @@ outros.
   aparecem como "em breve".
 - **Login** com e-mail e senha ou com a conta Google. Ao lado, o botão
   **"Experimentar sem conta"** abre a demonstração.
-- **Acesso ao grupo** em duas colunas: os grupos da conta (com o campo do
-  **código de convite**) numa, a criação de um grupo novo na outra. Quem cria
-  o grupo pode pôr uma **foto do grupo** e entra como organizador. Na
-  demonstração, depois de escolher o grupo, a pessoa escolhe quem é dentro
-  dele.
+- **Espaço pessoal** (desde 11/11/2026): ao entrar, a pessoa cai no espaço
+  dela, com as atividades pessoais (a disciplina é opcional, então serve
+  também para o dia a dia) e as atividades dos grupos que estão com ela, além
+  dos eventos de todos os grupos. O **seletor de espaço**, no alto à
+  esquerda, troca para um grupo, cria um grupo novo (com **foto do grupo**,
+  e quem cria entra como organizador) e entra com o **código de convite**.
+  Na demonstração, a primeira tela pede só o nome.
+- **Meu perfil**: nome, avatar e foto da conta, que valem em todos os grupos
+  de uma vez, e o lembrete por e-mail.
 - **Convite para o grupo**: o organizador gera, em Membros, um código de 8
   letras e números e um link (`/convite/CODIGO`), válidos por 7 dias. Quem
   abre o link e entra com a conta cai direto no grupo, como participante. Se
@@ -94,27 +102,36 @@ outros.
   atrasadas) como filtro, próximas entregas, progresso por disciplina, o seu
   ritmo (experiência e ofensiva), os próximos eventos e os próximos feriados.
 - **Calendário** do mês, da semana ou em lista, com as entregas de cada dia
-  nas cores das disciplinas, os eventos do grupo e os feriados nacionais. A troca de mês (ou de
+  nas cores das disciplinas, os eventos do grupo e os feriados nacionais.
+  Uma **barra de filtros** com rótulos escolhe o que aparece (atividades,
+  eventos, feriados), a disciplina e "só as minhas", e diz quanto está
+  aparecendo. A troca de mês (ou de
   semana) passa a página para o lado, pelos botões ou deslizando o dedo no
   celular. Um dia do calendário abre a criação de atividade (ou de evento)
   com a data já preenchida.
 - **Eventos** do grupo: prova, apresentação, palestra, reunião ou outro, com
-  dia, horário (opcional), local, disciplina (opcional) e observações. Têm
-  página própria, com os próximos e os passados, e aparecem no calendário e
-  no painel. Qualquer membro cadastra; edita e exclui quem cadastrou ou o
-  organizador.
+  dia (ou do dia X ao dia Y), horário (opcional), local, disciplina
+  (opcional) e observações. Têm página própria, com os próximos e os
+  passados, filtro por tipo e por disciplina, e aparecem no calendário (o de
+  vários dias, em cada dia dele) e no painel. Qualquer membro cadastra; edita
+  e exclui quem cadastrou ou o organizador.
 - **Disciplinas** por grupo, com cor escolhida numa **paleta de 18 cores**
   legíveis nos dois temas. Nome único dentro do grupo.
 - **Conteúdos** (opcionais) dentro de cada disciplina, em ordem definida pelo
   grupo.
-- **Atividades** de uma disciplina, com título, disciplina, prazo e
-  responsável obrigatórios, além de conteúdo, descrição, peso de 1 a 5,
-  prioridade e status. O
-  formulário começa vazio: o que é obrigatório é cobrado ao salvar, e o que
-  fica em branco assume o padrão (peso 1, status "a fazer"). O prazo é
-  escolhido num calendário com a cara do sistema, que marca hoje, os fins de
-  semana e os feriados. Se o conteúdo ainda não existe, o organizador o cria
-  ali mesmo, sem perder o que já preencheu.
+- **Atividades** com título, disciplina (opcional no espaço pessoal) e prazo
+  obrigatórios, além de responsável (ou **"A definir"**, que o grupo todo vê
+  com o botão **Assumir**), conteúdo, descrição, peso de 1 a 5, prioridade e
+  status. O formulário começa vazio: o que é obrigatório é cobrado ao salvar,
+  e o que fica em branco assume o padrão (peso 1, status "a fazer"). Do
+  espaço pessoal ou de um grupo, o campo **Onde** cadastra em qualquer um dos
+  dois, sem trocar de espaço. Depois de criar, a pessoa volta para onde
+  estava. O prazo é escolhido num calendário com a cara do sistema, que marca
+  hoje, os fins de semana e os feriados. Se o conteúdo ainda não existe, o
+  organizador o cria ali mesmo, sem perder o que já preencheu.
+- **Várias atividades de uma vez**: uma linha por atividade, com a lista de
+  títulos colada de uma vez e a mesma disciplina, prazo ou responsável para
+  todas. Na lista, o organizador **seleciona várias e troca o responsável**.
 - **Lista de atividades** com busca (título, descrição, disciplina ou
   conteúdo), filtros por situação, disciplina, responsável e prazo, e
   ordenação. Cada filtro mostra o marcador do sistema: a cor da disciplina, a
@@ -125,14 +142,19 @@ outros.
   (com conta, a partir das fotografias que o próprio banco grava a cada
   mudança; na demonstração, reconstruída pelas datas das atividades).
 - **Experiência, ofensiva e conquistas**: experiência por membro, dias
-  seguidos com conclusão e seis conquistas, com ranking do grupo.
+  seguidos com conclusão e seis conquistas, com ranking do grupo. No espaço
+  pessoal, tudo somado e a posição em cada grupo. Concluir por engano e
+  desfazer tira a experiência **e a conquista** que tinha saído.
+- **Lembrete por e-mail**: uma vez por dia, de manhã, as atividades de cada
+  pessoa que vencem em até 2 dias ou já venceram. Desliga em Meu perfil.
 - **Marca do Vértice** que, ao abrir um grupo, aparece no centro com o nome
   dele e dá um terço de volta enquanto a tela se dissolve no painel; ao passar
   o mouse, dá uma volta rápida. As seções ficam numa **barra no topo** (no
   celular, num menu que desce do topo).
 - **Membros** com **foto de perfil** ou **avatar**, em dois estilos de desenho
   à escolha (Croodles Neutral e Notionists), com sorteio. A foto passa por um **editor** em que a pessoa
-  arrasta e dá zoom para enquadrar antes de salvar.
+  arrasta e dá zoom para enquadrar antes de salvar. Quem tem conta muda o
+  nome e a foto em Meu perfil; a ficha do grupo guarda a função e o contato.
 - **Perfis**: o **organizador** gerencia membros, disciplinas e conteúdos,
   edita o grupo (nome, descrição e foto), edita e exclui qualquer atividade e
   exclui o grupo; o **participante** cadastra atividades, edita e exclui as
@@ -149,7 +171,8 @@ outros.
   não consegue guardar os dados. Fechar a aba com alteração a caminho do
   banco pede confirmação.
 - **Migração automática** dos dados de quem usou as versões anteriores.
-- Layout responsivo, do celular à tela larga.
+- Layout responsivo, do celular à tela larga: no computador, as telas
+  aproveitam a largura (até 1680 px).
 
 ---
 
@@ -189,17 +212,19 @@ npm run preview    # pré-visualizar a versão de produção
 npm run verificar  # conferir as regras de negócio
 ```
 
-> Sem banco configurado, o sistema abre direto na demonstração. Na tela de
-> acesso, clique em **"Carregar dados de exemplo"** para entrar com um grupo
-> preenchido.
+> Sem banco configurado, o sistema abre direto na demonstração. Na primeira
+> tela, informe um nome e clique em **"Começar com dados de exemplo"** para
+> entrar com atividades do dia a dia e um grupo preenchido.
 
 ### Ligar o banco (Supabase)
 
 1. Crie um projeto no Supabase (região São Paulo).
 2. No **SQL Editor**, rode o script `banco-de-dados/04-script-criacao.sql`
    do repositório da equipe. Ele cria as tabelas, as regras de acesso, os
-   gatilhos, o convite e o espaço das fotos, e pode ser rodado de novo (apaga
-   e recria tudo).
+   gatilhos, o convite, o espaço pessoal, o lembrete e o espaço das fotos.
+   **Só num projeto novo**: ele apaga e recria tudo. Num banco que já tem
+   dados, rode o script de atualização (`banco-de-dados/07-atualizacao-11-11.sql`),
+   que só acrescenta.
 3. Em **Authentication**, desligue *Confirm email* em *Sign In / Providers →
    Email* e, para o Google, ligue o provedor com o Client ID e o Client
    Secret criados no Google Cloud. Em *URL Configuration*, ponha o endereço
@@ -216,15 +241,56 @@ Na Vercel, as mesmas duas variáveis (`VITE_SUPABASE_URL` e
 `VITE_SUPABASE_ANON_KEY`) vão em *Settings → Environment Variables*.
 
 O `npm run verificar` roda as verificações de `verificacoes/`, em JavaScript
-puro, sem biblioteca de teste instalada. São 240 conferências das regras que
+puro, sem biblioteca de teste instalada. São 280 conferências das regras que
 mais escondem erro: progresso por razão de pesos (e não média de
 percentuais), experiência que não pode ser creditada duas vezes, ofensiva,
-conquistas que não podem ser revogadas, perfis, quem pode mudar o status de
-cada atividade, validação da atividade, o enquadramento da foto, a migração
-dos dados antigos, a ordem das gravações no banco e a evolução do progresso.
+conquistas concedidas uma vez só e retiradas só quando a conclusão é
+desfeita, perfis, quem pode mudar o status e assumir cada atividade,
+validação da atividade e do evento de vários dias, o enquadramento da foto,
+a migração dos dados antigos, a ordem das gravações no banco e a evolução do
+progresso.
 
 As regras do banco têm verificações próprias, em SQL
 (`banco-de-dados/05-verificacoes.sql`), que rodam num PostgreSQL local.
+
+### Lembrete por e-mail
+
+O próprio banco manda os e-mails, uma vez por dia, pelo **Brevo** (plano
+grátis, 300 e-mails por dia). A chave do Brevo fica guardada no **Vault** do
+Supabase e não aparece em nenhum arquivo.
+
+1. Crie a conta no [Brevo](https://www.brevo.com) com o e-mail do Vértice.
+   Em *Senders, Domains & Dedicated IPs → Senders*, cadastre esse mesmo
+   e-mail como remetente e confirme pelo link que chega nele.
+2. Em *SMTP & API → API Keys*, gere uma chave e copie (ela começa com
+   `xkeysib-`).
+3. No Supabase, em *Database → Extensions*, ligue **pg_cron** e **pg_net**.
+4. No *SQL Editor*, guarde a chave (cole a sua no lugar do texto):
+
+   ```sql
+   select vault.create_secret('COLE_AQUI_A_CHAVE_DO_BREVO', 'brevo_api_key');
+   ```
+
+5. Teste o envio na hora (troque pelo e-mail do Vértice e pelo endereço do
+   site). Devolve quantos e-mails saíram; só recebe quem tem atividade perto
+   do prazo:
+
+   ```sql
+   select enviar_lembretes('email-do-vertice@gmail.com', 'Vértice', 'https://endereco-do-site');
+   ```
+
+6. Agende para todo dia às 7h de Brasília (10h em UTC):
+
+   ```sql
+   select cron.schedule('lembrete-diario', '0 10 * * *',
+     $$ select enviar_lembretes('email-do-vertice@gmail.com', 'Vértice', 'https://endereco-do-site') $$);
+   ```
+
+Como o remetente é um Gmail, sem domínio próprio, o primeiro e-mail pode cair
+no spam: marque "não é spam". Para desligar o agendamento:
+`select cron.unschedule('lembrete-diario');`. No plano grátis, o Supabase
+pausa o projeto depois de uma semana sem uso, e aí o lembrete para até o
+projeto voltar.
 
 ---
 
@@ -285,8 +351,8 @@ src/
 ├── context/
 │   ├── TemaContext.jsx       # Tema claro/escuro
 │   ├── ContaContext.jsx      # Conta (login) e modo: com conta ou demonstração
-│   ├── DataContext.jsx       # Coleções + cadastro + seletores + conquistas + gravação no banco
-│   └── AuthContext.jsx       # Sessão (grupo e membro)
+│   ├── DataContext.jsx       # Coleções + perfil + espaço pessoal + cadastro + seletores + conquistas + gravação
+│   └── AuthContext.jsx       # Sessão (o espaço aberto e quem é a pessoa nele)
 ├── routes/
 │   └── ProtectedRoute.jsx    # Barra as rotas privadas sem sessão
 ├── components/
@@ -294,13 +360,13 @@ src/
 │   ├── tutorial/             # Tutorial opcional
 │   ├── ui/                   # Componentes base: botão, cartão, campos, lista de escolha,
 │   │                         # campo de data, editor de foto, diálogo, avatares...
-│   ├── layout/               # Barra do topo, layout das páginas públicas e a passagem ao abrir o grupo
+│   ├── layout/               # Barra do topo (com o seletor de espaço), layout das páginas públicas e a passagem ao abrir
 │   ├── atividades/           # Linha da lista, cartões de situação, peso, conclusão
 │   ├── eventos/              # Cartão, formulário e tipos de evento
 │   ├── feedback/             # Seção e botão do formulário de feedback
 │   ├── publicas/             # Movimento das páginas públicas (aparecer ao rolar, mouse)
 │   ├── disciplinas/          # Formulários, paleta de cores e gráfico da evolução
-│   ├── grupos/               # Edição do grupo (nome, descrição e foto)
+│   ├── grupos/               # Cadastro e edição do grupo (nome, descrição e foto)
 │   ├── membros/              # Formulário de membro (foto e avatar) e convite
 │   ├── gamificacao/          # "Seu ritmo": experiência, ofensiva e conquistas
 │   ├── opcoes.jsx            # Opções das listas: cor, foto, situação, prioridade, perfil
@@ -313,14 +379,16 @@ src/
     ├── publicas/             # Início, Sobre nós, Entrar, Convite, página 404
     ├── Painel.jsx
     ├── Calendario.jsx
-    ├── Eventos.jsx           # Próximos e passados, com filtro por tipo
+    ├── Eventos.jsx           # Próximos e passados, com filtro por tipo e por disciplina
     ├── Disciplinas.jsx
     ├── DisciplinaDetalhe.jsx # Atividades, conteúdos (opcionais) e progresso
     ├── Atividades.jsx
     ├── AtividadeForm.jsx     # Criar e editar (mesmo componente)
+    ├── AtividadesEmLote.jsx  # Várias atividades de uma vez
     ├── AtividadeDetalhe.jsx
     ├── Membros.jsx
-    └── Conquistas.jsx
+    ├── Conquistas.jsx
+    └── Perfil.jsx            # Meu perfil: nome, foto e lembrete por e-mail
 
 verificacoes/                 # Verificação das regras de negócio (npm run verificar)
 ```
@@ -347,29 +415,34 @@ chamar o banco por fora do sistema.
 Na demonstração, as coleções do navegador guardam **as mesmas chaves e
 vínculos** do modelo relacional.
 
-Chaves: `grupos`, `membros`, `disciplinas`, `conteudos`, `atividades`,
-`eventos`, `conquistasMembro`, `sessao`, `versaoDados`.
+Chaves: `grupos`, `perfis`, `membros`, `disciplinas`, `conteudos`,
+`atividades`, `eventos`, `conquistasMembro`, `sessao`, `versaoDados`.
 
-A `sessao` guarda o grupo e o membro que está usando o sistema. Ela não vem
-do modelo relacional: é estado do navegador, e existe porque o perfil do RN07
-precisa saber quem é a pessoa.
+A `sessao` guarda o espaço aberto (o pessoal ou um grupo). Ela não vem do
+modelo relacional: é estado do navegador. Quem a pessoa é dentro de cada
+grupo fica no próprio membro (`usuarioId`), como no banco: com conta, o id
+da conta; na demonstração, o usuário fixo `demo`.
 
 | Entidade | Campos |
 |---|---|
-| **grupo** | `id`, `nome`, `descricao`, `foto`, `criadoEm` |
-| **membro** | `id`, `grupoId`, `nome`, `funcao`, `email`, `avatar`, `estiloAvatar`, `foto`, `perfil` |
+| **grupo** | `id`, `nome`, `descricao`, `foto`, `pessoal` (o espaço pessoal), `criadoEm` |
+| **perfil** | `id` (a conta), `nome`, `avatar`, `estiloAvatar`, `foto`, `lembreteEmail`, `grupoPessoalId` |
+| **membro** | `id`, `grupoId`, `usuarioId`, `nome`, `funcao`, `email`, `avatar`, `estiloAvatar`, `foto`, `perfil` |
 | **disciplina** | `id`, `grupoId`, `nome`, `cor`, `criadaEm` (nome único no grupo, cor da paleta) |
 | **conteudo** | `id`, `disciplinaId`, `nome`, `descricao`, `ordem` (nome único na disciplina) |
-| **atividade** | `id`, `disciplinaId`, `conteudoId` (vazio quando não tem conteúdo), `responsavelId`, `titulo`, `descricao`, `prazo`, `peso`, `prioridade`, `status`, `criadaEm`, `dataConclusao` |
-| **evento** | `id`, `grupoId`, `titulo`, `tipo`, `data`, `horaInicio`, `horaFim`, `local`, `disciplinaId` (opcional), `descricao`, `criadoPor`, `criadoEm` |
+| **atividade** | `id`, `grupoId`, `disciplinaId` (vazio só no espaço pessoal), `conteudoId` (vazio quando não tem conteúdo), `responsavelId` (vazio = "A definir"), `titulo`, `descricao`, `prazo`, `peso`, `prioridade`, `status`, `criadaEm`, `dataConclusao` |
+| **evento** | `id`, `grupoId`, `titulo`, `tipo`, `data`, `dataFim` (evento de vários dias), `horaInicio`, `horaFim`, `local`, `disciplinaId` (opcional), `descricao`, `criadoPor`, `criadoEm` |
 | **conquista do membro** | `membroId`, `codigo`, `obtidaEm` (espelha a tabela `membro_conquista`) |
 
-Repare que **a atividade não guarda `grupoId`**: o grupo chega pela cadeia
-`atividade → disciplina → grupo`. Guardá-lo ali seria um dado derivado com
-prazo de validade. Todo seletor filtra por grupo atravessando essa cadeia, e
-por isso cada grupo só enxerga o que é dele. Se a atividade tiver conteúdo,
-ele é da mesma disciplina. O evento guarda o `grupoId` porque a disciplina
-dele é opcional.
+Desde 11/11/2026 **a atividade guarda o `grupoId`**, porque no espaço
+pessoal a disciplina é opcional (antes, o grupo chegava pela cadeia
+`atividade → disciplina → grupo`). Com disciplina, o banco confere que os
+dois combinam, e a atividade não muda de grupo. Se a atividade tiver
+conteúdo, ele é da mesma disciplina. O evento guarda o `grupoId` pelo mesmo
+motivo: a disciplina dele é opcional.
+
+O **perfil** guarda o nome, o avatar e a foto da conta. Os membros da pessoa
+em cada grupo acompanham o perfil: mudou o perfil, mudam todos.
 
 O `status` é gravado como `'a fazer'`, `'fazendo'` ou `'concluido'`.
 
@@ -380,13 +453,14 @@ gravada em `avatar`, no estilo gravado em `estiloAvatar`, e o grupo mostra as
 iniciais do nome.
 
 A **experiência** e a **ofensiva** não são gravadas: são calculadas a partir
-das atividades concluídas. As **conquistas** são gravadas, porque uma
-conquista concedida não é retirada depois.
+das atividades concluídas. As **conquistas** são gravadas, uma vez por
+membro; quando a pessoa desfaz uma conclusão, as que dependiam dela saem
+junto com a experiência (RN12, revisada em 11/11/2026).
 
 ### Exclusão em cascata
 
 - Grupo excluído remove disciplinas, conteúdos, atividades, eventos, membros
-  e conquistas.
+  e conquistas. O espaço pessoal não se exclui.
 - Disciplina excluída remove seus conteúdos e atividades. Os eventos dela
   continuam, sem disciplina.
 - **Conteúdo excluído não leva as atividades**: elas continuam na
@@ -411,6 +485,14 @@ dados gravado em `versaoDados`.
   conteúdo "Geral" que a versão 1 criou só para não deixar atividade solta
   sai, e as atividades dele ficam direto na disciplina. Membro com um dos
   estilos de avatar que saíram passa para o estilo padrão.
+- **Versão 4** (espaço pessoal): a atividade ganha o grupo da disciplina, e
+  o membro escolhido em "Quem é você?" fica marcado como a pessoa. Na
+  próxima vez, a demonstração pede o nome e cria o espaço pessoal, sem
+  perder os grupos.
+
+Com conta, o banco tem o seu script de atualização
+(`banco-de-dados/07-atualizacao-11-11.sql`), que só acrescenta: cada conta
+ganha o espaço pessoal e o perfil no primeiro acesso depois dele.
 
 ---
 
@@ -420,7 +502,7 @@ dados gravado em `versaoDados`.
 |------|------|--------|
 | `/` | Página inicial | pública |
 | `/sobre` | Sobre nós | pública |
-| `/entrar` | Login e acesso ao grupo (`/login` leva para cá) | pública |
+| `/entrar` | Login e, na demonstração, o nome (`/login` leva para cá) | pública |
 | `/convite/:codigo` | Link do convite: guarda o código e leva ao acesso | pública |
 | `/painel` | Painel | privada |
 | `/calendario` | Calendário | privada |
@@ -428,11 +510,13 @@ dados gravado em `versaoDados`.
 | `/disciplinas` | Disciplinas do grupo | privada |
 | `/disciplina/:id` | Atividades, conteúdos e progresso da disciplina | privada |
 | `/atividades` | Lista de atividades com filtros | privada |
-| `/atividade/nova` | Formulário de nova atividade | privada |
+| `/atividade/nova` | Formulário de nova atividade (`?onde=` já escolhe o lugar) | privada |
+| `/atividades/lote` | Várias atividades de uma vez | privada |
 | `/atividade/:id` | Detalhe da atividade | privada |
 | `/atividade/:id/editar` | Formulário de edição | privada |
 | `/membros` | Membros do grupo | privada |
 | `/conquistas` | Experiência, ofensiva, conquistas e ranking | privada |
+| `/perfil` | Meu perfil: nome, foto e lembrete por e-mail | privada |
 | `*` | Página 404 | pública |
 
 As rotas privadas só abrem com uma sessão; sem ela, o sistema manda para

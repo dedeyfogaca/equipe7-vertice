@@ -125,7 +125,8 @@ checar(
   (ler('membros') || []).map((m) => m.perfil),
   ['organizador', 'participante']
 );
-checar('atividade não guarda grupoId', (ler('atividades') || []).some((a) => 'grupoId' in a), false);
+// Desde a versão 4 (11/11/2026) a atividade guarda o grupo, o da disciplina.
+checar('a atividade guarda o grupo da disciplina (versão 4)', (ler('atividades') || []).every((a) => a.grupoId === 'g1'), true);
 
 console.log('\nRodar de novo não duplica nada\n');
 
@@ -251,7 +252,7 @@ gravar('grupos', [GRUPO]);
 gravar('membros', [{ id: 'm1', nome: 'Alguém', grupoId: 'g1', perfil: 'organizador' }]);
 gravar('disciplinas', [{ id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' }]);
 gravar('conteudos', [{ id: 'c1', nome: 'Geral', descricao: '', disciplinaId: 'd1', ordem: 0 }]);
-gravar('atividades', [{ ...atividadeNova('a1'), disciplinaId: 'd1' }]);
+gravar('atividades', [{ ...atividadeNova('a1'), disciplinaId: 'd1', grupoId: 'g1' }]);
 const antes = memoria.get('atividades');
 const limpo = migrarDados();
 checar('resumo zerado', limpo.v2, { responsaveisDefinidos: 0, coresAjustadas: 0 });
@@ -293,8 +294,32 @@ checar('nenhuma atividade some', ativ3.length, 3);
 checar('estilo de avatar que saiu vira o padrão', ler('membros').map((m) => m.estiloAvatar ?? null), ['croodles-neutral', 'notionists', null]);
 checar('resumo do passo 3', v3.v3, { atividadesAjustadas: 3, conteudosGeraisRemovidos: 1, avataresAjustados: 1 });
 checar('o passo 2 não roda de novo', v3.v2, null);
-checar('marcador na versão 3', ler('versaoDados'), 3);
+checar('marcador na versão de agora (4)', ler('versaoDados'), 4);
 checar('e não roda outra vez', migrarDados().motivo, 'ja-migrado');
+
+console.log('\nVersão 4: grupo na atividade e a pessoa marcada no membro (espaço pessoal)\n');
+
+memoria.clear();
+gravar('versaoDados', 3);
+gravar('grupos', [GRUPO]);
+gravar('membros', [
+  { id: 'm1', nome: 'Alguém', grupoId: 'g1', perfil: 'organizador' },
+  { id: 'm2', nome: 'Outra', grupoId: 'g1', perfil: 'participante' },
+]);
+gravar('disciplinas', [{ id: 'd1', nome: 'Cálculo', cor: '#3b82f6', grupoId: 'g1' }]);
+gravar('atividades', [
+  { ...atividadeNova('a1'), disciplinaId: 'd1' },
+  { ...atividadeNova('a2'), disciplinaId: 'disciplina-que-sumiu' },
+]);
+gravar('sessao', { grupoId: 'g1', membroId: 'm2' });
+const v4 = migrarDados();
+const ativ4 = ler('atividades');
+checar('a atividade ganha o grupo da disciplina', ativ4[0].grupoId, 'g1');
+checar('a de disciplina que não existe fica como estava', 'grupoId' in ativ4[1], false);
+checar('quem estava na sessão fica marcado como a pessoa', ler('membros').map((m) => m.usuarioId ?? ''), ['', 'demo']);
+checar('resumo do passo 4', v4.v4, { atividadesAjustadas: 1, membroMarcado: true });
+checar('o passo 3 não roda de novo', v4.v3, null);
+checar('marcador na versão 4', ler('versaoDados'), 4);
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

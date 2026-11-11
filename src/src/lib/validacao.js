@@ -5,7 +5,9 @@
 import { corDisciplinaValida, PERFIL, PESO, STATUS, tipoEventoValido } from './constants.js';
 import { dataValida } from './datas.js';
 
-export function validarAtividade(dados, { membros = [], conteudos = [], disciplinas = [] } = {}) {
+// `pessoal`: a atividade é do espaço pessoal (RN24), onde a disciplina é
+// opcional e a responsável é sempre a própria pessoa.
+export function validarAtividade(dados, { membros = [], conteudos = [], disciplinas = [], pessoal = false } = {}) {
   const erros = {};
 
   const titulo = (dados.titulo || '').trim();
@@ -21,21 +23,22 @@ export function validarAtividade(dados, { membros = [], conteudos = [], discipli
     erros.prazo = 'O prazo informado não é uma data válida.';
   }
 
-  // RN06: toda atividade tem um responsável (revisão de 28/10/2026, a
-  // pedido da professora). É ele quem recebe a experiência na conclusão
-  // (RN10).
+  // RN06 (revisada em 11/11/2026): o responsável pode ficar "A definir"
+  // enquanto ninguém assume. Sem responsável, a atividade não sai de
+  // "a fazer": quem conclui é quem recebe a experiência (RN10).
   //
   // RN03: e ele tem de ser membro do grupo da atividade.
-  if (!dados.responsavelId) {
-    erros.responsavelId = 'Escolha o responsável pela atividade.';
-  } else if (membros.length > 0 && !membros.some((m) => m.id === dados.responsavelId)) {
+  if (dados.responsavelId && membros.length > 0 && !membros.some((m) => m.id === dados.responsavelId)) {
     erros.responsavelId = 'O responsável escolhido não pertence ao grupo.';
+  } else if (!dados.responsavelId && !pessoal && dados.status && dados.status !== STATUS.A_FAZER) {
+    erros.responsavelId = 'Escolha quem vai fazer antes de mudar o status.';
   }
 
   // RN13 (revisada em 06/11/2026): a atividade pertence a uma disciplina do
   // grupo. O conteúdo é opcional; se vier, tem de ser daquela disciplina.
+  // RN24: no espaço pessoal, a disciplina também é opcional.
   if (!dados.disciplinaId) {
-    erros.disciplinaId = 'Escolha a disciplina da atividade.';
+    if (!pessoal) erros.disciplinaId = 'Escolha a disciplina da atividade.';
   } else if (disciplinas.length > 0 && !disciplinas.some((d) => d.id === dados.disciplinaId)) {
     erros.disciplinaId = 'A disciplina escolhida não pertence a este grupo.';
   }
@@ -165,9 +168,9 @@ export function validarConteudo(dados, { conteudos = [], ignorarId = null } = {}
   return erros;
 }
 
-// RF01: criar o grupo pede também o nome de quem cria: essa pessoa é o
-// primeiro membro e o organizador (RN07). Assim o grupo nunca nasce sem
-// ninguém para gerenciá-lo.
+// RF01: quem cria o grupo é o primeiro membro e o organizador (RN07). Com o
+// perfil da conta (RF35), o nome dessa pessoa já é conhecido; sem perfil,
+// o formulário pede o nome junto.
 export function validarGrupo(dados, { exigirCriador = true } = {}) {
   const erros = {};
   if (!dados.nome || !dados.nome.trim()) {
@@ -179,6 +182,15 @@ export function validarGrupo(dados, { exigirCriador = true } = {}) {
   return erros;
 }
 
+// RF35: o nome do perfil, que aparece em todos os grupos.
+export function validarPerfil(dados) {
+  const erros = {};
+  const nome = (dados.nome || '').trim();
+  if (!nome) erros.nome = 'Informe o seu nome.';
+  else if (nome.length > 80) erros.nome = 'O nome pode ter no máximo 80 caracteres.';
+  return erros;
+}
+
 // Atalho para checar se um objeto de erros está vazio.
 export function semErros(erros) {
   return Object.keys(erros).length === 0;
@@ -186,7 +198,9 @@ export function semErros(erros) {
 
 // RF31: evento do grupo: título, tipo e dia são obrigatórios; horário é
 // opcional (sem horário, vale o dia todo), mas se tiver fim, ele vem depois
-// do início.
+// do início. O evento pode durar vários dias (revisão de 11/11/2026): o dia
+// do fim, se vier, não é antes do dia do começo; aí o horário de fim vale
+// para o último dia e pode ser menor que o de início.
 export function validarEvento(dados, { disciplinas = [] } = {}) {
   const erros = {};
 
@@ -209,6 +223,15 @@ export function validarEvento(dados, { disciplinas = [] } = {}) {
     erros.data = 'O dia informado não é uma data válida.';
   }
 
+  const variosDias = Boolean(dados.dataFim) && dados.dataFim !== dados.data;
+  if (dados.dataFim) {
+    if (!dataValida(dados.dataFim)) {
+      erros.dataFim = 'O dia informado não é uma data válida.';
+    } else if (dados.data && dados.dataFim < dados.data) {
+      erros.dataFim = 'O fim não pode ser antes do começo.';
+    }
+  }
+
   const hora = /^([01]\d|2[0-3]):[0-5]\d$/;
   if (dados.horaInicio && !hora.test(dados.horaInicio)) {
     erros.horaInicio = 'Horário inválido.';
@@ -218,7 +241,7 @@ export function validarEvento(dados, { disciplinas = [] } = {}) {
       erros.horaFim = 'Informe o início antes do fim.';
     } else if (!hora.test(dados.horaFim)) {
       erros.horaFim = 'Horário inválido.';
-    } else if (dados.horaFim <= dados.horaInicio) {
+    } else if (!variosDias && dados.horaFim <= dados.horaInicio) {
       erros.horaFim = 'O fim precisa ser depois do início.';
     }
   }

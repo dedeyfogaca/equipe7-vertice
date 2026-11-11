@@ -16,7 +16,7 @@ import { plural } from '../lib/utils.js';
 
 export default function Disciplinas() {
   useTitulo('Disciplinas');
-  const { grupoAtivo, ehOrganizador } = useAuth();
+  const { grupoAtivo, ehOrganizador, noEspacoPessoal } = useAuth();
   const {
     disciplinasDoGrupo,
     conteudosDaDisciplina,
@@ -98,7 +98,11 @@ export default function Disciplinas() {
           <EmptyState
             icone={BookOpen}
             titulo="Nenhuma disciplina ainda"
-            descricao="Cadastre as disciplinas do semestre. Elas organizam as atividades e são a base do cálculo de progresso."
+            descricao={
+              noEspacoPessoal
+                ? 'No seu espaço, a disciplina é opcional. Use para separar o que é só seu por matéria ou por área (Inglês, Academia, Casa) e ver o progresso de cada uma.'
+                : 'Cadastre as disciplinas do semestre. Elas organizam as atividades e são a base do cálculo de progresso.'
+            }
           >
             {ehOrganizador && (
               <Button onClick={() => setFormulario({})}>
@@ -109,7 +113,7 @@ export default function Disciplinas() {
           </EmptyState>
         </Card>
       ) : (
-        <ul className="mt-4 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+        <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3 min-[1600px]:grid-cols-4">
           {disciplinas.map((disciplina) => {
             const conteudos = conteudosDaDisciplina(disciplina.id);
             const qtdAtividades = atividadesDaDisciplina(disciplina.id).length;

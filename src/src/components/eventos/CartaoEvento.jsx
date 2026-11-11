@@ -1,7 +1,8 @@
-import { CalendarDays, Clock, MapPin } from 'lucide-react';
+import { CalendarDays, CalendarRange, Clock, MapPin } from 'lucide-react';
 
 import { Badge } from '../ui/basicos.jsx';
-import { horarioDoEvento, iconeDoEvento, quandoEvento } from './tipos.jsx';
+import { AvatarGrupo } from '../ui/avatar-grupo.jsx';
+import { eventoDeVariosDias, fimDoEvento, horarioDoEvento, iconeDoEvento, periodoDoEvento, quandoEvento } from './tipos.jsx';
 import { rotuloTipoEvento } from '../../lib/constants.js';
 import { dataLocal, diasRestantes } from '../../lib/datas.js';
 import { DIAS_CURTOS, MESES, ddmm } from '../../lib/formatos.js';
@@ -29,14 +30,16 @@ function BlocoDia({ iso, cor }) {
  * painel do grupo: sem o bloco do dia nem as observações (no compacto, o dia
  * vem escrito, a não ser com `mostrarDia={false}`, no painel do próprio
  * dia). `acoes` entra à direita (o menu de editar e excluir). `feriado`,
- * quando o evento cai num feriado nacional, aparece como aviso.
+ * quando o evento cai num feriado nacional, aparece como aviso. `grupo`,
+ * no espaço pessoal, diz de que grupo é o evento (RF34).
  */
-export function CartaoEvento({ evento, disciplina, compacto = false, mostrarDia = true, feriado, acoes, className }) {
+export function CartaoEvento({ evento, disciplina, grupo, compacto = false, mostrarDia = true, feriado, acoes, className }) {
   const Icone = iconeDoEvento(evento.tipo);
   const cor = disciplina?.cor || '#06b6d4';
-  const dias = diasRestantes(evento.data);
+  const dias = diasRestantes(fimDoEvento(evento));
   const passou = dias !== null && dias < 0;
   const quando = quandoEvento(evento);
+  const varios = eventoDeVariosDias(evento);
 
   return (
     <div
@@ -70,15 +73,31 @@ export function CartaoEvento({ evento, disciplina, compacto = false, mostrarDia 
             </Badge>
           )}
           {!compacto && quando && (
-            <Badge tom={dias === 0 ? 'primaria' : dias === 1 ? 'fazendo' : 'neutro'}>{quando}</Badge>
+            <Badge
+              tom={
+                quando === 'Acontecendo' || quando === 'Hoje' || quando === 'Último dia hoje'
+                  ? 'primaria'
+                  : quando === 'Amanhã'
+                    ? 'fazendo'
+                    : 'neutro'
+              }
+            >
+              {quando}
+            </Badge>
           )}
         </div>
         <p className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[13px] text-sutil">
           {compacto && mostrarDia && (
             <span className="inline-flex items-center gap-1.5 font-medium text-suave">
               <CalendarDays className="size-3.5" aria-hidden="true" />
-              {DIAS_CURTOS[dataLocal(evento.data)?.getDay() ?? 0]}, {ddmm(evento.data)}
+              {varios ? periodoDoEvento(evento) : `${DIAS_CURTOS[dataLocal(evento.data)?.getDay() ?? 0]}, ${ddmm(evento.data)}`}
               {quando && <span className="font-normal text-sutil">({quando.toLowerCase()})</span>}
+            </span>
+          )}
+          {varios && (!compacto || !mostrarDia) && (
+            <span className="inline-flex items-center gap-1.5 font-medium text-suave">
+              <CalendarRange className="size-3.5" aria-hidden="true" />
+              {periodoDoEvento(evento)}
             </span>
           )}
           {compacto && !mostrarDia && <span className="font-medium text-suave">{rotuloTipoEvento(evento.tipo)}</span>}
@@ -90,6 +109,12 @@ export function CartaoEvento({ evento, disciplina, compacto = false, mostrarDia 
             <span className="inline-flex items-center gap-1.5">
               <MapPin className="size-3.5" aria-hidden="true" />
               {evento.local}
+            </span>
+          )}
+          {grupo && (
+            <span className="inline-flex items-center gap-1.5">
+              <AvatarGrupo grupo={grupo} tamanho={16} tom="neutro" />
+              {grupo.nome}
             </span>
           )}
           {disciplina && (

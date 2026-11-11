@@ -11,10 +11,12 @@ import { semErroEm } from '../../lib/utils.js';
 export const DICA_FOTO_GRUPO = `Opcional. JPG, PNG ou WebP, até ${FOTO.TAMANHO_MAXIMO_MB} MB. Sem foto, o grupo aparece com as iniciais do nome.`;
 
 /**
- * Edição do grupo: nome, descrição e foto (RN07: só o organizador). Monte
- * com `key` para reiniciar o formulário.
+ * Cadastro (sem `grupo`) e edição do grupo: nome, descrição e foto. Editar
+ * é do organizador (RN07); quem cria vira o organizador. Monte com `key`
+ * para reiniciar o formulário.
  */
 export function FormGrupo({ aberto, aoMudar, grupo, aoSalvar }) {
+  const novo = !grupo;
   const [form, setForm] = useState(() => ({
     nome: grupo?.nome ?? '',
     descricao: grupo?.descricao ?? '',
@@ -40,8 +42,12 @@ export function FormGrupo({ aberto, aoMudar, grupo, aoSalvar }) {
     <Dialogo
       aberto={aberto}
       aoMudar={aoMudar}
-      titulo="Editar grupo"
-      descricao="O nome e a foto aparecem para todo o grupo."
+      titulo={novo ? 'Criar grupo' : 'Editar grupo'}
+      descricao={
+        novo
+          ? 'Para uma turma, um trabalho ou uma matéria do semestre. Você entra como organizador e convida o resto depois.'
+          : 'O nome e a foto aparecem para todo o grupo.'
+      }
       largura={540}
       rodape={
         <>
@@ -49,7 +55,7 @@ export function FormGrupo({ aberto, aoMudar, grupo, aoSalvar }) {
             Cancelar
           </Button>
           <Button type="submit" form="form-grupo">
-            Salvar
+            {novo ? 'Criar grupo' : 'Salvar'}
           </Button>
         </>
       }
@@ -70,6 +76,7 @@ export function FormGrupo({ aberto, aoMudar, grupo, aoSalvar }) {
             onChange={atualizarCampo('nome')}
             placeholder="Ex.: Trio do TCC"
             autoComplete="off"
+            autoFocus={novo}
           />
         </Field>
         <Field id="descricao-grupo" label="Descrição" dica="Opcional. Uma linha sobre o grupo.">

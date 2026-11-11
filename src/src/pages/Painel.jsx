@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, CalendarDays, CalendarPlus, ListPlus, Plus, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, CalendarDays, CalendarPlus, ListPlus, Plus, Search } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -8,6 +8,7 @@ import { useFeriados } from '../hooks/useFeriados.js';
 import { useTitulo } from '../hooks/useTitulo.js';
 import { Button } from '../components/ui/botao.jsx';
 import { Aviso, Card, EmptyState, TituloCartao } from '../components/ui/basicos.jsx';
+import { AvatarGrupo } from '../components/ui/avatar-grupo.jsx';
 import { BarraProgresso } from '../components/ui/progresso.jsx';
 import { CartoesSituacao } from '../components/atividades/CartoesSituacao.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
@@ -20,7 +21,7 @@ import { STATUS } from '../lib/constants.js';
 import { anoDaData, formatarData } from '../lib/datas.js';
 import { diaPorExtenso, porPrazo, saudacao } from '../lib/formatos.js';
 import { contarPorSituacao, naSituacao, SITUACAO } from '../lib/situacoes.js';
-import { primeiroNome } from '../lib/utils.js';
+import { plural, primeiroNome } from '../lib/utils.js';
 
 const TITULOS = {
   [SITUACAO.A_FAZER]: 'A fazer',
@@ -31,8 +32,25 @@ const TITULOS = {
 
 const LIMITE_LISTA = 8;
 
-// Primeiros passos: disciplina, depois atividade. Conteúdo é opcional.
-function PrimeirosPassos({ temDisciplinas }) {
+// Primeiros passos: disciplina, depois atividade. Conteúdo é opcional. No
+// espaço pessoal, a disciplina também é (RN24).
+function PrimeirosPassos({ temDisciplinas, pessoal }) {
+  if (pessoal) {
+    return (
+      <EmptyState
+        icone={ListPlus}
+        titulo="Seu espaço está pronto"
+        descricao="Cadastre o que você precisa fazer, da faculdade ou do dia a dia. As atividades dos seus grupos que estiverem com você aparecem aqui também."
+      >
+        <Button asChild>
+          <Link to="/atividade/nova">
+            <Plus aria-hidden="true" />
+            Nova atividade
+          </Link>
+        </Button>
+      </EmptyState>
+    );
+  }
   if (!temDisciplinas) {
     return (
       <EmptyState
@@ -62,15 +80,75 @@ function PrimeirosPassos({ temDisciplinas }) {
   );
 }
 
+// RF34: no espaço pessoal, os grupos da pessoa, com o que está com ela em
+// cada um, e o atalho para abrir o grupo.
+function SeusGrupos() {
+  const { grupos, meusMembros, atividades } = useData();
+  const { entrar } = useAuth();
+  const navigate = useNavigate();
+  const lista = grupos
+    .filter((g) => !g.pessoal && meusMembros.some((m) => m.grupoId === g.id))
+    .map((g) => {
+      const eu = meusMembros.find((m) => m.grupoId === g.id);
+      const comigo = atividades.filter((a) => a.responsavelId === eu?.id && a.status !== STATUS.CONCLUIDO).length;
+      const aDefinir = atividades.filter((a) => a.grupoId === g.id && !a.responsavelId).length;
+      return { grupo: g, comigo, aDefinir };
+    });
+
+  return (
+    <Card as="section" aria-labelledby="t-grupos" className="flex flex-col gap-3 p-[22px]">
+      <TituloCartao id="t-grupos">Seus grupos</TituloCartao>
+      {lista.length === 0 ? (
+        <p className="text-sm leading-relaxed text-sutil">
+          Nenhum grupo ainda. Crie um para a turma ou entre com o código de convite, pelo seletor no alto, à esquerda.
+        </p>
+      ) : (
+        <ul className="-mx-2 flex flex-col">
+          {lista.map(({ grupo, comigo, aDefinir }) => (
+            <li key={grupo.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  entrar(grupo.id);
+                  navigate('/painel');
+                }}
+                className="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-superficie-2"
+              >
+                <AvatarGrupo grupo={grupo} tamanho={34} tom="suave" />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-[15px] font-semibold text-forte">{grupo.nome}</span>
+                  <span className="truncate text-[13px] text-sutil">
+                    {comigo > 0 ? `${plural(comigo, 'pendente')} com você` : 'Nada pendente com você'}
+                    {aDefinir > 0 ? ` · ${aDefinir} a definir` : ''}
+                  </span>
+                </span>
+                <ArrowRight
+                  className="size-4 shrink-0 text-sutil transition-[color,transform] group-hover:translate-x-0.5 group-hover:text-primaria"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">Abrir {grupo.nome}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
 export default function Painel() {
   useTitulo('Painel');
   const navigate = useNavigate();
-  const { grupoAtivo, membroAtivo } = useAuth();
-  const { atividadesDoGrupo, disciplinasDoGrupo, eventosDoGrupo, progressoDaDisciplina } = useData();
+  const { grupoAtivo, membroAtivo, noEspacoPessoal } = useAuth();
+  const { atividadesDoEspaco, disciplinasDoGrupo, disciplinasDoEspaco, eventosDoEspaco, progressoDaDisciplina, perfil } =
+    useData();
 
-  const atividades = atividadesDoGrupo(grupoAtivo.id);
+  // RF34: no espaço pessoal, as atividades pessoais e as que estão com a
+  // pessoa nos grupos; os eventos de todos os grupos dela.
+  const atividades = atividadesDoEspaco(grupoAtivo.id);
   const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
-  const proximosEventos = eventosDoGrupo(grupoAtivo.id).filter(eventoFuturo).slice(0, 3);
+  const todasDisciplinas = disciplinasDoEspaco(grupoAtivo.id);
+  const proximosEventos = eventosDoEspaco(grupoAtivo.id).filter(eventoFuturo).slice(0, 3);
 
   // As situações filtram a lista aqui mesmo. Sem filtro, a lista mostra as
   // próximas entregas (o que ainda não foi concluído, por prazo).
@@ -130,7 +208,7 @@ export default function Painel() {
           <span className="text-sm text-sutil">{diaPorExtenso()}</span>
           <h1 className="text-[clamp(28px,3vw,40px)] font-semibold leading-[1.08] tracking-[-0.04em] text-forte">
             {saudacao()}
-            {membroAtivo ? `, ${primeiroNome(membroAtivo.nome)}` : ''}
+            {perfil || membroAtivo ? `, ${primeiroNome(perfil?.nome || membroAtivo.nome)}` : ''}
           </h1>
         </div>
         <div className="flex w-full flex-wrap items-center gap-2.5 sm:w-auto">
@@ -194,12 +272,14 @@ export default function Painel() {
           </div>
 
           {atividades.length === 0 ? (
-            <PrimeirosPassos temDisciplinas={disciplinas.length > 0} />
+            <PrimeirosPassos temDisciplinas={disciplinas.length > 0} pessoal={noEspacoPessoal} />
           ) : lista.length === 0 ? (
             <p className="px-5 pb-6 pt-2 text-[15px] text-sutil sm:px-[22px]">
               {filtro
                 ? 'Nenhuma atividade nesta situação.'
-                : 'Nada pendente. Todas as atividades do grupo estão concluídas.'}
+                : noEspacoPessoal
+                  ? 'Nada pendente. Tudo o que está com você foi concluído.'
+                  : 'Nada pendente. Todas as atividades do grupo estão concluídas.'}
             </p>
           ) : (
             <ul className="divide-y divide-divisor border-t border-divisor">
@@ -218,6 +298,8 @@ export default function Painel() {
         </Card>
 
         <div className="flex min-w-0 flex-col gap-5">
+          {noEspacoPessoal && <SeusGrupos />}
+
           <Card as="section" aria-labelledby="t-eventos" className="flex flex-col gap-3.5 p-[22px]">
             <div className="flex items-center justify-between gap-3">
               <TituloCartao id="t-eventos">Próximos eventos</TituloCartao>
@@ -240,7 +322,7 @@ export default function Painel() {
                     <CartaoEvento
                       evento={evento}
                       compacto
-                      disciplina={disciplinas.find((d) => d.id === evento.disciplinaId)}
+                      disciplina={todasDisciplinas.find((d) => d.id === evento.disciplinaId)}
                     />
                   </li>
                 ))}
@@ -248,6 +330,9 @@ export default function Painel() {
             )}
           </Card>
 
+          {/* No espaço pessoal, a disciplina é opcional: o cartão só aparece
+              quando a pessoa tem disciplinas suas. */}
+          {(!noEspacoPessoal || disciplinas.length > 0) && (
           <Card as="section" aria-labelledby="t-progresso" className="flex flex-col gap-4 p-[22px]">
             <TituloCartao id="t-progresso">Progresso por disciplina</TituloCartao>
             {disciplinas.length === 0 ? (
@@ -275,8 +360,9 @@ export default function Painel() {
               ))
             )}
           </Card>
+          )}
 
-          {membroAtivo && <SeuRitmo membroId={membroAtivo.id} />}
+          {noEspacoPessoal ? <SeuRitmo daConta /> : membroAtivo && <SeuRitmo membroId={membroAtivo.id} />}
 
           <Card as="section" aria-label="Feriados" className="p-[22px]">
             <ProximosFeriados feriados={feriados} carregando={carregando} erro={erro} />

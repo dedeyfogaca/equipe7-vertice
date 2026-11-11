@@ -1,6 +1,18 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarClock, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import {
+  CalendarClock,
+  CalendarDays,
+  CalendarPlus,
+  CalendarRange,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  ListChecks,
+  Plus,
+  X,
+} from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -8,10 +20,13 @@ import { useFeriados } from '../hooks/useFeriados.js';
 import { useTitulo } from '../hooks/useTitulo.js';
 import { Button } from '../components/ui/botao.jsx';
 import { Badge, Card, EmptyState, Rotulo } from '../components/ui/basicos.jsx';
+import { Interruptor, Label } from '../components/ui/campos.jsx';
+import { IconeOpcao, SelectRico } from '../components/ui/selecao.jsx';
+import { opcoesDisciplinas, opcoesGrupos } from '../components/opcoes.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
 import { ProximosFeriados } from '../components/ProximosFeriados.jsx';
 import { CartaoEvento } from '../components/eventos/CartaoEvento.jsx';
-import { horarioDoEvento, iconeDoEvento } from '../components/eventos/tipos.jsx';
+import { fimDoEvento, horarioDoEvento, iconeDoEvento } from '../components/eventos/tipos.jsx';
 import { useEventos } from '../components/eventos/useEventos.jsx';
 import { rotuloTipoEvento } from '../lib/constants.js';
 import { STATUS } from '../lib/constants.js';
@@ -34,6 +49,12 @@ import { cn, corComAlfa, plural, primeiroNome } from '../lib/utils.js';
 // de ver (mês, semana e lista) e um painel com o dia escolhido. Trocar de mês
 // (ou de semana) passa a página para o lado, pelos botões ou deslizando o
 // dedo no celular.
+//
+// Filtros (revisão de 11/11/2026, as pessoas ficavam perdidas com a fileira
+// de botões das disciplinas): uma barra só, com rótulos, para escolher o que
+// aparece (atividades, eventos, feriados), a disciplina e "só as minhas"; ao
+// lado, quanto está aparecendo e o atalho para limpar. O evento de vários
+// dias aparece em todos os dias dele.
 
 const VISOES = [
   { valor: 'mes', rotulo: 'Mês' },
@@ -61,6 +82,40 @@ function inicioDaSemana(data) {
 
 function primeiroDoMes(data) {
   return new Date(data.getFullYear(), data.getMonth(), 1);
+}
+
+// Os dias do evento (o de vários dias aparece em cada um, até 62 dias).
+function diasDoEvento(evento) {
+  const dias = [];
+  const fim = fimDoEvento(evento);
+  for (let d = dataLocal(evento.data); d && paraISO(d) <= fim && dias.length < 62; d = somarDias(d, 1)) {
+    dias.push(paraISO(d));
+  }
+  return dias;
+}
+
+/** Botão de ligar e desligar da barra de filtros. */
+function Chip({ ligado, aoMudar, icone: Icone, children }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={ligado}
+      onClick={() => aoMudar(!ligado)}
+      className={cn(
+        'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors',
+        ligado
+          ? 'border-primaria-barra/50 bg-primaria-barra/10 text-forte'
+          : 'border-borda bg-superficie text-sutil hover:border-borda-forte hover:text-texto'
+      )}
+    >
+      {ligado ? (
+        <Check className="size-3.5 text-primaria-texto" strokeWidth={2.6} aria-hidden="true" />
+      ) : (
+        <Icone className="size-3.5" aria-hidden="true" />
+      )}
+      {children}
+    </button>
+  );
 }
 
 const ANIMACAO = { proximo: 'animate-mes-proximo', anterior: 'animate-mes-anterior' };
@@ -111,8 +166,9 @@ function Etiqueta({ item, inteira = false }) {
 
 /** Etiqueta do evento: contorno em vez de faixa, com o ícone (e a hora, na semana). */
 function EtiquetaEvento({ item, inteira = false }) {
-  const { evento, disciplina } = item;
-  const Icone = iconeDoEvento(evento.tipo);
+  const { evento, disciplina, continuacao } = item;
+  // Nos dias seguintes de um evento de vários dias, o ícone é o do período.
+  const Icone = continuacao ? CalendarRange : iconeDoEvento(evento.tipo);
   return (
     <span
       className={cn(
@@ -127,7 +183,9 @@ function EtiquetaEvento({ item, inteira = false }) {
         strokeWidth={2.2}
       />
       <span className={cn('min-w-0', inteira ? 'break-words' : 'truncate')}>
-        {inteira && evento.horaInicio && <span className="numero font-medium text-sutil">{evento.horaInicio} </span>}
+        {inteira && evento.horaInicio && !continuacao && (
+          <span className="numero font-medium text-sutil">{evento.horaInicio} </span>
+        )}
         {evento.titulo}
       </span>
     </span>
@@ -152,13 +210,18 @@ function CartaoDoDia({ item, membros }) {
           {atividade.titulo}
         </Link>
         <span className="text-[13px] text-sutil">
+          {item.grupo ? `${item.grupo.nome}${disciplina ? ' · ' : ''}` : ''}
           {disciplina?.nome}
           {conteudo ? ` › ${conteudo.nome}` : ''}
         </span>
         <span className="flex flex-wrap items-center gap-1.5">
           <Badge tom={tomDaAtividade(atividade)}>{rotuloSituacao(atividade)}</Badge>
           <Badge tom="neutro">Peso {atividade.peso}</Badge>
-          {responsavel && <Badge tom="neutro">{primeiroNome(responsavel.nome)}</Badge>}
+          {responsavel ? (
+            <Badge tom="neutro">{primeiroNome(responsavel.nome)}</Badge>
+          ) : (
+            !item.pessoal && <Badge tom="neutro">A definir</Badge>
+          )}
         </span>
       </span>
     </li>
@@ -167,20 +230,41 @@ function CartaoDoDia({ item, membros }) {
 
 export default function Calendario() {
   useTitulo('Calendário');
-  const { grupoAtivo } = useAuth();
-  const { atividadesDoGrupo, disciplinasDoGrupo, eventosDoGrupo, trilhaDaAtividade, membros } = useData();
+  const { grupoAtivo, membroAtivo, noEspacoPessoal } = useAuth();
+  const { atividadesDoEspaco, disciplinasDoEspaco, eventosDoEspaco, trilhaDaAtividade, membros, grupos, meusMembros } =
+    useData();
   const { novoEvento, menuDoEvento, janelas } = useEventos();
 
-  const atividades = atividadesDoGrupo(grupoAtivo.id);
-  const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
-  const eventos = eventosDoGrupo(grupoAtivo.id);
+  // RF34: no espaço pessoal, as atividades que estão com a pessoa e os
+  // eventos de todos os grupos dela.
+  const atividades = atividadesDoEspaco(grupoAtivo.id);
+  const disciplinas = disciplinasDoEspaco(grupoAtivo.id);
+  const eventos = eventosDoEspaco(grupoAtivo.id);
+  const espacos = noEspacoPessoal
+    ? grupos.filter((g) => g.id === grupoAtivo.id || meusMembros.some((m) => m.grupoId === g.id && !g.pessoal))
+    : [];
+  const grupoDe = (item) =>
+    item.grupoId !== grupoAtivo.id ? grupos.find((g) => g.id === item.grupoId && !g.pessoal) || null : null;
 
   const hoje = hojeISO();
   const [selecionado, setSelecionado] = useState(hoje);
   const [mesVisivel, setMesVisivel] = useState(() => primeiroDoMes(new Date()));
   const [visao, setVisao] = useState('mes');
-  const [ocultas, setOcultas] = useState(() => new Set());
-  const [mostrarEventos, setMostrarEventos] = useState(true);
+  // Filtros: o que aparece, a disciplina, só as minhas (no grupo) e onde
+  // (no espaço pessoal).
+  const [mostrar, setMostrar] = useState({ atividades: true, eventos: true, feriados: true });
+  const [fDisciplina, setFDisciplina] = useState('todas');
+  const [soMinhas, setSoMinhas] = useState(false);
+  const [fOnde, setFOnde] = useState('todos');
+  const alternar = (chave) => (ligado) => setMostrar((atual) => ({ ...atual, [chave]: ligado }));
+  const filtroAtivo =
+    !mostrar.atividades || !mostrar.eventos || !mostrar.feriados || fDisciplina !== 'todas' || soMinhas || fOnde !== 'todos';
+  const limparFiltros = () => {
+    setMostrar({ atividades: true, eventos: true, feriados: true });
+    setFDisciplina('todas');
+    setSoMinhas(false);
+    setFOnde('todos');
+  };
   // Para que lado a última troca de página andou (decide a animação).
   const [direcao, setDirecao] = useState(null);
   const painelRef = useRef(null);
@@ -189,15 +273,20 @@ export default function Calendario() {
   const mes = mesVisivel.getMonth();
   const dataSelecionada = dataLocal(selecionado);
 
-  // As entregas visíveis (disciplina não escondida na legenda), por dia.
+  // As entregas que passam nos filtros, por dia.
   const porDia = useMemo(() => {
     const mapa = new Map();
+    if (!mostrar.atividades) return mapa;
     atividades.forEach((atividade) => {
       if (!atividade.prazo) return;
       const { conteudo, disciplina } = trilhaDaAtividade(atividade);
-      if (disciplina && ocultas.has(disciplina.id)) return;
+      if (fDisciplina !== 'todas' && disciplina?.id !== fDisciplina) return;
+      if (soMinhas && atividade.responsavelId !== membroAtivo?.id) return;
+      if (fOnde !== 'todos' && atividade.grupoId !== fOnde) return;
+      const grupo = grupoDe(atividade);
+      const pessoal = grupos.find((g) => g.id === atividade.grupoId)?.pessoal;
       if (!mapa.has(atividade.prazo)) mapa.set(atividade.prazo, []);
-      mapa.get(atividade.prazo).push({ atividade, conteudo, disciplina });
+      mapa.get(atividade.prazo).push({ atividade, conteudo, disciplina, grupo, pessoal });
     });
     mapa.forEach((lista) =>
       lista.sort(
@@ -207,21 +296,30 @@ export default function Calendario() {
       )
     );
     return mapa;
-  }, [atividades, trilhaDaAtividade, ocultas]);
+    // grupoDe e grupos mudam junto com as atividades e o espaço
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [atividades, trilhaDaAtividade, mostrar.atividades, fDisciplina, soMinhas, fOnde, membroAtivo]);
 
-  // Eventos por dia (já em ordem de horário). O de disciplina escondida na
-  // legenda some junto com ela.
+  // Eventos por dia (já em ordem de horário). O de vários dias entra em cada
+  // um deles; nos seguintes ao primeiro, como continuação.
   const eventosPorDia = useMemo(() => {
     const mapa = new Map();
-    if (!mostrarEventos) return mapa;
+    if (!mostrar.eventos) return mapa;
     eventos.forEach((evento) => {
-      if (evento.disciplinaId && ocultas.has(evento.disciplinaId)) return;
+      if (fDisciplina !== 'todas' && evento.disciplinaId !== fDisciplina) return;
+      if (fOnde !== 'todos' && evento.grupoId !== fOnde) return;
       const disciplina = disciplinas.find((d) => d.id === evento.disciplinaId) || null;
-      if (!mapa.has(evento.data)) mapa.set(evento.data, []);
-      mapa.get(evento.data).push({ evento, disciplina });
+      const grupo = grupoDe(evento);
+      diasDoEvento(evento).forEach((iso) => {
+        if (!mapa.has(iso)) mapa.set(iso, []);
+        mapa.get(iso).push({ evento, disciplina, grupo, continuacao: iso !== evento.data });
+      });
     });
+    // No dia, o que começa ali vem antes da continuação.
+    mapa.forEach((lista) => lista.sort((a, b) => Number(a.continuacao) - Number(b.continuacao)));
     return mapa;
-  }, [eventos, disciplinas, ocultas, mostrarEventos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventos, disciplinas, mostrar.eventos, fDisciplina, fOnde]);
 
   // Quadro do mês: semanas completas, de domingo a sábado.
   const celulas = useMemo(() => {
@@ -243,7 +341,9 @@ export default function Calendario() {
       ...new Set([atual, atual + 1, celulas[0].getFullYear(), celulas[celulas.length - 1].getFullYear(), ano]),
     ];
   }, [celulas, ano]);
-  const { feriados, carregando, erro, feriadoEm } = useFeriados(anos);
+  const { feriados, carregando, erro, feriadoEm: feriadoDoDia } = useFeriados(anos);
+  // Com os feriados desligados no filtro, o quadro não os marca.
+  const feriadoEm = (iso) => (mostrar.feriados ? feriadoDoDia(iso) : null);
 
   const escolherDia = (iso, { rolar = false } = {}) => {
     // Na semana, a página só vira quando a semana muda (escolher outro dia da
@@ -298,15 +398,6 @@ export default function Calendario() {
   const deslizar = useDeslizar(navegar);
   const animacao = ANIMACAO[direcao] ?? '';
 
-  const alternarDisciplina = (id) => {
-    setOcultas((atual) => {
-      const proximo = new Set(atual);
-      if (proximo.has(id)) proximo.delete(id);
-      else proximo.add(id);
-      return proximo;
-    });
-  };
-
   const doSelecionado = porDia.get(selecionado) || [];
   const eventosDoSelecionado = eventosPorDia.get(selecionado) || [];
   const feriadoSelecionado = feriadoEm(selecionado);
@@ -317,6 +408,24 @@ export default function Calendario() {
     const dias = new Set([...porDia.keys(), ...eventosPorDia.keys()].filter((iso) => iso.startsWith(prefixo)));
     return [...dias].sort().map((iso) => [iso, porDia.get(iso) || [], eventosPorDia.get(iso) || []]);
   }, [porDia, eventosPorDia, ano, mes]);
+
+  // Quanto está aparecendo (no mês, ou na semana), para a pessoa se situar.
+  const resumo = useMemo(() => {
+    const dentro =
+      visao === 'semana'
+        ? (iso) => iso >= paraISO(diasDaSemana[0]) && iso <= paraISO(diasDaSemana[6])
+        : (iso) => iso.startsWith(`${ano}-${String(mes + 1).padStart(2, '0')}-`);
+    let entregas = 0;
+    porDia.forEach((lista, iso) => {
+      if (dentro(iso)) entregas += lista.length;
+    });
+    const idsEventos = new Set();
+    eventosPorDia.forEach((lista, iso) => {
+      if (dentro(iso)) lista.forEach(({ evento }) => idsEventos.add(evento.id));
+    });
+    const quando = visao === 'semana' ? 'nesta semana' : `em ${MESES[mes]}`;
+    return `${plural(entregas, 'entrega')} e ${plural(idsEventos.size, 'evento')} ${quando}`;
+  }, [porDia, eventosPorDia, visao, diasDaSemana, ano, mes]);
 
   const semanaTexto =
     visao === 'semana'
@@ -388,46 +497,75 @@ export default function Calendario() {
         </div>
       </header>
 
-      {(disciplinas.length > 0 || eventos.length > 0) && (
-        <div role="group" aria-label="O que aparece no calendário" className="flex flex-wrap gap-2">
-          {eventos.length > 0 && (
-            <button
-              type="button"
-              aria-pressed={mostrarEventos}
-              onClick={() => setMostrarEventos((atual) => !atual)}
-              className={cn(
-                'inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-[opacity,border-color]',
-                mostrarEventos
-                  ? 'border border-borda-forte bg-superficie text-texto'
-                  : 'border border-dashed border-borda-forte text-apagado opacity-70'
-              )}
-            >
-              <CalendarClock aria-hidden="true" className="size-4 text-primaria-texto" />
+      {/* Filtros: o que aparece, de qual disciplina e de quem. */}
+      <Card
+        as="section"
+        aria-label="Filtros do calendário"
+        className="flex flex-col gap-3 p-3 sm:p-4 xl:flex-row xl:items-center xl:justify-between"
+      >
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div role="group" aria-labelledby="f-mostrar" className="flex flex-wrap items-center gap-2">
+            <Rotulo id="f-mostrar" className="mr-0.5">
+              Mostrar
+            </Rotulo>
+            <Chip ligado={mostrar.atividades} aoMudar={alternar('atividades')} icone={ListChecks}>
+              Atividades
+            </Chip>
+            <Chip ligado={mostrar.eventos} aoMudar={alternar('eventos')} icone={CalendarClock}>
               Eventos
-            </button>
+            </Chip>
+            <Chip ligado={mostrar.feriados} aoMudar={alternar('feriados')} icone={CalendarDays}>
+              Feriados
+            </Chip>
+          </div>
+          {disciplinas.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Label htmlFor="f-cal-disc" className="shrink-0">
+                Disciplina
+              </Label>
+              <SelectRico
+                id="f-cal-disc"
+                valor={fDisciplina}
+                aoMudar={setFDisciplina}
+                className="h-9 w-[210px] text-[14px]"
+                opcoes={[{ valor: 'todas', rotulo: 'Todas', icone: <IconeOpcao icone={Layers} /> }, ...opcoesDisciplinas(disciplinas)]}
+              />
+            </div>
           )}
-          {disciplinas.map((d) => {
-            const ligada = !ocultas.has(d.id);
-            return (
-              <button
-                key={d.id}
-                type="button"
-                aria-pressed={ligada}
-                onClick={() => alternarDisciplina(d.id)}
-                className={cn(
-                  'inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-[opacity,border-color]',
-                  ligada
-                    ? 'border border-borda-forte bg-superficie text-texto'
-                    : 'border border-dashed border-borda-forte text-apagado opacity-70'
-                )}
-              >
-                <span aria-hidden="true" className="size-2.5 rounded-[3px]" style={{ background: d.cor }} />
-                {d.nome}
-              </button>
-            );
-          })}
+          {noEspacoPessoal
+            ? espacos.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="f-cal-onde" className="shrink-0">
+                    Onde
+                  </Label>
+                  <SelectRico
+                    id="f-cal-onde"
+                    valor={fOnde}
+                    aoMudar={setFOnde}
+                    className="h-9 w-[210px] text-[14px]"
+                    opcoes={[{ valor: 'todos', rotulo: 'Tudo', icone: <IconeOpcao icone={Layers} /> }, ...opcoesGrupos(espacos)]}
+                  />
+                </div>
+              )
+            : membroAtivo && (
+                <label htmlFor="f-cal-minhas" className="flex cursor-pointer items-center gap-2.5 text-[14px] font-medium text-texto">
+                  <Interruptor id="f-cal-minhas" ligado={soMinhas} aoMudar={setSoMinhas} />
+                  Só as minhas atividades
+                </label>
+              )}
         </div>
-      )}
+        <div className="flex items-center justify-between gap-3 border-t border-divisor pt-3 xl:justify-end xl:border-0 xl:pt-0">
+          <p className="text-[13px] text-sutil" role="status">
+            {resumo}
+          </p>
+          {filtroAtivo && (
+            <Button variante="fantasma" tamanho="sm" onClick={limparFiltros}>
+              <X aria-hidden="true" />
+              Limpar filtros
+            </Button>
+          )}
+        </div>
+      </Card>
 
       {/* Na semana, cada coluna já mostra o dia inteiro: o painel do dia sai
           para as colunas ganharem largura. */}
@@ -647,7 +785,14 @@ export default function Calendario() {
                         <ul className={cn('flex flex-col gap-2', itens.length > 0 && 'mb-2.5')}>
                           {doDia.map(({ evento, disciplina }) => (
                             <li key={evento.id}>
-                              <CartaoEvento evento={evento} disciplina={disciplina} compacto mostrarDia={false} acoes={menuDoEvento(evento)} />
+                              <CartaoEvento
+                                evento={evento}
+                                disciplina={disciplina}
+                                grupo={grupoDe(evento)}
+                                compacto
+                                mostrarDia={false}
+                                acoes={menuDoEvento(evento)}
+                              />
                             </li>
                           ))}
                         </ul>
@@ -693,7 +838,14 @@ export default function Calendario() {
             <ul aria-label="Eventos do dia" className="flex flex-col gap-2">
               {eventosDoSelecionado.map(({ evento, disciplina }) => (
                 <li key={evento.id}>
-                  <CartaoEvento evento={evento} disciplina={disciplina} compacto mostrarDia={false} acoes={menuDoEvento(evento)} />
+                  <CartaoEvento
+                    evento={evento}
+                    disciplina={disciplina}
+                    grupo={grupoDe(evento)}
+                    compacto
+                    mostrarDia={false}
+                    acoes={menuDoEvento(evento)}
+                  />
                 </li>
               ))}
             </ul>

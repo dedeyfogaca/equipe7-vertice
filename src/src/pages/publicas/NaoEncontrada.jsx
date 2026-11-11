@@ -6,8 +6,8 @@ import { Button } from '../../components/ui/botao.jsx';
 
 export default function NaoEncontrada() {
   useTitulo('Página não encontrada');
-  const { autenticado, precisaIdentificar } = useAuth();
-  const logado = autenticado && !precisaIdentificar;
+  const { autenticado, precisaIdentificar, precisaPerfil } = useAuth();
+  const logado = autenticado && !precisaIdentificar && !precisaPerfil;
 
   return (
     <LayoutPublico>

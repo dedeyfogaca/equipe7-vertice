@@ -13,14 +13,17 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import { useTitulo } from '../hooks/useTitulo.js';
 import { Avatar } from '../components/ui/avatar-membro.jsx';
+import { AvatarGrupo } from '../components/ui/avatar-grupo.jsx';
 import { Button } from '../components/ui/botao.jsx';
 import { Badge, Card, EmptyState, PageHeader, Rotulo } from '../components/ui/basicos.jsx';
 import { CONQUISTAS, diaLocal } from '../lib/gamificacao.js';
+import { STATUS } from '../lib/constants.js';
 import { formatarData } from '../lib/datas.js';
 import { cn, plural } from '../lib/utils.js';
 
 // Experiência (RN10), ofensiva (RN11) e conquistas (RN12): as suas e o
-// ranking do grupo.
+// ranking do grupo. No espaço pessoal (RF34), as da pessoa em todos os
+// grupos somadas, e a posição dela em cada grupo.
 
 const ICONES = {
   PRIMEIRO_PASSO: Footprints,
@@ -54,7 +57,7 @@ function Estatistica({ rotulo, valor, destaque = false }) {
 
 export default function Conquistas() {
   useTitulo('Conquistas');
-  const { grupoAtivo, membroAtivo } = useAuth();
+  const { grupoAtivo, membroAtivo, noEspacoPessoal } = useAuth();
 
   // Grupo de uma versão anterior que ainda não tem membro nenhum: não há de
   // quem mostrar experiência, ofensiva e conquistas (UC09, fluxo 1A).
@@ -77,18 +80,40 @@ export default function Conquistas() {
     );
   }
 
-  return <ConquistasDoMembro grupoId={grupoAtivo.id} membroAtivo={membroAtivo} />;
+  return <ConquistasDoMembro grupoId={grupoAtivo.id} membroAtivo={membroAtivo} daConta={noEspacoPessoal} />;
 }
 
-function ConquistasDoMembro({ grupoId, membroAtivo }) {
-  const { rankingDoGrupo, conquistasDoMembro } = useData();
+function ConquistasDoMembro({ grupoId, membroAtivo, daConta }) {
+  const {
+    rankingDoGrupo,
+    conquistasDoMembro,
+    xpDaConta,
+    ofensivaDaConta,
+    conquistasDaConta,
+    atividades,
+    meusMembros,
+    grupos,
+  } = useData();
 
-  const ranking = rankingDoGrupo(grupoId);
+  const ranking = daConta ? [] : rankingDoGrupo(grupoId);
   const minha = ranking.find((l) => l.membro.id === membroAtivo.id);
-  const xp = minha?.xp ?? 0;
-  const ofensiva = minha?.ofensiva ?? 0;
-  const concluidas = minha?.concluidas ?? 0;
-  const obtidas = new Map(conquistasDoMembro(membroAtivo.id).map((c) => [c.codigo, c]));
+  const meus = new Set(meusMembros.map((m) => m.id));
+  const xp = daConta ? xpDaConta : (minha?.xp ?? 0);
+  const ofensiva = daConta ? ofensivaDaConta : (minha?.ofensiva ?? 0);
+  const concluidas = daConta
+    ? atividades.filter((a) => meus.has(a.responsavelId) && a.status === STATUS.CONCLUIDO).length
+    : (minha?.concluidas ?? 0);
+  const obtidas = new Map((daConta ? conquistasDaConta : conquistasDoMembro(membroAtivo.id)).map((c) => [c.codigo, c]));
+  // No espaço pessoal: a posição da pessoa em cada grupo dela.
+  const nosGrupos = daConta
+    ? grupos
+        .filter((g) => !g.pessoal && meusMembros.some((m) => m.grupoId === g.id))
+        .map((grupo) => {
+          const lista = rankingDoGrupo(grupo.id);
+          const eu = meusMembros.find((m) => m.grupoId === grupo.id);
+          return { grupo, linha: lista.find((l) => l.membro.id === eu?.id), total: lista.length };
+        })
+    : [];
 
   // O quanto falta para cada marco que ainda não foi atingido.
   const andamento = (conquista) => {
@@ -108,16 +133,27 @@ function ConquistasDoMembro({ grupoId, membroAtivo }) {
 
   return (
     <>
-      <PageHeader titulo="Conquistas" subtitulo="Experiência, ofensiva e marcos: os seus e os do grupo." />
+      <PageHeader
+        titulo="Conquistas"
+        subtitulo={
+          daConta
+            ? 'Experiência, ofensiva e marcos somando tudo o que você concluiu, no pessoal e nos grupos.'
+            : 'Experiência, ofensiva e marcos: os seus e os do grupo.'
+        }
+      />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Estatistica rotulo="Experiência" valor={`${xp} XP`} destaque />
         <Estatistica rotulo="Ofensiva" valor={plural(ofensiva, 'dia')} />
         <Estatistica rotulo="Concluídas" valor={concluidas} />
-        <Estatistica
-          rotulo="Posição no grupo"
-          valor={minha ? `${minha.posicao}º de ${ranking.length}` : 'sem posição'}
-        />
+        {daConta ? (
+          <Estatistica rotulo="Grupos" valor={nosGrupos.length} />
+        ) : (
+          <Estatistica
+            rotulo="Posição no grupo"
+            valor={minha ? `${minha.posicao}º de ${ranking.length}` : 'sem posição'}
+          />
+        )}
       </div>
 
       <section aria-labelledby="t-conquistas" className="mt-10">
@@ -174,6 +210,31 @@ function ConquistasDoMembro({ grupoId, membroAtivo }) {
         </ul>
       </section>
 
+      {daConta && nosGrupos.length > 0 && (
+        <section aria-labelledby="t-nos-grupos" className="mt-10">
+          <h2 id="t-nos-grupos" className="mb-4 text-[19px] font-semibold tracking-[-0.02em] text-forte">
+            Nos seus grupos
+          </h2>
+          <Card className="overflow-hidden">
+            <ul className="divide-y divide-divisor">
+              {nosGrupos.map(({ grupo, linha, total }) => (
+                <li key={grupo.id} className="flex items-center gap-3 px-5 py-3.5">
+                  <AvatarGrupo grupo={grupo} tamanho={36} tom="suave" />
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate font-semibold text-forte">{grupo.nome}</span>
+                    <span className="text-[13px] text-sutil">
+                      {linha ? `${linha.posicao}º de ${total} no ranking · ${plural(linha.concluidas, 'concluída')}` : 'Sem posição'}
+                    </span>
+                  </span>
+                  <span className="numero font-bold text-gam-texto">{linha?.xp ?? 0} XP</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </section>
+      )}
+
+      {!daConta && (
       <section aria-labelledby="t-ranking" className="mt-10">
         <h2 id="t-ranking" className="mb-4 text-[19px] font-semibold tracking-[-0.02em] text-forte">
           Ranking do grupo
@@ -228,6 +289,7 @@ function ConquistasDoMembro({ grupoId, membroAtivo }) {
           ordem alfabética.
         </p>
       </section>
+      )}
     </>
   );
 }

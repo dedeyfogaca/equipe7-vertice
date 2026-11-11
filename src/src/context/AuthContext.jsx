@@ -4,25 +4,23 @@ import { PERFIL } from '../lib/constants.js';
 import { useData } from './DataContext.jsx';
 import { useConta } from './ContaContext.jsx';
 
-// Sessão: o grupo e quem, dentro dele, está usando o sistema.
+// Sessão: o espaço aberto (o pessoal ou um grupo) e quem, dentro dele, está
+// usando o sistema.
 //
-// Com conta (RF27), quem está usando é a própria conta: o membro do grupo
-// ligado a ela. Basta escolher o grupo.
+// Desde a revisão de 11/11/2026 a pessoa tem um espaço pessoal (RF34): é
+// nele que ela cai ao entrar e é para ele que volta ao sair de um grupo.
+// Quem a pessoa é dentro de cada grupo fica marcado no próprio membro
+// (`usuarioId`): com conta, é a conta; na demonstração, o usuário "demo".
 //
-// No modo de demonstração continua sem senha: o acesso é seleção. O membro entrou
-// aqui por causa do RN07: "só o organizador exclui o grupo, gerencia membros,
-// disciplinas e conteúdos". Sem saber quem é a pessoa, não há o que comparar
-// com o perfil, e o campo `perfil` fica sendo enfeite.
-//
-// Um caso precisa de cuidado: o grupo recém-criado não tem membro nenhum, e
-// alguém precisa poder cadastrar o primeiro. Nesse caso quem está lá é
-// tratado como organizador. É o mesmo que a migração faz, dando
-// `organizador` ao primeiro membro do grupo.
+// Na demonstração, um grupo antigo pode ter gente sem ninguém marcado: aí a
+// pessoa diz quem é ("Quem é você?"), por causa do RN07: as telas mudam
+// conforme o perfil. Um grupo sem membro nenhum (dado antigo) é tratado como
+// recém-criado, e quem está lá pode tudo para montá-lo.
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const { grupos, membros, carregando } = useData();
-  const { modo, usuario } = useConta();
+  const { grupos, membros, carregando, espacoPessoal, meuUsuarioId, vincularMembro } = useData();
+  const { modo } = useConta();
   const comConta = modo === 'conta';
   // Cada modo guarda a própria sessão, para a demonstração e a conta não se misturarem.
   const chave = comConta ? 'sessaoConta' : 'sessao';
@@ -32,10 +30,12 @@ export function AuthProvider({ children }) {
     salvarSessao(sessao, chave);
   }, [sessao, chave]);
 
+  // O grupo da sessão; sem grupo escolhido, o espaço pessoal.
   const grupoAtivo = useMemo(
-    () => grupos.find((g) => g.id === sessao?.grupoId) || null,
-    [grupos, sessao]
+    () => grupos.find((g) => g.id === sessao?.grupoId) || espacoPessoal || null,
+    [grupos, sessao, espacoPessoal]
   );
+  const noEspacoPessoal = Boolean(grupoAtivo?.pessoal);
 
   const membrosDoGrupoAtivo = useMemo(
     () => (grupoAtivo ? membros.filter((m) => m.grupoId === grupoAtivo.id) : []),
@@ -43,14 +43,12 @@ export function AuthProvider({ children }) {
   );
 
   const membroAtivo = useMemo(
-    () =>
-      membrosDoGrupoAtivo.find((m) => (comConta ? m.usuarioId === usuario?.id : m.id === sessao?.membroId)) ||
-      null,
-    [membrosDoGrupoAtivo, sessao, comConta, usuario]
+    () => (meuUsuarioId ? membrosDoGrupoAtivo.find((m) => m.usuarioId === meuUsuarioId) : null) || null,
+    [membrosDoGrupoAtivo, meuUsuarioId]
   );
 
   // Se a sessão aponta para um grupo que foi removido (ou de que a conta
-  // saiu), encerramos o acesso. Com conta, só depois de os dados chegarem.
+  // saiu), volta para o espaço pessoal. Com conta, só depois de os dados chegarem.
   useEffect(() => {
     if (carregando) return;
     if (sessao?.grupoId && !grupos.some((g) => g.id === sessao.grupoId)) {
@@ -58,45 +56,43 @@ export function AuthProvider({ children }) {
     }
   }, [grupos, sessao, carregando]);
 
-  // Se o membro da sessão foi removido, a pessoa volta a se identificar.
-  useEffect(() => {
-    if (comConta) return;
-    if (sessao?.membroId && !membros.some((m) => m.id === sessao.membroId)) {
-      setSessao((atual) => (atual ? { ...atual, membroId: null } : atual));
-    }
-  }, [membros, sessao, comConta]);
-
   // Grupo sem membro nenhum: quem está lá está montando o grupo (só existe
   // no modo de demonstração, com dados antigos).
   const grupoVazio = !comConta && Boolean(grupoAtivo) && membrosDoGrupoAtivo.length === 0;
 
-  // O grupo tem gente, mas ainda não sabemos quem é quem está usando.
-  // (Com conta, quem está usando já é conhecido: não há o que escolher.)
+  // O grupo tem gente, mas ninguém marcado como a pessoa (demonstração).
   const precisaIdentificar = !comConta && Boolean(grupoAtivo) && !grupoVazio && !membroAtivo;
+
+  // Demonstração sem perfil (primeira vez, ou dados de antes da revisão de
+  // 11/11): a pessoa diz o nome antes de entrar, e assim ganha o espaço
+  // pessoal. Com conta, quem cria os dois é o banco.
+  const precisaPerfil = modo === 'demo' && !espacoPessoal;
 
   // RN07: quem pode gerenciar membros, disciplinas, conteúdos e excluir o
   // grupo. Enquanto o grupo está vazio, quem o criou pode tudo.
   const ehOrganizador = grupoVazio || membroAtivo?.perfil === PERFIL.ORGANIZADOR;
 
-  const entrar = useCallback((grupoId, membroId = null) => {
-    setSessao({ grupoId, membroId });
+  const entrar = useCallback((grupoId) => {
+    setSessao({ grupoId, membroId: null });
   }, []);
 
-  const identificar = useCallback((membroId) => {
-    setSessao((atual) => (atual ? { ...atual, membroId } : atual));
-  }, []);
+  const identificar = useCallback((membroId) => vincularMembro(membroId), [vincularMembro]);
 
+  // Sair do grupo = voltar para o espaço pessoal.
   const sair = useCallback(() => setSessao(null), []);
 
   const valor = useMemo(
     () => ({
       carregando,
-      grupoId: sessao?.grupoId ?? null,
+      grupoId: grupoAtivo?.id ?? null,
       grupoAtivo,
+      noEspacoPessoal,
+      espacoPessoal,
       membroAtivo,
       membrosDoGrupoAtivo,
       autenticado: Boolean(grupoAtivo) && (!comConta || Boolean(membroAtivo)),
       precisaIdentificar,
+      precisaPerfil,
       ehOrganizador,
       entrar,
       identificar,
@@ -104,11 +100,14 @@ export function AuthProvider({ children }) {
     }),
     [
       carregando,
-      sessao,
       grupoAtivo,
+      noEspacoPessoal,
+      espacoPessoal,
       membroAtivo,
       membrosDoGrupoAtivo,
+      comConta,
       precisaIdentificar,
+      precisaPerfil,
       ehOrganizador,
       entrar,
       identificar,

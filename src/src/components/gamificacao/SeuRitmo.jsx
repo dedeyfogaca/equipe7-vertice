@@ -32,13 +32,25 @@ export function SeloConquista({ conquista, obtida }) {
   );
 }
 
-/** RN10, RN11 e RN12 do membro: experiência, ofensiva e conquistas. */
-export function SeuRitmo({ membroId, titulo = 'Seu ritmo' }) {
-  const { ofensivaDoMembro, xpDoMembro, ultimosDiasDoMembro, conquistasDoMembro } = useData();
-  const ofensiva = ofensivaDoMembro(membroId);
-  const xp = xpDoMembro(membroId);
-  const dias = ultimosDiasDoMembro(membroId, 7);
-  const obtidas = conquistasDoMembro(membroId);
+/**
+ * RN10, RN11 e RN12 do membro: experiência, ofensiva e conquistas. Com
+ * `daConta` (espaço pessoal, RF34), soma a pessoa em todos os grupos.
+ */
+export function SeuRitmo({ membroId, daConta = false, titulo = 'Seu ritmo' }) {
+  const {
+    ofensivaDoMembro,
+    xpDoMembro,
+    ultimosDiasDoMembro,
+    conquistasDoMembro,
+    xpDaConta,
+    ofensivaDaConta,
+    ultimosDiasDaConta,
+    conquistasDaConta,
+  } = useData();
+  const ofensiva = daConta ? ofensivaDaConta : ofensivaDoMembro(membroId);
+  const xp = daConta ? xpDaConta : xpDoMembro(membroId);
+  const dias = daConta ? ultimosDiasDaConta(7) : ultimosDiasDoMembro(membroId, 7);
+  const obtidas = daConta ? conquistasDaConta : conquistasDoMembro(membroId);
   const codigos = new Set(obtidas.map((c) => c.codigo));
   const ultimas = obtidas
     .slice(0, 2)

@@ -6,6 +6,10 @@
 
 import { STATUS } from './constants.js';
 
+// Com o espaço pessoal (revisão de 11/11/2026), a mesma tela mostra
+// atividades de grupos diferentes: quem chama monta o `quem` do grupo da
+// atividade (ver hooks/usePermissoes.js).
+
 /** A pessoa da sessão é a responsável pela atividade? */
 export function ehResponsavel(atividade, quem) {
   return Boolean(quem?.membroId) && atividade?.responsavelId === quem.membroId;
@@ -29,6 +33,13 @@ export function podeExcluirAtividade(atividade, quem) {
   return podeEditarAtividade(atividade, quem);
 }
 
+// RN06: atividade "A definir" fica visível para o grupo todo, e qualquer
+// integrante pode assumir. Só depois de assumida ela pode ser iniciada e
+// concluída (RN20).
+export function podeAssumir(atividade, quem) {
+  return Boolean(quem?.membroId) && Boolean(atividade) && !atividade.responsavelId;
+}
+
 /**
  * RN20 no formulário: o status que vai ser gravado. Quem não é o responsável
  * (o escolhido no próprio formulário) não decide o status: a atividade nova
@@ -36,6 +47,7 @@ export function podeExcluirAtividade(atividade, quem) {
  */
 export function statusAoSalvar({ statusEscolhido, statusAtual, responsavelId, quem }) {
   const original = statusAtual || STATUS.A_FAZER;
+  if (!responsavelId) return STATUS.A_FAZER;
   if (!ehResponsavel({ responsavelId }, quem)) return original;
   return statusEscolhido || original;
 }

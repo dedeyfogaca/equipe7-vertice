@@ -5,7 +5,7 @@ import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-rea
 import { useFeriados } from '../../hooks/useFeriados.js';
 import { Button } from './botao.jsx';
 import { baseControle } from './campos.jsx';
-import { dataLocal, formatarDataExtensa, hojeISO, paraISO } from '../../lib/datas.js';
+import { dataLocal, formatarData, formatarDataExtensa, hojeISO, paraISO } from '../../lib/datas.js';
 import { capitalizar, DIAS_CURTOS, DIAS_LONGOS, MESES, tituloMes } from '../../lib/formatos.js';
 import { cn } from '../../lib/utils.js';
 
@@ -25,6 +25,7 @@ export function CampoData({
   valor,
   aoMudar,
   placeholder = 'Selecione a data',
+  curto = false,
   className,
   ...rest
 }) {
@@ -42,7 +43,9 @@ export function CampoData({
         >
           <CalendarDays aria-hidden="true" className="size-4 shrink-0 text-sutil" />
           {selecionada ? (
-            <span className="min-w-0 flex-1 truncate">{capitalizar(formatarDataExtensa(valor))}</span>
+            <span className="min-w-0 flex-1 truncate">
+              {curto ? formatarData(valor) : capitalizar(formatarDataExtensa(valor))}
+            </span>
           ) : (
             <span className="min-w-0 flex-1 truncate text-apagado">{placeholder}</span>
           )}

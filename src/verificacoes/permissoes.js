@@ -12,6 +12,7 @@
 
 import {
   ehResponsavel,
+  podeAssumir,
   podeEditarAtividade,
   podeEditarEvento,
   podeExcluirAtividade,
@@ -94,6 +95,20 @@ checar('outro participante não edita', podeEditarEvento(provaDoBruno, { membroI
 checar('o organizador edita o evento de qualquer um', podeEditarEvento(provaDoBruno, { membroId: 'ana', organizador: true }), true);
 checar('evento sem autor: só o organizador', [podeEditarEvento(semAutor, { membroId: 'carla', organizador: false }), podeEditarEvento(semAutor, { membroId: 'ana', organizador: true })], [false, true]);
 checar('sem saber quem é, ninguém edita', podeEditarEvento(provaDoBruno, { membroId: null, organizador: false }), false);
+
+console.log('\nRN06 (revisada em 11/11/2026): atividade "A definir"\n');
+
+const aDefinir = { id: 'a9', responsavelId: '', status: 'a fazer' };
+checar('qualquer membro pode assumir', [podeAssumir(aDefinir, bruno), podeAssumir(aDefinir, ana)], [true, true]);
+checar('quem não é do grupo, não', podeAssumir(aDefinir, { membroId: null, organizador: false }), false);
+checar('atividade com responsável não se assume', podeAssumir(daAna, bruno), false);
+checar('ninguém muda o status antes de alguém assumir', [podeMudarStatus(aDefinir, ana), podeMudarStatus(aDefinir, bruno)], [false, false]);
+checar('o participante não edita sem assumir; o organizador edita', [podeEditarAtividade(aDefinir, bruno), podeEditarAtividade(aDefinir, ana)], [false, true]);
+checar(
+  'salvar sem responsável grava "a fazer", mesmo com outro status escolhido',
+  statusAoSalvar({ statusEscolhido: 'concluido', statusAtual: '', responsavelId: '', quem: ana }),
+  'a fazer'
+);
 
 console.log(
   falhas === 0 ? '\nTodas as verificações passaram.\n' : `\n${falhas} verificação(ões) falharam.\n`

@@ -244,10 +244,7 @@ function quemFechou(lista) {
  * RN12: o que conceder agora. Recebe as conquistas já concedidas
  * ([{ membroId, codigo }]) e os marcos atingidos neste momento
  * ([{ membroId, codigos }]) e devolve só as novas, com a data de hoje.
- *
- * Nunca devolve remoção: uma conquista concedida continua concedida mesmo
- * que o marco deixe de valer (a atividade foi reaberta, o conteúdo ganhou
- * atividade nova). E nunca concede a mesma duas vezes.
+ * Nunca concede a mesma duas vezes. A retirada é com `conquistasPerdidas`.
  */
 export function conquistasNovas(jaConcedidas = [], alcancadas = [], agora = new Date().toISOString()) {
   const chaves = new Set(jaConcedidas.map((c) => `${c.membroId}:${c.codigo}`));
@@ -264,11 +261,41 @@ export function conquistasNovas(jaConcedidas = [], alcancadas = [], agora = new 
 }
 
 /**
+ * RN12 (revisada em 11/11/2026): a conquista sai junto com a experiência.
+ * Quando o membro perde uma conclusão (desfez, a atividade concluída foi
+ * excluída ou passou para outra pessoa), as conquistas que valiam antes e
+ * deixaram de valer agora são retiradas.
+ *
+ * A comparação é entre o antes e o depois, no mesmo dia: assim só sai o que
+ * a perda derrubou. Uma ofensiva que já tinha acabado por falta de conclusões
+ * (o "Semana Cheia" de um mês atrás) não é retirada por isso.
+ *
+ * @param {string} membroId
+ * @param {{ atividades: Array, conteudos: Array }} antes contexto antes da mudança
+ * @param {{ atividades: Array, conteudos: Array }} depois contexto depois da mudança
+ * @returns {string[]} códigos que deixaram de valer
+ */
+export function conquistasPerdidas(membroId, antes, depois, hoje = new Date()) {
+  const agora = new Set(conquistasAlcancadas(membroId, { ...depois, hoje }));
+  return conquistasAlcancadas(membroId, { ...antes, hoje }).filter((codigo) => !agora.has(codigo));
+}
+
+/** Ids das atividades concluídas de cada membro: { membroId: Set(ids) }. */
+export function concluidasPorMembro(atividades = []) {
+  const mapa = new Map();
+  atividades.forEach((a) => {
+    if (a.status !== STATUS.CONCLUIDO || !a.responsavelId) return;
+    if (!mapa.has(a.responsavelId)) mapa.set(a.responsavelId, new Set());
+    mapa.get(a.responsavelId).add(a.id);
+  });
+  return mapa;
+}
+
+/**
  * Códigos das conquistas cujo marco o membro atinge com o estado atual.
  *
  * Quem decide o que já foi concedido é quem chama (o armazenamento das
- * conquistas): esta função só responde "o marco está atingido agora?". Uma
- * conquista concedida não é retirada se o marco deixar de valer (RN12).
+ * conquistas): esta função só responde "o marco está atingido agora?".
  *
  * @param {string} membroId
  * @param {{ atividades: Array, conteudos: Array, hoje?: Date }} contexto

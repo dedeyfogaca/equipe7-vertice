@@ -11,13 +11,20 @@
 // Versão 3: o conteúdo virou opcional (revisão de 06/11/2026): a atividade
 // passa a guardar a própria disciplina. E os avatares ficaram em dois estilos.
 //
+// Versão 4: espaço pessoal (revisão de 11/11/2026). A atividade passa a
+// guardar o grupo, porque no espaço pessoal ela pode não ter disciplina. E
+// quem a pessoa é dentro do grupo passa a ficar marcado no próprio membro
+// (`usuarioId`), como acontece com conta.
+//
 // Cada passo roda uma vez só. O marcador de versão gravado é o que impede uma
 // segunda passada de duplicar disciplina.
 
 import {
   CHAVES,
   CHAVE_LEGADA_TAREFAS,
+  USUARIO_DEMO,
   lerColecao,
+  lerSessao,
   lerVersaoDados,
   novoId,
   removerChave,
@@ -38,7 +45,8 @@ import { ESTILO_AVATAR_PADRAO, estiloAvatarValido } from './avatar.js';
 //   0 -> 1: tarefa com disciplina de texto vira atividade na cadeia
 //   1 -> 2: responsável obrigatório e paleta de 18 cores
 //   2 -> 3: disciplina na atividade, conteúdo opcional, dois estilos de avatar
-export const VERSAO_DADOS = 3;
+//   3 -> 4: grupo na atividade e a pessoa marcada no membro (espaço pessoal)
+export const VERSAO_DADOS = 4;
 
 // Nome do conteúdo que recebe as atividades que já existiam. A pessoa
 // renomeia ou divide depois; o importante é não deixar atividade solta.
@@ -348,6 +356,41 @@ function migrarParaV3() {
 }
 
 /**
+ * Passo 3 -> 4.
+ *
+ * - A atividade ganha `grupoId`, o grupo da disciplina dela.
+ * - O membro escolhido em "Quem é você?" na sessão aberta fica marcado como
+ *   a pessoa da demonstração. Nos outros grupos, ela escolhe de novo ao
+ *   entrar, e a escolha também fica marcada.
+ */
+function migrarParaV4() {
+  const disciplinas = lerColecao(CHAVES.disciplinas);
+  const grupoDaDisciplina = new Map(disciplinas.map((d) => [d.id, d.grupoId]));
+  const atividades = lerColecao(CHAVES.atividades);
+
+  let atividadesAjustadas = 0;
+  const atividadesFinais = atividades.map((a) => {
+    const grupoId = grupoDaDisciplina.get(a.disciplinaId);
+    if (a.grupoId || !grupoId) return a;
+    atividadesAjustadas += 1;
+    return { ...a, grupoId };
+  });
+
+  const sessao = lerSessao(CHAVES.sessao);
+  const membros = lerColecao(CHAVES.membros);
+  let membroMarcado = false;
+  const membrosFinais = membros.map((m) => {
+    if (!sessao?.membroId || m.id !== sessao.membroId || m.usuarioId) return m;
+    membroMarcado = true;
+    return { ...m, usuarioId: USUARIO_DEMO };
+  });
+
+  if (atividadesAjustadas > 0) salvarColecao(CHAVES.atividades, atividadesFinais);
+  if (membroMarcado) salvarColecao(CHAVES.membros, membrosFinais);
+  return { atividadesAjustadas, membroMarcado };
+}
+
+/**
  * Executa os passos que ainda não rodaram. Chamada uma vez, antes de a
  * aplicação montar. Devolve um resumo do que mudou (útil em teste e no log):
  * os campos do passo 1 no topo e o resumo do passo 2 em `v2`.
@@ -360,8 +403,9 @@ export function migrarDados() {
 
   const resultado = versao < 1 ? migrarParaV1() : { migrou: false, motivo: 'ja-migrado' };
   const v2 = versao < 2 ? migrarParaV2() : null;
-  const v3 = migrarParaV3();
+  const v3 = versao < 3 ? migrarParaV3() : null;
+  const v4 = migrarParaV4();
   salvarVersaoDados(VERSAO_DADOS);
 
-  return { ...resultado, v2, v3 };
+  return { ...resultado, v2, v3, v4 };
 }

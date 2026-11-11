@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   ArrowDownAZ,
   BookOpen,
   CalendarClock,
   CalendarDays,
   CalendarRange,
+  CheckSquare,
   History,
   Layers,
   ListPlus,
@@ -13,6 +15,7 @@ import {
   Search,
   SearchX,
   SlidersHorizontal,
+  UserCog,
   Users,
   X,
 } from 'lucide-react';
@@ -26,7 +29,7 @@ import { Card, EmptyState, PageHeader } from '../components/ui/basicos.jsx';
 import { Input, Label } from '../components/ui/campos.jsx';
 import { IconeOpcao, SelectRico } from '../components/ui/selecao.jsx';
 import { AnelPeso } from '../components/ui/progresso.jsx';
-import { opcoesDisciplinas, opcoesMembros } from '../components/opcoes.jsx';
+import { A_DEFINIR, OPCAO_A_DEFINIR, opcoesDisciplinas, opcoesGrupos, opcoesMembros } from '../components/opcoes.jsx';
 import { CartoesSituacao } from '../components/atividades/CartoesSituacao.jsx';
 import { LinhaAtividade } from '../components/atividades/LinhaAtividade.jsx';
 import { useAlternarConclusao } from '../components/atividades/useAlternarConclusao.jsx';
@@ -61,14 +64,27 @@ function pendentesPrimeiro(a, b) {
 
 export default function Atividades() {
   useTitulo('Atividades');
-  const { grupoAtivo, membroAtivo } = useAuth();
-  const { atividadesDoGrupo, membrosDoGrupo, disciplinasDoGrupo, trilhaDaAtividade } =
-    useData();
+  const { grupoAtivo, membroAtivo, noEspacoPessoal, ehOrganizador } = useAuth();
+  const {
+    atividadesDoEspaco,
+    membrosDoGrupo,
+    disciplinasDoEspaco,
+    disciplinasDoGrupo,
+    trilhaDaAtividade,
+    grupos,
+    meusMembros,
+    definirResponsavel,
+  } = useData();
   const alternarConclusao = useAlternarConclusao();
 
-  const atividades = atividadesDoGrupo(grupoAtivo.id);
+  // RF34: no espaço pessoal, as pessoais e as dos grupos que estão com a pessoa.
+  const atividades = atividadesDoEspaco(grupoAtivo.id);
   const membros = membrosDoGrupo(grupoAtivo.id);
-  const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
+  const disciplinas = disciplinasDoEspaco(grupoAtivo.id);
+  // No espaço pessoal, o filtro de responsável vira "onde": pessoal ou um dos grupos.
+  const espacos = noEspacoPessoal
+    ? grupos.filter((g) => g.id === grupoAtivo.id || meusMembros.some((m) => m.grupoId === g.id && !g.pessoal))
+    : [];
 
   const anos = useMemo(() => {
     const conjunto = new Set([new Date().getFullYear()]);
@@ -117,8 +133,10 @@ export default function Atividades() {
       lista = lista.filter((a) => trilhaDaAtividade(a).disciplina?.id === fDisciplina);
     }
 
-    if (fResponsavel !== 'todos') {
-      lista = lista.filter((a) => a.responsavelId === fResponsavel);
+    if (fResponsavel === A_DEFINIR) {
+      lista = lista.filter((a) => !a.responsavelId);
+    } else if (fResponsavel !== 'todos') {
+      lista = lista.filter((a) => (noEspacoPessoal ? a.grupoId : a.responsavelId) === fResponsavel);
     }
 
     const termo = busca.trim().toLowerCase();
@@ -153,10 +171,46 @@ export default function Atividades() {
     else if (ordem === 'peso') ordenada.sort((a, b) => b.peso - a.peso || porPrazo(a, b));
     else if (ordem === 'titulo') ordenada.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
     return ordenada;
-  }, [atividades, situacao, fDisciplina, fResponsavel, fPrazo, busca, ordem, trilhaDaAtividade]);
+  }, [atividades, situacao, fDisciplina, fResponsavel, fPrazo, busca, ordem, trilhaDaAtividade, noEspacoPessoal]);
 
   const semAtividades = atividades.length === 0;
-  const semDisciplinas = disciplinasDoGrupo(grupoAtivo.id).length === 0;
+  // No espaço pessoal a disciplina é opcional (RN24): dá para começar direto.
+  const semDisciplinas = !noEspacoPessoal && disciplinasDoGrupo(grupoAtivo.id).length === 0;
+
+  // RF37: trocar o responsável de várias atividades de uma vez (organizador).
+  const loteDisponivel = !noEspacoPessoal && ehOrganizador && membros.length > 0;
+  const [selecionando, setSelecionando] = useState(false);
+  const [marcadas, setMarcadas] = useState(() => new Set());
+  const [novoResponsavel, setNovoResponsavel] = useState('');
+  const marcar = (id) =>
+    setMarcadas((atual) => {
+      const proximo = new Set(atual);
+      if (proximo.has(id)) proximo.delete(id);
+      else proximo.add(id);
+      return proximo;
+    });
+  const visiveisMarcadas = filtradas.filter((a) => marcadas.has(a.id));
+  const todasMarcadas = filtradas.length > 0 && visiveisMarcadas.length === filtradas.length;
+  const fecharSelecao = () => {
+    setSelecionando(false);
+    setMarcadas(new Set());
+    setNovoResponsavel('');
+  };
+  const aplicarResponsavel = () => {
+    if (!novoResponsavel || visiveisMarcadas.length === 0) return;
+    const ids = visiveisMarcadas.map((a) => a.id);
+    const responsavelId = novoResponsavel === A_DEFINIR ? '' : novoResponsavel;
+    const mudaram = definirResponsavel(ids, responsavelId);
+    const ficaram = ids.length - mudaram;
+    const quem = responsavelId ? membros.find((m) => m.id === responsavelId)?.nome : 'A definir';
+    toast.success(mudaram === 1 ? '1 atividade mudou de responsável' : `${mudaram} atividades mudaram de responsável`, {
+      description:
+        ficaram > 0
+          ? `Agora com ${quem}. ${plural(ficaram, 'atividade')} ficou como estava: concluída${responsavelId ? '' : ' ou já começada'}, ou já com essa pessoa.`
+          : `Agora com ${quem}.`,
+    });
+    fecharSelecao();
+  };
   const temFiltro =
     situacao !== SITUACAO.TODAS ||
     busca.trim() !== '' ||
@@ -174,14 +228,34 @@ export default function Atividades() {
     <>
       <PageHeader
         titulo="Atividades"
-        subtitulo="Clique numa situação para filtrar."
+        subtitulo={
+          noEspacoPessoal
+            ? 'As suas e as dos grupos que estão com você. Clique numa situação para filtrar.'
+            : 'Clique numa situação para filtrar.'
+        }
         acoes={
-          <Button asChild>
-            <Link to="/atividade/nova">
-              <Plus aria-hidden="true" />
-              Nova atividade
-            </Link>
-          </Button>
+          <>
+            {loteDisponivel && !semAtividades && (
+              <Button variante="secundaria" onClick={() => (selecionando ? fecharSelecao() : setSelecionando(true))}>
+                <CheckSquare aria-hidden="true" />
+                {selecionando ? 'Cancelar seleção' : 'Selecionar'}
+              </Button>
+            )}
+            {!semDisciplinas && (
+              <Button variante="secundaria" asChild>
+                <Link to="/atividades/lote">
+                  <ListPlus aria-hidden="true" />
+                  Várias de uma vez
+                </Link>
+              </Button>
+            )}
+            <Button asChild>
+              <Link to="/atividade/nova">
+                <Plus aria-hidden="true" />
+                Nova atividade
+              </Link>
+            </Button>
+          </>
         }
       />
 
@@ -204,7 +278,11 @@ export default function Atividades() {
             <EmptyState
               icone={ListPlus}
               titulo="Nenhuma atividade ainda"
-              descricao="As disciplinas e os conteúdos já estão prontos. Agora é pendurar a primeira atividade num deles."
+              descricao={
+                noEspacoPessoal
+                  ? 'Cadastre o que você precisa fazer, da faculdade ou do dia a dia. Aqui a disciplina é opcional. As atividades dos seus grupos que estiverem com você também aparecem aqui.'
+                  : 'As disciplinas e os conteúdos já estão prontos. Agora é pendurar a primeira atividade num deles.'
+              }
             >
               <Button asChild>
                 <Link to="/atividade/nova">
@@ -270,15 +348,20 @@ export default function Atividades() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="f-resp">Responsável</Label>
+              <Label htmlFor="f-resp">{noEspacoPessoal ? 'Onde' : 'Responsável'}</Label>
               <SelectRico
                 id="f-resp"
                 valor={fResponsavel}
                 aoMudar={setFResponsavel}
-                opcoes={[
-                  { valor: 'todos', rotulo: 'Todos', icone: <IconeOpcao icone={Users} /> },
-                  ...opcoesMembros(membros, { voceId: membroAtivo?.id }),
-                ]}
+                opcoes={
+                  noEspacoPessoal
+                    ? [{ valor: 'todos', rotulo: 'Tudo', icone: <IconeOpcao icone={Layers} /> }, ...opcoesGrupos(espacos)]
+                    : [
+                        { valor: 'todos', rotulo: 'Todos', icone: <IconeOpcao icone={Users} /> },
+                        OPCAO_A_DEFINIR,
+                        ...opcoesMembros(membros, { voceId: membroAtivo?.id }),
+                      ]
+                }
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -316,6 +399,20 @@ export default function Atividades() {
             </Card>
           ) : (
             <Card className="overflow-hidden">
+              {selecionando && (
+                <div className="flex items-center gap-3 border-b border-divisor bg-superficie-2/60 px-4 py-2.5 sm:px-5">
+                  <input
+                    type="checkbox"
+                    checked={todasMarcadas}
+                    onChange={() => setMarcadas(todasMarcadas ? new Set() : new Set(filtradas.map((a) => a.id)))}
+                    aria-label="Selecionar todas as atividades da lista"
+                    className="size-[22px] shrink-0 cursor-pointer rounded-md accent-primaria-barra"
+                  />
+                  <span className="text-[13px] font-medium text-sutil">
+                    {todasMarcadas ? 'Desmarcar todas' : 'Marcar todas as da lista'}
+                  </span>
+                </div>
+              )}
               <ul className="divide-y divide-divisor" aria-label={plural(filtradas.length, 'atividade')}>
                 {filtradas.map((atividade) => (
                   <LinhaAtividade
@@ -323,10 +420,40 @@ export default function Atividades() {
                     atividade={atividade}
                     feriado={feriadoEm(atividade.prazo)}
                     aoAlternar={alternarConclusao}
+                    selecao={selecionando ? { marcada: marcadas.has(atividade.id), aoMarcar: marcar } : undefined}
                   />
                 ))}
               </ul>
             </Card>
+          )}
+
+          {/* Barra das ações em lote (RF37): fica presa no pé da tela. */}
+          {selecionando && (
+            <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-2xl border border-borda bg-superficie p-3 shadow-flutuante sm:flex-row sm:items-center sm:p-3.5">
+              <p className="flex items-center gap-2 px-1 text-[14px] font-semibold text-forte" role="status">
+                <UserCog className="size-4 text-primaria-texto" aria-hidden="true" />
+                {visiveisMarcadas.length === 1 ? '1 selecionada' : `${visiveisMarcadas.length} selecionadas`}
+              </p>
+              <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                <Label htmlFor="lote-resp" className="sm:sr-only">
+                  Novo responsável
+                </Label>
+                <SelectRico
+                  id="lote-resp"
+                  valor={novoResponsavel}
+                  aoMudar={setNovoResponsavel}
+                  placeholder="Passar para..."
+                  className="sm:w-[260px]"
+                  opcoes={[OPCAO_A_DEFINIR, ...opcoesMembros(membros, { voceId: membroAtivo?.id })]}
+                />
+                <Button onClick={aplicarResponsavel} disabled={!novoResponsavel || visiveisMarcadas.length === 0}>
+                  Trocar responsável
+                </Button>
+                <Button variante="fantasma" onClick={fecharSelecao}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}

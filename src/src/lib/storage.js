@@ -13,6 +13,8 @@ export const CHAVES = {
   conquistas: 'conquistasMembro',
   // RF31: eventos do grupo (prova, palestra, apresentação...).
   eventos: 'eventos',
+  // RF35: o perfil da conta. No modo de demonstração, um só ({ id: 'demo' }).
+  perfis: 'perfis',
   sessao: 'sessao',
   versao: 'versaoDados',
 };
@@ -110,6 +112,11 @@ export function salvarVersaoDados(versao) {
     /* silencioso de propósito */
   }
 }
+
+// Sem conta, quem usa o sistema é sempre a mesma pessoa: o "usuário" da
+// demonstração. É com este id que os membros dela ficam marcados
+// (`usuarioId`), como a conta faz com o banco.
+export const USUARIO_DEMO = 'demo';
 
 // Gera ids únicos. Usa crypto.randomUUID quando disponível (como sugere a doc),
 // com um fallback simples para ambientes sem suporte.

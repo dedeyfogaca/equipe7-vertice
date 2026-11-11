@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, LogOut, Sparkles, UsersRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, LogOut, Sparkles, UserRound, UsersRound } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
@@ -22,20 +22,24 @@ import { CampoFoto } from '../../components/ui/editor-foto.jsx';
 import { MarcaVertice } from '../../components/ui/marca.jsx';
 import { useTransicaoGrupo } from '../../components/layout/TransicaoGrupo.jsx';
 import { rotuloPerfil } from '../../lib/constants.js';
-import { gerarDadosExemplo } from '../../lib/seed.js';
+import { gerarDadosExemplo, gerarExemploPessoal } from '../../lib/seed.js';
 import { lerConvitePendente } from '../../lib/convite.js';
-import { semErros, validarGrupo } from '../../lib/validacao.js';
+import { semErros, validarGrupo, validarPerfil } from '../../lib/validacao.js';
 import { cn, plural, semErroEm } from '../../lib/utils.js';
 
-// Tela de acesso. Três situações:
+// Tela de acesso.
 //   * sem conta e fora da demonstração: login (RF27) ou "experimentar sem conta";
-//   * com conta: os grupos da conta, o código de convite (RF28) e o cadastro
-//     de um grupo novo. Quem é a pessoa no grupo vem da própria conta;
-//   * demonstração: os grupos deste navegador e, depois de escolher o grupo,
-//     quem você é dentro dele (seleção, sem senha).
+//   * com conta: a pessoa vai direto para o espaço pessoal (RF34), que o
+//     banco cria no primeiro acesso. Os grupos, o convite e o grupo novo
+//     ficam no seletor de espaço, dentro do sistema;
+//   * demonstração, na primeira vez: o nome da pessoa, que cria o perfil e o
+//     espaço pessoal deste navegador (com ou sem dados de exemplo);
+//   * demonstração, num grupo antigo sem ninguém marcado: quem você é
+//     dentro dele (seleção, sem senha).
 //
-// Duas colunas: à esquerda os grupos que já existem, à direita o cadastro de
-// um grupo novo.
+// Se o espaço pessoal não abrir com conta (o banco ainda sem a atualização
+// de 11/11), sobra o acesso antigo: os grupos da conta, o código de convite
+// e o cadastro de um grupo novo, em duas colunas.
 
 const classeOpcao =
   'group flex w-full items-center gap-3 rounded-2xl border border-borda bg-superficie-2 p-3 text-left transition-colors hover:border-primaria-barra/60 hover:bg-superficie-3';
@@ -43,12 +47,19 @@ const classeOpcao =
 export default function Entrar() {
   const { autenticado, precisaIdentificar, grupoAtivo, membrosDoGrupoAtivo, entrar, identificar, sair } =
     useAuth();
-  const { grupos, membros, criarGrupo, importarExemplo, carregando } = useData();
+  const { grupos, membros, criarGrupo, importarExemplo, carregando, perfil, espacoPessoal, meuUsuarioId, criarEspacoPessoal } =
+    useData();
   const { modo, temBanco, verificando, usuario, nomeDaConta, sairDaConta, sairDaDemonstracao } = useConta();
   const comConta = modo === 'conta';
   const location = useLocation();
   const destino = location.state?.de || '/painel';
   useTitulo(precisaIdentificar ? 'Quem é você?' : 'Entrar');
+  // Demonstração sem perfil: a pessoa ainda não disse o nome.
+  const primeiraVezNaDemo = modo === 'demo' && !espacoPessoal;
+  // Dado antigo da demonstração: o membro marcado como a pessoa já tem nome.
+  const [nomeDemo, setNomeDemo] = useState(
+    () => membros.find((m) => m.usuarioId === meuUsuarioId)?.nome || ''
+  );
 
   const [form, setForm] = useState({ nome: '', criador: '', descricao: '', foto: '' });
   const [erros, setErros] = useState({});
@@ -63,7 +74,7 @@ export default function Entrar() {
 
   // Sessão completa: grupo escolhido e pessoa identificada. (Durante a
   // passagem para o painel, quem navega é a transição.)
-  if (autenticado && !precisaIdentificar && !emCurso) {
+  if (autenticado && !precisaIdentificar && !primeiraVezNaDemo && !emCurso) {
     return <Navigate to={destino} replace />;
   }
 
@@ -92,7 +103,7 @@ export default function Entrar() {
   // RF01: quem cria o grupo entra como o primeiro membro e organizador.
   const criar = (evento) => {
     evento.preventDefault();
-    const novosErros = validarGrupo(form);
+    const novosErros = validarGrupo(form, { exigirCriador: !perfil });
     setErros(novosErros);
     if (!semErros(novosErros)) {
       document.getElementById(novosErros.nome ? 'nome' : 'criador')?.focus();
@@ -102,8 +113,8 @@ export default function Entrar() {
     abrir(
       dados.nome.trim(),
       () => {
-        const { grupo, membro } = criarGrupo(dados);
-        entrar(grupo.id, membro.id);
+        const { grupo } = criarGrupo(dados);
+        entrar(grupo.id);
         toast.success('Grupo criado', { description: `Você é o organizador de ${grupo.nome}.` });
       },
       '/painel'
@@ -111,9 +122,33 @@ export default function Entrar() {
   };
 
   const carregarExemplo = () => {
-    const pacote = gerarDadosExemplo();
+    const pacote = gerarDadosExemplo({ usuarioId: meuUsuarioId });
     importarExemplo(pacote);
     entrar(pacote.grupo.id);
+  };
+
+  // RF34 na demonstração: o nome cria o perfil e o espaço pessoal. Com os
+  // exemplos, entram também algumas atividades do dia a dia e o grupo de
+  // exemplo, em que a pessoa é a organizadora.
+  const comecarDemo = (comExemplos) => {
+    const novosErros = validarPerfil({ nome: nomeDemo });
+    setErros(novosErros);
+    if (!semErros(novosErros)) {
+      document.getElementById('nome-demo')?.focus();
+      return;
+    }
+    abrir(
+      'seu espaço',
+      () => {
+        const { grupo, membro } = criarEspacoPessoal({ nome: nomeDemo });
+        if (comExemplos) {
+          importarExemplo(gerarExemploPessoal({ grupoId: grupo.id, membroId: membro.id }));
+          importarExemplo(gerarDadosExemplo({ usuarioId: meuUsuarioId }));
+        }
+        entrar(grupo.id);
+      },
+      '/painel'
+    );
   };
 
   return (
@@ -150,18 +185,28 @@ export default function Entrar() {
         id="conteudo"
         className={cn(
           'relative mx-auto flex w-full flex-1 justify-center px-4 pb-16 pt-6',
-          precisaIdentificar && modo ? 'max-w-[492px] sm:items-center sm:pt-2' : 'max-w-[1080px] lg:pt-10'
+          (precisaIdentificar || primeiraVezNaDemo) && modo
+            ? 'max-w-[492px] sm:items-center sm:pt-2'
+            : 'max-w-[1080px] lg:pt-10'
         )}
       >
         <div className="w-full">
           <div className="mb-7 text-center">
             <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.04em] text-forte">
-              {!modo ? 'Entre no Vértice' : precisaIdentificar ? 'Quem é você?' : 'Acesse seu grupo'}
+              {!modo
+                ? 'Entre no Vértice'
+                : primeiraVezNaDemo
+                  ? 'Como podemos te chamar?'
+                  : precisaIdentificar
+                    ? 'Quem é você?'
+                    : 'Acesse seu grupo'}
             </h1>
             <p className="mt-2 text-balance text-[15px] text-sutil">
               {!modo
                 ? 'Com a sua conta, o grupo inteiro vê as mesmas disciplinas, atividades e eventos.'
-                : precisaIdentificar
+                : primeiraVezNaDemo
+                  ? 'Você ganha um espaço pessoal para organizar o que é só seu. Os grupos vêm depois.'
+                  : precisaIdentificar
                   ? 'Escolha o seu nome para entrar. É ele que decide o que você pode gerenciar.'
                   : comConta
                     ? 'Entre num grupo seu, use um código de convite ou crie um grupo novo.'
@@ -185,6 +230,42 @@ export default function Entrar() {
 
           {!modo ? (
             <PainelLogin convite={Boolean(lerConvitePendente())} />
+          ) : primeiraVezNaDemo ? (
+            <Card className="p-6 shadow-flutuante sm:p-7">
+              <form
+                noValidate
+                onSubmit={(evento) => {
+                  evento.preventDefault();
+                  comecarDemo(false);
+                }}
+                className="flex flex-col gap-4"
+              >
+                <Field id="nome-demo" label="Seu nome" obrigatorio erro={erros.nome}>
+                  <Input
+                    value={nomeDemo}
+                    onChange={(evento) => {
+                      setNomeDemo(evento.target.value);
+                      setErros((atual) => semErroEm(atual, 'nome'));
+                    }}
+                    placeholder="Ex.: Ana Souza"
+                    autoComplete="name"
+                    autoFocus
+                  />
+                </Field>
+                <Button type="submit" tamanho="lg" className="w-full">
+                  <UserRound aria-hidden="true" />
+                  Começar
+                </Button>
+                <Button type="button" variante="secundaria" className="w-full" onClick={() => comecarDemo(true)}>
+                  <Sparkles aria-hidden="true" />
+                  Começar com dados de exemplo
+                </Button>
+                <p className="text-center text-[13px] leading-relaxed text-sutil">
+                  Com os exemplos, você ganha algumas atividades do dia a dia e um grupo de TCC pronto, em que você é o
+                  organizador.
+                </p>
+              </form>
+            </Card>
           ) : precisaIdentificar ? (
             <Card className="p-6 shadow-flutuante sm:p-7">
               <p className="mb-3 text-sm text-sutil">
@@ -212,7 +293,7 @@ export default function Entrar() {
               </ul>
               <div className="mt-5 text-center">
                 <Button variante="link" onClick={sair}>
-                  Trocar de grupo
+                  {espacoPessoal ? 'Voltar ao espaço pessoal' : 'Trocar de grupo'}
                 </Button>
               </div>
             </Card>
@@ -297,14 +378,16 @@ export default function Entrar() {
                       autoComplete="off"
                     />
                   </Field>
-                  <Field id="criador" label="Seu nome" obrigatorio erro={erros.criador}>
-                    <Input
-                      value={form.criador}
-                      onChange={atualizarCampo('criador')}
-                      placeholder="Ex.: Ana Souza"
-                      autoComplete="name"
-                    />
-                  </Field>
+                  {!perfil && (
+                    <Field id="criador" label="Seu nome" obrigatorio erro={erros.criador}>
+                      <Input
+                        value={form.criador}
+                        onChange={atualizarCampo('criador')}
+                        placeholder="Ex.: Ana Souza"
+                        autoComplete="name"
+                      />
+                    </Field>
+                  )}
                   <Field id="descricao" label="Descrição" dica="Opcional. Uma linha sobre o grupo.">
                     <Input
                       value={form.descricao}

@@ -17,22 +17,28 @@ import { ddmm } from '../../lib/formatos.js';
  * confirmação. Devolve as ações e os elementos a renderizar (`janelas`).
  */
 export function useEventos() {
-  const { grupoAtivo, membroAtivo } = useAuth();
-  const { criarEvento, atualizarEvento, removerEvento, disciplinasDoGrupo } = useData();
+  const { grupoAtivo } = useAuth();
+  const { criarEvento, atualizarEvento, removerEvento, disciplinasDoGrupo, grupos, meusMembros, meuMembroEm } = useData();
   const { podeEditarEvento } = usePermissoes();
 
   // `formulario`: null, { data } (novo) ou { evento } (edição).
   const [formulario, setFormulario] = useState(null);
   const [removendo, setRemovendo] = useState(null);
-  const disciplinas = disciplinasDoGrupo(grupoAtivo.id);
+  // RF34: o evento novo pode ir para o espaço pessoal ou para um dos grupos.
+  const espacos = grupos.filter((g) => meusMembros.some((m) => m.grupoId === g.id));
 
   const salvar = (dados) => {
     if (formulario?.evento) {
-      atualizarEvento(formulario.evento.id, dados);
+      const { grupoId: _mesmoGrupo, ...resto } = dados;
+      atualizarEvento(formulario.evento.id, resto);
       toast.success('Evento atualizado', { description: dados.titulo.trim() });
     } else {
-      const novo = criarEvento({ ...dados, grupoId: grupoAtivo.id, criadoPor: membroAtivo?.id ?? '' });
-      toast.success('Evento cadastrado', { description: `${novo.titulo}, ${ddmm(novo.data)}` });
+      const grupoId = dados.grupoId || grupoAtivo.id;
+      const novo = criarEvento({ ...dados, grupoId, criadoPor: meuMembroEm(grupoId)?.id ?? '' });
+      const outro = grupoId !== grupoAtivo.id ? grupos.find((g) => g.id === grupoId) : null;
+      toast.success('Evento cadastrado', {
+        description: `${novo.titulo}, ${ddmm(novo.data)}${outro ? `, em ${outro.pessoal ? 'Pessoal' : outro.nome}` : ''}`,
+      });
     }
     setFormulario(null);
   };
@@ -74,14 +80,16 @@ export function useEventos() {
           aoMudar={(abrir) => !abrir && setFormulario(null)}
           evento={formulario.evento}
           dataInicial={formulario.data}
-          disciplinas={disciplinas}
+          grupoInicial={grupoAtivo.id}
+          espacos={espacos}
+          disciplinasDe={disciplinasDoGrupo}
           aoSalvar={salvar}
         />
       )}
       <Confirmacao
         aberto={Boolean(removendo)}
         titulo="Excluir evento?"
-        mensagem={removendo ? `${removendo.titulo} (${ddmm(removendo.data)}) sai do calendário do grupo.` : ''}
+        mensagem={removendo ? `${removendo.titulo} (${ddmm(removendo.data)}) sai do calendário.` : ''}
         textoConfirmar="Excluir"
         perigo
         onConfirmar={confirmarRemocao}

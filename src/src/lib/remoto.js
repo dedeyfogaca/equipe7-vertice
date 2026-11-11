@@ -9,6 +9,9 @@
 // seguem do grupo para as conquistas (pai antes do filho) e as exclusões, ao
 // contrário. Quando o pai sai, os filhos não são excluídos um a um: o banco
 // já os leva junto (ON DELETE CASCADE).
+//
+// O perfil da conta (RF35) é criado pelo banco, no primeiro acesso
+// (garantir_espaco_pessoal): o sistema só o lê e altera.
 
 const vazio = (valor) => (valor === '' || valor === undefined ? null : valor);
 const texto = (valor) => valor ?? '';
@@ -25,6 +28,7 @@ export const COLECOES = [
       nome: g.nome,
       descricao: vazio(g.descricao),
       foto: vazio(g.foto),
+      pessoal: Boolean(g.pessoal),
       data_criacao: g.criadoEm,
     }),
     deLinha: (r) => ({
@@ -32,7 +36,31 @@ export const COLECOES = [
       nome: r.nome,
       descricao: texto(r.descricao),
       foto: texto(r.foto),
+      pessoal: Boolean(r.pessoal),
       criadoEm: r.data_criacao,
+    }),
+  },
+  {
+    chave: 'perfis',
+    tabela: 'perfil',
+    colunas: ['id_usuario'],
+    idDe: (p) => p.id,
+    paraLinha: (p) => ({
+      id_usuario: p.id,
+      nome: p.nome,
+      avatar: vazio(p.avatar),
+      estilo_avatar: p.estiloAvatar,
+      foto: vazio(p.foto),
+      lembrete_email: Boolean(p.lembreteEmail),
+    }),
+    deLinha: (r) => ({
+      id: r.id_usuario,
+      nome: r.nome,
+      avatar: texto(r.avatar),
+      estiloAvatar: r.estilo_avatar,
+      foto: texto(r.foto),
+      lembreteEmail: Boolean(r.lembrete_email),
+      grupoPessoalId: texto(r.id_grupo_pessoal),
     }),
   },
   {
@@ -112,13 +140,19 @@ export const COLECOES = [
     chave: 'atividades',
     tabela: 'atividade',
     colunas: ['id_atividade'],
-    pai: { chave: 'disciplinas', campo: 'disciplinaId' },
+    // sai junto com o grupo ou com a disciplina
+    pai: [
+      { chave: 'grupos', campo: 'grupoId' },
+      { chave: 'disciplinas', campo: 'disciplinaId' },
+    ],
     idDe: (a) => a.id,
     paraLinha: (a) => ({
       id_atividade: a.id,
-      id_disciplina: a.disciplinaId,
+      id_grupo: a.grupoId,
+      id_disciplina: vazio(a.disciplinaId),
       id_conteudo: vazio(a.conteudoId),
-      id_responsavel: a.responsavelId,
+      // vazio = "A definir" (RN06)
+      id_responsavel: vazio(a.responsavelId),
       titulo: a.titulo,
       descricao: vazio(a.descricao),
       prazo: a.prazo,
@@ -130,9 +164,10 @@ export const COLECOES = [
     }),
     deLinha: (r) => ({
       id: r.id_atividade,
-      disciplinaId: r.id_disciplina,
+      grupoId: r.id_grupo,
+      disciplinaId: texto(r.id_disciplina),
       conteudoId: texto(r.id_conteudo),
-      responsavelId: r.id_responsavel,
+      responsavelId: texto(r.id_responsavel),
       titulo: r.titulo,
       descricao: texto(r.descricao),
       prazo: r.prazo,
@@ -157,6 +192,7 @@ export const COLECOES = [
       titulo: e.titulo,
       tipo: e.tipo,
       data_evento: e.data,
+      data_fim: e.dataFim && e.dataFim !== e.data ? e.dataFim : null,
       hora_inicio: vazio(e.horaInicio),
       hora_fim: vazio(e.horaFim),
       local_evento: vazio(e.local),
@@ -171,6 +207,7 @@ export const COLECOES = [
       titulo: r.titulo,
       tipo: r.tipo,
       data: r.data_evento,
+      dataFim: texto(r.data_fim),
       horaInicio: hora(r.hora_inicio),
       horaFim: hora(r.hora_fim),
       local: texto(r.local_evento),
@@ -188,6 +225,16 @@ export const COLECOES = [
     deLinha: (r) => ({ membroId: r.id_membro, codigo: r.codigo_conquista, obtidaEm: r.data_obtencao }),
   },
 ];
+
+/**
+ * Cria, se ainda não existir, o espaço pessoal e o perfil da conta (RF34,
+ * RF35). Devolve o id do espaço pessoal.
+ */
+export async function garantirEspacoPessoal(cliente) {
+  const { data, error } = await cliente.rpc('garantir_espaco_pessoal');
+  if (error) throw error;
+  return data;
+}
 
 /** Lê tudo o que a conta pode ver (o banco já filtra pelos grupos dela, RN01). */
 export async function carregarTudo(cliente) {
@@ -261,11 +308,12 @@ export async function aplicar(cliente, mudancas) {
   COLECOES.forEach((c) => {
     saindo[c.chave] = new Set((mudancas[c.chave]?.excluir || []).map(c.idDe));
   });
+  const paisDe = (c) => (Array.isArray(c.pai) ? c.pai : c.pai ? [c.pai] : []);
   for (const c of [...COLECOES].reverse()) {
     const m = mudancas[c.chave];
     if (!m) continue;
     for (const obj of m.excluir) {
-      if (c.pai && saindo[c.pai.chave].has(obj[c.pai.campo])) continue;
+      if (paisDe(c).some((p) => saindo[p.chave].has(obj[p.campo]))) continue;
       const linha = c.paraLinha(obj);
       const { data, error } = await ondeChave(cliente.from(c.tabela).delete(), c, linha).select(c.colunas[0]);
       if (error) throw error;
@@ -283,6 +331,10 @@ export function mensagemDoErro(erro) {
   if (/uk_disciplina_nome/.test(msg)) return 'Este grupo já tem uma disciplina com esse nome.';
   if (/uk_conteudo_nome/.test(msg)) return 'Esta disciplina já tem um conteúdo com esse nome.';
   if (/atividade_id_responsavel_fkey/.test(msg)) return 'Passe as atividades desse membro para outra pessoa antes.';
+  if (/ck_atividade_a_definir/.test(msg)) return 'Escolha quem vai fazer antes de mudar o status.';
+  if (/garantir_espaco_pessoal|id_grupo|column .* does not exist|PGRST202/i.test(msg) || erro?.code === 'PGRST202') {
+    return 'O banco ainda não recebeu a atualização de 11/11. Rode o script de atualização no Supabase.';
+  }
   if (/Failed to fetch|NetworkError|network/i.test(msg)) return 'Sem conexão com o servidor. Confira a internet e tente de novo.';
   // As regras do próprio banco já respondem em português (ver o script de criação do banco).
   if (/[áéíóúãõç]/i.test(msg)) return msg;

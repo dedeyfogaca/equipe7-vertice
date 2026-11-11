@@ -18,13 +18,16 @@ import { semErroEm } from '../../lib/utils.js';
  * escolhida passa pelo editor, onde a pessoa enquadra antes de salvar.
  *
  * - `membro` vazio: cadastro; preenchido: edição.
- * - `proprioPerfil`: o participante editando a si mesmo. Ele troca nome,
- *   foto e contato, mas não o perfil (RN07).
+ * - `proprioPerfil`: o participante editando a si mesmo. Ele troca a
+ *   função e o contato, mas não o perfil (RN07).
+ * - Membro ligado a uma conta: o nome, o avatar e a foto vêm do perfil da
+ *   conta (RF35) e valem em todos os grupos; aqui não se mudam.
  *
  * Monte com `key` para reiniciar o formulário.
  */
 export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = false, aoSalvar }) {
   const edicao = Boolean(membro);
+  const vinculado = Boolean(membro?.usuarioId);
   // RN07: o primeiro membro de um grupo vazio é o organizador (D01).
   const primeiroDoGrupo = !edicao && membros.length === 0;
 
@@ -52,17 +55,16 @@ export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = f
     setErros(novosErros);
     if (!semErros(novosErros)) return;
     aoSalvar({
-      nome: form.nome.trim(),
+      ...(vinculado
+        ? {}
+        : { nome: form.nome.trim(), avatar: form.avatar, estiloAvatar: form.estiloAvatar, foto: form.foto }),
       funcao: form.funcao.trim(),
       email: form.email.trim(),
-      avatar: form.avatar,
-      estiloAvatar: form.estiloAvatar,
-      foto: form.foto,
       ...(proprioPerfil ? {} : { perfil: form.perfil }),
     });
   };
 
-  const titulo = proprioPerfil ? 'Editar meu perfil' : edicao ? 'Editar membro' : 'Adicionar membro';
+  const titulo = proprioPerfil ? 'Meus dados no grupo' : edicao ? 'Editar membro' : 'Adicionar membro';
 
   return (
     <Dialogo
@@ -71,7 +73,7 @@ export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = f
       titulo={titulo}
       descricao={
         proprioPerfil
-          ? 'Seu nome e sua foto aparecem nas atividades em que você é responsável.'
+          ? 'A função e o contato valem só neste grupo.'
           : 'Quem entra no grupo pode ser responsável pelas atividades.'
       }
       largura={560}
@@ -87,33 +89,47 @@ export function FormMembro({ aberto, aoMudar, membro, membros, proprioPerfil = f
       }
     >
       <form id="form-membro" onSubmit={enviar} noValidate className="flex flex-col gap-5">
-        <CampoFoto
-          id="foto"
-          foto={form.foto}
-          aoMudar={(foto) => setForm((atual) => ({ ...atual, foto }))}
-          previa={
-            <Avatar nome={form.nome || 'Novo membro'} seed={form.avatar} estilo={form.estiloAvatar} foto={form.foto} tamanho={72} />
-          }
-          dica={`JPG, PNG ou WebP, até ${FOTO.TAMANHO_MAXIMO_MB} MB. Você enquadra a foto antes de salvar. Sem foto, vale o avatar.`}
-        />
+        {vinculado ? (
+          <div className="flex items-center gap-3 rounded-2xl border border-borda bg-superficie-2 p-3">
+            <Avatar membro={membro} tamanho={48} decorativo />
+            <p className="min-w-0 text-[14px] leading-snug text-sutil">
+              <strong className="block truncate font-semibold text-forte">{membro.nome}</strong>
+              {proprioPerfil
+                ? 'Seu nome e sua foto mudam em Meu perfil e valem em todos os grupos.'
+                : 'O nome e a foto vêm do perfil da conta dessa pessoa.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <CampoFoto
+              id="foto"
+              foto={form.foto}
+              aoMudar={(foto) => setForm((atual) => ({ ...atual, foto }))}
+              previa={
+                <Avatar nome={form.nome || 'Novo membro'} seed={form.avatar} estilo={form.estiloAvatar} foto={form.foto} tamanho={72} />
+              }
+              dica={`JPG, PNG ou WebP, até ${FOTO.TAMANHO_MAXIMO_MB} MB. Você enquadra a foto antes de salvar. Sem foto, vale o avatar.`}
+            />
 
-        <SeletorAvatar
-          semente={form.avatar}
-          estilo={form.estiloAvatar}
-          temFoto={Boolean(form.foto)}
-          aoEscolherEstilo={(estiloAvatar) => setForm((atual) => ({ ...atual, estiloAvatar }))}
-          aoSortear={() => setForm((atual) => ({ ...atual, avatar: novaSeedAvatar() }))}
-        />
+            <SeletorAvatar
+              semente={form.avatar}
+              estilo={form.estiloAvatar}
+              temFoto={Boolean(form.foto)}
+              aoEscolherEstilo={(estiloAvatar) => setForm((atual) => ({ ...atual, estiloAvatar }))}
+              aoSortear={() => setForm((atual) => ({ ...atual, avatar: novaSeedAvatar() }))}
+            />
 
-        <Field id="nome-membro" label="Nome" obrigatorio erro={erros.nome}>
-          <Input
-            value={form.nome}
-            onChange={atualizarCampo('nome')}
-            placeholder="Ex.: Ana Souza"
-            autoComplete="off"
-            autoFocus
-          />
-        </Field>
+            <Field id="nome-membro" label="Nome" obrigatorio erro={erros.nome}>
+              <Input
+                value={form.nome}
+                onChange={atualizarCampo('nome')}
+                placeholder="Ex.: Ana Souza"
+                autoComplete="off"
+                autoFocus
+              />
+            </Field>
+          </>
+        )}
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Field id="funcao" label="Função no grupo" dica="Opcional.">

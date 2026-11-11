@@ -8,8 +8,10 @@
 
 export const ehFotoNova = (foto) => typeof foto === 'string' && foto.startsWith('data:');
 
+// A foto do perfil (RF35) fica na pasta do espaço pessoal da conta.
 const COLECOES_COM_FOTO = {
   grupos: { prefixo: 'grupo', grupoDe: (o) => o.id },
+  perfis: { prefixo: 'perfil', grupoDe: (o) => o.grupoPessoalId },
   membros: { prefixo: 'membro', grupoDe: (o) => o.grupoId },
 };
 

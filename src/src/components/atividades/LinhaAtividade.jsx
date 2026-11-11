@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
-import { CalendarDays, Check, UserRound } from 'lucide-react';
+import { toast } from 'sonner';
+import { CalendarDays, Check, Hand, UserRound } from 'lucide-react';
 
+import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
 import { usePermissoes } from '../../hooks/usePermissoes.js';
 import { Avatar } from '../ui/avatar-membro.jsx';
@@ -11,24 +13,46 @@ import { STATUS } from '../../lib/constants.js';
 import { etiquetaPrazo, tomDaAtividade } from '../../lib/formatos.js';
 import { cn, primeiroNome } from '../../lib/utils.js';
 
+// Onde a atividade está: no espaço pessoal aparecem também as dos grupos
+// (RF34), e aí o nome do grupo vai na frente.
+export function trilhaEmTexto({ grupo, disciplina, conteudo }, grupoAtivoId) {
+  const doOutroEspaco = grupo && grupo.id !== grupoAtivoId && !grupo.pessoal;
+  const partes = [doOutroEspaco ? grupo.nome : null, disciplina?.nome ?? (grupo?.pessoal ? null : 'Sem disciplina')]
+    .filter(Boolean)
+    .join(' · ');
+  const texto = `${partes}${conteudo ? ` › ${conteudo.nome}` : ''}`;
+  return texto || 'Pessoal';
+}
+
 /**
  * Uma atividade numa lista: peso, cor da disciplina, título, trilha
- * (disciplina › conteúdo), prazo e responsável. A linha inteira leva ao
- * detalhe.
+ * (grupo · disciplina › conteúdo), prazo e responsável. A linha inteira leva
+ * ao detalhe.
  *
  * Com `aoAlternar`, a linha ganha o botão de concluir na frente, ativo só
  * nas atividades de quem está usando (RN20). Nas dos outros, o círculo só
- * mostra a situação.
+ * mostra a situação. A atividade "A definir" (RN06) mostra o botão Assumir
+ * no lugar do responsável.
+ *
+ * Com `selecao` ({ marcada, aoMarcar }), o círculo vira uma caixa de marcar,
+ * para as ações em lote (RF37).
  */
-export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
-  const { trilhaDaAtividade, membros } = useData();
-  const { podeMudarStatus } = usePermissoes();
+export function LinhaAtividade({ atividade, feriado, aoAlternar, selecao, className }) {
+  const { trilhaDaAtividade, membros, grupos, assumirAtividade } = useData();
+  const { grupoAtivo } = useAuth();
+  const { podeMudarStatus, podeAssumir } = usePermissoes();
   const { conteudo, disciplina } = trilhaDaAtividade(atividade);
+  const grupo = grupos.find((g) => g.id === atividade.grupoId) || null;
   const responsavel = membros.find((m) => m.id === atividade.responsavelId) || null;
   const concluida = atividade.status === STATUS.CONCLUIDO;
   const tom = tomDaAtividade(atividade);
   const etiqueta = etiquetaPrazo(atividade);
   const cor = disciplina?.cor || 'var(--borda-forte)';
+  const aDefinir = !atividade.responsavelId;
+
+  const assumir = () => {
+    if (assumirAtividade(atividade.id)) toast.success('Atividade assumida', { description: `${atividade.titulo} agora é sua.` });
+  };
 
   const selos = (
     <>
@@ -51,7 +75,15 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
         className
       )}
     >
-      {aoAlternar && podeMudarStatus(atividade) ? (
+      {selecao ? (
+        <input
+          type="checkbox"
+          checked={selecao.marcada}
+          onChange={() => selecao.aoMarcar(atividade.id)}
+          aria-label={`Selecionar ${atividade.titulo}`}
+          className="relative z-10 size-[22px] shrink-0 cursor-pointer rounded-md accent-primaria-barra"
+        />
+      ) : aoAlternar && podeMudarStatus(atividade) ? (
         <button
           type="button"
           aria-pressed={concluida}
@@ -67,11 +99,19 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
           <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
         </button>
       ) : aoAlternar ? (
-        // Atividade de outra pessoa: o mesmo círculo, sem ação.
+        // Atividade de outra pessoa (ou "A definir"): o mesmo círculo, sem ação.
         <span
           role="img"
-          aria-label={`${concluida ? 'Concluída' : 'Não concluída'}. Só ${responsavel ? primeiroNome(responsavel.nome) : 'o responsável'} muda o status.`}
-          title={`Só ${responsavel ? primeiroNome(responsavel.nome) : 'o responsável'} muda o status`}
+          aria-label={
+            aDefinir
+              ? 'Não concluída. Assuma a atividade para poder concluir.'
+              : `${concluida ? 'Concluída' : 'Não concluída'}. Só ${responsavel ? primeiroNome(responsavel.nome) : 'o responsável'} muda o status.`
+          }
+          title={
+            aDefinir
+              ? 'Assuma a atividade para poder concluir'
+              : `Só ${responsavel ? primeiroNome(responsavel.nome) : 'o responsável'} muda o status`
+          }
           className={cn(
             'relative z-10 flex size-[26px] shrink-0 cursor-not-allowed items-center justify-center rounded-full border-2',
             concluida ? 'border-concluido/50 bg-concluido/50 text-fundo' : 'border-dashed border-borda-forte'
@@ -96,8 +136,7 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
           {atividade.titulo}
         </Link>
         <p className="mt-0.5 truncate text-[13px] text-sutil">
-          {disciplina?.nome ?? 'Sem disciplina'}
-          {conteudo ? ` › ${conteudo.nome}` : ''}
+          {trilhaEmTexto({ grupo, disciplina, conteudo }, grupoAtivo?.id)}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:hidden">{selos}</div>
       </div>
@@ -108,13 +147,22 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, className }) {
 
       {responsavel ? (
         <Avatar membro={responsavel} tamanho={30} className="relative z-10" />
+      ) : podeAssumir(atividade) && !selecao ? (
+        <button
+          type="button"
+          onClick={assumir}
+          className="relative z-10 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-primaria-barra/40 bg-primaria-barra/10 px-3 text-[13px] font-semibold text-primaria-texto transition-colors hover:bg-primaria-barra/20"
+        >
+          <Hand className="size-3.5" aria-hidden="true" />
+          Assumir
+        </button>
       ) : (
-        // Só acontece com dado antigo (RN06): um círculo vazio, e não um
-        // avatar, para não parecer que existe um membro chamado assim (D03).
+        // "A definir" (RN06): um círculo vazio, e não um avatar, para não
+        // parecer que existe um membro chamado assim (D03).
         <span
           role="img"
-          aria-label="Sem responsável"
-          title="Sem responsável"
+          aria-label="Responsável a definir"
+          title="Responsável a definir"
           className="relative z-10 inline-flex size-[30px] shrink-0 items-center justify-center rounded-full border border-dashed border-borda-forte text-apagado"
         >
           <UserRound className="size-4" aria-hidden="true" />

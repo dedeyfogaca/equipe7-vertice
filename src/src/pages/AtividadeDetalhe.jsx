@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, CalendarDays, Check, CircleHelp, Lock, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Check, CircleHelp, Hand, Lock, Pencil, Trash2, UserRound } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -15,6 +15,7 @@ import { Confirmacao } from '../components/ui/dialogo.jsx';
 import { SelectRico } from '../components/ui/selecao.jsx';
 import { OPCOES_STATUS } from '../components/opcoes.jsx';
 import { AnelPeso, BarraProgresso } from '../components/ui/progresso.jsx';
+import { AvatarGrupo } from '../components/ui/avatar-grupo.jsx';
 import { RetornoConclusao } from '../components/atividades/RetornoConclusao.jsx';
 import {
   normalizarPeso,
@@ -49,14 +50,16 @@ function Dado({ rotulo, children }) {
 export default function AtividadeDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { grupoAtivo } = useAuth();
-  const { podeMudarStatus, podeEditar, podeExcluir: podeExcluirAtividade } = usePermissoes();
+  const { grupoAtivo, noEspacoPessoal } = useAuth();
+  const { podeMudarStatus, podeEditar, podeExcluir: podeExcluirAtividade, podeAssumir } = usePermissoes();
   const {
     obterAtividade,
     atualizarAtividade,
     removerAtividade,
+    assumirAtividade,
     membrosDoGrupo,
-    disciplinasDoGrupo,
+    meuMembroEm,
+    grupos,
     trilhaDaAtividade,
     progressoDoConteudo,
     progressoDaDisciplina,
@@ -64,12 +67,17 @@ export default function AtividadeDetalhe() {
   } = useData();
 
   const existente = obterAtividade(id);
-  // RN01: atividade de outro grupo é tratada como inexistente.
+  // RN01: atividade de outro grupo é tratada como inexistente. No espaço
+  // pessoal, também valem as dos grupos da pessoa (RF34).
   const atividade =
-    existente && disciplinasDoGrupo(grupoAtivo.id).some((d) => d.id === existente.disciplinaId) ? existente : null;
+    existente && (existente.grupoId === grupoAtivo.id || (noEspacoPessoal && meuMembroEm(existente.grupoId)))
+      ? existente
+      : null;
   useTitulo(atividade?.titulo ?? 'Atividade');
 
-  const membros = membrosDoGrupo(grupoAtivo.id);
+  const membros = membrosDoGrupo(atividade?.grupoId ?? grupoAtivo.id);
+  const grupoDaAtividade = grupos.find((g) => g.id === atividade?.grupoId) || null;
+  const deOutroGrupo = Boolean(grupoDaAtividade) && grupoDaAtividade.id !== grupoAtivo.id;
   const anos = useMemo(
     () => Array.from(new Set([new Date().getFullYear(), anoDaData(atividade?.prazo)].filter(Boolean))),
     [atividade?.prazo]
@@ -102,15 +110,21 @@ export default function AtividadeDetalhe() {
   const podeEditarEsta = podeEditar(atividade);
   const podeExcluir = podeExcluirAtividade(atividade);
   const nomeResponsavel = responsavel ? primeiroNome(responsavel.nome) : 'o responsável';
+  const aDefinir = !atividade.responsavelId;
+  const podeAssumirEsta = podeAssumir(atividade);
+  const assumir = () => {
+    if (assumirAtividade(atividade.id)) toast.success('Atividade assumida', { description: 'Agora ela é sua. Bom trabalho!' });
+  };
 
   // RF15: o que a conclusão desta atividade fez com o conteúdo (ou com a
   // disciplina, quando ela não está em conteúdo nenhum).
-  const depois = concluida
+  const temOndeMedir = Boolean(conteudo || disciplina);
+  const depois = concluida && temOndeMedir
     ? conteudo
       ? progressoDoConteudo(conteudo.id)
       : progressoDaDisciplina(atividade.disciplinaId)
     : null;
-  const antes = concluida ? progressoAntesDe(atividade) : null;
+  const antes = concluida && temOndeMedir ? progressoAntesDe(atividade) : null;
 
   const prazo = rotuloPrazo(atividade.prazo);
   const feriado = feriadoEm(atividade.prazo);
@@ -118,6 +132,16 @@ export default function AtividadeDetalhe() {
   const xp = xpPotencial(atividade);
 
   const mudarStatus = (status) => atualizarAtividade(atividade.id, { status });
+  // Concluir pelo botão tem "Desfazer", como na lista: um clique por engano
+  // se desfaz na hora (e a conquista sai junto, RN12).
+  const concluir = () => {
+    const anterior = atividade.status;
+    mudarStatus(STATUS.CONCLUIDO);
+    toast.success('Atividade concluída', {
+      description: `+${xp} XP para você`,
+      action: { label: 'Desfazer', onClick: () => atualizarAtividade(atividade.id, { status: anterior }) },
+    });
+  };
 
   const excluir = () => {
     removerAtividade(atividade.id);
@@ -148,6 +172,13 @@ export default function AtividadeDetalhe() {
       <header className="mb-4 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-2">
           <p className="flex flex-wrap items-center gap-2 text-sm text-sutil">
+            {deOutroGrupo && (
+              <>
+                <AvatarGrupo grupo={grupoDaAtividade} tamanho={18} tom="neutro" />
+                <span className="font-medium">{grupoDaAtividade.pessoal ? 'Pessoal' : grupoDaAtividade.nome}</span>
+                {disciplina && <span aria-hidden="true">·</span>}
+              </>
+            )}
             {disciplina && (
               <>
                 <span aria-hidden="true" className="size-2.5 rounded-[3px]" style={{ background: disciplina.cor }} />
@@ -164,10 +195,19 @@ export default function AtividadeDetalhe() {
           </h1>
         </div>
         <div className="flex flex-wrap gap-2.5">
+          {podeAssumirEsta && (
+            <Button onClick={assumir}>
+              <Hand aria-hidden="true" />
+              Assumir atividade
+            </Button>
+          )}
+          {/* Antes era "Concluir", com destaque, logo depois de criar: parecia
+              o fim do cadastro (feedback dos testes, 11/11/2026). Agora diz o
+              que faz e tem o peso de um botão secundário. */}
           {!concluida && podeStatus && (
-            <Button onClick={() => mudarStatus(STATUS.CONCLUIDO)}>
+            <Button variante="secundaria" onClick={concluir}>
               <Check aria-hidden="true" />
-              Concluir
+              Marcar como concluída
             </Button>
           )}
           {podeEditarEsta && (
@@ -239,23 +279,46 @@ export default function AtividadeDetalhe() {
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[13px] text-sutil">
                     <Lock className="size-3.5" aria-hidden="true" />
-                    Só {nomeResponsavel} muda o status.
+                    {aDefinir ? 'Quem assumir a atividade muda o status.' : `Só ${nomeResponsavel} muda o status.`}
                   </span>
                 </span>
               )}
             </Dado>
 
-            <Dado rotulo="Responsável">
-              <span className="flex items-center gap-2.5">
-                <Avatar membro={responsavel} tamanho={34} decorativo />
-                <span className="flex flex-col">
-                  <span className="font-medium text-forte">{responsavel?.nome ?? 'Sem responsável'}</span>
-                  {responsavel && (
-                    <span className="text-[13px] text-sutil">{rotuloPerfil(responsavel.perfil)}</span>
-                  )}
-                </span>
-              </span>
-            </Dado>
+            {!grupoDaAtividade?.pessoal && (
+              <Dado rotulo="Responsável">
+                {responsavel ? (
+                  <span className="flex items-center gap-2.5">
+                    <Avatar membro={responsavel} tamanho={34} decorativo />
+                    <span className="flex flex-col">
+                      <span className="font-medium text-forte">{responsavel.nome}</span>
+                      <span className="text-[13px] text-sutil">{rotuloPerfil(responsavel.perfil)}</span>
+                    </span>
+                  </span>
+                ) : (
+                  <span className="flex flex-col gap-2.5">
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex size-[34px] shrink-0 items-center justify-center rounded-full border border-dashed border-borda-forte text-apagado"
+                      >
+                        <UserRound className="size-4" />
+                      </span>
+                      <span className="flex flex-col">
+                        <span className="font-medium text-forte">A definir</span>
+                        <span className="text-[13px] text-sutil">Visível para o grupo todo</span>
+                      </span>
+                    </span>
+                    {podeAssumirEsta && (
+                      <Button variante="secundaria" tamanho="sm" onClick={assumir} className="self-start">
+                        <Hand aria-hidden="true" />
+                        Assumir
+                      </Button>
+                    )}
+                  </span>
+                )}
+              </Dado>
+            )}
 
             <Dado rotulo="Prazo">
               <span className="flex flex-col gap-1">
@@ -295,7 +358,9 @@ export default function AtividadeDetalhe() {
                 <span className="text-[13px] text-sutil">
                   {concluida
                     ? `creditados a ${responsavel ? primeiroNome(responsavel.nome) : 'quem é responsável'}`
-                    : 'ao concluir'}
+                    : aDefinir
+                      ? 'para quem assumir e concluir'
+                      : 'ao concluir'}
                 </span>
               </span>
             </Dado>

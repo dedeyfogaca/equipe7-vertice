@@ -1,6 +1,7 @@
-import { Crown, SignalHigh, SignalLow, SignalMedium, UserRound } from 'lucide-react';
+import { Crown, House, SignalHigh, SignalLow, SignalMedium, UserRound } from 'lucide-react';
 
 import { Avatar } from './ui/avatar-membro.jsx';
+import { AvatarGrupo } from './ui/avatar-grupo.jsx';
 import { IconeOpcao, PontoCor } from './ui/selecao.jsx';
 import {
   PERFIL,
@@ -19,6 +20,32 @@ import { cn } from '../lib/utils.js';
 /** Disciplinas com o quadradinho da cor, como no "Progresso por disciplina". */
 export function opcoesDisciplinas(disciplinas) {
   return disciplinas.map((d) => ({ valor: d.id, rotulo: d.nome, icone: <PontoCor cor={d.cor} /> }));
+}
+
+// RN06: o responsável pode ficar "A definir". A lista de escolha não aceita
+// valor vazio como opção, então "A definir" tem um valor próprio, que o
+// formulário troca por vazio ao salvar.
+export const A_DEFINIR = 'a-definir';
+export const OPCAO_A_DEFINIR = {
+  valor: A_DEFINIR,
+  rotulo: 'A definir',
+  icone: (
+    <span
+      aria-hidden="true"
+      className="inline-flex size-[22px] shrink-0 items-center justify-center rounded-full border border-dashed border-borda-forte text-apagado"
+    >
+      <UserRound className="size-3" />
+    </span>
+  ),
+};
+
+/** Grupos (e o espaço pessoal) com a foto ou as iniciais. */
+export function opcoesGrupos(grupos) {
+  return grupos.map((g) => ({
+    valor: g.id,
+    rotulo: g.pessoal ? 'Pessoal' : g.nome,
+    icone: g.pessoal ? <IconeOpcao icone={House} /> : <AvatarGrupo grupo={g} tamanho={22} tom="neutro" />,
+  }));
 }
 
 /** Membros com a foto (ou o avatar sorteado). Quem está usando vem marcado. */

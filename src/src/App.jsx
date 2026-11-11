@@ -21,6 +21,8 @@ import AtividadeForm from './pages/AtividadeForm.jsx';
 import AtividadeDetalhe from './pages/AtividadeDetalhe.jsx';
 import Membros from './pages/Membros.jsx';
 import Conquistas from './pages/Conquistas.jsx';
+import Perfil from './pages/Perfil.jsx';
+import AtividadesEmLote from './pages/AtividadesEmLote.jsx';
 
 // Mapa de rotas.
 //
@@ -49,10 +51,12 @@ export default function App() {
             <Route path="/disciplina/:id" element={<DisciplinaDetalhe />} />
             <Route path="/atividades" element={<Atividades />} />
             <Route path="/atividade/nova" element={<AtividadeForm />} />
+            <Route path="/atividades/lote" element={<AtividadesEmLote />} />
             <Route path="/atividade/:id" element={<AtividadeDetalhe />} />
             <Route path="/atividade/:id/editar" element={<AtividadeForm />} />
             <Route path="/membros" element={<Membros />} />
             <Route path="/conquistas" element={<Conquistas />} />
+            <Route path="/perfil" element={<Perfil />} />
           </Route>
         </Route>
 

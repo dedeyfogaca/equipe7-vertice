@@ -1,6 +1,18 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, BookOpen, CalendarDays, Compass, LayoutDashboard, ListChecks, Trophy, Users, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  Compass,
+  House,
+  LayoutDashboard,
+  ListChecks,
+  Trophy,
+  Users,
+  X,
+} from 'lucide-react';
 
 import { useData } from '../../context/DataContext.jsx';
 import { Dialogo } from '../ui/dialogo.jsx';
@@ -17,9 +29,17 @@ const TutorialContext = createContext(null);
 function passos(comConta) {
   return [
     {
+      icone: House,
+      titulo: 'Seu espaço e seus grupos',
+      texto: comConta
+        ? 'Você entra no seu espaço pessoal: o que é só seu e o que está com você nos grupos. No seletor do alto, à esquerda, você abre um grupo, cria outro ou entra com um código de convite.'
+        : 'Você entra no seu espaço pessoal: o que é só seu e o que está com você nos grupos. No seletor do alto, à esquerda, você abre um grupo, cria outro ou carrega um grupo de exemplo.',
+      rota: '/painel',
+    },
+    {
       icone: LayoutDashboard,
       titulo: 'Painel',
-      texto: 'O resumo do grupo: o que vence logo, o progresso de cada disciplina, os próximos eventos e o seu ritmo.',
+      texto: 'O resumo do espaço aberto: o que vence logo, o progresso de cada disciplina, os próximos eventos e o seu ritmo.',
       rota: '/painel',
     },
     {
@@ -32,21 +52,23 @@ function passos(comConta) {
     {
       icone: ListChecks,
       titulo: 'Atividades',
-      texto: 'Toda atividade tem responsável, prazo e peso de 1 a 5. Só o responsável muda o status, e concluir mostra quanto o conteúdo avançou.',
+      texto:
+        'Toda atividade tem prazo e peso de 1 a 5. No grupo, ela tem responsável ou fica A definir até alguém assumir; só o responsável muda o status. Dá para cadastrar várias de uma vez e, no seu espaço, sem disciplina.',
       rota: '/atividades',
     },
     {
       icone: CalendarDays,
       titulo: 'Calendário e eventos',
-      texto: 'Prazos, provas, reuniões e palestras no mesmo calendário, com os feriados nacionais marcados.',
+      texto:
+        'Prazos, provas, reuniões e palestras no mesmo calendário, com os feriados nacionais marcados. A barra de filtros escolhe o que aparece; um evento pode durar vários dias.',
       rota: '/calendario',
     },
     {
       icone: Users,
       titulo: 'Membros',
       texto: comConta
-        ? 'O organizador gerencia o grupo e chama a turma pelo botão Convidar, com um link ou um código.'
-        : 'O organizador cadastra os membros e decide quem também organiza. Cada um pode editar o próprio perfil.',
+        ? 'Dentro de um grupo, o organizador gerencia a turma e chama o pessoal pelo botão Convidar, com um link ou um código. Seu nome e sua foto vêm de Meu perfil.'
+        : 'Dentro de um grupo, o organizador cadastra os membros e decide quem também organiza. Seu nome e sua foto vêm de Meu perfil.',
       rota: '/membros',
     },
     {

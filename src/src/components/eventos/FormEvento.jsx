@@ -6,7 +6,7 @@ import { Dialogo } from '../ui/dialogo.jsx';
 import { Field, Input, Textarea } from '../ui/campos.jsx';
 import { CampoData } from '../ui/campo-data.jsx';
 import { IconeOpcao, SelectRico } from '../ui/selecao.jsx';
-import { opcoesDisciplinas } from '../opcoes.jsx';
+import { opcoesDisciplinas, opcoesGrupos } from '../opcoes.jsx';
 import { iconeDoEvento } from './tipos.jsx';
 import { TIPO_EVENTO_OPCOES } from '../../lib/constants.js';
 import { semErros, validarEvento } from '../../lib/validacao.js';
@@ -17,13 +17,20 @@ const SEM_DISCIPLINA = '__sem-disciplina__';
 /**
  * Cadastro e edição de evento (RF31). Monte com `key` para reiniciar.
  * `dataInicial` vem do calendário, quando o evento nasce num dia escolhido.
+ *
+ * O evento pode durar vários dias (revisão de 11/11/2026): "Dura mais de um
+ * dia" abre o último dia. Na criação, `espacos` deixa escolher onde ele vai
+ * morar (o espaço pessoal ou um grupo, RF34); `disciplinasDe(grupoId)` dá a
+ * lista de disciplinas de cada lugar.
  */
-export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', disciplinas, aoSalvar }) {
+export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', grupoInicial, espacos = [], disciplinasDe, aoSalvar }) {
   const edicao = Boolean(evento);
   const [form, setForm] = useState(() => ({
+    grupoId: evento?.grupoId ?? grupoInicial,
     titulo: evento?.titulo ?? '',
     tipo: evento?.tipo ?? '',
     data: evento?.data ?? dataInicial,
+    dataFim: evento?.dataFim ?? '',
     horaInicio: evento?.horaInicio ?? '',
     horaFim: evento?.horaFim ?? '',
     local: evento?.local ?? '',
@@ -31,7 +38,9 @@ export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', discipli
     descricao: evento?.descricao ?? '',
   }));
   const [erros, setErros] = useState({});
+  const [variosDias, setVariosDias] = useState(() => Boolean(evento?.dataFim && evento.dataFim !== evento.data));
   const tipos = useRef([]);
+  const disciplinas = disciplinasDe(form.grupoId);
 
   const mudar = (campo, valor) => {
     setForm((atual) => ({
@@ -45,15 +54,17 @@ export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', discipli
 
   const enviar = (e) => {
     e.preventDefault();
-    const novosErros = validarEvento(form, { disciplinas });
+    const dados = { ...form, dataFim: variosDias ? form.dataFim : '' };
+    const novosErros = validarEvento(dados, { disciplinas });
+    if (variosDias && !form.dataFim) novosErros.dataFim = 'Escolha o último dia.';
     setErros(novosErros);
     if (!semErros(novosErros)) {
-      const primeiro = ['titulo', 'tipo', 'data', 'horaInicio', 'horaFim', 'local'].find((c) => novosErros[c]);
+      const primeiro = ['titulo', 'tipo', 'data', 'dataFim', 'horaInicio', 'horaFim', 'local'].find((c) => novosErros[c]);
       if (primeiro === 'tipo') tipos.current[0]?.focus();
       else document.getElementById(`evento-${primeiro}`)?.focus();
       return;
     }
-    aoSalvar(form);
+    aoSalvar(dados);
   };
 
   // Setas trocam o tipo, como num grupo de rádio.
@@ -91,6 +102,20 @@ export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', discipli
       }
     >
       <form id="form-evento" onSubmit={enviar} noValidate className="grid gap-5 sm:grid-cols-2">
+        {!edicao && espacos.length > 1 && (
+          <Field
+            id="evento-onde"
+            label="Onde"
+            dica={espacos.find((g) => g.id === form.grupoId)?.pessoal ? 'Só você vê.' : 'O grupo todo vê no calendário.'}
+            className="sm:col-span-2"
+          >
+            <SelectRico
+              valor={form.grupoId}
+              aoMudar={(grupoId) => setForm((atual) => ({ ...atual, grupoId, disciplinaId: '' }))}
+              opcoes={opcoesGrupos(espacos)}
+            />
+          </Field>
+        )}
         <Field id="evento-titulo" label="Nome" obrigatorio erro={erros.titulo} className="sm:col-span-2">
           <Input
             value={form.titulo}
@@ -147,14 +172,47 @@ export function FormEvento({ aberto, aoMudar, evento, dataInicial = '', discipli
           )}
         </div>
 
-        <Field id="evento-data" label="Dia" obrigatorio erro={erros.data} className="sm:col-span-2">
+        <Field
+          id="evento-data"
+          label={variosDias ? 'Primeiro dia' : 'Dia'}
+          obrigatorio
+          erro={erros.data}
+          className={variosDias ? undefined : 'sm:col-span-2'}
+        >
           <CampoData valor={form.data} aoMudar={(valor) => mudar('data', valor)} placeholder="Selecione o dia" />
         </Field>
+        {variosDias && (
+          <Field id="evento-dataFim" label="Último dia" obrigatorio erro={erros.dataFim}>
+            <CampoData valor={form.dataFim} aoMudar={(valor) => mudar('dataFim', valor)} placeholder="Selecione o dia" />
+          </Field>
+        )}
+        <label className="-mt-2 inline-flex cursor-pointer items-center gap-2.5 text-sm font-medium text-texto sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={variosDias}
+            onChange={(e) => {
+              setVariosDias(e.target.checked);
+              setErros((atual) => semErroEm(semErroEm(atual, 'dataFim'), 'horaFim'));
+            }}
+            className="size-[18px] cursor-pointer accent-primaria-barra"
+          />
+          Dura mais de um dia
+        </label>
 
-        <Field id="evento-horaInicio" label="Começa às" erro={erros.horaInicio} dica="Opcional. Sem horário, vale o dia todo.">
+        <Field
+          id="evento-horaInicio"
+          label={variosDias ? 'Começa às (no primeiro dia)' : 'Começa às'}
+          erro={erros.horaInicio}
+          dica={variosDias ? 'Opcional.' : 'Opcional. Sem horário, vale o dia todo.'}
+        >
           <Input type="time" value={form.horaInicio} onChange={(e) => mudar('horaInicio', e.target.value)} />
         </Field>
-        <Field id="evento-horaFim" label="Termina às" erro={erros.horaFim} dica="Opcional.">
+        <Field
+          id="evento-horaFim"
+          label={variosDias ? 'Termina às (no último dia)' : 'Termina às'}
+          erro={erros.horaFim}
+          dica="Opcional."
+        >
           <Input
             type="time"
             value={form.horaFim}
