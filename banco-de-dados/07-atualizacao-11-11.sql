@@ -291,7 +291,10 @@ declare
   v_semana    text[] := array['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
   v_curta     text[] := array['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
   v_meses     text[] := array['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  v_fonte     text := 'Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif';
+  -- as fontes do sistema: Inter Tight no texto e JetBrains Mono nos números.
+  -- Quem não carrega fonte da internet (o Gmail) usa as de reserva.
+  v_fonte     text := '''Inter Tight'',Inter,''Segoe UI'',Roboto,Helvetica,Arial,sans-serif';
+  v_mono      text := '''JetBrains Mono'',ui-monospace,Menlo,Consolas,monospace';
   v_chave     text;
   v_pessoa    record;
   v_item      record;
@@ -347,10 +350,10 @@ begin
         '<div style="font-size:13px;line-height:1.4;color:#64748b;padding-top:3px">%s</div>'
         '</td><td align="right" style="padding:14px 16px 14px 0;white-space:nowrap;vertical-align:top">'
         '<span style="display:inline-block;padding:4px 10px;border-radius:999px;background:%s;color:%s;font-size:12px;font-weight:700">%s</span>'
-        '<div style="font-size:12px;color:#94a3b8;padding-top:6px">%s, %s</div>'
+        '<div style="font-family:%s;font-size:12px;color:#94a3b8;padding-top:6px">%s, %s</div>'
         '</td></tr></table></td></tr>',
         v_cor, escapar_html(v_item.titulo), escapar_html(concat_ws(' · ', v_item.onde, v_item.disciplina)),
-        v_fundo, v_cor, v_rotulo,
+        v_fundo, v_cor, v_rotulo, v_mono,
         v_curta[extract(dow from v_item.prazo)::int + 1], to_char(v_item.prazo, 'DD/MM'));
 
       if v_item.prazo < v_hoje then
@@ -390,7 +393,8 @@ begin
     end if;
 
     v_html := format(
-      '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"></head>'
+      '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">'
+      '<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"></head>'
       '<body style="margin:0;padding:0;background:#eef2f7">'
       '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>'
       '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#eef2f7;font-family:%s">'
@@ -401,13 +405,13 @@ begin
       '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0"><tr>'
       '<td style="vertical-align:middle"><img src="%s/email-marca.png" width="28" height="28" alt="" style="display:inline-block;vertical-align:middle;border:0">'
       '<span style="display:inline-block;vertical-align:middle;padding-left:10px;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.2px">Vértice</span></td>'
-      '<td align="right" style="vertical-align:middle;font-size:12px;color:#94a3b8;white-space:nowrap">%s, %s de %s</td>'
+      '<td align="right" style="vertical-align:middle;font-family:%s;font-size:12px;color:#94a3b8;white-space:nowrap">%s, %s de %s</td>'
       '</tr></table>'
       '<div style="height:3px;margin-top:18px;border-radius:3px;background:#22d3ee;background-image:linear-gradient(90deg,#22d3ee,#0e7490)"></div>'
       '</td></tr>'
       -- corpo
       '<tr><td style="background:#ffffff;padding:28px 24px 8px">'
-      '<div style="font-size:24px;line-height:1.25;font-weight:700;color:#0b1220">Oi, %s!</div>'
+      '<div style="font-size:24px;line-height:1.25;font-weight:700;letter-spacing:-0.4px;color:#0b1220">Oi, %s!</div>'
       '<div style="font-size:15px;line-height:1.5;color:#334155;padding:6px 0 14px">%s</div>'
       '<div>%s</div>'
       '<table role="presentation" width="100%%" cellpadding="0" cellspacing="0">%s</table>'
@@ -422,7 +426,7 @@ begin
       '</td></tr>'
       '<tr><td align="center" style="padding:16px 0 0;font-size:11px;color:#94a3b8">Vértice · Plataforma de Acompanhamento de Aprendizagem</td></tr>'
       '</table></td></tr></table></body></html>',
-      v_resumo, v_fonte, v_site,
+      v_resumo, v_fonte, v_site, v_mono,
       v_semana[extract(dow from v_hoje)::int + 1], extract(day from v_hoje)::int, v_meses[extract(month from v_hoje)::int],
       escapar_html(split_part(v_pessoa.nome, ' ', 1)), v_resumo, v_chips, v_secoes,
       v_site, v_site);
