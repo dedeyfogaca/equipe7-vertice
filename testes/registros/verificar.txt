@@ -9,7 +9,7 @@ O cenário destrutivo: já migrado, mas sem o marcador de versão
 ok    não tenta migrar -> false
 ok    e diz por quê -> "sem-tarefas-antigas"
 ok    as atividades continuam lá -> 3
-ok    o marcador é gravado, para não repetir -> 3
+ok    o marcador é gravado, para não repetir -> 4
 
 Caminho normal: dados no formato antigo
 
@@ -20,7 +20,7 @@ ok    a chave antiga é apagada -> null
 ok    RN09: toda atividade ganha peso -> true
 ok    a concluída ganha data de conclusão -> true
 ok    RN07: o primeiro membro vira organizador -> ["organizador","participante"]
-ok    atividade não guarda grupoId -> false
+ok    a atividade guarda o grupo da disciplina (versão 4) -> true
 
 Rodar de novo não duplica nada
 
@@ -44,7 +44,7 @@ ok    id repetido quebraria chave de lista e `find` -> true
 Instalação nova: nada gravado
 
 ok    não migra -> false
-ok    marca a versão mesmo assim -> 3
+ok    marca a versão mesmo assim -> 4
 ok    e não inventa coleção -> null
 
 Versão 2: atividade sem responsável ganha um
@@ -56,7 +56,7 @@ ok    responsável de outro grupo é trocado (RN03) -> "m2"
 ok    responsável que não existe mais é trocado -> "m2"
 ok    conta quantas recebeu -> 3
 ok    nenhuma atividade fica sem responsável -> true
-ok    o marcador vai para a versão atual -> 3
+ok    o marcador vai para a versão atual -> 4
 
 Versão 2: cores fora da paleta nova
 
@@ -87,8 +87,17 @@ ok    nenhuma atividade some -> 3
 ok    estilo de avatar que saiu vira o padrão -> ["croodles-neutral","notionists",null]
 ok    resumo do passo 3 -> {"atividadesAjustadas":3,"conteudosGeraisRemovidos":1,"avataresAjustados":1}
 ok    o passo 2 não roda de novo -> null
-ok    marcador na versão 3 -> 3
+ok    marcador na versão de agora (4) -> 4
 ok    e não roda outra vez -> "ja-migrado"
+
+Versão 4: grupo na atividade e a pessoa marcada no membro (espaço pessoal)
+
+ok    a atividade ganha o grupo da disciplina -> "g1"
+ok    a de disciplina que não existe fica como estava -> false
+ok    quem estava na sessão fica marcado como a pessoa -> ["","demo"]
+ok    resumo do passo 4 -> {"atividadesAjustadas":1,"membroMarcado":true}
+ok    o passo 3 não roda de novo -> null
+ok    marcador na versão 4 -> 4
 
 Todas as verificações passaram.
 
@@ -218,9 +227,10 @@ Atividade completa passa
 
 ok    sem erro nenhum -> {}
 
-RN06: toda atividade tem responsável
+RN06 (revisada em 11/11/2026): responsável ou "A definir"
 
-ok    sem responsável é barrada -> "Escolha o responsável pela atividade."
+ok    sem responsável, fica "A definir" e passa -> {}
+ok    mas não começa nem conclui sem alguém assumir -> ["Escolha quem vai fazer antes de mudar o status.","Escolha quem vai fazer antes de mudar o status."]
 ok    responsável de outro grupo é barrado (RN03) -> "O responsável escolhido não pertence ao grupo."
 ok    qualquer membro do grupo serve -> undefined
 
@@ -250,10 +260,21 @@ ok    e em ano comum, não -> false
 
 Os dados de exemplo seguem a regra
 
-ok    toda atividade de exemplo tem responsável do grupo -> true
+ok    toda atividade de exemplo tem responsável do grupo ou está "A definir" -> true
+ok    o exemplo tem uma "A definir" -> 1
+ok    toda atividade de exemplo guarda o grupo -> true
+ok    quem usa a demonstração entra no lugar da organizadora -> ["demo","",""]
 ok    e passa na validação -> 0
 ok    o primeiro membro do exemplo é o organizador (RN07) -> "organizador"
 ok    exemplo tem atividade sem conteúdo -> true
+
+RN24: no espaço pessoal, a disciplina é opcional
+
+ok    no grupo, sem disciplina é barrada -> "Escolha a disciplina da atividade."
+ok    no espaço pessoal, passa sem disciplina -> {}
+ok    as atividades pessoais de exemplo passam, sem disciplina e com a dona do espaço -> true
+ok    perfil sem nome -> "Informe o seu nome."
+ok    perfil com nome -> {}
 
 RF31: eventos
 
@@ -267,6 +288,14 @@ ok    fim antes do início -> "O fim precisa ser depois do início."
 ok    fim sem início -> "Informe o início antes do fim."
 ok    horário inválido -> "Horário inválido."
 ok    disciplina de outro grupo -> "A disciplina escolhida não pertence a este grupo."
+
+Evento de vários dias (revisão de 11/11/2026)
+
+ok    vários dias, com o fim do último dia antes do início do primeiro, passa -> {}
+ok    último dia antes do primeiro -> "O fim não pode ser antes do começo."
+ok    último dia que não existe -> "O dia informado não é uma data válida."
+ok    no mesmo dia, o fim antes do início continua barrado -> "O fim precisa ser depois do início."
+ok    o exemplo tem um evento de vários dias -> 1
 ok    eventos de exemplo passam -> 0
 
 Todas as verificações passaram.
@@ -323,13 +352,21 @@ ok    30 dias seguidos é Mês Cheio -> true
 ok    490 XP ainda não é Meio Milhar -> false
 ok    500 XP é -> true
 
-Concessão: uma vez só e sem revogar
+Concessão: uma vez só
 
 ok    concede o que é novo -> [{"membroId":"m1","codigo":"PRIMEIRO_PASSO","obtidaEm":"2026-10-28T12:00:00.000Z"}]
 ok    não concede de novo o que já foi concedido -> []
-ok    o marco deixou de valer (atividade reaberta): nada é retirado -> []
+ok    a concessão não retira nada (quem retira é conquistasPerdidas) -> []
 ok    a mesma conquista para outra pessoa é outra concessão -> 1
 ok    código repetido na mesma rodada conta uma vez -> 1
+
+Retirada: sai junto com a experiência (RN12 revisada)
+
+ok    concluiu por engano e desfez: Primeiro Passo, Conteúdo Dominado e Disciplina Fechada saem -> ["PRIMEIRO_PASSO","CONTEUDO_DOMINADO","DISCIPLINA_FECHADA"]
+ok    com outra conclusão, o Primeiro Passo fica; o conteúdo que voltou a ter pendência sai -> ["CONTEUDO_DOMINADO","DISCIPLINA_FECHADA"]
+ok    a Semana Cheia de um mês atrás não sai por desfazer uma conclusão de hoje -> false
+ok    a conclusão de outra pessoa não tira nada de m1 -> []
+ok    concluídas por membro (sem responsável não entra) -> [["m1",1],["m2",1]]
 
 Todas as verificações passaram.
 
@@ -369,6 +406,15 @@ ok    outro participante não edita -> false
 ok    o organizador edita o evento de qualquer um -> true
 ok    evento sem autor: só o organizador -> [false,true]
 ok    sem saber quem é, ninguém edita -> false
+
+RN06 (revisada em 11/11/2026): atividade "A definir"
+
+ok    qualquer membro pode assumir -> [true,true]
+ok    quem não é do grupo, não -> false
+ok    atividade com responsável não se assume -> false
+ok    ninguém muda o status antes de alguém assumir -> [false,false]
+ok    o participante não edita sem assumir; o organizador edita -> [false,true]
+ok    salvar sem responsável grava "a fazer", mesmo com outro status escolhido -> "a fazer"
 
 Todas as verificações passaram.
 
@@ -428,6 +474,12 @@ Ordem das gravações
 ok    inserções do pai para o filho -> ["insert grupo","insert membro","insert disciplina","insert atividade"]
 ok    excluir o grupo manda só o grupo (o banco leva o resto em cascata) -> ["delete grupo"]
 ok    excluir só a atividade -> ["delete atividade"]
+ok    mudar o perfil é uma alteração no perfil -> ["update perfil"]
+ok    a ligação com o espaço pessoal não vai na linha do perfil (é do banco) -> false
+ok    o perfil vai depois do grupo e antes dos membros -> ["grupos","perfis","membros"]
+ok    a atividade sem disciplina sai junto com o grupo dela -> ["delete grupo"]
+ok    "A definir" e sem disciplina vão como nulo, com o grupo -> [null,null,"p1"]
+ok    evento de um dia só não grava o fim -> null
 
 Recusa do banco
 
@@ -436,6 +488,8 @@ ok    mensagem das regras do banco passa em português -> "Só o responsável mu
 ok    nome repetido de disciplina -> "Este grupo já tem uma disciplina com esse nome."
 ok    sem internet -> "Sem conexão com o servidor. Confira a internet e tente de novo."
 ok    erro desconhecido em inglês não aparece cru -> "Não foi possível salvar. Tente de novo."
+ok    "A definir" não conclui -> "Escolha quem vai fazer antes de mudar o status."
+ok    banco sem a atualização de 11/11 -> "O banco ainda não recebeu a atualização de 11/11. Rode o script de atualização no Supabase."
 
 Fotos para o Storage
 
@@ -443,6 +497,7 @@ ok    foto do editor é foto nova -> true
 ok    endereço do Storage não é -> false
 ok    a linha vai com a foto antiga -> "antiga.jpg"
 ok    a foto nova sobe na pasta do grupo -> [["membros","g1","membro"]]
+ok    a foto do perfil sobe na pasta do espaço pessoal -> [["perfis","p1","perfil"]]
 
 Evolução do progresso (RF12)
 

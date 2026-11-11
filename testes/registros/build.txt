@@ -1,4 +1,7 @@
 $ npm ci
+
+added 154 packages, and audited 155 packages in 5s
+
 18 packages are looking for funding
   run `npm fund` for details
 
@@ -20,13 +23,14 @@ dist/assets/avatar-andrey-D9NfJ-69.webp                            27.60 kB
 dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2        40.40 kB
 dist/assets/inter-tight-latin-wght-normal-DX-nOvPD.woff2           44.87 kB
 dist/assets/inter-tight-latin-ext-wght-normal-B4u9PlvR.woff2       89.80 kB
-dist/assets/index-BvVNuqMN.css                                     87.19 kB │ gzip:  17.71 kB
+dist/assets/index-Dt6hcFVr.css                                     90.49 kB │ gzip:  18.22 kB
 dist/assets/banco-De9GV7Vy.js                                       0.77 kB │ gzip:   0.41 kB
 dist/assets/react-B6sfNDQf.js                                     182.35 kB │ gzip:  60.11 kB
-dist/assets/interface-BrT4mfYo.js                                 198.14 kB │ gzip:  58.73 kB
-dist/assets/index-BFfRrbme.js                                     698.07 kB │ gzip: 213.39 kB
+dist/assets/interface-BbtMrurl.js                                 201.41 kB │ gzip:  59.56 kB
+dist/assets/index-CRmyfzMa.js                                     743.68 kB │ gzip: 226.96 kB
+
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 5.08s
+✓ built in 3.86s

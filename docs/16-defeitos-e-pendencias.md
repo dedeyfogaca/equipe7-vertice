@@ -1,11 +1,11 @@
 # 16 · Defeitos e Pendências
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026, atualizado em 11/11/2026
 
 ---
 
-Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. O ciclo de 27/11, executado em 08/11/2026 sobre a versão com o banco de dados, encontrou os defeitos D11 a D13, corrigidos no mesmo dia. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
+Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. O ciclo de 27/11, executado em 08/11/2026 sobre a versão com o banco de dados, encontrou os defeitos D11 a D13, corrigidos no mesmo dia. A conferência no sistema publicado, com o projeto real do Supabase, encontrou o D14. A execução completa de 11/11/2026, com a revisão de 11/11, encontrou os defeitos D15 a D18, corrigidos antes da execução final. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
 
 Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando reteste** e **Fechado**.
 
@@ -28,12 +28,94 @@ Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando retes
 | D11 | Com conta, as conquistas não eram gravadas no banco | Alta | CT59 de 27/11 | Matheus | CT59 (aprovado) | Fechado |
 | D12 | A tela de login gravava coleções vazias no navegador | Baixa | CT58 de 27/11 | Matheus | CT58 (aprovado) | Fechado |
 | D13 | Roteiro do CT30 escolhia um domingo que é feriado | Baixa | CT30 de 27/11 | Andrey | CT30 (aprovado) | Fechado |
+| D14 | No projeto real do Supabase, o sistema não lia nem gravava nada, e as alterações se perdiam sem aviso | Alta | Conferência no sistema publicado em 08/11 | Matheus | CT57 a CT66 (aprovados) | Fechado |
+| D15 | Na demonstração, quem já tinha dados de uma versão anterior entrava direto no grupo antigo, sem espaço pessoal | Média | CT85 de 11/11 | Andrey | CT85 (aprovado) | Fechado |
+| D16 | No sistema sem banco configurado, "Sair da demonstração" levava a uma tela de login que não funciona | Baixa | CT24 de 11/11 | Andrey | CT24 e CT65 (aprovados) | Fechado |
+| D17 | Roteiro do CT51 esperava nenhum evento em feriado, e o exemplo cai em 15/11 quando o teste roda em 11/11 | Baixa | CT51 de 11/11 | Andrey | CT51 (aprovado) | Fechado |
+| D18 | Roteiros do CT59 e do CT64 não previam o espaço pessoal | Baixa | CT59 e CT64 de 11/11 | Matheus | CT59 e CT64 (aprovados) | Fechado |
 
-Os defeitos D01 a D10 foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11. Os defeitos D11 a D13 foram corrigidos em 08/11/2026, e a execução completa do ciclo de 27/11 foi feita depois das correções.
+Os defeitos D01 a D10 foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11. Os defeitos D11 a D13 foram corrigidos em 08/11/2026, e a execução completa do ciclo de 27/11 foi feita depois das correções. Os defeitos D15 a D18 foram corrigidos em 11/11/2026, e a execução completa de 11/11 foi refeita depois das correções.
 
 ---
 
 ## Detalhamento
+
+### D18
+
+**Roteiros do CT59 e do CT64 não previam o espaço pessoal**
+
+- **Requisito afetado:** nenhum; o defeito era dos roteiros de teste, não do sistema
+- **Gravidade:** Baixa
+- **Como reproduzir:** executar o roteiro com conta (CT57 a CT66) sobre a versão de 11/11.
+- **Esperado:** os dois casos conferem o que conferiam antes.
+- **Observado:** o CT59 esperava voltar à tela de disciplinas depois de criar a atividade, mas o formulário foi aberto direto pelo endereço, sem tela anterior, e o sistema voltou para a lista de atividades, como previsto. O CT64 procurava o membro "Bruno Lima" pelo nome, e desde 11/11 cada conta tem também o membro do espaço pessoal, com o mesmo nome; a consulta do roteiro achou dois e parou.
+- **Correção:** o CT59 passou a esperar a lista de atividades, e o CT64 passou a procurar o membro no grupo da atividade.
+- **Responsável:** Matheus
+- **Situação:** Fechado
+- **Novo teste:** CT59 e CT64, aprovados
+
+### D17
+
+**Roteiro do CT51 esperava nenhum evento em feriado, e o exemplo cai em 15/11 quando o teste roda em 11/11**
+
+- **Requisito afetado:** nenhum; o defeito era do roteiro de teste, como o D13
+- **Gravidade:** Baixa
+- **Como reproduzir:** executar o CT51 em 11/11/2026. Os eventos do exemplo são marcados em relação ao dia de hoje, e um deles cai em 15/11, feriado da Proclamação da República.
+- **Esperado:** o roteiro confere o aviso de feriado em quantos eventos caírem num feriado.
+- **Observado:** o cartão do evento mostrou o aviso de feriado (o comportamento certo), e o roteiro, que esperava nenhum, reprovou o caso.
+- **Correção:** o roteiro passou a contar, nos próprios dados, quantos eventos caem em 15/11 e a esperar esse número de avisos.
+- **Responsável:** Andrey
+- **Situação:** Fechado
+- **Novo teste:** CT51, aprovado
+
+### D16
+
+**No sistema sem banco configurado, "Sair da demonstração" levava a uma tela de login que não funciona**
+
+- **Requisito afetado:** RF09, RF20
+- **Gravidade:** Baixa: só acontece rodando o sistema na própria máquina sem o `.env`; a versão publicada tem o banco
+- **Como reproduzir:**
+  1. Rodar o sistema sem `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+  2. Começar a demonstração e, no menu da conta, escolher "Sair da demonstração".
+- **Esperado:** sem banco, só existe a demonstração, e não há para onde sair.
+- **Observado:** o sistema saía da demonstração e mostrava a tela de login, que não tem banco para conferir a conta.
+- **Correção:** o item "Sair da demonstração" só aparece quando o banco está configurado. Sem banco, o menu oferece "Voltar ao espaço pessoal" dentro dos grupos.
+- **Responsável:** Andrey
+- **Situação:** Fechado
+- **Novo teste:** CT24 (sem banco) e CT65 (com banco), aprovados
+
+### D15
+
+**Na demonstração, quem já tinha dados de uma versão anterior entrava direto no grupo antigo, sem espaço pessoal**
+
+- **Requisito afetado:** RF34, RF20
+- **Gravidade:** Média: a pessoa não via o espaço pessoal nem a tela Meu perfil até limpar os dados do navegador
+- **Como reproduzir:**
+  1. Ter, no navegador, dados da demonstração da versão anterior, com um grupo aberto.
+  2. Abrir a versão de 11/11.
+- **Esperado:** os dados antigos continuam, e a pessoa ganha o espaço pessoal, com o grupo antigo no seletor.
+- **Observado:** a migração ligou o grupo às atividades e marcou a pessoa, mas o sistema abriu direto o grupo antigo, que estava na sessão, sem criar o espaço pessoal.
+- **Correção:** enquanto a demonstração não tem espaço pessoal, as telas internas levam à tela do nome, já preenchido com o nome do membro marcado. Ao confirmar, o sistema cria o perfil e o espaço pessoal, e o grupo antigo continua como estava.
+- **Responsável:** Andrey
+- **Situação:** Fechado
+- **Novo teste:** CT85, aprovado
+
+### D14
+
+**No projeto real do Supabase, o sistema não lia nem gravava nada, e as alterações se perdiam sem aviso**
+
+- **Requisito afetado:** RNF02, RF28
+- **Gravidade:** Alta: o grupo aparecia na tela, mas não ia para o banco
+- **Como reproduzir:**
+  1. Criar o banco no Supabase com o script da versão anterior.
+  2. Entrar com a conta, criar um grupo e, em Membros, clicar em **Convidar**.
+- **Esperado:** o grupo fica gravado no banco e o convite é gerado.
+- **Observado:** "Você não tem permissão para essa alteração." no convite, e nenhuma linha na tabela `grupo`.
+- **Causa:** o projeto do Supabase não dava às contas conectadas acesso às tabelas criadas pelo script; o banco local de teste dava esse acesso por padrão, e por isso os testes não pegaram. Sem a primeira leitura, a camada de dados descartava as alterações sem avisar.
+- **Correção:** o script de criação passou a dar as permissões ele mesmo (a seção 7); o apoio para teste local deixou de dar acesso por padrão, para os testes reproduzirem o Supabase; e, se a primeira leitura falhar, toda alteração avisa que não foi salva.
+- **Responsável:** Matheus
+- **Situação:** Fechado
+- **Novo teste:** CT57 a CT66, aprovados de novo com o banco local sem acesso por padrão
 
 ### D13
 
@@ -255,7 +337,10 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto | A fazer | 24/11/2026 |
 | Testar nos navegadores Firefox e Edge (RNF05) | A fazer (T51) | 26/11/2026 |
 | Conferir no sistema publicado, com o projeto real do Supabase, o login com o Google, o convite entre duas contas e o envio de uma foto | A fazer | 24/11/2026 |
-| Ler as respostas do formulário de feedback dos usuários de teste e transformar o que vier em tarefas | A fazer (T77) | 20/11/2026 |
+| Ler as respostas do formulário de feedback dos usuários de teste e transformar o que vier em tarefas | Em andamento (T77): os comentários recebidos até 11/11 entraram na revisão de 11/11 | 20/11/2026 |
+| Rodar a atualização do banco (`07-atualizacao-11-11.sql`) no projeto real do Supabase antes de publicar a versão de 11/11 | A fazer | Antes de publicar |
+| Ligar o lembrete por e-mail no projeto real: conta no Brevo, remetente confirmado, chave no Vault e agendamento | A fazer | 20/11/2026 |
+| Conferir no sistema publicado o espaço pessoal de uma conta antiga, o perfil em dois grupos e um lembrete recebido de verdade | A fazer | 24/11/2026 |
 
 ---
 
@@ -273,6 +358,7 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Banco de dados no Supabase, acesso com conta Google ou e-mail, convite para o grupo e fotos no armazenamento de arquivos | Implementados para 27/11 (T46 a T50). Verificados do CT57 ao CT66 e nas 40 verificações do banco |
 | Eventos no banco de dados | A tabela `evento` está no banco com as demais, com a regra de edição do RN21 no próprio banco. Verificado no CT63 e nas verificações do banco |
 | Histórico de progresso (RF12) | Implementado para 27/11 (T35). Verificado no CT59 e no CT68 |
+| Notificações por e-mail (fora do escopo até 08/11) | O lembrete diário por e-mail entrou na revisão de 11/11 (RF36, T82). Verificado no CT80 e nas verificações do banco |
 
 ---
 
