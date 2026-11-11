@@ -44,17 +44,19 @@ Versão avaliada: tag **`entrega-27-11-2026`**.
 | O que o manual pede | Onde está |
 |---|---|
 | Software funcionando | [equipe7-vertice.vercel.app](https://equipe7-vertice.vercel.app/), o código em [`src/`](src/) e [Como rodar](#como-rodar) |
-| Revisão e alterações desde a entrega de 06/11 | [Histórico de Alterações, revisão de 08/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-08112026) |
+| Revisão e alterações desde a entrega de 06/11 | Histórico de Alterações, revisões de [08/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-08112026) e de [11/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-11112026) |
 | O que entrou e o que será demonstrado | [MVP: recorte da entrega de 27/11](docs/14-mvp.md#recorte-da-entrega-de-27112026) |
-| Banco de dados | [Modelo lógico](banco-de-dados/02-modelo-logico.md), [script de criação](banco-de-dados/04-script-criacao.sql) e [verificações do banco](banco-de-dados/05-verificacoes.sql) |
+| Banco de dados | [Modelo lógico](banco-de-dados/02-modelo-logico.md), [script de criação](banco-de-dados/04-script-criacao.sql), [verificações do banco](banco-de-dados/05-verificacoes.sql) e [atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql) |
 | Arquitetura com o banco e o login | [Arquitetura e Tecnologias](docs/13-arquitetura.md) |
 | Backlog com a situação final das tarefas | [Backlog do Projeto](docs/12-backlog.md) |
-| Testes executados, resultados e evidências | [Casos de Teste](docs/15-casos-de-teste.md) e [`testes/evidencias-27-11/`](testes/evidencias-27-11/) |
+| Testes executados, resultados e evidências | [Casos de Teste](docs/15-casos-de-teste.md) e [`testes/evidencias-11-11/`](testes/evidencias-11-11/) |
 | Defeitos e pendências | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) |
 | Rastreabilidade até o código e os testes | [Matriz de Rastreabilidade](docs/11-matriz-de-rastreabilidade.md#implementação-e-testes) |
-| Telas novas e mapa de navegação | [Telas e Navegação](prototipos/01-telas-e-navegacao.md#entrega-final-27112026) |
+| Telas novas e mapa de navegação | [Telas e Navegação](prototipos/01-telas-e-navegacao.md#revisão-de-11112026) |
 
-**Resumo:** o Vértice ficou completo. Os dados do grupo passaram do navegador para um banco PostgreSQL no Supabase, em que as próprias regras do banco garantem que cada conta só veja os grupos de que participa e só altere o que o perfil permite. A pessoa entra com e-mail e senha ou com a conta Google, o organizador chama a turma por um link ou um código de convite, as fotos vão para o armazenamento de arquivos e a tela da disciplina mostra a evolução do progresso dia a dia. Quem só quer conhecer o sistema usa o modo de demonstração, sem conta, que ganhou um tutorial opcional. Os 33 requisitos funcionais estão implementados. Foram executados 68 casos de teste em 08/11/2026, todos aprovados, além de 240 verificações das regras em JavaScript e 40 verificações do banco em SQL; os três defeitos encontrados (D11 a D13) foram corrigidos antes da execução final.
+**Resumo:** o Vértice ficou completo. Os dados do grupo passaram do navegador para um banco PostgreSQL no Supabase, em que as próprias regras do banco garantem que cada conta só veja os grupos de que participa e só altere o que o perfil permite. A pessoa entra com e-mail e senha ou com a conta Google, o organizador chama a turma por um link ou um código de convite, as fotos vão para o armazenamento de arquivos e a tela da disciplina mostra a evolução do progresso dia a dia. Quem só quer conhecer o sistema usa o modo de demonstração, sem conta, que ganhou um tutorial opcional.
+
+Na revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste, cada pessoa ganhou um **espaço pessoal**, onde cai ao entrar e onde organiza o que é só dela e o que está com ela em todos os grupos, sem sair de um grupo para anotar uma tarefa do dia a dia. Entraram também o perfil da conta, com a foto valendo em todos os grupos, o lembrete diário por e-mail, o evento de vários dias, filtros mais claros no calendário, o responsável "A definir" com o botão Assumir, as ações em lote e telas mais largas no computador. Os dados de quem já tinha conta continuam: o banco recebe uma atualização própria, que só acrescenta. Os 38 requisitos funcionais estão implementados. Foram executados 85 casos de teste em 11/11/2026, todos aprovados, além de 280 verificações das regras em JavaScript e 77 verificações do banco em SQL; os defeitos encontrados (D11 a D18) foram corrigidos antes das execuções finais.
 
 ### Entrega de 06/11/2026
 
@@ -85,19 +87,20 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 
 - Página inicial com movimento ao rolar e ao passar o mouse, seção de feedback dos usuários de teste e página Sobre nós, com a história da equipe
 - Seções do sistema numa barra no topo, que no celular vira um menu que desce do topo
-- Login com e-mail e senha ou com a conta Google, e um modo de demonstração sem conta, com tutorial opcional
+- Login com e-mail e senha ou com a conta Google, e um modo de demonstração sem conta, que começa pelo nome, com tutorial opcional
+- Espaço pessoal, aberto ao entrar, com as tarefas e os eventos só da pessoa e o que está com ela em todos os grupos, e o seletor de espaço no topo, que troca de grupo, cria grupo e entra com código sem sair do sistema
+- Meu perfil: nome, avatar e foto que valem em todos os grupos, e o lembrete diário por e-mail das atividades perto do prazo
 - Dados do grupo num banco PostgreSQL no Supabase, iguais para todos os integrantes e em qualquer aparelho, com as regras de acesso garantidas pelo próprio banco
 - Convite para o grupo por link ou por código, gerado pelo organizador
-- Criação e seleção de grupos de estudo, numa tela de acesso em duas colunas, com foto do grupo opcional: quem cria entra como organizador
 - Cadastro de membros com perfis de permissão e foto de perfil, enquadrada num editor, ou avatar sorteado, em dois estilos para escolher; ao remover um membro, o organizador escolhe quem assume as atividades dele
 - Cadastro de disciplinas, com cor escolhida numa paleta de 18 cores, e, se o grupo quiser, de conteúdos que separam a disciplina por assunto
-- Cadastro de atividades com disciplina, conteúdo opcional, prazo, peso, prioridade, status e responsável obrigatório; o conteúdo pode ser criado sem sair do formulário, e só o responsável muda o status da atividade
-- Eventos do grupo (prova, apresentação, palestra, reunião), com página própria de próximos e passados, no painel e no calendário
+- Cadastro de atividades com disciplina (opcional no espaço pessoal), conteúdo opcional, prazo, peso, prioridade, status e responsável, que pode ficar "A definir" até alguém assumir; o conteúdo pode ser criado sem sair do formulário, só o responsável muda o status, e várias atividades podem ser cadastradas, ou trocar de responsável, de uma vez
+- Eventos (prova, apresentação, palestra, reunião), no grupo ou no espaço pessoal, de um dia ou de vários, com página própria de próximos e passados, filtro por disciplina, no painel e no calendário
 - Lista com busca, filtros por situação, disciplina, responsável e prazo, e ordenação, com a cor de cada disciplina e a foto de cada responsável
 - Painel com totais por situação, atividades atrasadas, próximas entregas, próximos eventos, progresso por disciplina e próximos feriados
-- Calendário do mês, da semana ou em lista, com as entregas nas cores das disciplinas e os eventos, troca de mês animada (também deslizando o dedo) e criação de atividade ou de evento a partir de um dia
+- Calendário do mês, da semana ou em lista, com as entregas nas cores das disciplinas e os eventos, uma barra de filtros, troca de mês animada (também deslizando o dedo) e criação de atividade ou de evento a partir de um dia
 - Barra de progresso por conteúdo e por disciplina, calculada a partir do peso das atividades concluídas, e a evolução do progresso dia a dia na tela da disciplina
-- Experiência, ofensiva de dias seguidos, seis conquistas e ranking do grupo
+- Experiência, ofensiva de dias seguidos, seis conquistas (retiradas junto com a experiência quando a conclusão é desfeita) e ranking do grupo
 - Sinalização de prazos em fim de semana e em feriado nacional
 - Tema claro e escuro em todas as telas, dados de exemplo e uso no celular
 
@@ -115,6 +118,7 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 | Estado | Context API | Suficiente para o volume de dados do projeto, sem dependência externa |
 | Banco de dados | PostgreSQL no Supabase | Recebe o modelo lógico como está e garante as regras de acesso no próprio banco |
 | Login e fotos | Supabase Auth e Storage | E-mail e senha ou conta Google, e as fotos num armazenamento de arquivos, sem servidor próprio |
+| Lembrete por e-mail | Brevo, chamado pelo próprio banco (pg_net) e agendado nele (pg_cron) | Plano gratuito suficiente para a turma, sem servidor próprio; a chave fica no cofre do Supabase |
 | Demonstração | Armazenamento do navegador, com a mesma estrutura do banco | Permite conhecer o sistema sem criar conta |
 | Hospedagem | Vercel | Publicação gratuita do site, refeita a cada atualização no GitHub |
 | Integração | BrasilAPI | Fonte pública e gratuita para os feriados nacionais |
@@ -136,7 +140,8 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 │   ├── telas/          As oito telas do protótipo do MVP em imagem
 │   └── navegavel/      Protótipo clicável do MVP: abra o index.html no navegador
 ├── testes/             Evidências e registros da execução dos testes
-│   ├── evidencias-27-11/  Capturas de tela do ciclo de 27/11, por caso de teste
+│   ├── evidencias-11-11/  Capturas de tela da execução de 11/11, por caso de teste
+│   ├── evidencias-27-11/  Capturas de tela da execução de 08/11
 │   ├── evidencias-06-11/  Capturas de tela do ciclo de 06/11
 │   ├── evidencias/     Capturas de tela do ciclo de 20/10
 │   └── registros/      Saída do npm run verificar, do build e da execução dos casos
@@ -156,16 +161,16 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 | 03 | [Objetivos](docs/03-objetivos.md) | Objetivo geral e objetivos específicos |
 | 04 | [Público-Alvo e Perfis do Usuário](docs/04-publico-alvo-e-perfis-do-usuario.md) | Estudante organizador e estudante participante |
 | 05 | [Escopo](docs/05-escopo.md) | Incluído, não incluído e restrições |
-| 06 | [Requisitos Funcionais](docs/06-requisitos-funcionais.md) | RF01 a RF33 |
+| 06 | [Requisitos Funcionais](docs/06-requisitos-funcionais.md) | RF01 a RF38 |
 | 07 | [Requisitos Não Funcionais](docs/07-requisitos-nao-funcionais.md) | RNF01 a RNF11 |
-| 08 | [Regras de Negócio](docs/08-regras-de-negocio.md) | RN01 a RN23 |
+| 08 | [Regras de Negócio](docs/08-regras-de-negocio.md) | RN01 a RN26 |
 | 09 | [Histórico de Alterações](docs/09-historico-de-alteracoes.md) | Mudanças desde a Entrega 1, com data, motivo e impacto |
-| 10 | [Especificação dos Casos de Uso](docs/10-casos-de-uso.md) | UC01, UC02, UC03, UC05, UC07, UC08, UC09, UC12, UC13, UC14, UC15 e UC16 detalhados |
+| 10 | [Especificação dos Casos de Uso](docs/10-casos-de-uso.md) | UC01, UC02, UC03, UC05, UC07, UC08, UC09, UC12 a UC21 detalhados |
 | 11 | [Matriz de Rastreabilidade](docs/11-matriz-de-rastreabilidade.md) | Requisito → caso de uso → entidades → tela → MVP → código → teste |
-| 12 | [Backlog do Projeto](docs/12-backlog.md) | 77 tarefas com requisito, prioridade, responsável, prazo, situação e critérios de conclusão |
-| 13 | [Arquitetura e Tecnologias](docs/13-arquitetura.md) | Camadas, banco e login no Supabase, serviços externos, ambiente e organização das pastas |
+| 12 | [Backlog do Projeto](docs/12-backlog.md) | 89 tarefas com requisito, prioridade, responsável, prazo, situação e critérios de conclusão |
+| 13 | [Arquitetura e Tecnologias](docs/13-arquitetura.md) | Camadas, banco e login no Supabase, lembrete por e-mail, serviços externos, ambiente e organização das pastas |
 | 14 | [Produto Mínimo Viável](docs/14-mvp.md) | Classificação dos requisitos, o fluxo completo e os recortes de 20/10, 06/11 e 27/11 |
-| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 68 casos executados em 08/11, com resultado e evidência, e o resumo dos ciclos anteriores |
+| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 85 casos executados em 11/11, com resultado e evidência, e o resumo dos ciclos anteriores |
 | 16 | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) | Defeitos encontrados nos testes e pendências |
 
 ### Modelagem do software
@@ -173,10 +178,10 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 | Diagrama | Conteúdo |
 |---|---|
 | [Identidade visual](diagramas/00-identidade-visual.md) | Paleta, tipografia e vocabulário de formas usados nos diagramas |
-| [Casos de uso](diagramas/01-casos-de-uso.md) | Atores, fronteira do sistema e os dezesseis casos de uso |
-| [Classes](diagramas/02-classes.md) | Dez classes com atributos, operações e cardinalidades |
+| [Casos de uso](diagramas/01-casos-de-uso.md) | Atores, fronteira do sistema e os vinte e um casos de uso |
+| [Classes](diagramas/02-classes.md) | Onze classes com atributos, operações e cardinalidades |
 | [Fluxo: Concluir atividade](diagramas/03-atividade-concluir.md) | Recálculo de progresso, experiência, ofensiva e conquistas |
-| [Fluxo: Cadastrar atividade](diagramas/04-atividade-cadastrar.md) | Disciplina obrigatória, conteúdo opcional, validações e padrões |
+| [Fluxo: Cadastrar atividade](diagramas/04-atividade-cadastrar.md) | Onde a atividade fica, disciplina (opcional no espaço pessoal), conteúdo opcional, "A definir", validações e padrões |
 | [Arquitetura](diagramas/svg/arquitetura.svg) | Camadas da aplicação, Supabase, demonstração e serviços externos |
 | [Mapa de navegação](diagramas/svg/mapa-navegacao-v2.svg) | Como as telas da versão final se conectam |
 | [Mapa de navegação do MVP](diagramas/svg/mapa-navegacao.svg) | Como as oito telas do protótipo do MVP se conectam |
@@ -187,10 +192,11 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 |---|---|
 | [Modelo conceitual](banco-de-dados/01-modelo-conceitual.md) | Entidades, atributos, relacionamentos e cardinalidades |
 | [Modelo lógico](banco-de-dados/02-modelo-logico.md) | Tabelas, chaves primárias e estrangeiras, tipos e restrições |
-| [Dicionário de dados](banco-de-dados/03-dicionario-de-dados.md) | Descrição campo a campo das dez tabelas |
-| [Script de criação](banco-de-dados/04-script-criacao.sql) | PostgreSQL do Supabase: tabelas, regras de acesso por linha, gatilhos, convite, conquistas e o espaço das fotos |
-| [Verificações do banco](banco-de-dados/05-verificacoes.sql) | 40 conferências das regras do banco, tentando o acesso como contas diferentes |
+| [Dicionário de dados](banco-de-dados/03-dicionario-de-dados.md) | Descrição campo a campo das onze tabelas |
+| [Script de criação](banco-de-dados/04-script-criacao.sql) | PostgreSQL do Supabase, para um projeto novo: tabelas, regras de acesso por linha, gatilhos, convite, conquistas, o espaço das fotos e o lembrete por e-mail |
+| [Verificações do banco](banco-de-dados/05-verificacoes.sql) | 77 conferências das regras do banco, tentando o acesso como contas diferentes |
 | [Apoio para teste local](banco-de-dados/06-apoio-teste-local.sql) | Imita o que o Supabase já tem, para rodar as verificações num PostgreSQL local |
+| [Atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql) | Para o banco que já está no ar: acrescenta o espaço pessoal, o perfil, o "A definir", o evento de vários dias e o lembrete, sem apagar dado nenhum |
 
 ---
 
@@ -201,8 +207,8 @@ A primeira versão funcional entrega o ciclo completo de medição de aprendizag
 | | Requisitos | O que entrega |
 |---|---|---|
 | **No MVP** | RF01 a RF06, RF08, RF09, RF10, RF11, RF13, RF14, RF15, RF19, RF20 | O ciclo fechado, do cadastro à medida, nos temas claro e escuro |
-| **Desejável** | RF07, RF12, RF16 a RF18, RF21 a RF32 e o banco de dados | Ofensiva, conquistas, histórico, sinalização de datas, calendário, fotos de perfil e do grupo, paleta, páginas públicas, acesso com conta, convite, conteúdo criado pela atividade, eventos e feedback |
-| **Futura** | Nenhum | Notificações, exportação e app nativo |
+| **Desejável** | RF07, RF12, RF16 a RF18, RF21 a RF38 e o banco de dados | Ofensiva, conquistas, histórico, sinalização de datas, calendário, fotos de perfil e do grupo, paleta, páginas públicas, acesso com conta, convite, conteúdo criado pela atividade, eventos e feedback |
+| **Futura** | Nenhum | Notificações push, exportação e app nativo |
 
 A classificação completa, com justificativa item a item, está em [Produto Mínimo Viável](docs/14-mvp.md). O protótipo navegável em [`prototipos/navegavel/`](prototipos/navegavel/index.html) cobre exatamente as telas do MVP; as telas da versão 2 estão em [Telas e Navegação](prototipos/01-telas-e-navegacao.md).
 
@@ -234,7 +240,7 @@ npm ci          # instala exatamente as versões do package-lock.json
 npm run dev     # roda em desenvolvimento
 ```
 
-O terminal exibirá o endereço local, normalmente `http://localhost:5173`. Sem o banco configurado, o sistema abre no modo de demonstração: use **"Carregar dados de exemplo"** para entrar com um grupo de dados fictícios já preenchido.
+O terminal exibirá o endereço local, normalmente `http://localhost:5173`. Sem o banco configurado, o sistema abre no modo de demonstração: informe o nome e use **"Começar com dados de exemplo"** para entrar com um grupo de dados fictícios já preenchido.
 
 ```bash
 npm run verificar  # confere as regras de progresso, experiência, ofensiva, conquistas, perfis, atividades, permissões, recorte da foto e migração
@@ -242,7 +248,7 @@ npm run build      # gera a versão de produção
 npm run preview    # pré-visualiza a versão de produção
 ```
 
-Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-script-criacao.sql`](banco-de-dados/04-script-criacao.sql) no SQL Editor e preencha `src/.env` a partir de `src/.env.example`, com a URL e a chave pública do projeto. O passo a passo, com o login do Google, está no [README de `src/`](src/README.md#ligar-o-banco-supabase). Versões das bibliotecas e organização das pastas estão em [Arquitetura e Tecnologias](docs/13-arquitetura.md#ambiente-de-desenvolvimento), e os detalhes do código no [README de `src/`](src/README.md).
+Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-script-criacao.sql`](banco-de-dados/04-script-criacao.sql) no SQL Editor (num projeto que já tem dados, rode só a [atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql), que não apaga nada) e preencha `src/.env` a partir de `src/.env.example`, com a URL e a chave pública do projeto. O passo a passo, com o login do Google, está no [README de `src/`](src/README.md#ligar-o-banco-supabase), e o do lembrete por e-mail, em [Lembrete por e-mail](src/README.md#lembrete-por-e-mail). Versões das bibliotecas e organização das pastas estão em [Arquitetura e Tecnologias](docs/13-arquitetura.md#ambiente-de-desenvolvimento), e os detalhes do código no [README de `src/`](src/README.md).
 
 ---
 
@@ -250,8 +256,10 @@ Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-scrip
 
 | Até | O quê |
 |---|---|
-| 20/11/2026 | Ler as respostas do formulário de feedback dos usuários de teste |
-| 24/11/2026 | Conferir no sistema publicado o login com o Google, o convite entre duas contas, uma foto enviada e os feriados reais da BrasilAPI |
+| Antes de publicar | Rodar a atualização de 11/11 no projeto real do Supabase |
+| 20/11/2026 | Ligar o lembrete por e-mail no projeto real (Brevo, chave no Supabase e agendamento) |
+| 20/11/2026 | Ler as respostas do formulário de feedback dos usuários de teste que chegarem |
+| 24/11/2026 | Conferir no sistema publicado o login com o Google, o convite entre duas contas, uma foto enviada, os feriados reais da BrasilAPI, o espaço pessoal de uma conta antiga e um lembrete recebido |
 | 24/11/2026 | Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto |
 | 26/11/2026 | Executar os casos de teste no Firefox e no Edge (RNF05) |
 | 27/11/2026 | Apresentação final, com todos os integrantes |
