@@ -1,11 +1,11 @@
 # Modelo Conceitual do Banco de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 08/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 11/11/2026
 
 ---
 
-O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17) e convite (RF28). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro aponta para ela.
+O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17), convite (RF28) e perfil (RF35). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro e o perfil apontam para ela.
 
 ---
 
@@ -15,11 +15,14 @@ O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir 
 %%{init: {"theme": "base", "fontFamily": "Space Grotesk", "themeVariables": {"fontFamily": "Space Grotesk, Segoe UI, sans-serif", "fontSize": "14px", "primaryColor": "#E0F7FC", "primaryTextColor": "#0B1220", "primaryBorderColor": "#0891B2", "lineColor": "#5B6678", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F5F7FC", "nodeBorder": "#0891B2", "mainBkg": "#E0F7FC", "textColor": "#0B1220", "titleColor": "#0E7490"}, "er": {"diagramPadding": 24, "entityPadding": 16, "minEntityWidth": 150}}}%%
 erDiagram
     GRUPO ||--o{ MEMBRO : "possui"
+    PERFIL ||--o{ MEMBRO : "identifica"
+    PERFIL |o--o| GRUPO : "tem como espaco pessoal"
     GRUPO ||--o{ DISCIPLINA : "organiza"
     DISCIPLINA ||--o{ CONTEUDO : "divide-se em"
-    DISCIPLINA ||--o{ ATIVIDADE : "reune"
+    GRUPO ||--o{ ATIVIDADE : "contem"
+    DISCIPLINA |o--o{ ATIVIDADE : "reune"
     CONTEUDO |o--o{ ATIVIDADE : "agrupa"
-    MEMBRO ||--o{ ATIVIDADE : "e responsavel por"
+    MEMBRO |o--o{ ATIVIDADE : "e responsavel por"
     GRUPO ||--o{ EVENTO : "agenda"
     DISCIPLINA |o--o{ EVENTO : "e assunto de"
     MEMBRO |o--o{ EVENTO : "cadastra"
@@ -39,12 +42,13 @@ erDiagram
 
 | Entidade | Atributos | Origem |
 |---|---|---|
-| **GRUPO** | identificador, nome, descrição, foto do grupo, data de criação | RF01, RF29 |
+| **GRUPO** | identificador, nome, descrição, foto do grupo, se é espaço pessoal, data de criação | RF01, RF29, RF34 |
+| **PERFIL** | conta de acesso, nome, avatar e estilo do avatar, foto, lembrete por e-mail ligado, data do último lembrete, data de criação | RF35, RF36 |
 | **MEMBRO** | identificador, conta de acesso, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil, data de criação | RF02, RF19, RF24, RF27 |
 | **DISCIPLINA** | identificador, nome, cor de identificação, data de criação | RF13 |
 | **CONTEUDO** | identificador, nome, descrição, ordem de apresentação | RF14 |
-| **ATIVIDADE** | identificador, título, descrição, prazo, peso, prioridade, status, data de criação, data de conclusão | RF03, RN09 |
-| **EVENTO** | identificador, título, tipo, data, hora de início, hora de fim, local, descrição, data de criação | RF31, RN21 |
+| **ATIVIDADE** | identificador, título, descrição, prazo, peso, prioridade, status, data de criação, data de conclusão | RF03, RN09, RF34 |
+| **EVENTO** | identificador, título, tipo, data, data de fim, hora de início, hora de fim, local, descrição, data de criação | RF31, RN21 |
 | **PROGRESSO_HISTORICO** | identificador, data do registro, percentual | RF12 |
 | **CONQUISTA** | código, nome, descrição, ícone, tipo de critério, valor do critério | RF17 |
 | **MEMBRO_CONQUISTA** | data de obtenção | RN12 |
@@ -56,12 +60,15 @@ erDiagram
 
 | Relacionamento | Cardinalidade | Leitura |
 |---|---|---|
-| GRUPO **possui** MEMBRO | 1 : N | Um grupo possui zero ou muitos membros; cada membro pertence a exatamente um grupo |
+| GRUPO **possui** MEMBRO | 1 : N | Um grupo possui zero ou muitos membros; cada membro pertence a exatamente um grupo. O espaço pessoal tem um membro só, o dono (RN24) |
+| PERFIL **identifica** MEMBRO | 1 : N, opcional | Um perfil identifica os membros da mesma conta, um em cada grupo, que levam o nome e a foto dele (RN26); o membro cadastrado pelo organizador e ainda sem conta não tem perfil. A ligação é pela conta de acesso, que os dois guardam |
+| PERFIL **tem como espaço pessoal** GRUPO | 1 : 1, opcional | Cada perfil tem um espaço pessoal, criado no primeiro acesso, e cada espaço pessoal é de um perfil só (RN24) |
 | GRUPO **organiza** DISCIPLINA | 1 : N | Um grupo organiza zero ou muitas disciplinas; cada disciplina pertence a exatamente um grupo |
 | DISCIPLINA **divide-se em** CONTEUDO | 1 : N | Uma disciplina divide-se em zero ou muitos conteúdos; cada conteúdo pertence a exatamente uma disciplina |
-| DISCIPLINA **reúne** ATIVIDADE | 1 : N | Uma disciplina reúne zero ou muitas atividades; cada atividade pertence a exatamente uma disciplina (RN13) |
+| GRUPO **contém** ATIVIDADE | 1 : N | Um grupo contém zero ou muitas atividades; cada atividade pertence a exatamente um grupo, ou ao espaço pessoal de alguém |
+| DISCIPLINA **reúne** ATIVIDADE | 1 : N, opcional | Uma disciplina reúne zero ou muitas atividades, do mesmo grupo dela; nos grupos, cada atividade pertence a exatamente uma disciplina, e no espaço pessoal, a nenhuma ou a uma (RN13, RN24) |
 | CONTEUDO **agrupa** ATIVIDADE | 1 : N, opcional | Um conteúdo agrupa zero ou muitas atividades; cada atividade pertence a nenhum ou a um conteúdo, que precisa ser da mesma disciplina dela (RN13) |
-| MEMBRO **é responsável por** ATIVIDADE | 1 : N | Um membro é responsável por zero ou muitas atividades; cada atividade tem exatamente um responsável (RN06) |
+| MEMBRO **é responsável por** ATIVIDADE | 1 : N, opcional | Um membro é responsável por zero ou muitas atividades; cada atividade tem um responsável ou fica "A definir", sem nenhum, até alguém assumir (RN06) |
 | DISCIPLINA **registra** PROGRESSO_HISTORICO | 1 : N | Uma disciplina acumula zero ou muitos registros de progresso; cada registro pertence a uma única disciplina |
 | GRUPO **agenda** EVENTO | 1 : N | Um grupo agenda zero ou muitos eventos; cada evento pertence a exatamente um grupo |
 | DISCIPLINA **é assunto de** EVENTO | 1 : N, opcional | Um evento pode ser de uma disciplina (uma prova, por exemplo) ou de nenhuma (uma reunião); se a disciplina sai, o evento fica sem disciplina (RN02) |
@@ -78,7 +85,11 @@ erDiagram
 
 **Por que a atividade guarda a disciplina, e o conteúdo é opcional.** Até a revisão de 03/11, a atividade chegava à disciplina pelo conteúdo, e por isso todo grupo precisava criar ao menos um conteúdo antes da primeira atividade. Com o conteúdo opcional, a atividade passou a apontar direto para a disciplina; quando tem conteúdo, ele precisa ser da mesma disciplina (RN13), o que a aplicação valida e o banco reforça.
 
-**Por que a atividade não guarda o grupo.** O grupo de uma atividade é alcançado pelo caminho ATIVIDADE → DISCIPLINA → GRUPO. Guardar o identificador do grupo diretamente na atividade criaria um caminho alternativo que poderia divergir do primeiro (uma atividade poderia apontar para o grupo A e, pela disciplina, para o grupo B).
+**Por que a atividade passou a guardar o grupo.** Até 11/11, o grupo de uma atividade era alcançado pelo caminho ATIVIDADE → DISCIPLINA → GRUPO, e guardar o grupo na atividade criaria um caminho alternativo que poderia divergir do primeiro. Com o espaço pessoal, a atividade pode não ter disciplina (uma tarefa do dia a dia), e o caminho deixou de existir para ela. A atividade passou a guardar o grupo, e a divergência é impedida pelo banco: quando há disciplina, ela precisa ser do mesmo grupo da atividade (RN24), e a atividade não muda de grupo depois de criada. As atividades existentes receberam o grupo da sua disciplina na atualização de 11/11.
+
+**Por que o espaço pessoal é um grupo.** O espaço pessoal precisa de quase tudo o que o grupo já tem: atividades, eventos, disciplinas, as regras de acesso e o cálculo de progresso e de experiência. Modelá-lo como um grupo com a marca de pessoal, com um membro só, reaproveita toda essa estrutura, e as diferenças (disciplina opcional, sem convite, sem outros membros, não pode ser excluído) ficam em regras do banco, e não em tabelas novas.
+
+**Por que o perfil é separado do membro.** O membro existe uma vez em cada grupo e guarda o que é do grupo: a função, o perfil de organizador ou participante e as atividades. O nome e a foto, que a pessoa quer iguais em todos os grupos (RN26), e a escolha do lembrete por e-mail são da conta, e não de um grupo. Guardá-los no membro obrigaria a pessoa a trocar a foto grupo por grupo, que era o comportamento até 11/11. O membro continua com as próprias colunas de nome e foto, que valem para quem ainda não tem conta e recebem uma cópia do perfil para quem tem.
 
 **Por que o evento é separado da atividade.** A atividade é trabalho de alguém: tem responsável, peso, status e entra no progresso. O evento é algo que acontece num dia (uma prova, uma palestra) e não é concluído por ninguém. Juntar os dois obrigaria o evento a ter responsável e peso, e faria uma prova contar no progresso como se fosse tarefa.
 

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 680" width="3450" height="2040">
-<rect width="1150" height="680" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 700" width="3450" height="2100">
+<rect width="1150" height="700" fill="#FFFFFF"/>
 <defs>
 <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5B6678"/></marker>
 <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0891B2"/></marker>
@@ -29,7 +29,7 @@
 <text x="692" y="94" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="10.5" fill="#0E7490" font-weight="700" text-anchor="middle" letter-spacing="1.5">DENTRO DA SESSÃO</text>
 <rect x="272" y="262" width="172" height="58" rx="10" fill="#E0F7FC" stroke="#0891B2" stroke-width="2.2"/>
 <text x="358.0" y="288" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Painel</text>
-<text x="358.0" y="306" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">entra por aqui</text>
+<text x="358.0" y="306" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">entra no espaço pessoal</text>
 <path d="M217 317 L245 317 L245 291 L272 291" fill="none" stroke="#0891B2" stroke-width="2" marker-end="url(#c)"/>
 <rect x="500" y="110" width="172" height="52" rx="10" fill="#F5F7FC" stroke="#CDD4E1" stroke-width="1.6"/>
 <text x="586.0" y="136" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="15" fill="#0B1220" font-weight="700" text-anchor="middle" letter-spacing="0">Calendário</text>
@@ -85,4 +85,5 @@
 <text x="694" y="570" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="11.5" fill="#7C3AED" font-weight="700" text-anchor="middle" letter-spacing="0">progresso, experiência, ofensiva e conquistas atualizados</text>
 <text x="575.0" y="640" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">A barra do topo leva a qualquer seção a partir de qualquer tela.</text>
 <text x="575.0" y="658" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">Nova atividade abre também do Painel e da lista de Atividades, e Novo evento também do dia escolhido no Calendário; o detalhe leva à edição no mesmo formulário.</text>
+<text x="575.0" y="676" font-family="Space Grotesk, 'DejaVu Sans', sans-serif" font-size="12" fill="#5B6678" font-weight="400" text-anchor="middle" letter-spacing="0">O seletor de espaço troca entre o espaço pessoal e os grupos; Meu perfil abre pelo menu da conta, e Várias de uma vez, pela lista de Atividades.</text>
 </svg>

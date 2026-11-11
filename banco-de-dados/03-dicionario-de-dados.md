@@ -1,25 +1,44 @@
 # Dicionário de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 08/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 11/11/2026
 
 ---
 
-Descrição campo a campo das dez tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
+Descrição campo a campo das onze tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
 
 ---
 
 ## grupo
 
-Guarda cada grupo de estudo cadastrado. É a raiz de toda a estrutura: membros, disciplinas, conteúdos e atividades pertencem sempre a um grupo.
+Guarda cada grupo de estudo cadastrado e o espaço pessoal de cada conta. É a raiz de toda a estrutura: membros, disciplinas, conteúdos, atividades e eventos pertencem sempre a um grupo.
 
 | Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
 |---|---|---|---|---|---|
 | id_grupo | UUID | | Sim | PK | Identificador único do grupo |
-| nome | VARCHAR | 80 | Sim | | Nome do grupo de estudo exibido na tela de acesso |
+| nome | VARCHAR | 80 | Sim | | Nome do grupo de estudo exibido no seletor de espaço. No espaço pessoal, a tela mostra "Pessoal" |
 | descricao | VARCHAR | 255 | Não | | Texto livre com a finalidade do grupo |
 | foto | TEXT | | Não | | Endereço da foto do grupo no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Vazia, o grupo aparece com as iniciais do nome (RF29, RN19) |
+| pessoal | BOOLEAN | | Sim | | Verdadeiro no espaço pessoal de uma conta: um grupo de uma pessoa só, criado pelo sistema no primeiro acesso, sem convite e sem outros membros, que não pode ser excluído. Padrão: falso (RF34, RN24) |
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora em que o grupo foi criado |
+
+---
+
+## perfil
+
+Guarda o nome, o avatar e a foto de cada conta, que valem em todos os grupos de que ela participa, e a escolha do lembrete por e-mail. Uma linha por conta, criada pelo sistema no primeiro acesso (RF35, RF36, RN26).
+
+| Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
+|---|---|---|---|---|---|
+| id_usuario | UUID | | Sim | PK, FK | Conta dona do perfil, no serviço de autenticação do Supabase (`auth.users`) |
+| nome | VARCHAR | 80 | Sim | | Nome da pessoa, levado aos membros dela em todos os grupos |
+| avatar | VARCHAR | 60 | Não | | Semente do avatar (RN15) |
+| estilo_avatar | VARCHAR | 20 | Sim | | `croodles-neutral` (Rabisco, o padrão) ou `notionists` (Ilustrado) |
+| foto | TEXT | | Não | | Endereço da foto no armazenamento de arquivos, na pasta do espaço pessoal. Quando existe, aparece no lugar do avatar em todos os grupos (RN19) |
+| lembrete_email | BOOLEAN | | Sim | | Se a pessoa recebe o lembrete diário por e-mail. Padrão: verdadeiro (RF36, RN25) |
+| id_grupo_pessoal | UUID | | Não | FK | Espaço pessoal da conta. Referencia `grupo.id_grupo`; um espaço por perfil |
+| ultimo_lembrete | DATE | | Não | | Dia em que o último lembrete foi enviado, para não repetir no mesmo dia. Gravado só pelo envio |
+| data_criacao | TIMESTAMPTZ | | Sim | | Data e hora em que o perfil foi criado |
 
 ---
 
@@ -32,12 +51,12 @@ Guarda os integrantes de um grupo. O perfil determina o que o integrante pode fa
 | id_membro | UUID | | Sim | PK | Identificador único do membro |
 | id_grupo | UUID | | Sim | FK | Grupo ao qual o membro pertence. Referencia `grupo.id_grupo` |
 | id_usuario | UUID | | Não | FK | Conta de acesso ligada ao membro, no serviço de autenticação do Supabase (`auth.users`). Vazia enquanto a pessoa foi só cadastrada pelo organizador e ainda não entrou com a própria conta. A mesma conta aparece no máximo uma vez em cada grupo (RF27, RN22) |
-| nome | VARCHAR | 80 | Sim | | Nome do integrante |
+| nome | VARCHAR | 80 | Sim | | Nome do integrante. Com conta, é o nome do perfil (RN26) |
 | funcao | VARCHAR | 60 | Não | | Papel do integrante no grupo, ex.: "Revisão e slides" |
 | email | VARCHAR | 120 | Não | | Endereço de e-mail para contato |
 | avatar | VARCHAR | 60 | Não | | Semente usada para desenhar o avatar. A imagem não é armazenada; o que se guarda é a semente que, com o estilo, a reproduz (RF19, RN15) |
 | estilo_avatar | VARCHAR | 20 | Sim | | Estilo de desenho do avatar, entre dois: `croodles-neutral` (Rabisco, o padrão) e `notionists` (Ilustrado) (RF19) |
-| foto | TEXT | | Não | | Endereço da foto de perfil enviada pelo membro, no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Quando existe, aparece no lugar do avatar; vazia, vale o avatar (RF24, RN15, RN19) |
+| foto | TEXT | | Não | | Endereço da foto de perfil enviada pelo membro, no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Quando existe, aparece no lugar do avatar; vazia, vale o avatar. Com conta, é a foto do perfil (RF24, RN15, RN19, RN26) |
 | perfil | VARCHAR | 15 | Sim | | Perfil de permissão: `organizador` ou `participante`. Padrão: `participante` |
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora do cadastro do membro |
 
@@ -74,20 +93,21 @@ Guarda as divisões internas de uma disciplina, para o grupo que quer acompanhar
 
 ## atividade
 
-Guarda cada atividade de estudo. É a tabela que alimenta todos os cálculos do sistema: progresso, experiência, ofensiva e conquistas.
+Guarda cada atividade de estudo e cada tarefa do espaço pessoal. É a tabela que alimenta todos os cálculos do sistema: progresso, experiência, ofensiva e conquistas.
 
 | Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
 |---|---|---|---|---|---|
 | id_atividade | UUID | | Sim | PK | Identificador único da atividade |
-| id_disciplina | UUID | | Sim | FK | Disciplina da atividade. Referencia `disciplina.id_disciplina`. Excluída a disciplina, a atividade sai junto (RN02, RN13) |
+| id_grupo | UUID | | Sim | FK | Grupo da atividade, ou o espaço pessoal. Referencia `grupo.id_grupo`. Não muda depois de criada; excluído o grupo, a atividade sai junto (RN02, RF34) |
+| id_disciplina | UUID | | Não | FK | Disciplina da atividade, do mesmo grupo. Referencia `disciplina.id_disciplina`. Obrigatória nos grupos e opcional no espaço pessoal. Excluída a disciplina, a atividade sai junto (RN02, RN13, RN24) |
 | id_conteudo | UUID | | Não | FK | Conteúdo da disciplina em que a atividade está, quando o grupo usa conteúdos. Referencia `conteudo.id_conteudo` e precisa ser da mesma disciplina. Excluído o conteúdo, fica vazio, e a atividade continua na disciplina (RN02, RN13) |
-| id_responsavel | UUID | | Sim | FK | Membro responsável pela execução, que recebe a experiência na conclusão. Referencia `membro.id_membro`. Antes de um membro ser excluído, as atividades dele passam para outro membro do grupo (RN02, RN06) |
+| id_responsavel | UUID | | Não | FK | Membro responsável pela execução, que recebe a experiência na conclusão. Referencia `membro.id_membro`. Vazio, a atividade fica "A definir" e em `a fazer` até alguém assumir; no espaço pessoal, é sempre o dono. Antes de um membro ser excluído, as atividades dele passam para outro membro do grupo (RN02, RN06, RN24) |
 | titulo | VARCHAR | 120 | Sim | | Título da atividade. Mínimo de 3 caracteres |
 | descricao | TEXT | | Não | | Detalhamento do que precisa ser feito |
 | prazo | DATE | | Sim | | Data limite para a conclusão |
 | peso | SMALLINT | | Sim | | Esforço relativo da atividade, de 1 a 5. Base do cálculo de progresso e de experiência. Padrão: 1 |
 | prioridade | VARCHAR | 10 | Não | | Urgência informada pelo usuário: `baixa`, `media` ou `alta` |
-| status | VARCHAR | 12 | Sim | | Situação atual: `a fazer`, `fazendo` ou `concluido`. Padrão: `a fazer`. Só o responsável altera (RN20) |
+| status | VARCHAR | 12 | Sim | | Situação atual: `a fazer`, `fazendo` ou `concluido`. Padrão: `a fazer`. Só o responsável altera, e a atividade "A definir" fica em `a fazer` (RN06, RN20) |
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora do cadastro da atividade |
 | data_conclusao | TIMESTAMPTZ | | Não | | Data e hora em que a atividade passou para `concluido`. Base do cálculo da ofensiva. Preenchida exatamente quando o status é `concluido`, e fica vazia se a conclusão for revertida |
 
@@ -95,7 +115,7 @@ Guarda cada atividade de estudo. É a tabela que alimenta todos os cálculos do 
 
 ## evento
 
-Guarda o que vai acontecer num dia para o grupo: uma prova, uma apresentação, uma palestra, uma reunião. Não tem responsável, peso nem status, e não entra no progresso (RF31, RN21).
+Guarda o que vai acontecer num dia, ou num período de vários dias, para o grupo ou só para a pessoa, no espaço pessoal: uma prova, uma apresentação, uma palestra, uma reunião, uma semana acadêmica. Não tem responsável, peso nem status, e não entra no progresso (RF31, RN21).
 
 | Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
 |---|---|---|---|---|---|
@@ -105,9 +125,10 @@ Guarda o que vai acontecer num dia para o grupo: uma prova, uma apresentação, 
 | id_criador | UUID | | Não | FK | Membro que cadastrou o evento; ele e o organizador podem editar e excluir (RN21). Referencia `membro.id_membro`. Com conta, é preenchido pelo banco com o membro de quem está conectado. Fica vazio quando o membro sai do grupo |
 | titulo | VARCHAR | 120 | Sim | | Nome do evento, ex.: "Prova de Banco de Dados" |
 | tipo | VARCHAR | 12 | Sim | | `prova`, `apresentacao`, `palestra`, `reuniao` ou `outro` |
-| data_evento | DATE | | Sim | | Dia do evento. Passa para a lista de passados no dia seguinte |
+| data_evento | DATE | | Sim | | Dia do evento, ou o primeiro dia do período |
+| data_fim | DATE | | Não | | Último dia do evento de vários dias; não pode ser antes de `data_evento`. Vazio, o evento é de um dia. O evento passa para a lista de passados no dia seguinte ao último dia (RF31, RN21) |
 | hora_inicio | TIME | | Não | | Hora de início. Sem ela, o evento vale o dia todo |
-| hora_fim | TIME | | Não | | Hora de término. Só existe com a hora de início e precisa ser depois dela (RN21) |
+| hora_fim | TIME | | Não | | Hora de término. Só existe com a hora de início; no evento de um dia, precisa ser depois dela, e no de vários dias, é a hora de término do último dia (RN21) |
 | local_evento | VARCHAR | 120 | Não | | Onde acontece, ex.: "Sala 204" ou "Google Meet" |
 | descricao | TEXT | | Não | | Observações, ex.: o que cai na prova |
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora do cadastro do evento |
@@ -150,7 +171,7 @@ Tabela associativa que resolve o relacionamento muitos-para-muitos entre membro 
 |---|---|---|---|---|---|
 | id_membro | UUID | | Sim | PK, FK | Membro que obteve a conquista. Referencia `membro.id_membro` |
 | codigo_conquista | VARCHAR | 30 | Sim | PK, FK | Conquista obtida. Referencia `conquista.codigo` |
-| data_obtencao | TIMESTAMPTZ | | Sim | | Data e hora em que o marco foi atingido |
+| data_obtencao | TIMESTAMPTZ | | Sim | | Data e hora em que o marco foi atingido. Se a conclusão que sustentava a conquista for desfeita, a linha é excluída (RN12) |
 
 ---
 

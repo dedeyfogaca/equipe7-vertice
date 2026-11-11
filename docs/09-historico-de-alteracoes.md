@@ -1,11 +1,11 @@
 # 09 · Histórico de Alterações
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 08/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 11/11/2026
 
 ---
 
-Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, as de 29/10 e 01/11/2026, com os ajustes que a equipe pediu ao revisar a versão 2, a de 03/11/2026, com os pedidos da equipe para a entrega de 06/11, e a de 08/11/2026, com o banco de dados e o acesso com conta para a entrega de 27/11. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
+Registro das mudanças aplicadas ao Documento de Visão e Requisitos ao longo do bimestre: da Entrega 1 (14/08/2026) para a Entrega 2 (08/09/2026), a revisão de 17/09/2026 feita a partir da conferência com o código, os acréscimos da Entrega 3 (25/09/2026), a revisão do início do 2º bimestre (19/10/2026), a revisão de 28/10/2026, com os pedidos da professora depois da entrega de 20/10, as de 29/10 e 01/11/2026, com os ajustes que a equipe pediu ao revisar a versão 2, a de 03/11/2026, com os pedidos da equipe para a entrega de 06/11, a de 08/11/2026, com o banco de dados e o acesso com conta para a entrega de 27/11, e a de 11/11/2026, com as considerações da equipe e os comentários dos usuários de teste. A numeração dos requisitos existentes foi preservada; os itens novos foram acrescentados ao final de cada tabela.
 
 ---
 
@@ -259,6 +259,28 @@ Com o banco de dados, o acesso com conta e o convite implementados para a entreg
 | 08/11/2026 | Doc. 05 | As restrições de persistência, acesso e integração descrevem o sistema com o banco e o modo de demonstração | Nenhum |
 | 08/11/2026 | Modelo de dados | O script de criação passou a ser o do PostgreSQL do Supabase, com identificadores UUID, regras de acesso por linha, gatilhos para as regras que dependem de quem está conectado, a tabela `convite` e o espaço das fotos | Docs. do banco, diagrama de classes e arquitetura |
 | 08/11/2026 | Docs. 05 a 16, diagramas, modelo de dados e protótipos | Requisitos, regras e casos de uso novos; matriz com RF27, RF28, RF33, RN22 e RN23; tarefas T74 a T77; arquitetura com o Supabase; casos de teste do modo com conta; telas de acesso, convite, evolução e tutorial | Exigência do manual |
+
+---
+
+## 2º bimestre: revisão de 11/11/2026
+
+A equipe reuniu, em 09/11, as considerações sobre o uso do sistema e os comentários dos usuários de teste. Os pedidos foram: um espaço principal de cada pessoa, de onde ela organiza tudo e cria os seus grupos, sem precisar sair de um grupo para anotar algo só dela; a foto de perfil valendo em todos os grupos; filtros mais claros no calendário; evento de vários dias; lembrete por e-mail das atividades perto do prazo; telas que aproveitem melhor a largura do computador; tarefas do dia a dia, e não só da faculdade; o responsável "A definir" com o botão Assumir; cadastro e troca de responsável em lote; o filtro de disciplina nos eventos; e a correção de duas confusões, o botão Concluir logo depois de cadastrar e a conquista que ficava depois de desfazer a conclusão. A mudança foi feita sem perder os dados de quem já tinha conta: o banco recebe uma atualização própria, que cria o espaço pessoal de cada conta no primeiro acesso. **Nenhum requisito ou regra foi removido ou renumerado**; os novos foram acrescentados ao final de cada tabela.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 11/11/2026 | RF34, RN24, RN01 | Requisito e regra novos: o espaço pessoal, aberto ao entrar, com as atividades e eventos só da pessoa e o que está com ela em todos os grupos. A pessoa anota uma tarefa do dia a dia sem sair do grupo e sem disciplina | UC17 novo, UC01, classes, modelo de dados (`grupo.pessoal`, `atividade.id_grupo`, disciplina opcional), atualização do banco (`07-atualizacao-11-11.sql`), versão 4 dos dados da demonstração e testes (CT69, CT70, CT81 e CT85) |
+| 11/11/2026 | RF01, RF09, RF27 | O seletor de espaço, no topo, troca entre o espaço pessoal e os grupos, cria grupo e entra com código sem sair do sistema. A tela de acesso em duas colunas deixou de existir: quem entra vai direto para o espaço pessoal, e sair do grupo volta para ele | UC01, UC15, UC16 e testes (CT53, CT71 e CT72) |
+| 11/11/2026 | RF35, RN26, RF24 | Requisito e regra novos: Meu perfil, com o nome, o avatar e a foto que valem em todos os grupos. Antes, a foto mudava só no grupo aberto | UC18 novo, UC02, modelo de dados (tabela `perfil`) e testes (CT05 e CT76) |
+| 11/11/2026 | RF36, RN25 | Requisito e regra novos: lembrete diário por e-mail das atividades que vencem nos próximos 2 dias ou venceram nos últimos 7, enviado pelo Brevo e agendado no próprio banco, e que pode ser desligado em Meu perfil | UC21 novo, modelo de dados (`perfil.lembrete_email`), arquitetura, passo a passo no README e testes (CT80) |
+| 11/11/2026 | RF31, RN21 | O evento pode durar vários dias (do dia X ao dia Y) e aparece em cada dia do calendário. A página de eventos ganhou o filtro por disciplina | UC14, modelo de dados (`evento.data_fim`) e testes (CT77 e CT83) |
+| 11/11/2026 | RF23 | Os botões das disciplinas no calendário deram lugar a uma barra de filtros: o que aparece (atividades, eventos, feriados), a disciplina, o grupo ou só as minhas, um resumo do que está na tela e "Limpar filtros". As pessoas se perdiam com os botões | UC13 e testes (CT15 e CT82) |
+| 11/11/2026 | RF38, RN06 | Requisito novo: o responsável pode ficar "A definir", e qualquer integrante assume a atividade. Até alguém assumir, ela fica em "a fazer" | UC05, UC19 novo, modelo de dados (`atividade.id_responsavel` opcional) e testes (CT09 e CT73) |
+| 11/11/2026 | RF37 | Requisito novo: várias atividades de uma vez, com a lista de títulos colada e a linha "Para todas", e a troca do responsável de várias atividades pelo organizador | UC20 novo e testes (CT78 e CT79) |
+| 11/11/2026 | RF03, RF05 | Depois de cadastrar, o sistema volta para a tela de onde a pessoa veio, em vez de abrir o detalhe com o botão Concluir em destaque, que levava a concluir por engano. No detalhe, "Marcar como concluída" ficou discreto e o aviso oferece desfazer | UC05, UC07 e testes (CT10, CT17, CT70 e CT75) |
+| 11/11/2026 | RF17, RN12 | A conquista passou a sair junto com a experiência quando a conclusão que a sustentava é desfeita. Antes, quem concluía por engano e desfazia continuava com o "Primeiro Passo" | UC07, modelo de dados (regra de acesso para retirar a conquista) e testes (CT12 e CT74) |
+| 11/11/2026 | RF20 | Na demonstração, a pessoa informa só o nome e ganha o espaço pessoal; com os dados de exemplo, entram tarefas pessoais e um grupo pronto em que ela é um dos membros | UC12 e testes (CT81) |
+| 11/11/2026 | RNF01 | As telas internas passaram a ocupar mais a largura do computador (até 1680 pixels, com margens menores), sem rolagem lateral no celular | Testes (CT84) |
+| 11/11/2026 | Docs. 05 a 16, diagramas, modelo de dados e protótipos | Requisitos, regras e casos de uso novos; matriz com RF34 a RF38 e RN24 a RN26; tarefas T78 a T89; arquitetura com o espaço pessoal e o lembrete; casos de teste CT69 a CT85 e nova execução completa; telas recapturadas | Exigência do manual |
 
 ---
 
