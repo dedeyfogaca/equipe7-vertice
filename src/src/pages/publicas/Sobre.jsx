@@ -1,11 +1,10 @@
 import { useTitulo } from '../../hooks/useTitulo.js';
 import { LayoutPublico } from '../../components/layout/LayoutPublico.jsx';
-import { dataLocal } from '../../lib/datas.js';
 import { cn } from '../../lib/utils.js';
 import avatarAndrey from '../../assets/avatar-andrey.webp';
 import avatarMatheus from '../../assets/avatar-matheus.webp';
 
-// Sobre nós (pública): quem fez o Vértice e o caminho do projeto.
+// Sobre nós (pública): quem fez o Vértice.
 
 // Marca do GitHub (o ícone saiu do pacote de ícones, que não traz mais
 // marcas de empresas).
@@ -60,15 +59,6 @@ const PESSOAS = [
     acento: 'rgb(132 204 22 / 0.6)',
     borda: 'rgb(132 204 22 / 0.28)',
   },
-];
-
-const TRAJETORIA = [
-  { data: '2026-08-14', titulo: 'Visão e requisitos' },
-  { data: '2026-09-08', titulo: 'Modelagem e banco' },
-  { data: '2026-09-25', titulo: 'Protótipos e MVP' },
-  { data: '2026-10-20', titulo: 'Sistema testado' },
-  { data: '2026-11-06', titulo: 'Visual novo e calendário' },
-  { data: '2026-11-27', titulo: 'Login, banco e versão final' },
 ];
 
 function Pessoa({ pessoa, invertido }) {
@@ -133,7 +123,6 @@ function Retrato({ pessoa }) {
 
 export default function Sobre() {
   useTitulo('Sobre nós');
-  const hoje = new Date();
 
   return (
     <LayoutPublico>
@@ -148,38 +137,11 @@ export default function Sobre() {
         </p>
       </section>
 
-      {PESSOAS.map((pessoa, i) => (
-        <Pessoa key={pessoa.nome} pessoa={pessoa} invertido={i % 2 === 1} />
-      ))}
-
-      <section className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 pb-24 pt-16">
-        <div className="flex flex-col gap-3.5">
-          <span className="text-[13px] font-semibold uppercase tracking-[0.16em] text-primaria">A trajetória</span>
-          <h2 className="text-[clamp(32px,4vw,48px)] font-semibold leading-[1.05] tracking-[-0.04em] text-forte">
-            Do documento de requisitos ao sistema no ar.
-          </h2>
-        </div>
-        <ol className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {TRAJETORIA.map(({ data, titulo }) => {
-            const feito = dataLocal(data) <= hoje;
-            const [ano, mes, dia] = data.split('-');
-            return (
-              <li
-                key={data}
-                className={cn('flex flex-col gap-2 border-t-2 pt-4', feito ? 'border-primaria' : 'border-borda-forte')}
-              >
-                <span className="numero text-[13px] text-sutil">
-                  {dia}/{mes}/{ano}
-                </span>
-                <strong className={cn('text-[17px] font-semibold', feito ? 'text-forte' : 'text-suave')}>
-                  {titulo}
-                </strong>
-                <span className="sr-only">{feito ? '(concluído)' : '(próxima etapa)'}</span>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
+      <div className="pb-16 sm:pb-24">
+        {PESSOAS.map((pessoa, i) => (
+          <Pessoa key={pessoa.nome} pessoa={pessoa} invertido={i % 2 === 1} />
+        ))}
+      </div>
     </LayoutPublico>
   );
 }
