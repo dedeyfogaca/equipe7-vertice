@@ -11,6 +11,7 @@ import {
   ChevronsUpDown,
   Compass,
   House,
+  Inbox,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -43,7 +44,7 @@ import { EntrarComCodigo } from '../conta/EntrarComCodigo.jsx';
 import { TutorialProvider, useTutorial } from '../tutorial/Tutorial.jsx';
 import { obterConquista } from '../../lib/gamificacao.js';
 import { rotuloPerfil } from '../../lib/constants.js';
-import { LINK_FEEDBACK, temFormularioFeedback } from '../../lib/feedback.js';
+import { useEquipe } from '../feedback/useEquipe.js';
 import { entrarComCodigo, lerConvitePendente, limparConvitePendente } from '../../lib/convite.js';
 import { gerarDadosExemplo } from '../../lib/seed.js';
 import { cn, plural } from '../../lib/utils.js';
@@ -250,24 +251,24 @@ function useSairDoGrupo() {
 }
 
 // Canto direito da barra: quem está usando, com o perfil e a saída do grupo.
-// Feedback dos usuários de teste: abre o formulário anônimo em outra aba.
-// Sem o link ainda, o item aparece desligado, como "em breve".
+// Feedback dos usuários de teste (RF32): a página /feedback, dentro do
+// Vértice. Quem é da equipe (RN27) também vê o atalho para as respostas.
 function ItemFeedback() {
-  if (!temFormularioFeedback()) {
-    return (
-      <MenuItem disabled>
-        <MessageSquareText aria-hidden="true" />
-        Enviar feedback (em breve)
-      </MenuItem>
-    );
-  }
+  const navigate = useNavigate();
+  const equipe = useEquipe();
   return (
-    <MenuItem asChild>
-      <a href={LINK_FEEDBACK} target="_blank" rel="noopener noreferrer">
+    <>
+      <MenuItem onSelect={() => navigate('/feedback')}>
         <MessageSquareText aria-hidden="true" />
         Enviar feedback
-      </a>
-    </MenuItem>
+      </MenuItem>
+      {equipe && (
+        <MenuItem onSelect={() => navigate('/feedback/respostas')}>
+          <Inbox aria-hidden="true" />
+          Respostas do feedback
+        </MenuItem>
+      )}
+    </>
   );
 }
 
@@ -438,6 +439,7 @@ function MenuCelular({ aberto, aoMudar }) {
   const sairDaConta = useSairDaConta();
   const navigate = useNavigate();
   const { abrirTutorial } = useTutorial();
+  const equipe = useEquipe();
 
   return (
     <DialogPrimitive.Root open={aberto} onOpenChange={aoMudar}>
@@ -508,11 +510,30 @@ function MenuCelular({ aberto, aoMudar }) {
               >
                 <Compass className="!size-[18px]" />
               </Button>
-              {temFormularioFeedback() && (
-                <Button variante="fantasma" tamanho="icone" asChild>
-                  <a href={LINK_FEEDBACK} target="_blank" rel="noopener noreferrer" aria-label="Enviar feedback (abre em outra aba)" title="Enviar feedback">
-                    <MessageSquareText className="!size-[18px]" />
-                  </a>
+              <Button
+                variante="fantasma"
+                tamanho="icone"
+                aria-label="Enviar feedback"
+                title="Enviar feedback"
+                onClick={() => {
+                  aoMudar(false);
+                  navigate('/feedback');
+                }}
+              >
+                <MessageSquareText className="!size-[18px]" />
+              </Button>
+              {equipe && (
+                <Button
+                  variante="fantasma"
+                  tamanho="icone"
+                  aria-label="Respostas do feedback"
+                  title="Respostas do feedback"
+                  onClick={() => {
+                    aoMudar(false);
+                    navigate('/feedback/respostas');
+                  }}
+                >
+                  <Inbox className="!size-[18px]" />
                 </Button>
               )}
               {!noEspacoPessoal && (

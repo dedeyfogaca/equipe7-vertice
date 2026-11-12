@@ -9,6 +9,7 @@ import Inicio from './pages/publicas/Inicio.jsx';
 import Sobre from './pages/publicas/Sobre.jsx';
 import Entrar from './pages/publicas/Entrar.jsx';
 import Convite from './pages/publicas/Convite.jsx';
+import Feedback from './pages/publicas/Feedback.jsx';
 import NaoEncontrada from './pages/publicas/NaoEncontrada.jsx';
 
 import Painel from './pages/Painel.jsx';
@@ -23,6 +24,7 @@ import Membros from './pages/Membros.jsx';
 import Conquistas from './pages/Conquistas.jsx';
 import Perfil from './pages/Perfil.jsx';
 import AtividadesEmLote from './pages/AtividadesEmLote.jsx';
+import FeedbackRespostas from './pages/FeedbackRespostas.jsx';
 
 // Mapa de rotas.
 //
@@ -39,6 +41,7 @@ export default function App() {
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/entrar" element={<Entrar />} />
         <Route path="/convite/:codigo" element={<Convite />} />
+        <Route path="/feedback" element={<Feedback />} />
         {/* Endereço antigo da tela de acesso. */}
         <Route path="/login" element={<Navigate to="/entrar" replace />} />
 
@@ -57,6 +60,7 @@ export default function App() {
             <Route path="/membros" element={<Membros />} />
             <Route path="/conquistas" element={<Conquistas />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/feedback/respostas" element={<FeedbackRespostas />} />
           </Route>
         </Route>
 

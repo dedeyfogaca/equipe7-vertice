@@ -6,7 +6,6 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { BotaoTema } from '../BotaoTema.jsx';
 import { Button } from '../ui/botao.jsx';
 import { MarcaVertice, SimboloVertice } from '../ui/marca.jsx';
-import { temFormularioFeedback, LINK_FEEDBACK } from '../../lib/feedback.js';
 import { cn } from '../../lib/utils.js';
 
 // Casca das páginas públicas (início, sobre nós): o menu do site no topo, com
@@ -32,20 +31,9 @@ export function RodapePublico() {
           Vértice
         </span>
         <span>Equipe 7 · Andrey Fogaça e Matheus Saraiva Faustin · Imersão Profissional: Projeto de Software</span>
-        {temFormularioFeedback() ? (
-          <a
-            href={LINK_FEEDBACK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-suave transition-colors hover:text-primaria"
-          >
-            Enviar feedback<span className="sr-only"> (abre em outra aba)</span>
-          </a>
-        ) : (
-          <Link to="/#feedback" className="font-semibold text-suave transition-colors hover:text-primaria">
-            Feedback
-          </Link>
-        )}
+        <Link to="/feedback" className="font-semibold text-suave transition-colors hover:text-primaria">
+          Enviar feedback
+        </Link>
         <a
           href={INSTAGRAM}
           target="_blank"

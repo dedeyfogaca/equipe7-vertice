@@ -76,10 +76,14 @@ outros.
   enchem quando aparecem e cada funcionalidade mostra uma demonstração curta
   ao passar o mouse (no celular, quando aparece na tela). Quem pede menos
   movimento no sistema vê tudo parado.
-- **Feedback** dos usuários de teste: seção na página inicial (com link no
-  topo e no rodapé) e item no menu da conta, que abrem um formulário anônimo.
-  O link fica em `src/lib/feedback.js`; enquanto está vazio, os botões
-  aparecem como "em breve".
+- **Feedback** dos usuários de teste (desde 12/11/2026, dentro do sistema):
+  a página `/feedback`, aberta pela seção da página inicial, pelo rodapé e
+  pelo menu da conta, faz uma pergunta por vez (a nota e três perguntas
+  abertas), sem conta e sem nome. As respostas vão para o banco, e só as
+  contas da equipe as leem em **Respostas do feedback**, no menu da conta,
+  com o resumo das notas, busca, filtros, "marcar como lida", exclusão e a
+  planilha para o Excel. Sem banco, a página leva ao formulário do Google
+  (o link fica em `src/lib/feedback.js`).
 - **Login** com e-mail e senha ou com a conta Google. Ao lado, o botão
   **"Experimentar sem conta"** abre a demonstração.
 - **Espaço pessoal** (desde 11/11/2026): ao entrar, a pessoa cai no espaço
@@ -223,8 +227,11 @@ npm run verificar  # conferir as regras de negócio
    do repositório da equipe. Ele cria as tabelas, as regras de acesso, os
    gatilhos, o convite, o espaço pessoal, o lembrete e o espaço das fotos.
    **Só num projeto novo**: ele apaga e recria tudo. Num banco que já tem
-   dados, rode o script de atualização (`banco-de-dados/07-atualizacao-11-11.sql`),
-   que só acrescenta.
+   dados, rode os scripts de atualização, na ordem
+   (`banco-de-dados/07-atualizacao-11-11.sql` e
+   `banco-de-dados/08-atualizacao-feedback.sql`), que só acrescentam.
+   Depois, cadastre as contas da equipe, que leem o feedback:
+   `insert into equipe (id_usuario) select id from auth.users where email in ('...');`
 3. Em **Authentication**, desligue *Confirm email* em *Sign In / Providers →
    Email* e, para o Google, ligue o provedor com o Client ID e o Client
    Secret criados no Google Cloud. Em *URL Configuration*, ponha o endereço
@@ -241,14 +248,14 @@ Na Vercel, as mesmas duas variáveis (`VITE_SUPABASE_URL` e
 `VITE_SUPABASE_ANON_KEY`) vão em *Settings → Environment Variables*.
 
 O `npm run verificar` roda as verificações de `verificacoes/`, em JavaScript
-puro, sem biblioteca de teste instalada. São 280 conferências das regras que
+puro, sem biblioteca de teste instalada. São 297 conferências das regras que
 mais escondem erro: progresso por razão de pesos (e não média de
 percentuais), experiência que não pode ser creditada duas vezes, ofensiva,
 conquistas concedidas uma vez só e retiradas só quando a conclusão é
 desfeita, perfis, quem pode mudar o status e assumir cada atividade,
 validação da atividade e do evento de vários dias, o enquadramento da foto,
-a migração dos dados antigos, a ordem das gravações no banco e a evolução do
-progresso.
+a migração dos dados antigos, a ordem das gravações no banco, a evolução do
+progresso e o resumo e a planilha do feedback.
 
 As regras do banco têm verificações próprias, em SQL
 (`banco-de-dados/05-verificacoes.sql`), que rodam num PostgreSQL local.
@@ -341,7 +348,7 @@ src/
 │   ├── foto.js               # Enquadramento, recorte e redução das fotos
 │   ├── avatar.js             # Avatares nos dois estilos (DiceBear) + iniciais
 │   ├── feriados.js           # BrasilAPI → Nager.Date → cache
-│   ├── feedback.js           # Link do formulário anônimo de feedback
+│   ├── feedback.js           # Feedback: envio, respostas, resumo e planilha
 │   ├── seed.js               # Dados de exemplo
 │   └── utils.js              # Classes, plural, primeiro nome
 ├── hooks/
@@ -363,7 +370,7 @@ src/
 │   ├── layout/               # Barra do topo (com o seletor de espaço), layout das páginas públicas e a passagem ao abrir
 │   ├── atividades/           # Linha da lista, cartões de situação, peso, conclusão
 │   ├── eventos/              # Cartão, formulário e tipos de evento
-│   ├── feedback/             # Seção e botão do formulário de feedback
+│   ├── feedback/             # Seção da página inicial e quem é da equipe
 │   ├── publicas/             # Movimento das páginas públicas (aparecer ao rolar, mouse)
 │   ├── disciplinas/          # Formulários, paleta de cores e gráfico da evolução
 │   ├── grupos/               # Cadastro e edição do grupo (nome, descrição e foto)
@@ -376,7 +383,7 @@ src/
 │   ├── RolarParaTopo.jsx
 │   └── SomenteOrganizador.jsx
 └── pages/
-    ├── publicas/             # Início, Sobre nós, Entrar, Convite, página 404
+    ├── publicas/             # Início, Sobre nós, Entrar, Convite, Feedback, página 404
     ├── Painel.jsx
     ├── Calendario.jsx
     ├── Eventos.jsx           # Próximos e passados, com filtro por tipo e por disciplina
@@ -388,7 +395,8 @@ src/
     ├── AtividadeDetalhe.jsx
     ├── Membros.jsx
     ├── Conquistas.jsx
-    └── Perfil.jsx            # Meu perfil: nome, foto e lembrete por e-mail
+    ├── Perfil.jsx            # Meu perfil: nome, foto e lembrete por e-mail
+    └── FeedbackRespostas.jsx # Respostas do feedback, só para a equipe
 
 verificacoes/                 # Verificação das regras de negócio (npm run verificar)
 ```
@@ -492,7 +500,9 @@ dados gravado em `versaoDados`.
 
 Com conta, o banco tem o seu script de atualização
 (`banco-de-dados/07-atualizacao-11-11.sql`), que só acrescenta: cada conta
-ganha o espaço pessoal e o perfil no primeiro acesso depois dele.
+ganha o espaço pessoal e o perfil no primeiro acesso depois dele. O de
+12/11 (`banco-de-dados/08-atualizacao-feedback.sql`) cria as tabelas do
+feedback e da equipe.
 
 ---
 
@@ -504,6 +514,7 @@ ganha o espaço pessoal e o perfil no primeiro acesso depois dele.
 | `/sobre` | Sobre nós | pública |
 | `/entrar` | Login e, na demonstração, o nome (`/login` leva para cá) | pública |
 | `/convite/:codigo` | Link do convite: guarda o código e leva ao acesso | pública |
+| `/feedback` | Feedback dos usuários de teste, uma pergunta por vez | pública |
 | `/painel` | Painel | privada |
 | `/calendario` | Calendário | privada |
 | `/eventos` | Eventos do grupo (`?novo=` já abre o cadastro) | privada |
@@ -517,6 +528,7 @@ ganha o espaço pessoal e o perfil no primeiro acesso depois dele.
 | `/membros` | Membros do grupo | privada |
 | `/conquistas` | Experiência, ofensiva, conquistas e ranking | privada |
 | `/perfil` | Meu perfil: nome, foto e lembrete por e-mail | privada |
+| `/feedback/respostas` | Respostas do feedback (só as contas da equipe) | privada |
 | `*` | Página 404 | pública |
 
 As rotas privadas só abrem com uma sessão; sem ela, o sistema manda para

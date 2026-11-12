@@ -6,8 +6,10 @@ import { createClient } from '@supabase/supabase-js';
 //
 // A chave aqui é a pública (anon/publishable): ela só dá o que as políticas
 // de acesso do banco permitem. A chave secreta nunca vai para o navegador.
-const url = import.meta.env.VITE_SUPABASE_URL;
-const chave = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Fora do Vite (nas verificações com Node) não há import.meta.env.
+const env = import.meta.env ?? {};
+const url = env.VITE_SUPABASE_URL;
+const chave = env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = url && chave ? createClient(url, chave) : null;
 

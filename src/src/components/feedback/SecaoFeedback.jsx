@@ -1,7 +1,7 @@
-import { ArrowUpRight, Lightbulb, MessageSquareText, ThumbsUp, TriangleAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Lightbulb, MessageSquareText, ThumbsUp, TriangleAlert } from 'lucide-react';
 
 import { Revelar } from '../publicas/movimento.jsx';
-import { LINK_FEEDBACK, temFormularioFeedback } from '../../lib/feedback.js';
 import { cn } from '../../lib/utils.js';
 
 const PERGUNTAS = [
@@ -10,45 +10,29 @@ const PERGUNTAS = [
   { icone: Lightbulb, texto: 'O que faltou?' },
 ];
 
-/** Botão que abre o formulário de feedback em outra aba (ou "em breve"). */
-export function BotaoFeedback({ className, children = 'Responder o formulário' }) {
-  if (!temFormularioFeedback()) {
-    return (
-      <span
-        aria-disabled="true"
-        className={cn(
-          'inline-flex h-[52px] cursor-not-allowed items-center gap-2 rounded-full border border-dashed border-borda-forte px-6 text-base font-semibold text-sutil',
-          className
-        )}
-      >
-        Formulário em breve
-      </span>
-    );
-  }
+/** Botão que leva à página de feedback, dentro do Vértice (RF32). */
+export function BotaoFeedback({ className, children = 'Contar como foi' }) {
   return (
-    <a
-      href={LINK_FEEDBACK}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      to="/feedback"
       className={cn(
         'group/fb inline-flex h-[52px] items-center gap-2 rounded-full bg-primaria px-6 text-base font-semibold text-primaria-fg shadow-botao transition-[translate,filter] hover:-translate-y-px hover:brightness-105',
         className
       )}
     >
       {children}
-      <ArrowUpRight
+      <ArrowRight
         aria-hidden="true"
-        className="size-[18px] transition-transform duration-300 group-hover/fb:-translate-y-0.5 group-hover/fb:translate-x-0.5"
+        className="size-[18px] transition-transform duration-300 group-hover/fb:translate-x-0.5"
       />
-      <span className="sr-only">(abre em outra aba)</span>
-    </a>
+    </Link>
   );
 }
 
 /**
- * Seção de feedback da página inicial: quem testa o Vértice responde um
- * formulário anônimo. É com essas respostas que a equipe decide o que
- * melhorar até a entrega final.
+ * Seção de feedback da página inicial: quem testa o Vértice responde, no
+ * próprio sistema, quatro perguntas rápidas e anônimas. É com essas respostas
+ * que a equipe decide o que melhorar até a entrega final.
  */
 export function SecaoFeedback() {
   return (
@@ -63,8 +47,8 @@ export function SecaoFeedback() {
             Testou o Vértice? Conta pra gente.
           </h2>
           <p className="max-w-[520px] text-[17px] leading-relaxed text-sutil">
-            O formulário é anônimo e leva uns dois minutos. Vale elogio, crítica, bug e ideia: é com as respostas
-            que a gente decide o que melhorar até a entrega final.
+            São quatro perguntas rápidas, aqui mesmo, e leva uns dois minutos. Vale elogio, crítica, bug e ideia: é
+            com as respostas que a gente decide o que melhorar até a entrega final.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <BotaoFeedback />

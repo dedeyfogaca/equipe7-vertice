@@ -76,6 +76,8 @@
      para onde a pessoa andou. */
   --animate-mes-proximo: mes-proximo 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-mes-anterior: mes-anterior 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-passo-avanca: passo-avanca 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-passo-volta: passo-volta 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes mes-proximo {
@@ -91,6 +93,20 @@
   }
 }
 
+/* Passos do feedback (RF32): a pergunta seguinte entra pela direita, a
+   anterior pela esquerda. */
+@keyframes passo-avanca {
+  from {
+    opacity: 0;
+    translate: 28px 0;
+  }
+}
+@keyframes passo-volta {
+  from {
+    opacity: 0;
+    translate: -28px 0;
+  }
+}
 @keyframes menu-desce {
   from {
     translate: 0 -100%;
