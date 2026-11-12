@@ -9,7 +9,7 @@
 -- Cada conferência imprime "ok" ou "FALHOU"; no fim, o total.
 -- As conferências do fim (espaço pessoal, "A definir", evento de vários dias,
 -- conquista retirada e lembrete) entraram na revisão de 11/11/2026, e as do
--- feedback, em 12/11/2026.
+-- feedback, da saída do grupo e do histórico, em 12/11/2026.
 -- =====================================================================
 \set ON_ERROR_STOP 1
 \o /dev/null
@@ -502,6 +502,126 @@ insert into feedback (nota) select 3 from generate_series(1, 19);
 set role anon;
 select teste.recusa('mais de 20 respostas no mesmo minuto são recusadas',
   $$ insert into feedback (nota) values (3) $$, 'Muitas respostas agora. Tente de novo em um minuto.');
+reset role;
+
+-- ---------------------------------------------------------------------
+-- Sair do grupo e histórico do grupo (RF39, RF40, RN28, RN29), 12/11/2026
+-- ---------------------------------------------------------------------
+reset role;
+create temp table saida as select gen_random_uuid() as grupo, gen_random_uuid() as disc,
+  gen_random_uuid() as aberta, gen_random_uuid() as feita, gen_random_uuid() as solo;
+grant all on saida to authenticated;
+set role authenticated;
+select teste.como('00000000-0000-0000-0000-00000000000a');
+insert into grupo (id_grupo, nome) select grupo, 'Grupo da Saída' from saida;
+insert into membro (id_grupo, id_usuario, nome, email, perfil)
+  select grupo, auth.uid(), 'Ana Souza', 'ana@exemplo.com', 'organizador' from saida;
+insert into convite (id_grupo, codigo) select grupo, 'SAIRGRP2' from saida;
+insert into disciplina (id_disciplina, id_grupo, nome) select disc, grupo, 'Redes' from saida;
+select teste.como('00000000-0000-0000-0000-00000000000b');
+select entrar_com_codigo('SAIRGRP2', 'Bruno');
+select teste.como('00000000-0000-0000-0000-00000000000c');
+select entrar_com_codigo('SAIRGRP2', 'Carla');
+select teste.como('00000000-0000-0000-0000-00000000000a');
+insert into atividade (id_atividade, id_grupo, id_disciplina, id_responsavel, titulo, prazo)
+  select aberta, grupo, disc, (select id_membro from membro m where m.id_grupo = saida.grupo and m.email = 'bruno@exemplo.com'),
+         'Relatório de redes', current_date + 3 from saida;
+insert into atividade (id_atividade, id_grupo, id_disciplina, id_responsavel, titulo, prazo)
+  select feita, grupo, disc, (select id_membro from membro m where m.id_grupo = saida.grupo and m.email = 'bruno@exemplo.com'),
+         'Lista 1', current_date from saida;
+select teste.como('00000000-0000-0000-0000-00000000000b');
+update atividade set status = 'concluido' where id_atividade = (select feita from saida);
+
+select teste.confere('o histórico guarda quem criou o grupo e quem entrou',
+  (select string_agg(coalesce(autor, '-') || ' ' || acao || ' ' || tipo, ', ' order by data_registro, acao)
+     from registro where id_grupo = (select grupo from saida) and tipo in ('grupo', 'membro')),
+  'Ana Souza criou grupo, Bruno entrou membro, Carla entrou membro');
+select teste.confere('e as ações nas atividades, com o nome de quem fez',
+  (select string_agg(coalesce(autor, '-') || ' ' || acao || ' ' || alvo, ', ' order by data_registro, acao)
+     from registro where id_grupo = (select grupo from saida) and tipo = 'atividade'),
+  'Ana Souza criou Relatório de redes, Ana Souza criou Lista 1, Bruno concluiu Lista 1');
+select teste.confere('o participante lê o histórico do grupo',
+  (select count(*) > 0 from registro where id_grupo = (select grupo from saida)), true);
+select teste.recusa('mas não escreve nele',
+  $$ insert into registro (id_grupo, acao, tipo) select grupo, 'criou', 'grupo' from saida $$,
+  'new row violates row-level security policy for table "registro"');
+reset role;
+create temp table registro_antes as select * from registro where id_grupo = (select grupo from saida);
+grant select on registro_antes to authenticated;
+set role authenticated;
+delete from registro where id_grupo = (select grupo from saida);
+update registro set autor = 'Outra pessoa' where id_grupo = (select grupo from saida);
+select teste.confere('nem apaga ou altera uma linha',
+  (select format('%s %s', count(*) filter (where autor = 'Outra pessoa'), count(*)) from registro where id_grupo = (select grupo from saida)), '0 ' || (select count(*) from registro_antes));
+select teste.recusa('nem anota pela função do banco',
+  $$ select anotar((select grupo from saida), 'criou', 'grupo', 'falso') $$,
+  'permission denied for function anotar');
+update membro set data_saida = now() where id_usuario = auth.uid() and id_grupo = (select grupo from saida);
+select teste.confere('a saída não é gravada direto na tabela',
+  (select data_saida is null from membro where id_usuario = auth.uid() and id_grupo = (select grupo from saida)), true);
+select teste.como('00000000-0000-0000-0000-00000000000d');
+select teste.confere('quem é de fora não vê o histórico',
+  (select count(*) from registro where id_grupo = (select grupo from saida)), 0::bigint);
+
+select teste.como('00000000-0000-0000-0000-00000000000b');
+select teste.confere('o participante sai, e a atividade em aberto fica "A definir"',
+  sair_do_grupo((select grupo from saida)), 1);
+select teste.como('00000000-0000-0000-0000-00000000000a');
+select teste.confere('a atividade em aberto fica sem responsável, em "a fazer"',
+  (select format('%s %s', coalesce(id_responsavel::text, 'A definir'), status) from atividade where id_atividade = (select aberta from saida)),
+  'A definir a fazer');
+select teste.confere('a concluída continua no nome de quem saiu',
+  (select m.nome || ' ' || (m.data_saida is not null)::text from atividade a join membro m on m.id_membro = a.id_responsavel
+    where a.id_atividade = (select feita from saida)), 'Bruno true');
+select teste.confere('o histórico diz quem saiu e quantas atividades ficaram "A definir", sem uma linha por atividade',
+  (select string_agg(coalesce(autor, '-') || ' ' || acao || ' ' || coalesce(detalhe, '-'), ', ')
+     from registro where id_grupo = (select grupo from saida) and (acao = 'saiu' or acao = 'passou')),
+  'Bruno saiu 1');
+select teste.recusa('quem saiu não recebe atividade nova',
+  $$ update atividade set id_responsavel = (select id_membro from membro where email = 'bruno@exemplo.com'
+       and id_grupo = (select grupo from saida)) where id_atividade = (select aberta from saida) $$,
+  'Essa pessoa saiu do grupo.');
+select teste.recusa('a última organizadora não sai sem passar o cargo',
+  $$ select sair_do_grupo((select grupo from saida)) $$, 'Antes de sair, torne outra pessoa organizadora do grupo.');
+select teste.como('00000000-0000-0000-0000-00000000000b');
+select teste.confere('quem saiu não vê mais o grupo nem as atividades',
+  (select count(*) from grupo where id_grupo = (select grupo from saida))
+  + (select count(*) from atividade where id_grupo = (select grupo from saida)), 0::bigint);
+update membro set nome = 'Bruno de novo' where id_grupo = (select grupo from saida);
+reset role;
+select teste.confere('nem muda o próprio cadastro antigo',
+  (select nome from membro where email = 'bruno@exemplo.com' and id_grupo = (select grupo from saida)), 'Bruno'::varchar);
+set role authenticated;
+select teste.recusa('nem sai de novo',
+  $$ select sair_do_grupo((select grupo from saida)) $$, 'Você não faz parte deste grupo.');
+select entrar_com_codigo('SAIRGRP2', 'Bruno');
+select teste.confere('com o convite, volta no mesmo cadastro, como participante',
+  (select format('%s %s %s', count(*), max(perfil), bool_and(data_saida is null)::text) from membro
+    where id_usuario = auth.uid() and id_grupo = (select grupo from saida)), '1 participante true');
+select teste.confere('e o histórico registra a volta',
+  (select count(*) from registro where id_grupo = (select grupo from saida) and acao = 'voltou' and autor = 'Bruno'), 1::bigint);
+select garantir_espaco_pessoal();
+select teste.recusa('o espaço pessoal não tem como sair',
+  $$ select sair_do_grupo((select id_grupo_pessoal from perfil where id_usuario = auth.uid())) $$,
+  'O espaço pessoal é seu: não dá para sair dele.');
+
+select teste.como('00000000-0000-0000-0000-00000000000a');
+insert into grupo (id_grupo, nome) select solo, 'Sozinha' from saida;
+insert into membro (id_grupo, id_usuario, nome, perfil) select solo, auth.uid(), 'Ana Souza', 'organizador' from saida;
+select teste.recusa('sozinha no grupo, a saída é excluir o grupo',
+  $$ select sair_do_grupo((select solo from saida)) $$, 'Você é a única pessoa do grupo. Para sair, exclua o grupo.');
+delete from disciplina where id_disciplina = (select disc from saida);
+select teste.confere('excluir a disciplina vira uma linha só, sem uma por atividade',
+  (select string_agg(acao || ' ' || tipo, ', ') from registro
+    where id_grupo = (select grupo from saida) and acao = 'excluiu'), 'excluiu disciplina');
+delete from grupo where id_grupo = (select grupo from saida);
+reset role;
+select teste.confere('excluir o grupo leva o histórico junto',
+  (select count(*) from registro where id_grupo = (select grupo from saida)), 0::bigint);
+set role authenticated;
+select teste.confere('o espaço pessoal não tem histórico',
+  (select count(*) from registro r join grupo g using (id_grupo) where g.pessoal), 0::bigint);
+select teste.como(null);
 reset role;
 
 \o
