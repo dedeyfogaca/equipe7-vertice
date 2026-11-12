@@ -320,7 +320,7 @@ export default function Entrar() {
                 {grupos.length > 0 ? (
                   <ul className="flex flex-col gap-2">
                     {grupos.map((grupo) => {
-                      const qtd = membros.filter((m) => m.grupoId === grupo.id).length;
+                      const qtd = membros.filter((m) => m.grupoId === grupo.id && !m.saiuEm).length;
                       return (
                         <li key={grupo.id}>
                           <button type="button" onClick={() => entrarNoGrupo(grupo.id)} className={classeOpcao}>

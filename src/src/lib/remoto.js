@@ -92,6 +92,9 @@ export const COLECOES = [
       estiloAvatar: r.estilo_avatar,
       foto: texto(r.foto),
       perfil: r.perfil,
+      // RN28: quem saiu do grupo continua na lista, marcado. Só o banco muda
+      // este campo (sair_do_grupo), por isso ele não volta na gravação.
+      saiuEm: texto(r.data_saida),
     }),
   },
   {

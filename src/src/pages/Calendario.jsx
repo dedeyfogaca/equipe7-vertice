@@ -218,7 +218,10 @@ function CartaoDoDia({ item, membros }) {
           <Badge tom={tomDaAtividade(atividade)}>{rotuloSituacao(atividade)}</Badge>
           <Badge tom="neutro">Peso {atividade.peso}</Badge>
           {responsavel ? (
-            <Badge tom="neutro">{primeiroNome(responsavel.nome)}</Badge>
+            <Badge tom="neutro">
+              {primeiroNome(responsavel.nome)}
+              {responsavel.saiuEm ? ' (saiu)' : ''}
+            </Badge>
           ) : (
             !item.pessoal && <Badge tom="neutro">A definir</Badge>
           )}

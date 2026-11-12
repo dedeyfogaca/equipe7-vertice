@@ -18,6 +18,13 @@ import {
 } from '../lib/gamificacao.js';
 import { ESTILO_AVATAR_PADRAO, estiloAvatarValido, novaSeedAvatar } from '../lib/avatar.js';
 import { aplicar, carregarTudo, diferenca, garantirEspacoPessoal, mensagemDoErro, semMudancas } from '../lib/remoto.js';
+import {
+  atividadesQueFicamSemDono,
+  juntarRegistros,
+  motivoParaNaoSair,
+  reconstruirRegistros,
+  registrosDaMudanca,
+} from '../lib/registro.js';
 import { supabase } from '../lib/supabase.js';
 import { ehFotoNova, separarFotos, subirFoto } from '../lib/fotosRemotas.js';
 import { toast } from 'sonner';
@@ -53,6 +60,9 @@ export function DataProvider({ children }) {
   const [atividades, setAtividades] = useState(() => inicial(CHAVES.atividades));
   const [conquistas, setConquistas] = useState(() => inicial(CHAVES.conquistas));
   const [eventos, setEventos] = useState(() => inicial(CHAVES.eventos));
+  // RF40: o histórico dos grupos. Só a demonstração guarda aqui; com conta,
+  // ele fica no banco e é lido quando o painel do histórico abre.
+  const [registros, setRegistros] = useState(() => inicial(CHAVES.registros));
   const definir = useRef(null);
   definir.current = {
     grupos: setGrupos,
@@ -236,8 +246,9 @@ export function DataProvider({ children }) {
   // Com conta, a pessoa é a conta; na demonstração, o usuário fixo "demo".
   const meuUsuarioId = remoto ? usuario?.id || '' : USUARIO_DEMO;
   const perfil = useMemo(() => perfis.find((p) => p.id === meuUsuarioId) || null, [perfis, meuUsuarioId]);
+  // RN28: os grupos de que a pessoa saiu não contam mais como dela.
   const meusMembros = useMemo(
-    () => (meuUsuarioId ? membros.filter((m) => m.usuarioId === meuUsuarioId) : []),
+    () => (meuUsuarioId ? membros.filter((m) => m.usuarioId === meuUsuarioId && !m.saiuEm) : []),
     [membros, meuUsuarioId]
   );
   const meuMembroEm = useCallback(
@@ -283,8 +294,10 @@ export function DataProvider({ children }) {
   }, [perfil, membros, meuUsuarioId, remoto]);
 
   // ----- Seletores por grupo (cada grupo só enxerga o que é dele, RN01) -----
+  // Quem está no grupo. Com `{ todos: true }`, também quem saiu (RN28), que
+  // continua dono das atividades concluídas e das conquistas.
   const membrosDoGrupo = useCallback(
-    (grupoId) => membros.filter((m) => m.grupoId === grupoId),
+    (grupoId, { todos = false } = {}) => membros.filter((m) => m.grupoId === grupoId && (todos || !m.saiuEm)),
     [membros]
   );
   const disciplinasDoGrupo = useCallback(
@@ -533,6 +546,39 @@ export function DataProvider({ children }) {
     );
     setConquistas((atual) => atual.filter((c) => c.membroId !== id));
   }, []);
+
+  // RF39, RN28: a pessoa sai do grupo. As atividades em aberto dela ficam
+  // "A definir"; as concluídas e as conquistas continuam no nome dela. Com
+  // conta, quem faz tudo é o banco (sair_do_grupo). Devolve quantas
+  // atividades ficaram "A definir".
+  const sairDoGrupo = useCallback(
+    async (grupoId) => {
+      const eu = meusMembros.find((m) => m.grupoId === grupoId) || null;
+      const motivo = motivoParaNaoSair(
+        membros.filter((m) => m.grupoId === grupoId && !m.saiuEm),
+        eu,
+        { pessoal: ehPessoal(grupoId) }
+      );
+      if (motivo) throw new Error(motivo);
+      if (remoto) {
+        await aguardarGravacao();
+        const { data, error } = await supabase.rpc('sair_do_grupo', { p_grupo: grupoId });
+        if (error) throw new Error(mensagemDoErro(error));
+        await recarregar();
+        return Number(data) || 0;
+      }
+      const soltas = new Set(atividadesQueFicamSemDono(atividades, eu.id).map((a) => a.id));
+      const agora = new Date().toISOString();
+      setMembros((atual) =>
+        atual.map((m) => (m.id === eu.id ? { ...m, saiuEm: agora, perfil: PERFIL.PARTICIPANTE } : m))
+      );
+      setAtividades((atual) =>
+        atual.map((a) => (soltas.has(a.id) ? { ...a, responsavelId: '', status: STATUS.A_FAZER } : a))
+      );
+      return soltas.size;
+    },
+    [meusMembros, membros, ehPessoal, remoto, aguardarGravacao, recarregar, atividades]
+  );
 
   // ----- Disciplinas -----
   const criarDisciplina = useCallback(({ nome, grupoId, cor = COR_DISCIPLINA_PADRAO }) => {
@@ -974,6 +1020,68 @@ export function DataProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [atividades, membros, grupos]);
 
+  // ----- Histórico do grupo (RF40, RN29) -----
+  // Na demonstração, cada mudança nas coleções vira linhas do histórico,
+  // como os gatilhos do banco fazem com conta (ver lib/registro.js).
+  const fotografia = useRef(null);
+  useEffect(() => {
+    if (modo !== 'demo') return;
+    const atual = { grupos, membros, disciplinas, conteudos, atividades, eventos, conquistas };
+    const antes = fotografia.current;
+    fotografia.current = atual;
+    const existentes = grupos.map((g) => g.id);
+    if (!antes) {
+      // Primeira abertura depois da revisão de 12/11: o histórico começa
+      // pelo que as datas guardadas contam.
+      setRegistros((lista) =>
+        lista.length > 0
+          ? juntarRegistros(lista, [], existentes)
+          : juntarRegistros([], grupos.flatMap((g) => reconstruirRegistros(atual, g.id)), existentes)
+      );
+      return;
+    }
+    const autorEm = (grupoId) =>
+      membros.find((m) => m.grupoId === grupoId && m.usuarioId === meuUsuarioId) || null;
+    const novas = registrosDaMudanca(antes, atual, { autorEm });
+    const sumiu = antes.grupos.some((g) => !existentes.includes(g.id));
+    if (novas.length > 0 || sumiu) setRegistros((lista) => juntarRegistros(lista, novas, existentes));
+  }, [modo, grupos, membros, disciplinas, conteudos, atividades, eventos, conquistas, meuUsuarioId]);
+
+  useEffect(() => {
+    if (modo === 'demo') gravar(CHAVES.registros, registros);
+  }, [modo, registros, gravar]);
+
+  // Uma página do histórico, da mais nova para a mais antiga.
+  const carregarHistorico = useCallback(
+    async (grupoId, { desde = 0, quantos = 40 } = {}) => {
+      if (!remoto) {
+        // `registros` já está da mais nova para a mais antiga (juntarRegistros).
+        const lista = registros.filter((r) => r.grupoId === grupoId);
+        return { itens: lista.slice(desde, desde + quantos), temMais: lista.length > desde + quantos };
+      }
+      const { data, error } = await supabase
+        .from('registro')
+        .select('*')
+        .eq('id_grupo', grupoId)
+        .order('data_registro', { ascending: false })
+        .range(desde, desde + quantos);
+      if (error) throw new Error('Não foi possível carregar o histórico.');
+      const itens = (data || []).map((r) => ({
+        id: r.id_registro,
+        grupoId: r.id_grupo,
+        data: r.data_registro,
+        autorId: r.id_autor || '',
+        autor: r.autor || '',
+        acao: r.acao,
+        tipo: r.tipo,
+        alvo: r.alvo || '',
+        detalhe: r.detalhe || '',
+      }));
+      return { itens: itens.slice(0, quantos), temMais: itens.length > quantos };
+    },
+    [remoto, registros]
+  );
+
   const consumirNovasConquistas = useCallback(() => setNovasConquistas([]), []);
   const consumirConquistasRetiradas = useCallback(() => setConquistasRetiradas([]), []);
 
@@ -1036,6 +1144,9 @@ export function DataProvider({ children }) {
       criarMembro,
       atualizarMembro,
       removerMembro,
+      sairDoGrupo,
+      carregarHistorico,
+      registros,
       criarDisciplina,
       atualizarDisciplina,
       removerDisciplina,
@@ -1116,6 +1227,9 @@ export function DataProvider({ children }) {
       criarMembro,
       atualizarMembro,
       removerMembro,
+      sairDoGrupo,
+      carregarHistorico,
+      registros,
       criarDisciplina,
       atualizarDisciplina,
       removerDisciplina,

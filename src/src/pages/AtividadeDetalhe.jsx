@@ -102,7 +102,9 @@ export default function AtividadeDetalhe() {
   }
 
   const { conteudo, disciplina } = trilhaDaAtividade(atividade);
-  const responsavel = membros.find((m) => m.id === atividade.responsavelId) || null;
+  // Quem saiu do grupo continua dono das atividades concluídas (RN28).
+  const responsavel =
+    membrosDoGrupo(atividade.grupoId, { todos: true }).find((m) => m.id === atividade.responsavelId) || null;
   const concluida = atividade.status === STATUS.CONCLUIDO;
   // RN20: só o responsável conclui e muda o status. RN07: o organizador
   // edita e exclui qualquer atividade; o participante, só as dele.
@@ -292,7 +294,9 @@ export default function AtividadeDetalhe() {
                     <Avatar membro={responsavel} tamanho={34} decorativo />
                     <span className="flex flex-col">
                       <span className="font-medium text-forte">{responsavel.nome}</span>
-                      <span className="text-[13px] text-sutil">{rotuloPerfil(responsavel.perfil)}</span>
+                      <span className="text-[13px] text-sutil">
+                        {responsavel.saiuEm ? 'Saiu do grupo' : rotuloPerfil(responsavel.perfil)}
+                      </span>
                     </span>
                   </span>
                 ) : (

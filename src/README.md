@@ -159,6 +159,15 @@ outros.
   à escolha (Croodles Neutral e Notionists), com sorteio. A foto passa por um **editor** em que a pessoa
   arrasta e dá zoom para enquadrar antes de salvar. Quem tem conta muda o
   nome e a foto em Meu perfil; a ficha do grupo guarda a função e o contato.
+- **Sair do grupo** (desde 12/11/2026): qualquer membro sai pelo menu do
+  grupo ou pelo pé da tela Membros. O que está em aberto com a pessoa fica
+  "A definir"; o que ela já concluiu e as conquistas continuam no nome dela,
+  marcado "(saiu)". O último organizador passa o cargo antes, e quem está
+  sozinho exclui o grupo. A volta é pelo convite, no mesmo cadastro.
+- **Histórico do grupo** (desde 12/11/2026): um ícone pequeno no canto de
+  Membros (e "Histórico do grupo", no menu do grupo) abre um painel com tudo
+  o que aconteceu no grupo, quem fez e quando, com filtro por pessoa e por
+  tipo. Só leitura: com conta, quem grava é o próprio banco.
 - **Perfis**: o **organizador** gerencia membros, disciplinas e conteúdos,
   edita o grupo (nome, descrição e foto), edita e exclui qualquer atividade e
   exclui o grupo; o **participante** cadastra atividades, edita e exclui as
@@ -228,8 +237,9 @@ npm run verificar  # conferir as regras de negócio
    gatilhos, o convite, o espaço pessoal, o lembrete e o espaço das fotos.
    **Só num projeto novo**: ele apaga e recria tudo. Num banco que já tem
    dados, rode os scripts de atualização, na ordem
-   (`banco-de-dados/07-atualizacao-11-11.sql` e
-   `banco-de-dados/08-atualizacao-feedback.sql`), que só acrescentam.
+   (`banco-de-dados/07-atualizacao-11-11.sql`,
+   `banco-de-dados/08-atualizacao-feedback.sql` e
+   `banco-de-dados/09-atualizacao-historico.sql`), que só acrescentam.
    Depois, cadastre as contas da equipe, que leem o feedback:
    `insert into equipe (id_usuario) select id from auth.users where email in ('...');`
 3. Em **Authentication**, desligue *Confirm email* em *Sign In / Providers →
@@ -248,14 +258,15 @@ Na Vercel, as mesmas duas variáveis (`VITE_SUPABASE_URL` e
 `VITE_SUPABASE_ANON_KEY`) vão em *Settings → Environment Variables*.
 
 O `npm run verificar` roda as verificações de `verificacoes/`, em JavaScript
-puro, sem biblioteca de teste instalada. São 297 conferências das regras que
+puro, sem biblioteca de teste instalada. São 332 conferências das regras que
 mais escondem erro: progresso por razão de pesos (e não média de
 percentuais), experiência que não pode ser creditada duas vezes, ofensiva,
 conquistas concedidas uma vez só e retiradas só quando a conclusão é
 desfeita, perfis, quem pode mudar o status e assumir cada atividade,
 validação da atividade e do evento de vários dias, o enquadramento da foto,
 a migração dos dados antigos, a ordem das gravações no banco, a evolução do
-progresso e o resumo e a planilha do feedback.
+progresso, o resumo e a planilha do feedback, quem pode sair do grupo e o que
+cada mudança vira no histórico do grupo.
 
 As regras do banco têm verificações próprias, em SQL
 (`banco-de-dados/05-verificacoes.sql`), que rodam num PostgreSQL local.
@@ -349,6 +360,7 @@ src/
 │   ├── avatar.js             # Avatares nos dois estilos (DiceBear) + iniciais
 │   ├── feriados.js           # BrasilAPI → Nager.Date → cache
 │   ├── feedback.js           # Feedback: envio, respostas, resumo e planilha
+│   ├── registro.js           # Saída do grupo e histórico (o da demonstração e o texto de cada linha)
 │   ├── seed.js               # Dados de exemplo
 │   └── utils.js              # Classes, plural, primeiro nome
 ├── hooks/
@@ -373,7 +385,7 @@ src/
 │   ├── feedback/             # Seção da página inicial e quem é da equipe
 │   ├── publicas/             # Movimento das páginas públicas (aparecer ao rolar, mouse)
 │   ├── disciplinas/          # Formulários, paleta de cores e gráfico da evolução
-│   ├── grupos/               # Cadastro e edição do grupo (nome, descrição e foto)
+│   ├── grupos/               # Cadastro e edição do grupo, sair do grupo e o histórico
 │   ├── membros/              # Formulário de membro (foto e avatar) e convite
 │   ├── gamificacao/          # "Seu ritmo": experiência, ofensiva e conquistas
 │   ├── opcoes.jsx            # Opções das listas: cor, foto, situação, prioridade, perfil
@@ -424,7 +436,8 @@ Na demonstração, as coleções do navegador guardam **as mesmas chaves e
 vínculos** do modelo relacional.
 
 Chaves: `grupos`, `perfis`, `membros`, `disciplinas`, `conteudos`,
-`atividades`, `eventos`, `conquistasMembro`, `sessao`, `versaoDados`.
+`atividades`, `eventos`, `conquistasMembro`, `registros` (o histórico dos grupos), `sessao`,
+`versaoDados`.
 
 A `sessao` guarda o espaço aberto (o pessoal ou um grupo). Ela não vem do
 modelo relacional: é estado do navegador. Quem a pessoa é dentro de cada
@@ -502,7 +515,9 @@ Com conta, o banco tem o seu script de atualização
 (`banco-de-dados/07-atualizacao-11-11.sql`), que só acrescenta: cada conta
 ganha o espaço pessoal e o perfil no primeiro acesso depois dele. O de
 12/11 (`banco-de-dados/08-atualizacao-feedback.sql`) cria as tabelas do
-feedback e da equipe.
+feedback e da equipe, e o `09-atualizacao-historico.sql`, a saída do grupo
+(`membro.data_saida`) e o histórico (`registro`), já com o que aconteceu
+antes, montado com as datas guardadas.
 
 ---
 

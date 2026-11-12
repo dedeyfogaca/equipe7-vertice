@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
   Compass,
+  History,
   House,
   Inbox,
   LayoutDashboard,
@@ -40,6 +41,8 @@ import { Dialogo } from '../ui/dialogo.jsx';
 import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz, MenuRotulo, MenuSeparador } from '../ui/flutuantes.jsx';
 import { MarcaVertice } from '../ui/marca.jsx';
 import { FormGrupo } from '../grupos/FormGrupo.jsx';
+import { HistoricoDoGrupo } from '../grupos/HistoricoDoGrupo.jsx';
+import { SairDoGrupo } from '../grupos/SairDoGrupo.jsx';
 import { EntrarComCodigo } from '../conta/EntrarComCodigo.jsx';
 import { TutorialProvider, useTutorial } from '../tutorial/Tutorial.jsx';
 import { obterConquista } from '../../lib/gamificacao.js';
@@ -92,12 +95,17 @@ function IconeEspaco({ grupo, tamanho }) {
 
 function SeletorGrupo({ compacto = false }) {
   const { grupoAtivo, membrosDoGrupoAtivo, ehOrganizador, noEspacoPessoal, espacoPessoal, entrar } = useAuth();
-  const { grupos, membrosDoGrupo, atualizarGrupo, criarGrupo, importarExemplo, meuUsuarioId } = useData();
+  const { grupos, membros, membrosDoGrupo, atualizarGrupo, criarGrupo, importarExemplo, meuUsuarioId } = useData();
   const { modo } = useConta();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [dialogo, setDialogo] = useState(null); // 'editar' | 'criar' | 'codigo'
-  const outros = grupos.filter((g) => !g.pessoal);
+  const [dialogo, setDialogo] = useState(null); // 'editar' | 'criar' | 'codigo' | 'historico' | 'sair'
+  // RN28: o grupo de que a pessoa saiu some do seletor (com conta, o banco
+  // nem o devolve mais; na demonstração, ele continua no navegador).
+  const saiuDe = (grupoId) =>
+    membros.some((m) => m.grupoId === grupoId && m.usuarioId === meuUsuarioId && m.saiuEm) &&
+    !membros.some((m) => m.grupoId === grupoId && m.usuarioId === meuUsuarioId && !m.saiuEm);
+  const outros = grupos.filter((g) => !g.pessoal && !saiuDe(g.id));
 
   const trocar = (grupo) => {
     if (grupo.id === grupoAtivo.id) return;
@@ -197,6 +205,12 @@ function SeletorGrupo({ compacto = false }) {
               Editar grupo
             </MenuItem>
           )}
+          {!noEspacoPessoal && (
+            <MenuItem onSelect={() => setDialogo('historico')}>
+              <History aria-hidden="true" />
+              Histórico do grupo
+            </MenuItem>
+          )}
           <MenuItem onSelect={() => setDialogo('criar')}>
             <Plus aria-hidden="true" />
             Criar grupo
@@ -212,8 +226,25 @@ function SeletorGrupo({ compacto = false }) {
               Carregar grupo de exemplo
             </MenuItem>
           )}
+          {!noEspacoPessoal && (
+            <>
+              <MenuSeparador />
+              <MenuItem perigo onSelect={() => setDialogo('sair')}>
+                <LogOut aria-hidden="true" />
+                Sair do grupo
+              </MenuItem>
+            </>
+          )}
         </MenuConteudo>
       </MenuRaiz>
+      {!noEspacoPessoal && (
+        <HistoricoDoGrupo
+          aberto={dialogo === 'historico'}
+          aoMudar={(abrir) => !abrir && setDialogo(null)}
+          grupo={grupoAtivo}
+        />
+      )}
+      <SairDoGrupo aberto={dialogo === 'sair'} aoMudar={(abrir) => !abrir && setDialogo(null)} />
       {dialogo === 'editar' && (
         <FormGrupo aberto aoMudar={(abrir) => !abrir && setDialogo(null)} grupo={grupoAtivo} aoSalvar={salvarGrupo} />
       )}

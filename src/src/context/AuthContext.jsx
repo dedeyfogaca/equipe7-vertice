@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
   const noEspacoPessoal = Boolean(grupoAtivo?.pessoal);
 
   const membrosDoGrupoAtivo = useMemo(
-    () => (grupoAtivo ? membros.filter((m) => m.grupoId === grupoAtivo.id) : []),
+    () => (grupoAtivo ? membros.filter((m) => m.grupoId === grupoAtivo.id && !m.saiuEm) : []),
     [membros, grupoAtivo]
   );
 

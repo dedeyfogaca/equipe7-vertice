@@ -59,6 +59,39 @@ export function Dialogo({ aberto, aoMudar, titulo, descricao, largura = 520, chi
 }
 
 /**
+ * Painel que entra pela lateral direita, da altura da tela. Para consultas
+ * longas que não tiram a pessoa da página (o histórico do grupo, RF40).
+ */
+export function Gaveta({ aberto, aoMudar, titulo, descricao, children, rodape }) {
+  return (
+    <DialogPrimitive.Root open={aberto} onOpenChange={aoMudar}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className={classeFundo} />
+        <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex w-[min(100vw,480px)] flex-col border-l border-borda bg-superficie text-texto shadow-flutuante outline-none data-[state=open]:animate-gaveta-entra data-[state=closed]:animate-gaveta-sai">
+          <div className="flex items-start justify-between gap-4 border-b border-divisor px-6 pb-4 pt-6">
+            <div className="flex min-w-0 flex-col gap-1">
+              <DialogPrimitive.Title className="text-xl font-semibold tracking-[-0.03em] text-forte">
+                {titulo}
+              </DialogPrimitive.Title>
+              <DialogPrimitive.Description className={descricao ? 'text-sm leading-relaxed text-sutil' : 'sr-only'}>
+                {descricao || titulo}
+              </DialogPrimitive.Description>
+            </div>
+            <DialogPrimitive.Close asChild>
+              <Button variante="fantasma" tamanho="icone-sm" aria-label="Fechar">
+                <X />
+              </Button>
+            </DialogPrimitive.Close>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">{children}</div>
+          {rodape && <div className="border-t border-divisor bg-superficie-2 px-6 py-3">{rodape}</div>}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
+/**
  * Confirmação de ação destrutiva. `children` entra entre a mensagem e os
  * botões: é onde a remoção de membro pede quem assume as atividades.
  */

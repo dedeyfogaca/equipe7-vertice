@@ -15,6 +15,8 @@ export const CHAVES = {
   eventos: 'eventos',
   // RF35: o perfil da conta. No modo de demonstração, um só ({ id: 'demo' }).
   perfis: 'perfis',
+  // RF40: o histórico de cada grupo, na demonstração (com conta, fica no banco).
+  registros: 'registros',
   sessao: 'sessao',
   versao: 'versaoDados',
 };

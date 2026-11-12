@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Ellipsis, Link2, Lock, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
+import { Ellipsis, History, Link2, Lock, LogOut, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
@@ -13,7 +13,9 @@ import { Field } from '../components/ui/campos.jsx';
 import { SelectRico } from '../components/ui/selecao.jsx';
 import { opcoesMembros } from '../components/opcoes.jsx';
 import { Confirmacao } from '../components/ui/dialogo.jsx';
-import { MenuConteudo, MenuGatilho, MenuItem, MenuRaiz } from '../components/ui/flutuantes.jsx';
+import { Dica, MenuConteudo, MenuGatilho, MenuItem, MenuRaiz } from '../components/ui/flutuantes.jsx';
+import { HistoricoDoGrupo } from '../components/grupos/HistoricoDoGrupo.jsx';
+import { SairDoGrupo } from '../components/grupos/SairDoGrupo.jsx';
 import { FormMembro } from '../components/membros/FormMembro.jsx';
 import { DialogoConvite } from '../components/membros/DialogoConvite.jsx';
 import { PERFIL, rotuloPerfil } from '../lib/constants.js';
@@ -45,6 +47,8 @@ export default function Membros() {
   } = useData();
   const comConta = modo === 'conta';
   const [convidando, setConvidando] = useState(false);
+  const [vendoHistorico, setVendoHistorico] = useState(false);
+  const [saindo, setSaindo] = useState(false);
 
   const membros = membrosDoGrupo(grupoAtivo.id);
   const atividades = atividadesDoGrupo(grupoAtivo.id);
@@ -124,22 +128,37 @@ export default function Membros() {
         titulo="Membros"
         subtitulo={`${plural(membros.length, 'pessoa')} no grupo`}
         acoes={
-          ehOrganizador && (
-            <>
-              {comConta && (
-                <Button onClick={() => setConvidando(true)}>
-                  <Link2 aria-hidden="true" />
-                  Convidar
-                </Button>
-              )}
-              <Button variante={comConta ? 'secundaria' : 'primaria'} onClick={() => setFormulario({})}>
-                <UserPlus aria-hidden="true" />
-                Adicionar membro
+          <>
+            {/* RF40: o histórico do grupo, discreto, para todos os membros. */}
+            <Dica conteudo="Histórico do grupo">
+              <Button
+                variante="fantasma"
+                tamanho="icone"
+                aria-label="Histórico do grupo"
+                onClick={() => setVendoHistorico(true)}
+              >
+                <History />
               </Button>
-            </>
-          )
+            </Dica>
+            {ehOrganizador && (
+              <>
+                {comConta && (
+                  <Button onClick={() => setConvidando(true)}>
+                    <Link2 aria-hidden="true" />
+                    Convidar
+                  </Button>
+                )}
+                <Button variante={comConta ? 'secundaria' : 'primaria'} onClick={() => setFormulario({})}>
+                  <UserPlus aria-hidden="true" />
+                  Adicionar membro
+                </Button>
+              </>
+            )}
+          </>
         }
       />
+      <HistoricoDoGrupo aberto={vendoHistorico} aoMudar={setVendoHistorico} grupo={grupoAtivo} />
+      <SairDoGrupo aberto={saindo} aoMudar={setSaindo} />
       {comConta && ehOrganizador && (
         <DialogoConvite aberto={convidando} aoMudar={setConvidando} grupoId={grupoAtivo.id} membroId={membroAtivo?.id} />
       )}
@@ -243,9 +262,30 @@ export default function Membros() {
         </ul>
       )}
 
-      {/* RN07: só o organizador exclui o grupo. Fica no pé da página. */}
+      {/* RF39: qualquer membro sai do grupo; RN07: só o organizador exclui.
+          Os dois ficam no pé da página, longe das ações do dia a dia. */}
+      <div className="mt-auto flex flex-col gap-3 pt-10">
+      {membroAtivo && (
+        <section
+          aria-labelledby="t-sair"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-borda p-5 sm:p-6"
+        >
+          <div className="max-w-xl">
+            <h2 id="t-sair" className="text-[17px] font-semibold tracking-[-0.02em] text-forte">
+              Sair do grupo
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-sutil">
+              Você deixa de ver o grupo. O que está em aberto com você fica “A definir”; o que você já concluiu
+              continua no seu nome.
+            </p>
+          </div>
+          <Button variante="perigo-contorno" onClick={() => setSaindo(true)}>
+            <LogOut aria-hidden="true" />
+            Sair do grupo
+          </Button>
+        </section>
+      )}
       {ehOrganizador && (
-        <div className="mt-auto pt-10">
         <section
           aria-labelledby="t-perigo"
           className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-perigo/30 p-5 sm:p-6"
@@ -264,8 +304,8 @@ export default function Membros() {
             Excluir grupo
           </Button>
         </section>
-        </div>
       )}
+      </div>
 
       {formulario && (
         <FormMembro

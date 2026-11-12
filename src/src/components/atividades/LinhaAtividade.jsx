@@ -10,6 +10,7 @@ import { Badge } from '../ui/basicos.jsx';
 import { Dica } from '../ui/flutuantes.jsx';
 import { AnelPeso } from '../ui/progresso.jsx';
 import { STATUS } from '../../lib/constants.js';
+import { nomeDoMembro } from '../../lib/registro.js';
 import { etiquetaPrazo, tomDaAtividade } from '../../lib/formatos.js';
 import { cn, primeiroNome } from '../../lib/utils.js';
 
@@ -146,7 +147,11 @@ export function LinhaAtividade({ atividade, feriado, aoAlternar, selecao, classN
       {aoAlternar && <AnelPeso peso={atividade.peso} className="hidden md:block" />}
 
       {responsavel ? (
-        <Avatar membro={responsavel} tamanho={30} className="relative z-10" />
+        <Avatar
+          membro={{ ...responsavel, nome: nomeDoMembro(responsavel) }}
+          tamanho={30}
+          className={cn('relative z-10', responsavel.saiuEm && 'opacity-60 grayscale')}
+        />
       ) : podeAssumir(atividade) && !selecao ? (
         <button
           type="button"
