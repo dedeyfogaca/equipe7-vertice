@@ -57,6 +57,8 @@ O que **não** entrou no MVP não entrou por ser menos importante, e sim por nã
 | **RF36**: Lembrete por e-mail | Desejável | Não | Depende do acesso com conta e do banco; avisa fora do sistema o que o painel já mostra |
 | **RF37**: Atividades em lote | Desejável | Não | Atalho para o cadastro, que já existe uma a uma |
 | **RF38**: Responsável "A definir" e Assumir | Desejável | Não | Pedido dos usuários de teste; o ciclo funciona com o responsável escolhido no cadastro |
+| **RF39**: Sair do grupo | Desejável | Não | O organizador já remove membros; a saída por conta própria é comodidade |
+| **RF40**: Histórico do grupo | Desejável | Não | Transparência no trabalho em grupo, fora do ciclo principal |
 | Persistência em banco de dados | Desejável | Não | O modelo lógico já existe; a troca da camada de acesso para o PostgreSQL do Supabase está planejada para 27/11 |
 | Notificações push e e-mails além do lembrete diário | Futura | Não | O lembrete diário (RF36) entrou em 11/11, enviado pelo próprio banco; avisar a cada mudança exigiria um servidor, que esta versão não tem |
 | Exportação de relatórios | Futura | Não | Nenhum requisito do bimestre depende disso |
@@ -150,6 +152,7 @@ Para 27/11 o manual pede o software funcionando e a apresentação de todos os i
 | Criar um grupo e entrar com código pelo seletor de espaço, sem sair do sistema | RF01, RF28 | CT71 e CT72 |
 | Trocar a foto em Meu perfil e ver a mudança em todos os grupos | RF35, RN26 | CT76 |
 | Cadastrar uma atividade "A definir" e outra pessoa assumi-la; concluir por engano e desfazer, com a conquista saindo junto | RF38, RF17, RN06, RN12 | CT73 e CT74 |
+| Sair de um grupo como participante, voltar pelo convite e ver tudo no histórico do grupo | RF39, RF40, RN28, RN29 | CT89 a CT92 |
 | Cadastrar várias atividades de uma vez e trocar o responsável de várias | RF37 | CT78 e CT79 |
 | Filtrar o calendário e cadastrar um evento de vários dias | RF23, RF31 | CT77, CT82 e CT83 |
 | Mostrar o lembrete por e-mail ligado em Meu perfil e um e-mail recebido | RF36, RN25 | CT80 |

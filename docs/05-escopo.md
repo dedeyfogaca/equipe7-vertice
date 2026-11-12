@@ -50,6 +50,8 @@
 - Foto de perfil enviada pelo membro ou avatar sorteado e trocável, em dois estilos de desenho
 - Páginas públicas de apresentação: início, com elementos que reagem à rolagem e ao mouse, e sobre a equipe
 - Feedback dos usuários de teste dentro do sistema, respondido sem conta e sem identificação, com as respostas lidas só pela equipe
+- Saída do grupo pelo próprio membro, sem depender do organizador
+- Histórico do grupo: cada ação, quem fez e quando, para todos os membros consultarem
 - Modo de demonstração sem conta, em que a pessoa informa só o nome, com carga de dados de exemplo para conhecer o sistema sem cadastrar nada
 - Tutorial opcional que apresenta as telas principais
 

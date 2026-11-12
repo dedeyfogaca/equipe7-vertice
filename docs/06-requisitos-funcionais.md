@@ -45,6 +45,8 @@
 | **RF36** | O sistema deve enviar, uma vez por dia, um e-mail de lembrete a quem entrou com conta, com as atividades sob sua responsabilidade que vencem nos próximos dias ou estão atrasadas, e permitir desligar o lembrete em Meu perfil. | Média | RF03, RF27, RF35 |
 | **RF37** | O sistema deve permitir cadastrar várias atividades de uma vez, numa tabela em que cada linha é uma atividade, com a lista de títulos colada de uma vez e uma linha "Para todas" que aplica a mesma disciplina, prazo, peso ou responsável a todas; e permitir que o organizador selecione várias atividades na lista e troque o responsável de todas de uma vez. | Média | RF03, RF04 |
 | **RF38** | O sistema deve permitir cadastrar uma atividade do grupo com o responsável "A definir", visível para todos os integrantes, e oferecer a cada um o botão Assumir, que torna a pessoa responsável por ela. | Média | RF03, RF05 |
+| **RF39** | O sistema deve permitir que qualquer membro saia do grupo por conta própria, depois de confirmar: as atividades em aberto sob a responsabilidade dele ficam "A definir", as concluídas e as conquistas continuam no nome dele, e ele deixa de ver o grupo até voltar por um convite. | Média | RF01, RF28, RF38 |
+| **RF40** | O sistema deve manter o histórico de cada grupo, com cada ação feita nele (cadastro, edição e exclusão de atividades, disciplinas, conteúdos e eventos; conclusão, troca de responsável, entrada e saída de pessoas, conquistas), quem a fez e quando, e permitir que qualquer membro o consulte, com filtro por pessoa e por tipo, a partir de um atalho discreto. | Baixa | RF01 |
 
 ---
 

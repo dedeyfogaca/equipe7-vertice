@@ -286,13 +286,15 @@ A equipe reuniu, em 09/11, as considerações sobre o uso do sistema e os coment
 
 ## 2º bimestre: revisão de 12/11/2026
 
-Com os primeiros usuários de teste, a equipe achou que o formulário do Google tinha cara de formulário: abria fora do sistema, e as respostas ficavam numa planilha à parte. O feedback passou para dentro do Vértice, e o e-mail do lembrete ganhou o visual do sistema.
+Com os primeiros usuários de teste, a equipe achou que o formulário do Google tinha cara de formulário: abria fora do sistema, e as respostas ficavam numa planilha à parte. O feedback passou para dentro do Vértice, e o e-mail do lembrete ganhou o visual do sistema. No mesmo dia, a equipe notou que o participante não tinha como sair de um grupo sozinho, só sendo removido pelo organizador, e pediu também um histórico completo do grupo, discreto, para saber quem fez o quê.
 
 | Data | Item | Alteração e motivo | Impacto |
 |---|---|---|---|
 | 12/11/2026 | RF32, RN27 | O feedback passou a ser respondido dentro do Vértice, na página Feedback, uma pergunta por vez, sem conta e sem nome, e as respostas vão para o banco. A equipe lê, filtra, marca como lida, exclui e baixa as respostas na tela Respostas do feedback, que só aparece para as contas da equipe. O formulário do Google ficou só para a cópia que roda sem banco | Modelo de dados (`feedback`, `equipe`), matriz, telas, testes (CT56 revisto, CT86 a CT88) |
 | 12/11/2026 | RF36 | O e-mail do lembrete ganhou o visual do sistema: a marca, as fontes Inter Tight e JetBrains Mono, as atividades atrasadas separadas das que vencem nos próximos dias e o assunto que diz quantas de cada | Script do banco (`enviar_lembretes`), verificações do banco |
-| 12/11/2026 | Docs. 05, 06, 08, 11 a 16, modelo de dados e protótipos | Requisito e regra revistos; matriz com RN27 e as tabelas novas; tarefas T90 a T93; arquitetura; casos CT86 a CT88; atualização do banco em `08-atualizacao-feedback.sql` | Documento inteiro |
+| 12/11/2026 | RF39, RN28 | Requisito e regra novos: qualquer membro sai do grupo pelo menu do grupo ou pela tela Membros. As atividades em aberto dele ficam "A definir"; as concluídas e as conquistas continuam no nome dele, marcado como "(saiu)". O último organizador passa o cargo antes, e quem está sozinho exclui o grupo. Volta pelo convite | UC22 novo, modelo de dados (`membro.data_saida`), testes (CT89, CT90) |
+| 12/11/2026 | RF40, RN29 | Requisito e regra novos: o histórico do grupo, num painel lateral aberto por um ícone pequeno em Membros e pelo menu do grupo, com quem fez cada ação e quando, filtros por pessoa e por tipo, só para leitura. O que aconteceu antes foi montado com as datas guardadas | UC23 novo, modelo de dados (tabela `registro`), testes (CT91, CT92) |
+| 12/11/2026 | Docs. 05, 06, 08, 10 a 16, diagrama de casos de uso, modelo de dados e protótipos | Requisitos e regras novos e revistos; UC22 e UC23; matriz com RF39, RF40, RN27 a RN29 e as tabelas novas; tarefas T90 a T98; arquitetura; casos CT86 a CT92; atualizações do banco em `08-atualizacao-feedback.sql` e `09-atualizacao-historico.sql` | Documento inteiro |
 
 ---
 

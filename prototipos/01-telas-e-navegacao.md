@@ -11,12 +11,14 @@ Este documento reúne as telas do Vértice em cinco momentos: as da **revisão d
 
 ## Revisão de 12/11/2026
 
-O feedback dos usuários de teste passou para dentro do sistema, e a equipe lê as respostas numa tela só dela.
+O feedback dos usuários de teste passou para dentro do sistema, e a equipe lê as respostas numa tela só dela. Qualquer membro sai do grupo sozinho, e cada grupo tem um histórico de tudo o que aconteceu nele.
 
 | Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
 |---|---|---|---|---|
 | RF32 | Responder o feedback, uma pergunta por vez, sem conta e sem nome | Feedback | `/feedback` | Qualquer visitante |
 | RF32, RN27 | Resumo das notas, busca, filtros, marcar como lida, excluir e baixar a planilha | Respostas do feedback | `/feedback/respostas` | Só a equipe do projeto |
+| RF39, RN28 | Sair do grupo, com o que acontece com as atividades | Sair do grupo | janela, no menu do grupo e no pé de Membros | Ambos |
+| RF40, RN29 | O que aconteceu no grupo, quem fez e quando, com filtros | Histórico do grupo | painel lateral, aberto em Membros e no menu do grupo | Ambos, só leitura |
 
 #### Feedback
 
@@ -31,6 +33,18 @@ Um cartão no meio da tela, com uma pergunta por vez: primeiro a nota, com cinco
 ![Tela das respostas do feedback](telas-v2/feedback-respostas.png)
 
 No topo, quantas respostas chegaram, a nota média e quantas têm comentário; ao lado, quantas de cada nota, e clicar numa nota filtra por ela. Abaixo, a busca nos comentários, o período, a nota e "Só as novas". Cada resposta mostra a nota, a data, de onde veio e só as perguntas respondidas. "Baixar planilha" gera um arquivo que abre no Excel. Quem não é da equipe vê só o aviso de que as respostas são da equipe.
+
+#### Sair do grupo
+
+![Confirmação de saída do grupo](telas-v2/sair-do-grupo.png)
+
+No menu do grupo, no seletor de espaço, ou no pé da tela Membros, junto da exclusão do grupo. A confirmação diz quantas atividades em aberto ficam "A definir" e que o que a pessoa concluiu continua no nome dela. Para o último organizador, ou para quem está sozinho no grupo, a janela explica o que fazer antes e leva a Membros.
+
+#### Histórico do grupo
+
+![Painel do histórico do grupo](telas-v2/historico.png)
+
+Um ícone pequeno, de relógio, no canto da tela Membros, e "Histórico do grupo" no menu do grupo. O painel entra pela direita, sem tirar a pessoa da tela: as ações separadas por dia, com quem fez em destaque e a hora ao lado, e os filtros por pessoa e por tipo no topo.
 
 ---
 

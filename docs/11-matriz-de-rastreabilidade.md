@@ -51,8 +51,10 @@ A matriz demonstra que os artefatos não foram produzidos separadamente. Cada li
 | **RF36**: Lembrete por e-mail | UC21 · Receber lembrete por e-mail / UC18 · Editar o perfil | perfil, atividade, membro *(ator externo: Brevo)* | Meu perfil (ligar e desligar) e o e-mail | Não |
 | **RF37**: Atividades em lote | UC20 · Cadastrar e alterar em lote | atividade, disciplina, membro | Várias de uma vez e Atividades (seleção) | Não |
 | **RF38**: Responsável "A definir" e Assumir | UC19 · Assumir atividade / UC05 · Cadastrar atividade | atividade, membro | Atividades, detalhe e formulário da atividade | Não |
+| **RF39**: Sair do grupo | UC22 · Sair do grupo | membro (`data_saida`), atividade | Menu do grupo, no seletor de espaço, e pé da tela Membros | Não |
+| **RF40**: Histórico do grupo | UC23 · Consultar o histórico do grupo | registro | Painel Histórico do grupo, aberto em Membros e no menu do grupo | Não |
 
-Os trinta e oito requisitos funcionais possuem caso de uso e tela. Quatro não possuem entidade de dados, e nos quatro o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF33 o tutorial tem conteúdo fixo, e ter visto ou não é preferência do dispositivo. A conta do RF27 fica no serviço de autenticação do Supabase, e o membro e o perfil apontam para ela pelo `id_usuario`.
+Os quarenta requisitos funcionais possuem caso de uso e tela. Quatro não possuem entidade de dados, e nos quatro o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF33 o tutorial tem conteúdo fixo, e ter visto ou não é preferência do dispositivo. A conta do RF27 fica no serviço de autenticação do Supabase, e o membro e o perfil apontam para ela pelo `id_usuario`.
 
 ---
 
@@ -86,6 +88,8 @@ Os trinta e oito requisitos funcionais possuem caso de uso e tela. Quatro não p
 | **RN24**: espaço pessoal | UC17; UC05, fluxo 1D; UC01, fluxos 3C e 3D | Coluna `grupo.pessoal`, função `garantir_espaco_pessoal`, gatilho `conferir_atividade` e regras de acesso que barram membros e convites no espaço pessoal |
 | **RN25**: lembrete por e-mail | UC21 | Funções `lembretes_do_dia` e `enviar_lembretes`, colunas `perfil.lembrete_email` e `perfil.ultimo_lembrete` e o agendamento diário (pg_cron) |
 | **RN26**: perfil da conta em todos os grupos | UC18, passo 5; UC02, fluxo 5D; UC16, passo 7 | Tabela `perfil`, gatilho `conferir_perfil` e a cópia do perfil em `entrar_com_codigo` |
+| **RN28**: saída do grupo | UC22, passos 2 a 5 e fluxos 2A, 2B e 5A | Coluna `membro.data_saida`, função `sair_do_grupo`, as funções de acesso que só contam quem está no grupo e a volta em `entrar_com_codigo` |
+| **RN29**: histórico do grupo só para leitura | UC23 | Tabela `registro`, gatilhos `registrar_mudanca` e regra de acesso só de leitura; na demonstração, `lib/registro.js` |
 | **RN27**: feedback anônimo, lido só pela equipe | Telas Feedback e Respostas do feedback (RF32) | Tabelas `feedback` e `equipe`, função `eh_equipe`, gatilho `conferir_feedback` e regras de acesso por linha |
 
 ---
@@ -154,8 +158,10 @@ Atualizado em 11/11/2026, sobre a versão da entrega de 27/11 (tag `entrega-27-1
 | **RF36**: Lembrete por e-mail | Funções `lembretes_do_dia` e `enviar_lembretes` no banco (`04-script-criacao.sql`, seção 7), `pages/Perfil.jsx` (ligar e desligar) | CT80; `05-verificacoes.sql` | Implementado e testado com o envio simulado; o envio real depende da chave do Brevo no Supabase |
 | **RF37**: Atividades em lote | `pages/AtividadesEmLote.jsx`, `pages/Atividades.jsx`, `components/atividades/LinhaAtividade.jsx`, `context/DataContext.jsx` | CT78, CT79 | Implementado e testado |
 | **RF38**: "A definir" e Assumir | `components/opcoes.jsx`, `components/atividades/LinhaAtividade.jsx`, `pages/AtividadeDetalhe.jsx`, `lib/permissoes.js`, `hooks/usePermissoes.js`; gatilho `conferir_atividade` no banco | CT09, CT73; `verificacoes/permissoes.js`, `05-verificacoes.sql` | Implementado e testado |
+| **RF39**: Sair do grupo | `components/grupos/SairDoGrupo.jsx`, `pages/Membros.jsx`, `components/layout/AppShell.jsx`, `lib/registro.js`, `context/DataContext.jsx`; função `sair_do_grupo` no banco | CT89, CT90, CT92; `verificacoes/registro.js`, `05-verificacoes.sql` | Implementado e testado |
+| **RF40**: Histórico do grupo | `components/grupos/HistoricoDoGrupo.jsx`, `components/ui/dialogo.jsx` (painel lateral), `lib/registro.js`, `context/DataContext.jsx`; tabela `registro` e gatilhos no banco | CT91, CT92; `verificacoes/registro.js`, `05-verificacoes.sql` | Implementado e testado |
 
-**Resumo:** os 38 requisitos funcionais estão implementados e testados.
+**Resumo:** os 40 requisitos funcionais estão implementados e testados.
 
 ### Requisitos não funcionais verificados nesta entrega
 
@@ -177,7 +183,7 @@ Atualizado em 11/11/2026, sobre a versão da entrega de 27/11 (tag `entrega-27-1
 
 - Todo caso de uso tem origem em pelo menos um requisito funcional.
 - Todo requisito funcional aparece em pelo menos um caso de uso e em pelo menos uma tela.
-- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31), `convite` (RF28), `perfil` (RF35), `feedback` e `equipe` (RF32).
+- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31), `convite` (RF28), `perfil` (RF35), `feedback` e `equipe` (RF32), `registro` (RF40).
 - Todo serviço externo consumido pelo sistema está representado como ator secundário no diagrama de casos de uso e tem comportamento previsto para a sua indisponibilidade: BrasilAPI e Nager.Date (RN17), Supabase e Google (sem eles, o modo com conta fica indisponível e o de demonstração continua, RNF10) e Brevo (sem ele, o lembrete do dia não sai, e o sistema continua igual). A DiceBear deixou de ser serviço externo em 01/11/2026: os avatares passaram a ser desenhados pelo próprio sistema (RN15).
 - Nenhuma tela apresenta funcionalidade que não esteja documentada como requisito. Esta verificação foi refeita em 17/09/2026, percorrendo o código tela a tela; as funcionalidades encontradas sem requisito correspondente originaram os requisitos RF19 a RF22 e as regras RN15 a RN17. Foi refeita de novo em 28/10/2026, na revisão pedida pela professora, que originou os requisitos RF23 a RF28 e as regras RN18 e RN19, em 29/10/2026, nos ajustes da versão 2, que originaram os requisitos RF29 e RF30 e a regra RN20, em 03/11/2026, que originou os requisitos RF31 e RF32 e a regra RN21, em 08/11/2026, com o banco e o acesso com conta, que originou o requisito RF33 e as regras RN22 e RN23, e em 11/11/2026, com as considerações da equipe e dos usuários de teste, que originou os requisitos RF34 a RF38 e as regras RN24 a RN26.
 - Os nomes usados nos requisitos, nos casos de uso, nas classes, nas tabelas e nas telas são os mesmos: grupo, espaço pessoal, perfil, membro, disciplina, conteúdo, atividade, evento, progresso, conquista.

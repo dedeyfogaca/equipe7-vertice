@@ -1,11 +1,11 @@
 # 10 · Especificação dos Casos de Uso
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 12/11/2026
 
 ---
 
-Estão especificados a seguir os dezessete casos de uso prioritários. O [diagrama de casos de uso](../diagramas/01-casos-de-uso.md) apresenta os vinte e um casos identificados e sua correspondência com os requisitos.
+Estão especificados a seguir os dezenove casos de uso prioritários. O [diagrama de casos de uso](../diagramas/01-casos-de-uso.md) apresenta os vinte e três casos identificados e sua correspondência com os requisitos.
 
 ---
 
@@ -596,6 +596,67 @@ O convite por link ou por código de acesso, para a pessoa entrar no grupo com a
 **Pós-condições**
 
 - Cada pessoa com atividade no intervalo recebeu um e-mail naquele dia, e o perfil registra a data do último lembrete.
+
+---
+
+## UC22 · Sair do grupo
+
+| | |
+|---|---|
+| **Ator principal** | Estudante Participante (o Organizador também, por herança) |
+| **Objetivo** | Deixar um grupo por conta própria, sem depender do organizador |
+| **Pré-condições** | O estudante está num grupo (não no espaço pessoal) |
+| **Requisitos** | RF39 |
+| **Regras** | RN06, RN07, RN28 |
+
+**Fluxo principal**
+
+1. No menu do grupo, no seletor de espaço, ou no pé da tela Membros, o estudante escolhe "Sair do grupo".
+2. O sistema mostra o que vai acontecer: quantas atividades em aberto ficam "A definir", que as concluídas e as conquistas continuam no nome dele e como voltar.
+3. O estudante confirma.
+4. O sistema deixa as atividades em aberto dele "A definir" (RN06), marca o cadastro dele no grupo como saída e anota a saída no histórico do grupo (UC23).
+5. O sistema volta para o espaço pessoal, e o grupo sai do seletor de espaço.
+
+**Fluxos alternativos**
+
+- **(2A) Último organizador:** o estudante é o único organizador e há outras pessoas no grupo. O sistema explica que antes é preciso tornar alguém organizador e oferece abrir Membros (UC02); a saída não acontece (RN07, RN28).
+- **(2B) Sozinho no grupo:** o sistema explica que a saída, nesse caso, é excluir o grupo (UC01) e oferece abrir Membros, onde fica a exclusão.
+- **(3A) Desistir:** o estudante cancela, e nada muda.
+- **(5A) Voltar depois:** com um convite (UC16), o estudante entra de novo no mesmo cadastro, como participante, com as atividades concluídas e as conquistas de antes.
+
+**Pós-condições**
+
+- O estudante não vê mais o grupo. Quem ficou vê as atividades dele em aberto como "A definir", as concluídas com o nome dele marcado "(saiu)", e a saída no histórico.
+
+---
+
+## UC23 · Consultar o histórico do grupo
+
+| | |
+|---|---|
+| **Ator principal** | Estudante Participante (o Organizador também, por herança) |
+| **Objetivo** | Saber o que aconteceu no grupo, quem fez e quando |
+| **Pré-condições** | O estudante está num grupo (o espaço pessoal não tem histórico) |
+| **Requisitos** | RF40 |
+| **Regras** | RN29 |
+
+**Fluxo principal**
+
+1. O estudante aciona o ícone de histórico, no canto da tela Membros, ou "Histórico do grupo", no menu do grupo.
+2. O sistema abre um painel lateral com as ações do grupo, da mais nova para a mais antiga, separadas por dia, cada uma com quem fez, o que fez, em qual item e a hora.
+3. O estudante filtra por pessoa ou por tipo (atividades, pessoas, disciplinas e conteúdos, eventos, conquistas).
+4. O estudante carrega as ações mais antigas, se quiser.
+5. O estudante fecha o painel e continua na tela em que estava.
+
+**Fluxos alternativos**
+
+- **(2A) Grupo novo:** só a criação do grupo aparece.
+- **(2B) Antes de 12/11:** o que aconteceu antes da revisão de 12/11 aparece montado com as datas que já estavam guardadas (criações, conclusões e conquistas); edições e exclusões dessa época não aparecem, e o painel avisa.
+- **(3A) Nada com os filtros:** o sistema diz que não há ações com esses filtros nas linhas carregadas.
+
+**Pós-condições**
+
+- Nada muda: o histórico é só para leitura (RN29).
 
 ---
 

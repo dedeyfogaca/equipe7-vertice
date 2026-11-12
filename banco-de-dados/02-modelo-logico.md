@@ -47,6 +47,7 @@ erDiagram
         TEXT foto
         VARCHAR perfil
         TIMESTAMPTZ data_criacao
+        TIMESTAMPTZ data_saida
     }
 
     disciplina {
@@ -130,6 +131,18 @@ erDiagram
         TIMESTAMPTZ data_obtencao
     }
 
+    registro {
+        UUID id_registro PK
+        UUID id_grupo FK
+        TIMESTAMPTZ data_registro
+        UUID id_autor FK
+        VARCHAR autor
+        VARCHAR acao
+        VARCHAR tipo
+        VARCHAR alvo
+        VARCHAR detalhe
+    }
+
     grupo ||--o{ membro : ""
     grupo |o--o| perfil : ""
     grupo ||--o{ disciplina : ""
@@ -146,6 +159,8 @@ erDiagram
     disciplina ||--o{ progresso_historico : ""
     membro ||--o{ membro_conquista : ""
     conquista ||--o{ membro_conquista : ""
+    grupo ||--o{ registro : ""
+    membro |o--o{ registro : ""
 
 ```
 
@@ -222,6 +237,9 @@ A conta não altera `id_usuario`, `id_grupo_pessoal` nem `ultimo_lembrete`: o ga
 | foto | TEXT | | Sim | Endereço da foto de perfil no armazenamento de arquivos (RF24, RN19) |
 | perfil | VARCHAR(15) | | Não | Padrão `'participante'`; `CHECK IN ('organizador', 'participante')` (RN07) |
 | data_criacao | TIMESTAMPTZ | | Não | Padrão: data e hora atuais |
+| data_saida | TIMESTAMPTZ | | Sim | Vazia enquanto a pessoa está no grupo; preenchida por `sair_do_grupo` e esvaziada pela volta com o convite (RF39, RN28) |
+
+A conta não muda `data_saida` diretamente: o gatilho `conferir_membro` mantém o valor anterior, e só as funções do próprio banco o gravam.
 
 ### disciplina
 
@@ -331,6 +349,22 @@ A chave primária composta por `id_membro` e `codigo_conquista` é o que garante
 
 A conta só lê a própria linha, para saber se é da equipe (função `eh_equipe`), e ninguém grava pela API.
 
+### registro
+
+| Campo | Tipo | Chave | Nulo | Restrição |
+|---|---|---|---|---|
+| id_registro | UUID | PK | Não | Gerado pelo banco |
+| id_grupo | UUID | FK → grupo | Não | `ON DELETE CASCADE`; índice `ix_registro_grupo` com a data (RN29) |
+| data_registro | TIMESTAMPTZ | | Não | Padrão: a hora de cada ação (`clock_timestamp()`), mesmo dentro de um mesmo comando |
+| id_autor | UUID | FK → membro | Sim | `ON DELETE SET NULL`; vazio nas linhas montadas com as datas antigas, sem autor conhecido |
+| autor | VARCHAR(80) | | Sim | O nome de quem fez, como era na hora |
+| acao | VARCHAR(12) | | Não | `CHECK IN ('criou', 'editou', 'excluiu', 'concluiu', 'reabriu', 'assumiu', 'passou', 'status', 'cadastrou', 'entrou', 'voltou', 'saiu', 'removeu', 'promoveu', 'gerou', 'ganhou', 'perdeu')` |
+| tipo | VARCHAR(12) | | Não | `CHECK IN ('grupo', 'membro', 'atividade', 'disciplina', 'conteudo', 'evento', 'convite', 'conquista')` |
+| alvo | VARCHAR(160) | | Sim | O título ou o nome do item, como era na hora |
+| detalhe | VARCHAR(200) | | Sim | O complemento: para quem a atividade passou, o novo perfil, quantas ficaram "A definir"... |
+
+Quem grava é o próprio banco, pelos gatilhos `registrar_mudanca` nas tabelas do grupo e pela função `sair_do_grupo`. A tabela não aceita gravação pela API, e as funções que gravam nela não podem ser chamadas de fora (RN29).
+
 ### feedback
 
 | Campo | Tipo | Chave | Nulo | Restrição |
@@ -370,6 +404,8 @@ O gatilho `conferir_feedback` grava o identificador, a data e "não lida" na inc
 | RN24: espaço pessoal | Coluna `grupo.pessoal` e a função `garantir_espaco_pessoal`, que cria o espaço e o perfil uma vez por conta; as regras de acesso não deixam criar nem excluir um grupo pessoal pela API, nem cadastrar membros ou convites nele, e a função `entrar_com_codigo` recusa o espaço pessoal |
 | RN25: lembrete por e-mail | Funções `lembretes_do_dia` (quem recebe e o quê) e `enviar_lembretes` (monta e envia pelo Brevo e grava `ultimo_lembrete`), sem permissão de execução para as contas; agendamento diário com o pg_cron |
 | RN26: perfil em todos os grupos | Tabela `perfil`, editável só pela própria conta; `entrar_com_codigo` cria o membro com o nome e a foto do perfil |
+| RN28: saída do grupo | Coluna `membro.data_saida` e a função `sair_do_grupo`; `eh_membro`, `eh_organizador` e `membro_atual` só contam quem está no grupo; `conferir_atividade` não deixa passar atividade nova a quem saiu; `entrar_com_codigo` traz a pessoa de volta no mesmo cadastro |
+| RN29: histórico do grupo só para leitura | Tabela `registro`, gravada pelos gatilhos `registrar_mudanca`; só a regra de leitura, para quem está no grupo |
 | RN27: feedback anônimo, lido só pela equipe | Qualquer um inclui em `feedback`, com ou sem conta; só quem está em `equipe` (função `eh_equipe`) lê, marca como lida e exclui; gatilho `conferir_feedback`, com o limite de 20 respostas por minuto |
 
 ### Regras que continuam na aplicação

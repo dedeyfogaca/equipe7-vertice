@@ -5,7 +5,7 @@
 
 ---
 
-O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17), convite (RF28), perfil (RF35) e, desde 12/11, a resposta de feedback e a equipe do projeto (RF32). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro e o perfil apontam para ela.
+O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17), convite (RF28), perfil (RF35) e, desde 12/11, a resposta de feedback e a equipe do projeto (RF32) e o registro do histórico do grupo (RF40). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro e o perfil apontam para ela.
 
 ---
 
@@ -32,6 +32,8 @@ erDiagram
     GRUPO ||--o{ CONVITE : "e chamado por"
     MEMBRO |o--o{ CONVITE : "gera"
     PERFIL ||--o| EQUIPE : "integra"
+    GRUPO ||--o{ REGISTRO : "guarda"
+    MEMBRO |o--o{ REGISTRO : "e autor de"
     FEEDBACK
 
 ```
@@ -46,7 +48,7 @@ erDiagram
 |---|---|---|
 | **GRUPO** | identificador, nome, descrição, foto do grupo, se é espaço pessoal, data de criação | RF01, RF29, RF34 |
 | **PERFIL** | conta de acesso, nome, avatar e estilo do avatar, foto, lembrete por e-mail ligado, data do último lembrete, data de criação | RF35, RF36 |
-| **MEMBRO** | identificador, conta de acesso, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil, data de criação | RF02, RF19, RF24, RF27 |
+| **MEMBRO** | identificador, conta de acesso, nome, função, e-mail, avatar e estilo do avatar, foto de perfil, perfil, data de criação, data de saída | RF02, RF19, RF24, RF27, RF39 |
 | **DISCIPLINA** | identificador, nome, cor de identificação, data de criação | RF13 |
 | **CONTEUDO** | identificador, nome, descrição, ordem de apresentação | RF14 |
 | **ATIVIDADE** | identificador, título, descrição, prazo, peso, prioridade, status, data de criação, data de conclusão | RF03, RN09, RF34 |
@@ -56,6 +58,7 @@ erDiagram
 | **MEMBRO_CONQUISTA** | data de obtenção | RN12 |
 | **CONVITE** | identificador, código, data de criação, data de vencimento, ativo | RF28, RN22 |
 | **EQUIPE** | conta de acesso, data de criação | RF32, RN27 |
+| **REGISTRO** | identificador, data e hora, nome de quem fez, ação, tipo do item, nome do item, complemento | RF40, RN29 |
 | **FEEDBACK** | identificador, nota, o que funcionou, o que travou, o que faltou, contato, origem, lida, data de envio | RF32, RN27 |
 
 ---
@@ -80,6 +83,8 @@ erDiagram
 | MEMBRO **obtém** CONQUISTA | N : N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros |
 | GRUPO **é chamado por** CONVITE | 1 : N | Um grupo tem zero ou muitos convites; cada convite leva a exatamente um grupo |
 | MEMBRO **gera** CONVITE | 1 : N, opcional | Cada convite guarda o organizador que o gerou; se ele sai do grupo, o convite continua valendo até vencer |
+| GRUPO **guarda** REGISTRO | 1 : N | Cada ação feita no grupo vira um registro do histórico dele; o histórico sai junto com o grupo (RN29) |
+| MEMBRO **é autor de** REGISTRO | 1 : N, opcional | O registro guarda quem fez a ação; se a pessoa é removida do grupo, o registro continua, com o nome que ela tinha |
 | PERFIL **integra** EQUIPE | 1 : 1, opcional | A conta de quem faz o Vértice está na equipe e lê as respostas de feedback (RN27). A ligação é pela conta de acesso, como entre o perfil e o membro |
 
 ---
@@ -103,6 +108,10 @@ erDiagram
 **Por que o progresso histórico é uma entidade.** O percentual atual de uma disciplina pode ser calculado a qualquer momento a partir das atividades. Já a evolução ao longo do tempo (RF12) não pode: não há como saber, olhando o estado de hoje, qual era o percentual há duas semanas. Por isso o valor diário precisa ser gravado.
 
 **Por que a conta não é uma entidade do modelo.** Quem guarda o e-mail, a senha e o vínculo com o Google é o serviço de autenticação do Supabase, que tem as próprias tabelas. O modelo do Vértice só precisa saber qual membro é de qual conta, e por isso o membro ganhou o atributo "conta de acesso". Ele fica vazio enquanto a pessoa foi só cadastrada pelo organizador e ainda não entrou com a própria conta. Uma mesma conta pode ser membro de vários grupos, uma vez em cada.
+
+**Por que quem sai do grupo continua no cadastro.** As atividades concluídas e as conquistas são de quem as fez: se o cadastro saísse, elas ficariam sem dono, ou teriam de passar a outra pessoa, que ganharia uma experiência que não é dela. Por isso a saída é uma data no membro (RN28): com ela preenchida, a pessoa não conta mais como membro para as regras de acesso, mas o que ela fez continua no nome dela, e a volta pelo convite usa o mesmo cadastro.
+
+**Por que o registro guarda os nomes, e não só as chaves.** O histórico precisa continuar legível depois que a atividade é excluída, a disciplina muda de nome ou a pessoa sai do grupo. Por isso cada registro guarda o nome de quem fez e o do item como eram na hora da ação (RN29). A ligação com o membro existe só para o filtro por pessoa.
 
 **Por que o feedback não se liga a nada.** A resposta é anônima (RN27): ela não guarda a conta, o grupo nem o membro de quem respondeu, e por isso não tem relacionamento com as outras entidades. A origem diz só de onde veio (visitante, demonstração ou com conta), e o contato só existe se a pessoa quiser deixar.
 

@@ -338,7 +338,7 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Testar nos navegadores Firefox e Edge (RNF05) | A fazer (T51) | 26/11/2026 |
 | Conferir no sistema publicado, com o projeto real do Supabase, o login com o Google, o convite entre duas contas e o envio de uma foto | A fazer | 24/11/2026 |
 | Ler as respostas do feedback dos usuários de teste e transformar o que vier em tarefas | Em andamento (T77): os comentários recebidos até 11/11 entraram na revisão de 11/11; desde 12/11, as respostas chegam na tela Respostas do feedback | 20/11/2026 |
-| Rodar a atualização do feedback (`08-atualizacao-feedback.sql`) no projeto real do Supabase e cadastrar as contas da equipe na tabela `equipe` | A fazer | Antes de publicar a versão de 12/11 |
+| Rodar as atualizações de 12/11 (`08-atualizacao-feedback.sql` e `09-atualizacao-historico.sql`) no projeto real do Supabase e cadastrar as contas da equipe na tabela `equipe` | A fazer | Antes de publicar a versão de 12/11 |
 | Conferir no sistema publicado o espaço pessoal de uma conta antiga, o perfil em dois grupos e um lembrete recebido de verdade | A fazer | 24/11/2026 |
 
 ---

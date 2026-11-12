@@ -5,9 +5,9 @@
 
 ---
 
-Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, com a revisão de 11/11 (o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste) e com a de 12/11, que trouxe o feedback para dentro do sistema. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. Os 88 casos foram executados em 12/11, e as observações de cada caso estão em [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json). As evidências têm o nome do caso no arquivo.
+Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, com a revisão de 11/11 (o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste) e com a de 12/11, que trouxe o feedback para dentro do sistema, a saída do grupo e o histórico do grupo. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. Os 92 casos foram executados em 12/11, e as observações de cada caso estão em [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json). As evidências têm o nome do caso no arquivo.
 
-Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 12/11 está na visão geral e no registro. Os casos CT69 a CT85 cobrem a revisão de 11/11 e mantêm a descrição e as evidências daquela execução. Os casos CT86 a CT88 são novos e cobrem a revisão de 12/11, e o CT56 foi revisto para ela; os quatro têm as evidências de [`testes/evidencias-12-11/`](../testes/evidencias-12-11/).
+Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 12/11 está na visão geral e no registro. Os casos CT69 a CT85 cobrem a revisão de 11/11 e mantêm a descrição e as evidências daquela execução. Os casos CT86 a CT92 são novos e cobrem a revisão de 12/11, e o CT56 foi revisto para ela; os oito têm as evidências de [`testes/evidencias-12-11/`](../testes/evidencias-12-11/).
 
 Os ciclos anteriores (11/11, 08/11, 06/11, a rodada de 01/11 e 20/10) estão resumidos no [fim deste documento](#ciclo-de-1111). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
 
@@ -17,16 +17,16 @@ Os ciclos anteriores (11/11, 08/11, 06/11, a rodada de 01/11 e 20/10) estão res
 
 | Item | Valor |
 |---|---|
-| Data da execução | 12/11/2026, das 9h25 às 9h33 |
+| Data da execução | 12/11/2026, das 10h13 às 10h21 |
 | Versão testada | O código de `src/` desta entrega (Vértice 2.0.0 com o banco de dados e as revisões de 11/11 e 12/11) |
-| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68, CT81 a CT85 e CT88), e com elas, para o modo com conta (CT57 a CT66, CT69 a CT80, CT86 e CT87). As duas versões foram servidas com `npm run preview` |
+| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68, CT81 a CT85, CT88 e CT92), e com elas, para o modo com conta (CT57 a CT66, CT69 a CT80, CT86, CT87 e CT89 a CT91). As duas versões foram servidas com `npm run preview` |
 | Banco de dados | PostgreSQL 16 local, com `06-apoio-teste-local.sql` e `04-script-criacao.sql`, zerado antes de cada roteiro com conta. O sistema falou com ele por um servidor de teste que responde como o Supabase nas chamadas que o sistema usa (login por e-mail, consulta, inclusão, alteração e exclusão de linhas, a função do convite e o envio de arquivos), executando cada consulta no banco como a conta conectada, com as regras de acesso por linha valendo. O envio do lembrete (CT80) foi simulado: a chamada ao Brevo fica gravada numa tabela do apoio local, em vez de sair para a internet |
 | Ambiente | Node.js 22.23, npm 10.9, Chromium 153, tela de 1440 × 1000; do CT81 ao CT84, 1920 × 1080. No CT34, no CT53 e em parte do CT43, do CT46, do CT54 e do CT56, 390 × 844, tamanho de celular (no CT43, no CT46 e no CT54, também com tela de toque); no CT46, também 1024 × 900 |
 | Forma de execução | Roteiro automatizado no navegador (Playwright), seguindo os passos de cada caso; as capturas de tela são da própria execução. Do CT61 ao CT64 e do CT72 ao CT80, dois navegadores ao mesmo tempo, um para cada conta |
 | Dados | Fictícios, cadastrados durante o próprio teste. CT28 a CT30, CT34, CT37 a CT39, CT41 a CT46, CT48, CT49, CT51 a CT56, CT67 e CT68 usam os dados de exemplo do sistema; CT31, CT35, CT36, CT50 e CT85 partem de dados gravados no formato das versões anteriores. As fotos são uma imagem PNG de 640 × 480, uma imagem de 400 × 300 dividida em cores, para conferir o recorte, e uma foto de celular de 4000 × 3000, com 4,9 MB |
 | Rede | O ambiente de teste não acessa a internet. As respostas da BrasilAPI foram simuladas com a relação de feriados nacionais de 2026 e 2027, no formato do serviço; a Nager.Date ficou indisponível o tempo todo. O CT27 derruba também a BrasilAPI, para verificar as alternativas locais. O login com o Google e o projeto real do Supabase não foram usados (ver [o que não foi testado](#o-que-não-foi-testado-nesta-entrega)) |
 
-Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte do estado deixado pelo anterior. CT28 a CT30 seguem um segundo cenário, com os dados de exemplo, CT37 e CT38 um terceiro, CT57 a CT66 um quarto, com o banco, CT67 e CT68 um quinto, CT69 a CT80 um sexto, com o banco zerado de novo, CT81 a CT84 um sétimo, e CT86 e CT87 um oitavo, com o banco zerado de novo. Os demais começam com o navegador limpo. Em todos os cenários, o roteiro também conferiu que o console do navegador não registrou nenhum erro, com exceção do CT27, que derruba os serviços externos de propósito. As datas de prazo dos casos são contadas a partir do dia da execução em que cada caso foi descrito.
+Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte do estado deixado pelo anterior. CT28 a CT30 seguem um segundo cenário, com os dados de exemplo, CT37 e CT38 um terceiro, CT57 a CT66 um quarto, com o banco, CT67 e CT68 um quinto, CT69 a CT80 um sexto, com o banco zerado de novo, CT81 a CT84 um sétimo, CT86 e CT87 um oitavo, e CT89 a CT91 um nono, sempre com o banco zerado de novo. Os demais começam com o navegador limpo. Em todos os cenários, o roteiro também conferiu que o console do navegador não registrou nenhum erro, com exceção do CT27, que derruba os serviços externos de propósito. As datas de prazo dos casos são contadas a partir do dia da execução em que cada caso foi descrito.
 
 ---
 
@@ -34,19 +34,20 @@ Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte 
 
 | Situação | Casos |
 |---|---|
-| Aprovado | 88 |
+| Aprovado | 92 |
 | Reprovado | 0 |
-| **Total executado** | **88** |
+| **Total executado** | **92** |
 
 Além dos casos de teste, foram executadas as verificações automatizadas do projeto:
 
 | Verificação | Comando | Resultado | Registro |
 |---|---|---|---|
-| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto, avatares, gravação no banco, evolução do progresso, espaço pessoal, "A definir", retirada das conquistas e o resumo e a planilha do feedback | `npm run verificar` | 297 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
-| Regras do banco: acesso por grupo e por perfil, último organizador, status só pelo responsável, eventos, convite, histórico, exclusões em cascata, pasta das fotos, espaço pessoal, perfil, "A definir", evento de vários dias, lembrete e feedback (quem envia, quem lê, o que muda e o limite por minuto) | `05-verificacoes.sql` num PostgreSQL local | 87 conferências, todas passaram | [`verificacoes-banco.txt`](../testes/registros/verificacoes-banco.txt) |
+| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto, avatares, gravação no banco, evolução do progresso, espaço pessoal, "A definir", retirada das conquistas, o resumo e a planilha do feedback, a saída do grupo e as linhas do histórico | `npm run verificar` | 332 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
+| Regras do banco: acesso por grupo e por perfil, último organizador, status só pelo responsável, eventos, convite, histórico, exclusões em cascata, pasta das fotos, espaço pessoal, perfil, "A definir", evento de vários dias, lembrete, feedback (quem envia, quem lê, o que muda e o limite por minuto), saída do grupo e histórico (quem grava, quem lê, a volta pelo convite) | `05-verificacoes.sql` num PostgreSQL local | 111 conferências, todas passaram | [`verificacoes-banco.txt`](../testes/registros/verificacoes-banco.txt) |
 | Instalação e geração da versão de produção | `npm ci` e `npm run build` | Concluído sem erro, sem vulnerabilidades nas dependências | [`build.txt`](../testes/registros/build.txt) |
 | Atualização de um banco com os dados da versão anterior | `07-atualizacao-11-11.sql` sobre um banco criado com o script de 08/11 (antes e depois da correção do D14) e preenchido | Nenhum registro perdido, cada atividade com o grupo da sua disciplina, estrutura igual à de um banco novo e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
 | Atualização do feedback | `08-atualizacao-feedback.sql` sobre um banco criado com o script de 11/11 | Estrutura igual à de um banco novo, e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
+| Atualização da saída e do histórico | `09-atualizacao-historico.sql` sobre um banco com dados, criado com o script do feedback | Nenhum registro perdido, o histórico do que já aconteceu montado com as datas guardadas, estrutura igual à de um banco novo e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
 | Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json) |
 
 Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram corrigidos antes da execução de 11/11, e a de 12/11 não encontrou defeitos novos; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
@@ -145,6 +146,10 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | CT86 | RF32, RN27 | Feedback dentro do Vértice: uma pergunta por vez, anônimo e sem conta | Aprovado |
 | CT87 | RF32, RN27 | Respostas do feedback: só a equipe vê, com resumo, filtros, lida e planilha | Aprovado |
 | CT88 | RF32 | Sem banco, a página de feedback leva ao formulário da equipe | Aprovado |
+| CT89 | RF39, RN28 | Participante sai do grupo: o que está em aberto fica "A definir" | Aprovado |
+| CT90 | RF39, RN28, RF38 | Quem fica vê "A definir" e o nome de quem saiu; a última organizadora não sai | Aprovado |
+| CT91 | RF40, RN29, RN28 | Histórico do grupo: quem fez o quê, filtros, a volta pelo convite e só leitura | Aprovado |
+| CT92 | RF39, RF40, RN28, RN29 | Demonstração: o histórico fica no navegador e a saída segue as mesmas regras | Aprovado |
 
 ---
 
@@ -1100,6 +1105,50 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 - **Observado:** a página mostrou "Conta pra gente como foi." e o botão **Responder o formulário**, que aponta para `https://forms.gle/QpAtRSGux4XKd67T6`, em outra aba
 - **Situação:** Aprovado
 - **Evidência:** [CT88.png](../testes/evidencias-12-11/CT88.png)
+
+### CT89: Participante sai do grupo: o que está em aberto fica "A definir"
+
+- **Requisito:** RF39, RN28
+- **Pré-condição:** versão com o banco, banco zerado; Ana Souza organiza o "Grupo da Saída", com a disciplina Redes; Bruno Lima entrou pelo convite e é responsável por "Relatório de redes" (em aberto) e "Lista 1" (concluída por ele)
+- **Passos:** com a conta do Bruno, abrir o grupo e o menu do grupo; clicar em **Sair do grupo**; ler a confirmação e confirmar; abrir o seletor de espaço; pedir as atividades do grupo pela API com a sessão do Bruno
+- **Entrada:** conta `bruno@teste.com`
+- **Esperado:** o participante tem "Histórico do grupo" e "Sair do grupo" no menu; a confirmação diz o que acontece com as atividades; depois de sair, ele cai no espaço pessoal e o grupo some do seletor; no banco, o cadastro continua, marcado como saída; a concluída segue com ele e a aberta fica "A definir"; ele não lê mais nada do grupo
+- **Observado:** o menu mostrou os dois itens. A confirmação disse "Sair de Grupo da Saída?", que a atividade em aberto fica "A definir", que as concluídas e as conquistas continuam no nome dele e que, para voltar, é preciso um novo convite. Depois de confirmar, o Bruno caiu em `/painel`, no espaço Pessoal, e o grupo não estava mais no seletor. No banco, o cadastro dele ficou marcado como saída, como participante; "Lista 1" continuou concluída no nome dele, e "Relatório de redes" ficou "A definir", em "a fazer". Pela API, a consulta devolveu 0 atividades
+- **Situação:** Aprovado
+- **Evidência:** [CT89a.png](../testes/evidencias-12-11/CT89a.png) (confirmação), [CT89b.png](../testes/evidencias-12-11/CT89b.png) (de volta ao espaço pessoal)
+
+### CT90: Quem fica vê "A definir" e o nome de quem saiu; a última organizadora não sai
+
+- **Requisito:** RF39, RN28, RF38
+- **Pré-condição:** CT89
+- **Passos:** com a conta da Ana, abrir Atividades do grupo; abrir "Lista 1"; abrir Membros; clicar em **Sair do grupo**
+- **Entrada:** conta `ana@teste.com`
+- **Esperado:** a atividade que era do Bruno aparece com o botão Assumir; a concluída mostra o Bruno como responsável, marcado como quem saiu; Membros conta só quem está no grupo; sozinha no grupo, a Ana não sai e é orientada a excluir o grupo
+- **Observado:** "Relatório de redes" apareceu com **Assumir**. "Lista 1" mostrou Bruno Lima com "Saiu do grupo" no lugar do perfil. Membros mostrou "1 pessoa no grupo". O botão **Sair do grupo** abriu "Ainda não dá para sair", com "Você é a única pessoa do grupo. Para sair, exclua o grupo." e o atalho para a exclusão
+- **Situação:** Aprovado
+- **Evidência:** [CT90a.png](../testes/evidencias-12-11/CT90a.png) (atividade concluída por quem saiu), [CT90b.png](../testes/evidencias-12-11/CT90b.png) (saída bloqueada)
+
+### CT91: Histórico do grupo: quem fez o quê, filtros, a volta pelo convite e só leitura
+
+- **Requisito:** RF40, RN29, RN28, RF28
+- **Pré-condição:** CT90
+- **Passos:** com a conta do Bruno, entrar de novo com o código do grupo; abrir **Histórico do grupo** no menu do grupo; filtrar pela Ana e depois por "Disciplinas e conteúdos"; tentar gravar uma linha no histórico pela API; com a conta da Ana, abrir o ícone de relógio em Membros
+- **Entrada:** código `SAIRGRP2`
+- **Esperado:** o Bruno volta no mesmo cadastro, como participante; o histórico mostra, do mais novo para o mais antigo, a volta, a saída com quantas atividades ficaram "A definir" e as ações de cada um; os filtros combinam; ninguém grava no histórico pela API; o atalho de Membros abre o mesmo histórico
+- **Observado:** o Bruno voltou ao "Grupo da Saída", no mesmo cadastro, como participante. O histórico começou por "Bruno Lima voltou ao grupo", seguido de "Bruno Lima saiu do grupo: 1 atividade ficou "A definir"", a conquista, a conclusão de "Lista 1", as atividades, a disciplina e o convite criados pela Ana, a entrada do Bruno e "Ana Souza criou o grupo". O filtro pela Ana deixou só as ações dela, e com "Disciplinas e conteúdos", só "Ana Souza criou a disciplina "Redes"". A gravação pela API foi recusada (403). O ícone de relógio em Membros abriu o mesmo histórico
+- **Situação:** Aprovado
+- **Evidência:** [CT91a.png](../testes/evidencias-12-11/CT91a.png) (histórico), [CT91b.png](../testes/evidencias-12-11/CT91b.png) (filtros)
+
+### CT92: Demonstração: o histórico fica no navegador e a saída segue as mesmas regras
+
+- **Requisito:** RF39, RF40, RN28, RN29, RF20
+- **Pré-condição:** demonstração com os dados de exemplo
+- **Passos:** abrir o grupo "Trio do TCC" e o **Histórico do grupo**; em Membros, clicar em **Sair do grupo**; tornar o Bruno organizador; sair do grupo de novo
+- **Entrada:** nome "Ana Souza"
+- **Esperado:** o histórico do exemplo vem montado com as datas guardadas; como única organizadora, a Ana não sai; com outro organizador, ela sai, o grupo some do seletor, as atividades em aberto dela ficam "A definir" e o histórico guarda a saída com o número delas
+- **Observado:** o histórico trouxe "Ana Souza criou o grupo" e as disciplinas criadas. A primeira tentativa abriu "Antes de sair, torne outra pessoa organizadora do grupo.". Com o Bruno organizador, a saída foi confirmada, o "Trio do TCC" sumiu do seletor, nenhuma atividade em aberto ficou com a Ana, e o histórico guardou a saída com as 3 atividades que ficaram "A definir". Nenhum erro no console
+- **Situação:** Aprovado
+- **Evidência:** [CT92.png](../testes/evidencias-12-11/CT92.png)
 ---
 
 ## O que não foi testado nesta entrega
@@ -1107,7 +1156,7 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | Item | Motivo |
 |---|---|
 | Login com a conta Google | Depende do Google e do projeto real do Supabase, que o ambiente de teste não acessa. A conferência é feita no sistema publicado |
-| Feedback no projeto real do Supabase | O CT86 e o CT87 usaram o banco local. No sistema publicado, o feedback depende de rodar `08-atualizacao-feedback.sql` e de cadastrar as contas da equipe, nas [pendências](16-defeitos-e-pendencias.md#pendências) |
+| Feedback, saída e histórico no projeto real do Supabase | O CT86, o CT87 e os CT89 a CT91 usaram o banco local. No sistema publicado, eles dependem de rodar `08-atualizacao-feedback.sql` e `09-atualizacao-historico.sql` e de cadastrar as contas da equipe, nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | Envio real do lembrete pelo Brevo | O CT80 conferiu quem recebe, o assunto e a não repetição com a chamada ao Brevo simulada. O envio de verdade depende da conta no Brevo e da chave no Supabase, e a conferência de um e-mail recebido está nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | Projeto real do Supabase | Os casos com conta usaram o PostgreSQL local, com o mesmo script de criação, e um servidor de teste no lugar das chamadas do Supabase. A conferência no sistema publicado (criar conta, convite entre duas contas e foto) está nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | BrasilAPI e Nager.Date reais | O ambiente de teste não acessa a internet; as respostas foram simuladas no formato de cada serviço. A conferência com os serviços reais é feita na versão publicada na Vercel |

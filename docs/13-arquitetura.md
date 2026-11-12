@@ -82,6 +82,8 @@ As regras não estão espalhadas pelas telas. Ficam em módulos próprios, consu
 | Espaço pessoal: criação no primeiro acesso, o que ele mostra de cada grupo e o que ele não aceita | Função `garantir_espaco_pessoal` e gatilho `conferir_atividade` do banco; `context/DataContext.jsx` e `context/AuthContext.jsx` | RN01, RN24 |
 | Perfil da conta em todos os grupos | `context/DataContext.jsx` (leva o perfil aos membros da conta) e o gatilho `conferir_perfil` do banco | RN26 |
 | Quem recebe o lembrete e quando | Funções `lembretes_do_dia` e `enviar_lembretes` do banco | RN25 |
+| Quem pode sair do grupo e o que acontece com as atividades | `lib/registro.js` (`motivoParaNaoSair`) e a função `sair_do_grupo` do banco | RN28 |
+| O histórico do grupo e o texto de cada linha | Gatilhos `registrar_mudanca` do banco; na demonstração, `lib/registro.js`, que compara as coleções a cada mudança | RN29 |
 | Quem lê o feedback e quantas respostas o banco aceita | Função `eh_equipe`, gatilho `conferir_feedback` e regras de acesso do banco; `lib/feedback.js`, com a espera de 2 minutos no navegador | RN27 |
 | Quem enxerga e altera cada linha, último organizador, status só pelo responsável, "A definir" só assumido | Script do banco: regras de acesso por linha e gatilhos `conferir_membro`, `conferir_atividade` e `conferir_evento` | RN01, RN06, RN07, RN20, RN21, RNF11 |
 
@@ -124,6 +126,7 @@ Onde mexer para alterar cada parte do sistema. Os caminhos de código são relat
 | Páginas públicas: início, Sobre nós, acesso e 404 | `src/pages/publicas/`, com o movimento da página inicial em `src/components/publicas/movimento.jsx` |
 | Eventos: cadastro, cartão e menu de ações | `src/components/eventos/` e a tela `src/pages/Eventos.jsx` |
 | Feedback: a página das perguntas, a tela das respostas e o formulário de reserva, para a cópia sem banco | `src/pages/publicas/Feedback.jsx`, `src/pages/FeedbackRespostas.jsx` e `src/lib/feedback.js` |
+| Sair do grupo e histórico do grupo | `src/components/grupos/SairDoGrupo.jsx`, `src/components/grupos/HistoricoDoGrupo.jsx` e `src/lib/registro.js` |
 | Peças de interface reaproveitadas | `src/components/`, com os componentes base em `src/components/ui/`, entre eles a lista de escolha (`selecao.jsx`), o campo de data (`campo-data.jsx`) e o editor de foto (`editor-foto.jsx`) |
 | Barra do topo, seletor de espaço, largura das telas e layout das páginas públicas | `src/components/layout/` |
 | Cores dos temas claro e escuro | `src/index.css` |
@@ -131,7 +134,7 @@ Onde mexer para alterar cada parte do sistema. Os caminhos de código são relat
 | Dados: leitura, gravação, exclusão em cascata | `src/context/DataContext.jsx`, com o banco em `src/lib/remoto.js` e a demonstração em `src/lib/storage.js` |
 | Login e modo (com conta ou demonstração) | `src/context/ContaContext.jsx` e `src/components/conta/` |
 | Convite | `src/lib/convite.js`, `src/components/membros/DialogoConvite.jsx` e `src/pages/publicas/Convite.jsx` |
-| Tabelas, regras de acesso, gatilhos e lembrete do banco | `banco-de-dados/04-script-criacao.sql`, na raiz do repositório, e as atualizações de 11/11 e de 12/11 em `07-atualizacao-11-11.sql` e `08-atualizacao-feedback.sql` |
+| Tabelas, regras de acesso, gatilhos e lembrete do banco | `banco-de-dados/04-script-criacao.sql`, na raiz do repositório, e as atualizações em `07-atualizacao-11-11.sql`, `08-atualizacao-feedback.sql` e `09-atualizacao-historico.sql` |
 | Espaço aberto (pessoal ou grupo) e perfil de quem está usando | `src/context/AuthContext.jsx` |
 | Rotas | `src/App.jsx` e `src/routes/` |
 | Serviços externos | `src/lib/feriados.js` e `src/lib/avatar.js` |
@@ -157,6 +160,16 @@ A modelagem relacional da Entrega 2 não foi um exercício paralelo à implement
 | O acesso é pela conta Google ou pelo e-mail, e a entrada no grupo é por convite | As regras de negócio e os cálculos de progresso, em `src/lib/` |
 | As fotos de perfil e dos grupos vão para o armazenamento de arquivos | As telas e o mapa de navegação, com a tela de login e o convite a mais |
 | Os dados são compartilhados entre os integrantes e entre dispositivos | A hospedagem na Vercel |
+
+---
+
+## Histórico do grupo
+
+O histórico (RF40, RN29) é gravado onde os dados ficam. Com conta, quem anota é o próprio banco: cada tabela do grupo tem um gatilho que, depois de cada inclusão, alteração ou exclusão, grava uma linha em `registro` com o grupo, quem fez (o membro da conta logada), a ação e o nome do item como era na hora. Assim nada escapa, mesmo que a mudança venha de outro aparelho, e ninguém consegue apagar ou forjar uma linha: a tabela só aceita leitura pela API, e as funções que gravam nela não podem ser chamadas de fora.
+
+Na demonstração não há banco: a cada mudança nas coleções, `lib/registro.js` compara o antes e o depois e anota as mesmas ações, com o mesmo texto, no armazenamento do navegador (até 400 linhas por grupo). Nos dois casos, ações que são consequência de outra viram uma linha só: excluir uma disciplina não anota cada atividade que saiu com ela, e sair do grupo anota a saída com quantas atividades ficaram "A definir".
+
+A saída do grupo (RF39, RN28) também é do banco: `sair_do_grupo` confere quem pode sair, deixa as atividades em aberto "A definir" e marca `membro.data_saida`. As funções de acesso (`eh_membro`, `eh_organizador`, `membro_atual`) passaram a contar só quem está no grupo, e por isso a pessoa perde o acesso na hora, sem que nenhuma regra de acesso precisasse mudar.
 
 ---
 

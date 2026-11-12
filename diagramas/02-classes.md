@@ -1,11 +1,11 @@
 # Diagrama de Classes
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 11/11/2026
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
-O diagrama apresenta as onze classes do domínio, seus atributos principais e os relacionamentos com cardinalidade. Os losangos preenchidos indicam **composição**: a existência da parte depende do todo, o que corresponde à cascata de exclusão descrita na RN02.
+O diagrama apresenta as doze classes do domínio, seus atributos principais e os relacionamentos com cardinalidade. Os losangos preenchidos indicam **composição**: a existência da parte depende do todo, o que corresponde à cascata de exclusão descrita na RN02.
 
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Space Grotesk", "themeVariables": {"fontFamily": "Space Grotesk, Segoe UI, sans-serif", "fontSize": "14px", "primaryColor": "#F5F7FC", "primaryTextColor": "#0B1220", "primaryBorderColor": "#0891B2", "lineColor": "#5B6678", "classText": "#0B1220", "textColor": "#0B1220", "mainBkg": "#F5F7FC", "nodeBorder": "#0891B2", "edgeLabelBackground": "#FFFFFF", "titleColor": "#0E7490"}}}%%
@@ -44,6 +44,9 @@ classDiagram
         +String estiloAvatar
         +String foto
         +PerfilUsuario perfil
+        +Date saiuEm
+        +estaNoGrupo() Boolean
+        +sair() Integer
         +experienciaAcumulada() Integer
         +ofensivaAtual() Integer
         +ehOrganizador() Boolean
@@ -134,6 +137,16 @@ classDiagram
         +estaValido() Boolean
     }
 
+    class Registro {
+        +String id
+        +Date data
+        +String autor
+        +String acao
+        +String tipo
+        +String alvo
+        +String detalhe
+    }
+
     class StatusAtividade {
         <<enumeration>>
         A_FAZER
@@ -189,6 +202,8 @@ classDiagram
     Conquista "1" -- "0..*" MembroConquista
     Grupo "1" *-- "0..*" Convite : chamado por
     Membro "0..1" --> "0..*" Convite : gerou
+    Grupo "1" *-- "0..*" Registro : guarda
+    Membro "0..1" --> "0..*" Registro : fez
 
     Atividade ..> StatusAtividade
     Atividade ..> Prioridade
@@ -207,6 +222,7 @@ classDiagram
     style Conquista fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style MembroConquista fill:#EEF7DD,stroke:#4D7C0F,stroke-width:2.5px,color:#3F6212
     style Convite fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
+    style Registro fill:#F5F7FC,stroke:#CDD4E1,stroke-width:1.6px,color:#0B1220
     style StatusAtividade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style Prioridade fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
     style PerfilUsuario fill:#EEF1F6,stroke:#64748B,stroke-width:1.4px,color:#5B6678
@@ -237,6 +253,8 @@ classDiagram
 | Disciplina e ProgressoHistorico | 1 : 0..N | Uma disciplina acumula vários registros de progresso ao longo do tempo (RF12) |
 | Grupo e Convite | 1 : 0..N | Um grupo tem vários convites; cada convite leva a um único grupo e vence em 7 dias (RF28, RN22) |
 | Membro e Convite | 0..1 : 0..N | O convite guarda o organizador que o gerou (RN22) |
+| Grupo e Registro | 1 : 0..N | O grupo guarda o histórico de tudo o que aconteceu nele, uma linha por ação; o histórico sai junto quando o grupo é excluído, e o espaço pessoal não tem (RF40, RN29) |
+| Membro e Registro | 0..1 : 0..N | Cada linha do histórico aponta quem fez a ação. As linhas montadas com as datas guardadas, de antes da revisão de 12/11, podem não ter autor |
 | Membro e Conquista | 0..N : 0..N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros. A associação é resolvida pela classe associativa **MembroConquista**, que guarda a data de obtenção (RN12) |
 
 ---
@@ -246,6 +264,10 @@ classDiagram
 **Experiência e ofensiva são calculadas, não armazenadas.** `Membro.experienciaAcumulada()` soma `Atividade.experienciaGerada()` das atividades concluídas sob sua responsabilidade, e `Membro.ofensivaAtual()` percorre as datas em `Atividade.concluidaEm`. Guardar esses valores em atributos criaria uma segunda fonte de verdade que precisaria ser sincronizada a cada alteração de status, inclusive nas reversões previstas na RN10.
 
 **O progresso também é calculado.** `Conteudo.progresso()` e `Disciplina.progresso()` aplicam diretamente as fórmulas da RN08 e da RN14. A classe **ProgressoHistorico** não duplica esse cálculo: ela guarda o resultado de um dia específico, porque a evolução ao longo do tempo (RF12) não pode ser reconstruída a partir do estado atual.
+
+**Quem sai do grupo continua no grupo.** `Membro.saiuEm` marca a saída (RF39, RN28): o membro perde o acesso e some das listas e do ranking, mas continua dono das atividades concluídas e das conquistas. `Membro.sair()` deixa "A definir" as atividades em aberto dele e devolve quantas foram. Quem volta pelo convite reaparece no mesmo membro.
+
+**O histórico guarda o nome como era.** `Registro.autor` e `Registro.alvo` são cópias do nome de quem fez e do item na hora da ação, e não ligações: o histórico continua legível depois que a atividade é excluída ou a pessoa sai. Por isso a classe não tem métodos para alterar nada (RN29).
 
 **A Conquista é um catálogo.** Ela não pertence a nenhum grupo: descreve o marco e o critério de avaliação. Quem liga o marco ao estudante é a classe associativa MembroConquista.
 

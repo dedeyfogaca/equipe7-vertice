@@ -1,7 +1,7 @@
 # Diagrama de Casos de Uso
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 11/11/2026
+> Entrega 2 · Modelagem do Software · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
@@ -36,6 +36,7 @@ Entre os diagramas de modelagem, este é o único desenhado em SVG e não em Mer
 | UC15 · Entrar com conta | RF27 | Estudante Participante |
 | UC17 · Usar o espaço pessoal | RF34 | Estudante Participante |
 | UC18 · Editar o perfil | RF24, RF35 | Estudante Participante |
+| UC22 · Sair do grupo | RF39 | Estudante Participante |
 | UC05 · Cadastrar atividade | RF03, RF30 | Estudante Participante |
 | UC20 · Cadastrar e alterar em lote | RF37 | Estudante Participante (a troca de responsável, o Organizador) |
 | UC06 · Consultar atividades | RF04, RF05, RF07, RF22 | Estudante Participante |
@@ -45,11 +46,12 @@ Entre os diagramas de modelagem, este é o único desenhado em SVG e não em Mer
 | UC13 · Consultar calendário | RF07, RF23 | Estudante Participante |
 | UC14 · Gerenciar eventos | RF31 | Estudante Participante |
 | UC09 · Consultar painel de desempenho | RF18 | Estudante Participante |
+| UC23 · Consultar o histórico do grupo | RF40 | Estudante Participante |
 | UC21 · Receber lembrete por e-mail | RF36 | Estudante Participante |
 | UC10 · Alternar tema | RF08 | Estudante Participante |
 | UC11 · Encerrar sessão | RF09 | Estudante Participante |
 
-Todos os trinta e oito requisitos funcionais aparecem em pelo menos um caso de uso. O tutorial (RF33) é oferecido no painel na primeira visita e fica ligado ao UC12 porque é ali que quem está conhecendo o sistema chega a ele.
+Todos os quarenta requisitos funcionais aparecem em pelo menos um caso de uso. O tutorial (RF33) é oferecido no painel na primeira visita e fica ligado ao UC12 porque é ali que quem está conhecendo o sistema chega a ele.
 
 | Ator secundário | Casos de uso | Requisito |
 |---|---|---|

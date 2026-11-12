@@ -5,7 +5,7 @@
 
 ---
 
-Descrição campo a campo das treze tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
+Descrição campo a campo das catorze tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
 
 ---
 
@@ -59,6 +59,7 @@ Guarda os integrantes de um grupo. O perfil determina o que o integrante pode fa
 | foto | TEXT | | Não | | Endereço da foto de perfil enviada pelo membro, no armazenamento de arquivos. A pessoa enquadra a foto no editor, e a área enquadrada é reduzida para 256 × 256 antes do envio. Quando existe, aparece no lugar do avatar; vazia, vale o avatar. Com conta, é a foto do perfil (RF24, RN15, RN19, RN26) |
 | perfil | VARCHAR | 15 | Sim | | Perfil de permissão: `organizador` ou `participante`. Padrão: `participante` |
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora do cadastro do membro |
+| data_saida | TIMESTAMPTZ | | Não | | Data e hora em que a pessoa saiu do grupo. Vazia enquanto ela está no grupo; com ela preenchida, a pessoa perde o acesso, mas as atividades concluídas e as conquistas continuam no nome dela (RF39, RN28) |
 
 ---
 
@@ -188,6 +189,24 @@ Guarda os convites gerados pelo organizador para chamar a turma ao grupo (RF28, 
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora em que o convite foi gerado |
 | expira_em | TIMESTAMPTZ | | Sim | | Fim da validade. Padrão: 7 dias depois da criação |
 | ativo | BOOLEAN | | Sim | | Se o convite ainda pode ser usado. Padrão: verdadeiro |
+
+---
+
+## registro
+
+O histórico do grupo: uma linha por ação, gravada pelo próprio banco, com o nome de quem fez e o do item como eram na hora (RF40, RN29). Ninguém altera nem apaga.
+
+| Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
+|---|---|---|---|---|---|
+| id_registro | UUID | | Sim | PK | Identificador único da linha |
+| id_grupo | UUID | | Sim | FK | Grupo da ação. Referencia `grupo.id_grupo` |
+| data_registro | TIMESTAMPTZ | | Sim | | Data e hora da ação |
+| id_autor | UUID | | Não | FK | Quem fez. Referencia `membro.id_membro`; vazio quando o autor não é conhecido |
+| autor | VARCHAR | 80 | Não | | Nome de quem fez, como era na hora |
+| acao | VARCHAR | 12 | Sim | | O que foi feito: criou, editou, excluiu, concluiu, reabriu, assumiu, passou, status, cadastrou, entrou, voltou, saiu, removeu, promoveu, gerou, ganhou ou perdeu |
+| tipo | VARCHAR | 12 | Sim | | Em quê: grupo, membro, atividade, disciplina, conteudo, evento, convite ou conquista |
+| alvo | VARCHAR | 160 | Não | | Título ou nome do item, como era na hora |
+| detalhe | VARCHAR | 200 | Não | | Complemento da ação: para quem a atividade passou, o perfil novo, quantas atividades ficaram "A definir" na saída |
 
 ---
 
