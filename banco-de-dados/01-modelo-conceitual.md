@@ -1,11 +1,11 @@
 # Modelo Conceitual do Banco de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 11/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
-O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17), convite (RF28) e perfil (RF35). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro e o perfil apontam para ela.
+O modelo conceitual identifica **o que** o sistema precisa guardar, sem decidir ainda como isso será implementado. As entidades foram extraídas dos substantivos que aparecem nos requisitos: grupo (RF01), membro (RF02), disciplina (RF13), conteúdo (RF14), atividade (RF03), evento (RF31), histórico de progresso (RF12), conquista (RF17), convite (RF28), perfil (RF35) e, desde 12/11, a resposta de feedback e a equipe do projeto (RF32). A conta de quem entra no sistema (RF27) fica no serviço de autenticação do Supabase, fora do modelo do domínio; o membro e o perfil apontam para ela.
 
 ---
 
@@ -31,6 +31,8 @@ erDiagram
     CONQUISTA ||--o{ MEMBRO_CONQUISTA : "e obtida em"
     GRUPO ||--o{ CONVITE : "e chamado por"
     MEMBRO |o--o{ CONVITE : "gera"
+    PERFIL ||--o| EQUIPE : "integra"
+    FEEDBACK
 
 ```
 
@@ -53,6 +55,8 @@ erDiagram
 | **CONQUISTA** | código, nome, descrição, ícone, tipo de critério, valor do critério | RF17 |
 | **MEMBRO_CONQUISTA** | data de obtenção | RN12 |
 | **CONVITE** | identificador, código, data de criação, data de vencimento, ativo | RF28, RN22 |
+| **EQUIPE** | conta de acesso, data de criação | RF32, RN27 |
+| **FEEDBACK** | identificador, nota, o que funcionou, o que travou, o que faltou, contato, origem, lida, data de envio | RF32, RN27 |
 
 ---
 
@@ -76,6 +80,7 @@ erDiagram
 | MEMBRO **obtém** CONQUISTA | N : N | Um membro obtém várias conquistas e uma conquista é obtida por vários membros |
 | GRUPO **é chamado por** CONVITE | 1 : N | Um grupo tem zero ou muitos convites; cada convite leva a exatamente um grupo |
 | MEMBRO **gera** CONVITE | 1 : N, opcional | Cada convite guarda o organizador que o gerou; se ele sai do grupo, o convite continua valendo até vencer |
+| PERFIL **integra** EQUIPE | 1 : 1, opcional | A conta de quem faz o Vértice está na equipe e lê as respostas de feedback (RN27). A ligação é pela conta de acesso, como entre o perfil e o membro |
 
 ---
 
@@ -98,6 +103,10 @@ erDiagram
 **Por que o progresso histórico é uma entidade.** O percentual atual de uma disciplina pode ser calculado a qualquer momento a partir das atividades. Já a evolução ao longo do tempo (RF12) não pode: não há como saber, olhando o estado de hoje, qual era o percentual há duas semanas. Por isso o valor diário precisa ser gravado.
 
 **Por que a conta não é uma entidade do modelo.** Quem guarda o e-mail, a senha e o vínculo com o Google é o serviço de autenticação do Supabase, que tem as próprias tabelas. O modelo do Vértice só precisa saber qual membro é de qual conta, e por isso o membro ganhou o atributo "conta de acesso". Ele fica vazio enquanto a pessoa foi só cadastrada pelo organizador e ainda não entrou com a própria conta. Uma mesma conta pode ser membro de vários grupos, uma vez em cada.
+
+**Por que o feedback não se liga a nada.** A resposta é anônima (RN27): ela não guarda a conta, o grupo nem o membro de quem respondeu, e por isso não tem relacionamento com as outras entidades. A origem diz só de onde veio (visitante, demonstração ou com conta), e o contato só existe se a pessoa quiser deixar.
+
+**Por que a equipe é uma entidade.** Quem lê as respostas não é o organizador de um grupo, e sim quem faz o Vértice. Uma lista de contas guardada no banco deixa a regra de acesso conferir isso, sem depender de um e-mail escrito no código.
 
 **Por que o convite é uma entidade.** O código precisa ser conferido quando alguém o usa, e ele vence: o banco precisa saber de que grupo é, quando foi criado e até quando vale (RN22).
 

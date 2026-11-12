@@ -1,11 +1,36 @@
 # Telas e Navegação
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 11/11/2026
+> Entrega 3 · Protótipos e MVP · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
-Este documento reúne as telas do Vértice em quatro momentos: as da **revisão de 11/11**, com o espaço pessoal, o perfil da conta e os pedidos dos usuários de teste; as telas que entraram para a **entrega final de 27/11**, com o banco de dados, o acesso com conta e o convite; as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, que continuam valendo; e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+Este documento reúne as telas do Vértice em cinco momentos: as da **revisão de 12/11**, com o feedback dentro do sistema; as da **revisão de 11/11**, com o espaço pessoal, o perfil da conta e os pedidos dos usuários de teste; as telas que entraram para a **entrega final de 27/11**, com o banco de dados, o acesso com conta e o convite; as da **versão 2**, implementadas para a entrega de 06/11 com a nova identidade visual, que continuam valendo; e o **protótipo do MVP**, feito na Entrega 3, que orientou a primeira versão do código.
+
+---
+
+## Revisão de 12/11/2026
+
+O feedback dos usuários de teste passou para dentro do sistema, e a equipe lê as respostas numa tela só dela.
+
+| Requisito | Funcionalidade | Tela | Endereço | Perfil que utiliza |
+|---|---|---|---|---|
+| RF32 | Responder o feedback, uma pergunta por vez, sem conta e sem nome | Feedback | `/feedback` | Qualquer visitante |
+| RF32, RN27 | Resumo das notas, busca, filtros, marcar como lida, excluir e baixar a planilha | Respostas do feedback | `/feedback/respostas` | Só a equipe do projeto |
+
+#### Feedback
+
+![Página de feedback, na escolha da nota](telas-v2/feedback-nota.png)
+
+Um cartão no meio da tela, com uma pergunta por vez: primeiro a nota, com cinco rostos (as teclas de 1 a 5 também escolhem), depois as três perguntas abertas, que podem ser puladas, e por fim o contato, opcional. A barra no topo mostra quanto falta.
+
+![Página de feedback, numa pergunta aberta](telas-v2/feedback-pergunta.png)
+
+#### Respostas do feedback
+
+![Tela das respostas do feedback](telas-v2/feedback-respostas.png)
+
+No topo, quantas respostas chegaram, a nota média e quantas têm comentário; ao lado, quantas de cada nota, e clicar numa nota filtra por ela. Abaixo, a busca nos comentários, o período, a nota e "Só as novas". Cada resposta mostra a nota, a data, de onde veio e só as perguntas respondidas. "Baixar planilha" gera um arquivo que abre no Excel. Quem não é da equipe vê só o aviso de que as respostas são da equipe.
 
 ---
 
@@ -185,7 +210,7 @@ A página de apresentação: o que o Vértice mede, como funciona e o acesso. O 
 
 ![Seção de feedback na página inicial](telas-v2/feedback.png)
 
-Perto do fim, a seção de feedback convida quem testou a responder um formulário anônimo, com as três perguntas que importam. O mesmo formulário abre pelo rodapé e pelo menu da conta, dentro do sistema (RF32).
+Perto do fim, a seção de feedback convida quem testou a contar como foi, com as três perguntas que importam. Até 11/11, o botão, o rodapé e o menu da conta abriam um formulário anônimo do Google; desde 12/11, levam à página de feedback do próprio sistema, na [revisão de 12/11](#revisão-de-12112026) (RF32).
 
 #### Sobre nós
 

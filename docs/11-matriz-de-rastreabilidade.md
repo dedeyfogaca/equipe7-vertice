@@ -1,7 +1,7 @@
 # 11 · Matriz de Rastreabilidade
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2, atualizado em 12/11/2026
 
 ---
 
@@ -44,7 +44,7 @@ A matriz demonstra que os artefatos não foram produzidos separadamente. Cada li
 | **RF29**: Foto do grupo | UC01 · Gerenciar grupo de estudo | grupo | Seletor de espaço (Criar grupo e Editar grupo) | Não |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | UC05 · Cadastrar atividade | conteudo, disciplina | Formulário de atividade | Não |
 | **RF31**: Eventos, de um ou de vários dias | UC14 · Gerenciar eventos / UC13 · Consultar calendário | evento, grupo, disciplina, membro | Eventos, Painel e Calendário | Não |
-| **RF32**: Formulário de feedback dos usuários de teste | UC01 · Gerenciar grupo de estudo | *nenhuma; o formulário é externo* | Início, rodapé das páginas públicas e menu da conta | Não |
+| **RF32**: Feedback dos usuários de teste, dentro do sistema | UC01 · Gerenciar grupo de estudo | `feedback`, `equipe` | Feedback (`/feedback`), Respostas do feedback (`/feedback/respostas`), início, rodapé das páginas públicas e menu da conta | Não |
 | **RF33**: Tutorial opcional | UC12 · Carregar dados de exemplo | *nenhuma; a escolha de ter visto o tutorial é do dispositivo* | Painel (convite) e menu da conta | Não |
 | **RF34**: Espaço pessoal | UC17 · Usar o espaço pessoal / UC01 · Gerenciar grupo de estudo | grupo (`pessoal`), membro, atividade, evento, perfil | Seletor de espaço e todas as telas internas no espaço pessoal | Não |
 | **RF35**: Perfil da conta | UC18 · Editar o perfil | perfil, membro | Meu perfil | Não |
@@ -52,7 +52,7 @@ A matriz demonstra que os artefatos não foram produzidos separadamente. Cada li
 | **RF37**: Atividades em lote | UC20 · Cadastrar e alterar em lote | atividade, disciplina, membro | Várias de uma vez e Atividades (seleção) | Não |
 | **RF38**: Responsável "A definir" e Assumir | UC19 · Assumir atividade / UC05 · Cadastrar atividade | atividade, membro | Atividades, detalhe e formulário da atividade | Não |
 
-Os trinta e oito requisitos funcionais possuem caso de uso e tela. Cinco não possuem entidade de dados, e nos cinco o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF32 as respostas ficam no formulário externo, anônimas, fora do sistema; no RF33 o tutorial tem conteúdo fixo, e ter visto ou não é preferência do dispositivo. A conta do RF27 fica no serviço de autenticação do Supabase, e o membro e o perfil apontam para ela pelo `id_usuario`.
+Os trinta e oito requisitos funcionais possuem caso de uso e tela. Quatro não possuem entidade de dados, e nos quatro o motivo é o mesmo: o dado não pertence ao domínio. No RF08 a escolha do tema é preferência do dispositivo; no RF21 os feriados vêm de serviço externo e não são armazenados como dado do sistema, apenas reaproveitados enquanto o serviço estiver fora do ar (RN17); no RF26 as páginas têm conteúdo fixo; no RF33 o tutorial tem conteúdo fixo, e ter visto ou não é preferência do dispositivo. A conta do RF27 fica no serviço de autenticação do Supabase, e o membro e o perfil apontam para ela pelo `id_usuario`.
 
 ---
 
@@ -86,6 +86,7 @@ Os trinta e oito requisitos funcionais possuem caso de uso e tela. Cinco não po
 | **RN24**: espaço pessoal | UC17; UC05, fluxo 1D; UC01, fluxos 3C e 3D | Coluna `grupo.pessoal`, função `garantir_espaco_pessoal`, gatilho `conferir_atividade` e regras de acesso que barram membros e convites no espaço pessoal |
 | **RN25**: lembrete por e-mail | UC21 | Funções `lembretes_do_dia` e `enviar_lembretes`, colunas `perfil.lembrete_email` e `perfil.ultimo_lembrete` e o agendamento diário (pg_cron) |
 | **RN26**: perfil da conta em todos os grupos | UC18, passo 5; UC02, fluxo 5D; UC16, passo 7 | Tabela `perfil`, gatilho `conferir_perfil` e a cópia do perfil em `entrar_com_codigo` |
+| **RN27**: feedback anônimo, lido só pela equipe | Telas Feedback e Respostas do feedback (RF32) | Tabelas `feedback` e `equipe`, função `eh_equipe`, gatilho `conferir_feedback` e regras de acesso por linha |
 
 ---
 
@@ -146,7 +147,7 @@ Atualizado em 11/11/2026, sobre a versão da entrega de 27/11 (tag `entrega-27-1
 | **RF29**: Foto do grupo | `components/ui/avatar-grupo.jsx`, `components/ui/editor-foto.jsx`, `components/grupos/FormGrupo.jsx`, `components/layout/AppShell.jsx` | CT40 | Implementado e testado |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | `pages/AtividadeForm.jsx`, `components/disciplinas/FormConteudo.jsx` | CT41 | Implementado e testado |
 | **RF31**: Eventos, de um ou de vários dias | `pages/Eventos.jsx`, `components/eventos/`, `pages/Calendario.jsx`, `pages/Painel.jsx`, `context/DataContext.jsx`, `lib/validacao.js`, `lib/permissoes.js` | CT51, CT52, CT77, CT83; `verificacoes/atividades.js`, `verificacoes/permissoes.js` | Implementado e testado |
-| **RF32**: Formulário de feedback | `lib/feedback.js`, `components/feedback/SecaoFeedback.jsx`, `components/layout/LayoutPublico.jsx`, `components/layout/AppShell.jsx` | CT56 | Implementado e testado |
+| **RF32**: Feedback dentro do sistema | `lib/feedback.js`, `pages/publicas/Feedback.jsx`, `pages/FeedbackRespostas.jsx`, `components/feedback/`, `components/layout/LayoutPublico.jsx`, `components/layout/AppShell.jsx` | CT56, CT86 a CT88 | Implementado e testado |
 | **RF33**: Tutorial opcional | `components/tutorial/Tutorial.jsx`, `pages/Painel.jsx`, `components/layout/AppShell.jsx` | CT67 | Implementado e testado |
 | **RF34**: Espaço pessoal | `context/AuthContext.jsx`, `context/DataContext.jsx`, `components/layout/AppShell.jsx`, `pages/Painel.jsx`, `pages/Atividades.jsx`, `pages/Calendario.jsx`, `pages/Eventos.jsx`, `pages/Conquistas.jsx`, `hooks/usePermissoes.js`, `lib/remoto.js`, `lib/migracao.js`; função `garantir_espaco_pessoal` no banco | CT69, CT70, CT81, CT85; `verificacoes/migracao.js`, `05-verificacoes.sql` | Implementado e testado |
 | **RF35**: Perfil da conta | `pages/Perfil.jsx`, `context/DataContext.jsx`, `lib/validacao.js`, `lib/fotosRemotas.js`; tabela `perfil` e gatilho `conferir_perfil` no banco | CT05, CT72, CT76; `05-verificacoes.sql` | Implementado e testado |
@@ -176,7 +177,7 @@ Atualizado em 11/11/2026, sobre a versão da entrega de 27/11 (tag `entrega-27-1
 
 - Todo caso de uso tem origem em pelo menos um requisito funcional.
 - Todo requisito funcional aparece em pelo menos um caso de uso e em pelo menos uma tela.
-- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31), `convite` (RF28), `perfil` (RF35).
+- Toda entidade do modelo de dados tem origem em um requisito: `grupo` (RF01), `membro` (RF02), `disciplina` (RF13), `conteudo` (RF14), `atividade` (RF03), `progresso_historico` (RF12), `conquista` e `membro_conquista` (RF17), `evento` (RF31), `convite` (RF28), `perfil` (RF35), `feedback` e `equipe` (RF32).
 - Todo serviço externo consumido pelo sistema está representado como ator secundário no diagrama de casos de uso e tem comportamento previsto para a sua indisponibilidade: BrasilAPI e Nager.Date (RN17), Supabase e Google (sem eles, o modo com conta fica indisponível e o de demonstração continua, RNF10) e Brevo (sem ele, o lembrete do dia não sai, e o sistema continua igual). A DiceBear deixou de ser serviço externo em 01/11/2026: os avatares passaram a ser desenhados pelo próprio sistema (RN15).
 - Nenhuma tela apresenta funcionalidade que não esteja documentada como requisito. Esta verificação foi refeita em 17/09/2026, percorrendo o código tela a tela; as funcionalidades encontradas sem requisito correspondente originaram os requisitos RF19 a RF22 e as regras RN15 a RN17. Foi refeita de novo em 28/10/2026, na revisão pedida pela professora, que originou os requisitos RF23 a RF28 e as regras RN18 e RN19, em 29/10/2026, nos ajustes da versão 2, que originaram os requisitos RF29 e RF30 e a regra RN20, em 03/11/2026, que originou os requisitos RF31 e RF32 e a regra RN21, em 08/11/2026, com o banco e o acesso com conta, que originou o requisito RF33 e as regras RN22 e RN23, e em 11/11/2026, com as considerações da equipe e dos usuários de teste, que originou os requisitos RF34 a RF38 e as regras RN24 a RN26.
 - Os nomes usados nos requisitos, nos casos de uso, nas classes, nas tabelas e nas telas são os mesmos: grupo, espaço pessoal, perfil, membro, disciplina, conteúdo, atividade, evento, progresso, conquista.

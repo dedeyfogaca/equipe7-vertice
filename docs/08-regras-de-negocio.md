@@ -1,7 +1,7 @@
 # 08 · Regras de Negócio
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 12/11/2026
 
 ---
 
@@ -33,6 +33,7 @@
 | **RN24** | O espaço pessoal é um grupo de uma pessoa só, criado pelo sistema no primeiro acesso, um por conta. Nele a disciplina da atividade é opcional e a responsável é sempre a dona do espaço; não há membros a gerir nem convites, ele não pode ser excluído e não se entra nele com código. A experiência, a ofensiva e as conquistas mostradas no espaço pessoal somam a pessoa em todos os grupos, como se fossem de um integrante só. | Alta | RF34 |
 | **RN25** | O lembrete por e-mail sai no máximo uma vez por dia, às 7h (horário de Brasília), só para quem tem o lembrete ligado e alguma atividade sob sua responsabilidade, não concluída, com prazo entre hoje e os próximos 2 dias ou vencida nos últimos 7 dias. Quem não tem nada nesse intervalo não recebe e-mail. O lembrete vem ligado em toda conta nova. | Média | RF36 |
 | **RN26** | O nome, o avatar e a foto de quem entrou com conta são os do perfil e valem em todos os grupos; mudá-los em Meu perfil muda em todos de uma vez. No cadastro de um membro vinculado a uma conta, o organizador altera só a função, o e-mail e o perfil (organizador ou participante). | Média | RF35 |
+| **RN27** | A resposta de feedback é anônima: quem responde não precisa de conta, e o contato é opcional. Só as contas da equipe do projeto leem, marcam como lida e excluem as respostas; a resposta enviada não é alterada, só marcada como lida. O banco aceita até 20 respostas por minuto no total, e cada navegador espera 2 minutos entre um envio e outro. | Baixa | RF32 |
 
 ---
 

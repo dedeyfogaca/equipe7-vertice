@@ -1,11 +1,11 @@
 # Dicionário de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 11/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
-Descrição campo a campo das onze tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
+Descrição campo a campo das treze tabelas definidas no [modelo lógico](02-modelo-logico.md), no PostgreSQL do Supabase. Os identificadores são UUID: um código de 128 bits gerado sem consultar o banco, o que deixa a tela mostrar o cadastro na hora. A coluna "Obrig." indica se o preenchimento é obrigatório.
 
 ---
 
@@ -188,6 +188,35 @@ Guarda os convites gerados pelo organizador para chamar a turma ao grupo (RF28, 
 | data_criacao | TIMESTAMPTZ | | Sim | | Data e hora em que o convite foi gerado |
 | expira_em | TIMESTAMPTZ | | Sim | | Fim da validade. Padrão: 7 dias depois da criação |
 | ativo | BOOLEAN | | Sim | | Se o convite ainda pode ser usado. Padrão: verdadeiro |
+
+---
+
+## equipe
+
+Guarda as contas de quem faz o Vértice, as únicas que leem as respostas de feedback (RF32, RN27). A equipe cadastra as próprias contas direto no banco.
+
+| Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
+|---|---|---|---|---|---|
+| id_usuario | UUID | | Sim | PK, FK | Conta de um integrante da equipe, no serviço de autenticação do Supabase (`auth.users`) |
+| data_criacao | TIMESTAMPTZ | | Sim | | Data e hora em que a conta entrou na equipe |
+
+---
+
+## feedback
+
+Guarda as respostas de feedback dos usuários de teste, sem identificar quem respondeu (RF32, RN27).
+
+| Campo | Tipo | Tam. | Obrig. | Chave | Descrição |
+|---|---|---|---|---|---|
+| id_feedback | UUID | | Sim | PK | Identificador único da resposta, gerado pelo banco |
+| nota | SMALLINT | | Sim | | De 1 (Muito ruim) a 5 (Ótimo) |
+| funcionou | VARCHAR | 1000 | Não | | Resposta a "O que funcionou bem?" |
+| travou | VARCHAR | 1000 | Não | | Resposta a "O que travou ou confundiu?" |
+| faltou | VARCHAR | 1000 | Não | | Resposta a "O que faltou?" |
+| contato | VARCHAR | 120 | Não | | E-mail ou @ deixado por quem quer retorno |
+| origem | VARCHAR | 12 | Sim | | De onde veio: `visitante`, `demonstracao` ou `conta`. Padrão: `visitante` |
+| lida | BOOLEAN | | Sim | | Se a equipe já leu. Padrão: falso; é o único campo que muda depois do envio |
+| data_envio | TIMESTAMPTZ | | Sim | | Data e hora do envio, gravadas pelo banco |
 
 ---
 

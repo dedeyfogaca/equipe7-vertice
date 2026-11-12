@@ -1,7 +1,7 @@
 # 16 · Defeitos e Pendências
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026, atualizado em 11/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026, atualizado em 12/11/2026
 
 ---
 
@@ -337,9 +337,8 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto | A fazer | 24/11/2026 |
 | Testar nos navegadores Firefox e Edge (RNF05) | A fazer (T51) | 26/11/2026 |
 | Conferir no sistema publicado, com o projeto real do Supabase, o login com o Google, o convite entre duas contas e o envio de uma foto | A fazer | 24/11/2026 |
-| Ler as respostas do formulário de feedback dos usuários de teste e transformar o que vier em tarefas | Em andamento (T77): os comentários recebidos até 11/11 entraram na revisão de 11/11 | 20/11/2026 |
-| Rodar a atualização do banco (`07-atualizacao-11-11.sql`) no projeto real do Supabase antes de publicar a versão de 11/11 | A fazer | Antes de publicar |
-| Ligar o lembrete por e-mail no projeto real: conta no Brevo, remetente confirmado, chave no Vault e agendamento | A fazer | 20/11/2026 |
+| Ler as respostas do feedback dos usuários de teste e transformar o que vier em tarefas | Em andamento (T77): os comentários recebidos até 11/11 entraram na revisão de 11/11; desde 12/11, as respostas chegam na tela Respostas do feedback | 20/11/2026 |
+| Rodar a atualização do feedback (`08-atualizacao-feedback.sql`) no projeto real do Supabase e cadastrar as contas da equipe na tabela `equipe` | A fazer | Antes de publicar a versão de 12/11 |
 | Conferir no sistema publicado o espaço pessoal de uma conta antiga, o perfil em dois grupos e um lembrete recebido de verdade | A fazer | 24/11/2026 |
 
 ---
@@ -359,6 +358,8 @@ Itens que não são defeito, mas ficam registrados para as próximas entregas.
 | Eventos no banco de dados | A tabela `evento` está no banco com as demais, com a regra de edição do RN21 no próprio banco. Verificado no CT63 e nas verificações do banco |
 | Histórico de progresso (RF12) | Implementado para 27/11 (T35). Verificado no CT59 e no CT68 |
 | Notificações por e-mail (fora do escopo até 08/11) | O lembrete diário por e-mail entrou na revisão de 11/11 (RF36, T82). Verificado no CT80 e nas verificações do banco |
+| Rodar a atualização de 11/11 no projeto real do Supabase | Rodada em 11/11, antes de publicar a versão de 11/11 |
+| Ligar o lembrete por e-mail no projeto real | Ligado em 11/11: conta no Brevo, remetente confirmado, chave no Vault e agendamento diário. O primeiro e-mail chegou de verdade |
 
 ---
 

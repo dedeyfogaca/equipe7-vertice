@@ -1,7 +1,7 @@
 # 14 · Produto Mínimo Viável
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 3, atualizado em 12/11/2026
 
 ---
 
@@ -50,7 +50,7 @@ O que **não** entrou no MVP não entrou por ser menos importante, e sim por nã
 | **RF29**: Foto do grupo | Desejável | Não | As iniciais do nome já identificam o grupo |
 | **RF30**: Criar conteúdo a partir do formulário de atividade | Desejável | Não | Atalho: o conteúdo pode ser cadastrado antes, na tela de disciplinas |
 | **RF31**: Eventos | Desejável | Não | Complementam o calendário; o ciclo de medição não depende deles |
-| **RF32**: Formulário de feedback | Desejável | Não | Serve aos testes com usuários, não ao ciclo |
+| **RF32**: Feedback dos usuários de teste | Desejável | Não | Serve aos testes com usuários, não ao ciclo |
 | **RF33**: Tutorial opcional | Desejável | Não | Ajuda quem chega, mas as telas se explicam sem ele |
 | **RF34**: Espaço pessoal | Desejável | Não | Pedido da equipe em 11/11, depois de usar o sistema; o ciclo funciona dentro de um grupo |
 | **RF35**: Perfil da conta | Desejável | Não | Depende do acesso com conta (RF27) |
@@ -188,7 +188,7 @@ Para 06/11 o manual pede o sistema parcialmente funcional, com fluxos integrados
 
 | Passo da demonstração | Requisitos e regras | Testes |
 |---|---|---|
-| Abrir a página inicial, com o movimento ao rolar e ao passar o mouse, a seção de feedback e a página Sobre nós | RF26, RF32 | CT33, CT54 e CT56 |
+| Abrir a página inicial, com o movimento ao rolar e ao passar o mouse, a seção de feedback e a página Sobre nós | RF26, RF32 | CT33, CT54, CT56 e CT86 a CT88 |
 | Criar o grupo, com foto: quem cria entra como organizador, e a marca do Vértice aparece enquanto o grupo abre | RF01, RF29, RN07, RN19 | CT01, CT02, CT40 e CT45 |
 | Cadastrar membros com foto de perfil, enquadrada no editor, ou com o avatar num dos dois estilos | RF02, RF19, RF24, RN15, RN19 | CT03 a CT05, CT39 e CT47 |
 | Cadastrar disciplinas com a paleta de cores e, se o grupo quiser, os conteúdos delas | RF13, RF14, RF25, RN13, RN18 | CT06 a CT08 e CT49 |

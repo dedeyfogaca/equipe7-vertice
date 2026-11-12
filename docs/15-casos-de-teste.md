@@ -1,15 +1,15 @@
 # 15 · Casos de Teste
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026, atualizado em 11/11/2026
+> Imersão Profissional: Projeto de Software · ADSIS4S · 2º bimestre · Entrega de 27/11/2026, atualizado em 12/11/2026
 
 ---
 
-Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, e com a revisão de 11/11: o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. As evidências da execução de 11/11 estão em [`testes/evidencias-11-11/`](../testes/evidencias-11-11/), com o nome do caso no arquivo, e as observações de cada caso, em [`casos-de-teste-11-11.json`](../testes/registros/casos-de-teste-11-11.json).
+Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, com a revisão de 11/11 (o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste) e com a de 12/11, que trouxe o feedback para dentro do sistema. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. Os 88 casos foram executados em 12/11, e as observações de cada caso estão em [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json). As evidências têm o nome do caso no arquivo.
 
-Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 11/11 está na visão geral e no registro. Os casos CT69 a CT85 são novos e cobrem a revisão de 11/11.
+Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 12/11 está na visão geral e no registro. Os casos CT69 a CT85 cobrem a revisão de 11/11 e mantêm a descrição e as evidências daquela execução. Os casos CT86 a CT88 são novos e cobrem a revisão de 12/11, e o CT56 foi revisto para ela; os quatro têm as evidências de [`testes/evidencias-12-11/`](../testes/evidencias-12-11/).
 
-Os ciclos anteriores (08/11, 06/11, a rodada de 01/11 e 20/10) estão resumidos no [fim deste documento](#ciclo-de-0811). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
+Os ciclos anteriores (11/11, 08/11, 06/11, a rodada de 01/11 e 20/10) estão resumidos no [fim deste documento](#ciclo-de-1111). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
 
 ---
 
@@ -17,16 +17,16 @@ Os ciclos anteriores (08/11, 06/11, a rodada de 01/11 e 20/10) estão resumidos 
 
 | Item | Valor |
 |---|---|
-| Data da execução | 11/11/2026, das 13h34 às 13h41 |
-| Versão testada | O código de `src/` desta entrega (Vértice 2.0.0 com o banco de dados e a revisão de 11/11) |
-| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68 e CT81 a CT85), e com elas, para o modo com conta (CT57 a CT66 e CT69 a CT80). As duas versões foram servidas com `npm run preview` |
+| Data da execução | 12/11/2026, das 9h25 às 9h33 |
+| Versão testada | O código de `src/` desta entrega (Vértice 2.0.0 com o banco de dados e as revisões de 11/11 e 12/11) |
+| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68, CT81 a CT85 e CT88), e com elas, para o modo com conta (CT57 a CT66, CT69 a CT80, CT86 e CT87). As duas versões foram servidas com `npm run preview` |
 | Banco de dados | PostgreSQL 16 local, com `06-apoio-teste-local.sql` e `04-script-criacao.sql`, zerado antes de cada roteiro com conta. O sistema falou com ele por um servidor de teste que responde como o Supabase nas chamadas que o sistema usa (login por e-mail, consulta, inclusão, alteração e exclusão de linhas, a função do convite e o envio de arquivos), executando cada consulta no banco como a conta conectada, com as regras de acesso por linha valendo. O envio do lembrete (CT80) foi simulado: a chamada ao Brevo fica gravada numa tabela do apoio local, em vez de sair para a internet |
 | Ambiente | Node.js 22.23, npm 10.9, Chromium 153, tela de 1440 × 1000; do CT81 ao CT84, 1920 × 1080. No CT34, no CT53 e em parte do CT43, do CT46, do CT54 e do CT56, 390 × 844, tamanho de celular (no CT43, no CT46 e no CT54, também com tela de toque); no CT46, também 1024 × 900 |
 | Forma de execução | Roteiro automatizado no navegador (Playwright), seguindo os passos de cada caso; as capturas de tela são da própria execução. Do CT61 ao CT64 e do CT72 ao CT80, dois navegadores ao mesmo tempo, um para cada conta |
 | Dados | Fictícios, cadastrados durante o próprio teste. CT28 a CT30, CT34, CT37 a CT39, CT41 a CT46, CT48, CT49, CT51 a CT56, CT67 e CT68 usam os dados de exemplo do sistema; CT31, CT35, CT36, CT50 e CT85 partem de dados gravados no formato das versões anteriores. As fotos são uma imagem PNG de 640 × 480, uma imagem de 400 × 300 dividida em cores, para conferir o recorte, e uma foto de celular de 4000 × 3000, com 4,9 MB |
 | Rede | O ambiente de teste não acessa a internet. As respostas da BrasilAPI foram simuladas com a relação de feriados nacionais de 2026 e 2027, no formato do serviço; a Nager.Date ficou indisponível o tempo todo. O CT27 derruba também a BrasilAPI, para verificar as alternativas locais. O login com o Google e o projeto real do Supabase não foram usados (ver [o que não foi testado](#o-que-não-foi-testado-nesta-entrega)) |
 
-Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte do estado deixado pelo anterior. CT28 a CT30 seguem um segundo cenário, com os dados de exemplo, CT37 e CT38 um terceiro, CT57 a CT66 um quarto, com o banco, CT67 e CT68 um quinto, CT69 a CT80 um sexto, com o banco zerado de novo, e CT81 a CT84 um sétimo. Os demais começam com o navegador limpo. Em todos os cenários, o roteiro também conferiu que o console do navegador não registrou nenhum erro, com exceção do CT27, que derruba os serviços externos de propósito. As datas de prazo dos casos são contadas a partir do dia da execução, 11/11/2026.
+Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte do estado deixado pelo anterior. CT28 a CT30 seguem um segundo cenário, com os dados de exemplo, CT37 e CT38 um terceiro, CT57 a CT66 um quarto, com o banco, CT67 e CT68 um quinto, CT69 a CT80 um sexto, com o banco zerado de novo, CT81 a CT84 um sétimo, e CT86 e CT87 um oitavo, com o banco zerado de novo. Os demais começam com o navegador limpo. Em todos os cenários, o roteiro também conferiu que o console do navegador não registrou nenhum erro, com exceção do CT27, que derruba os serviços externos de propósito. As datas de prazo dos casos são contadas a partir do dia da execução em que cada caso foi descrito.
 
 ---
 
@@ -34,21 +34,22 @@ Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte 
 
 | Situação | Casos |
 |---|---|
-| Aprovado | 85 |
+| Aprovado | 88 |
 | Reprovado | 0 |
-| **Total executado** | **85** |
+| **Total executado** | **88** |
 
 Além dos casos de teste, foram executadas as verificações automatizadas do projeto:
 
 | Verificação | Comando | Resultado | Registro |
 |---|---|---|---|
-| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto, avatares, gravação no banco, evolução do progresso, espaço pessoal, "A definir" e retirada das conquistas | `npm run verificar` | 280 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
-| Regras do banco: acesso por grupo e por perfil, último organizador, status só pelo responsável, eventos, convite, histórico, exclusões em cascata, pasta das fotos, espaço pessoal, perfil, "A definir", evento de vários dias e lembrete | `05-verificacoes.sql` num PostgreSQL local | 77 conferências, todas passaram | [`verificacoes-banco.txt`](../testes/registros/verificacoes-banco.txt) |
+| Regras de migração, progresso, experiência, perfis, atividades e eventos, ofensiva, conquistas, permissões, recorte da foto, avatares, gravação no banco, evolução do progresso, espaço pessoal, "A definir", retirada das conquistas e o resumo e a planilha do feedback | `npm run verificar` | 297 verificações, todas passaram | [`verificar.txt`](../testes/registros/verificar.txt) |
+| Regras do banco: acesso por grupo e por perfil, último organizador, status só pelo responsável, eventos, convite, histórico, exclusões em cascata, pasta das fotos, espaço pessoal, perfil, "A definir", evento de vários dias, lembrete e feedback (quem envia, quem lê, o que muda e o limite por minuto) | `05-verificacoes.sql` num PostgreSQL local | 87 conferências, todas passaram | [`verificacoes-banco.txt`](../testes/registros/verificacoes-banco.txt) |
 | Instalação e geração da versão de produção | `npm ci` e `npm run build` | Concluído sem erro, sem vulnerabilidades nas dependências | [`build.txt`](../testes/registros/build.txt) |
 | Atualização de um banco com os dados da versão anterior | `07-atualizacao-11-11.sql` sobre um banco criado com o script de 08/11 (antes e depois da correção do D14) e preenchido | Nenhum registro perdido, cada atividade com o grupo da sua disciplina, estrutura igual à de um banco novo e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
-| Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-11-11.json`](../testes/registros/casos-de-teste-11-11.json) |
+| Atualização do feedback | `08-atualizacao-feedback.sql` sobre um banco criado com o script de 11/11 | Estrutura igual à de um banco novo, e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
+| Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json) |
 
-Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram corrigidos antes da execução registrada aqui; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
+Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram corrigidos antes da execução de 11/11, e a de 12/11 não encontrou defeitos novos; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
 
 ---
 
@@ -111,7 +112,7 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | CT53 | RF01, RF34, RNF01 | Seletor de espaço: o pessoal, os grupos, criar grupo e grupo de exemplo | Aprovado |
 | CT54 | RF26, RNF06 | Página inicial com movimento: aparece ao rolar, segue o mouse, demonstra no hover e respeita "reduzir movimento" | Aprovado |
 | CT55 | RNF06 | Textos sem travessão em nenhuma tela | Aprovado |
-| CT56 | RF32 | Feedback: seção na página inicial, link no topo e no rodapé, e item no menu da conta | Aprovado |
+| CT56 | RF32 | Feedback: seção na página inicial, link no topo e no rodapé, e item no menu da conta (revisto em 12/11) | Aprovado |
 | CT57 | RF27, RF20, RNF03 | Sem conta: a tela de acesso pede login ou demonstração | Aprovado |
 | CT58 | RF27, RF01, RF34, RN07 | Criar conta e criar grupo: o grupo e o organizador vão para o banco | Aprovado |
 | CT59 | RNF02, RF12, RF17, RN23 | Disciplina, atividade e conclusão vão para o banco e voltam depois de recarregar | Aprovado |
@@ -141,6 +142,9 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | CT83 | RF31, RN21 | Eventos: filtro por disciplina e evento de vários dias | Aprovado |
 | CT84 | RNF01 | Telas mais largas no computador, sem rolagem lateral no celular | Aprovado |
 | CT85 | RNF02, RF34, RN24 | Dados antigos da demonstração continuam, com o grupo na atividade e a pessoa marcada | Aprovado |
+| CT86 | RF32, RN27 | Feedback dentro do Vértice: uma pergunta por vez, anônimo e sem conta | Aprovado |
+| CT87 | RF32, RN27 | Respostas do feedback: só a equipe vê, com resumo, filtros, lida e planilha | Aprovado |
+| CT88 | RF32 | Sem banco, a página de feedback leva ao formulário da equipe | Aprovado |
 
 ---
 
@@ -745,11 +749,10 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 - **Pré-condição:** navegador limpo; página inicial
 - **Passos:** clicar em **Feedback** no menu do topo; conferir a seção, o botão e o rodapé; carregar os dados de exemplo e abrir o menu da conta; numa tela de celular, abrir o menu do sistema
 - **Entrada:** nenhuma
-- **Esperado:** o link do topo leva à seção, que explica o formulário e as perguntas; o botão, o rodapé, o menu da conta e o menu do celular abrem o formulário anônimo em outra aba
-- **Observado:** o link levou à seção "Testou o Vértice? Conta pra gente.", com as três perguntas. O botão **Responder o formulário**, o link **Enviar feedback** do rodapé, o item **Enviar feedback** do menu da conta e o do menu do celular apontam para `https://forms.gle/QpAtRSGux4XKd67T6`, abrindo em outra aba; nenhum botão ficou como "em breve". Nenhum erro no console
+- **Esperado:** o link do topo leva à seção, que explica e faz as três perguntas; o botão, o rodapé, o menu da conta e o menu do celular levam à página de feedback do próprio Vértice, na mesma aba
+- **Observado:** o link levou à seção "Testou o Vértice? Conta pra gente.", com as três perguntas. O botão **Contar como foi**, o link **Enviar feedback** do rodapé, o item **Enviar feedback** do menu da conta e o do menu do celular levaram a `/feedback`, sem abrir outra aba; nenhum botão ficou como "em breve". Nenhum erro no console. Até 11/11, os mesmos lugares abriam o formulário do Google em outra aba
 - **Situação:** Aprovado
-- **Evidência:** [CT56a.png](../testes/evidencias-06-11/CT56a.png) (seção na página inicial), [CT56b.png](../testes/evidencias-06-11/CT56b.png) (menu da conta)
-
+- **Evidência:** [CT56a.png](../testes/evidencias-12-11/CT56a.png) (seção na página inicial), [CT56b.png](../testes/evidencias-12-11/CT56b.png) (menu da conta)
 
 ### CT57: Sem conta: a tela de acesso pede login ou demonstração
 
@@ -1064,6 +1067,39 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 - **Observado:** versão 4, com o grupo na atividade e o Davi marcado. O campo do nome veio com "Davi"; ao começar, o painel pessoal mostrou "Lista 1", com "Grupo antigo"
 - **Situação:** Aprovado
 - **Evidência:** [CT85.png](../testes/evidencias-11-11/CT85.png)
+
+### CT86: Feedback dentro do Vértice: uma pergunta por vez, anônimo e sem conta
+
+- **Requisito:** RF32, RN27
+- **Pré-condição:** versão com o banco, banco zerado; navegador limpo, sem conta
+- **Passos:** na página inicial, clicar em **Contar como foi**; apertar a tecla 4; escrever o que funcionou e clicar em **Continuar**; pular a pergunta seguinte; voltar duas vezes e avançar de novo; escrever o que faltou e apertar Ctrl+Enter; deixar um contato e clicar em **Enviar feedback**; pedir as respostas ao banco sem conta; abrir a página de novo
+- **Entrada:** nota 4; "  O calendário com os filtros novos.  " (com espaços nas pontas); "Notificação no celular."; contato `@turma.ads`
+- **Esperado:** a página abre no próprio Vértice, com cinco notas; a tecla escolhe a nota e passa para a pergunta seguinte; sem texto, o botão diz Pular; Voltar mantém o que foi escrito; o banco grava a resposta sem os espaços, como visitante e não lida; quem não é da equipe não lê as respostas; logo depois, a página não aceita outra resposta
+- **Observado:** a página abriu em `/feedback`, com Muito ruim, Ruim, Ok, Bom e Ótimo. A tecla 4 marcou "Bom" e abriu "O que funcionou bem?"; na pergunta vazia, o botão dizia **Pular**; ao voltar, o texto continuava lá. O banco gravou nota 4, "O calendário com os filtros novos.", a pergunta pulada vazia, o contato, origem visitante e não lida. A consulta sem conta foi recusada (403). Reaberta, a página mostrou "Você acabou de responder."
+- **Situação:** Aprovado
+- **Evidência:** [CT86a.png](../testes/evidencias-12-11/CT86a.png) (a nota), [CT86b.png](../testes/evidencias-12-11/CT86b.png) (pergunta aberta), [CT86c.png](../testes/evidencias-12-11/CT86c.png) (agradecimento)
+
+### CT87: Respostas do feedback: só a equipe vê, com resumo, filtros, lida e planilha
+
+- **Requisito:** RF32, RN27
+- **Pré-condição:** CT86, com mais três respostas gravadas (notas 2, 5 e 3)
+- **Passos:** criar uma conta e abrir `/feedback/respostas`; pôr a conta na tabela `equipe`; abrir o menu da conta e **Respostas do feedback**; buscar "lote"; clicar na nota Ruim; limpar os filtros; marcar a primeira como lida e ligar **Só as novas**; clicar em **Baixar planilha**; excluir uma resposta
+- **Entrada:** conta `andrey@teste.com`
+- **Esperado:** fora da equipe, a tela não mostra as respostas; na equipe, o menu ganha o item; o resumo diz 4 respostas, nota média 3,5, todas novas, a mais recente primeiro; a busca e a nota filtram; marcar como lida grava no banco; a planilha traz o cabeçalho e uma linha por resposta; excluir pede confirmação e apaga do banco
+- **Observado:** sem estar na equipe, a tela mostrou "Só a equipe vê as respostas", sem nenhum comentário. Na equipe, o menu mostrou **Respostas do feedback**, e a tela, 4 respostas, nota média 3,5 e 4 "Nova". A busca deixou 1 resposta, e a nota Ruim, 1. A resposta marcada ficou lida no banco, e "Só as novas" mostrou 3. A planilha `feedback-vertice-2026-11-12.csv` veio com o cabeçalho e 4 linhas. Depois da confirmação, o banco ficou com 3 respostas
+- **Situação:** Aprovado
+- **Evidência:** [CT87a.png](../testes/evidencias-12-11/CT87a.png)
+
+### CT88: Sem banco, a página de feedback leva ao formulário da equipe
+
+- **Requisito:** RF32
+- **Pré-condição:** versão sem as variáveis do banco (demonstração)
+- **Passos:** abrir `/feedback`
+- **Entrada:** nenhuma
+- **Esperado:** como não há onde gravar, a página explica e leva ao formulário do Google, em outra aba
+- **Observado:** a página mostrou "Conta pra gente como foi." e o botão **Responder o formulário**, que aponta para `https://forms.gle/QpAtRSGux4XKd67T6`, em outra aba
+- **Situação:** Aprovado
+- **Evidência:** [CT88.png](../testes/evidencias-12-11/CT88.png)
 ---
 
 ## O que não foi testado nesta entrega
@@ -1071,11 +1107,24 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | Item | Motivo |
 |---|---|
 | Login com a conta Google | Depende do Google e do projeto real do Supabase, que o ambiente de teste não acessa. A conferência é feita no sistema publicado |
+| Feedback no projeto real do Supabase | O CT86 e o CT87 usaram o banco local. No sistema publicado, o feedback depende de rodar `08-atualizacao-feedback.sql` e de cadastrar as contas da equipe, nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | Envio real do lembrete pelo Brevo | O CT80 conferiu quem recebe, o assunto e a não repetição com a chamada ao Brevo simulada. O envio de verdade depende da conta no Brevo e da chave no Supabase, e a conferência de um e-mail recebido está nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | Projeto real do Supabase | Os casos com conta usaram o PostgreSQL local, com o mesmo script de criação, e um servidor de teste no lugar das chamadas do Supabase. A conferência no sistema publicado (criar conta, convite entre duas contas e foto) está nas [pendências](16-defeitos-e-pendencias.md#pendências) |
 | BrasilAPI e Nager.Date reais | O ambiente de teste não acessa a internet; as respostas foram simuladas no formato de cada serviço. A conferência com os serviços reais é feita na versão publicada na Vercel |
 | RNF05: Firefox e Edge | Executado apenas no Chromium; a execução no Firefox e no Edge é a tarefa T51, até 26/11 |
 | Arrastar a foto com o mouse ou o dedo e o gesto de pinça no editor de foto | O roteiro moveu a foto pelo teclado e mudou o zoom pelo controle deslizante, que usam o mesmo cálculo de enquadramento. O arraste com o mouse foi conferido só durante o desenvolvimento, e a pinça precisa de um celular de verdade |
+
+---
+
+## Ciclo de 11/11
+
+Os casos CT01 a CT85 foram executados em 11/11/2026, das 13h34 às 13h41, sobre a versão com a revisão de 11/11, antes do feedback dentro do sistema, e os 85 foram aprovados. As evidências estão em [`testes/evidencias-11-11/`](../testes/evidencias-11-11/) e o registro em [`casos-de-teste-11-11.json`](../testes/registros/casos-de-teste-11-11.json).
+
+| Situação | Casos |
+|---|---|
+| Aprovado | 85 |
+| Reprovado | 0 |
+| **Total executado** | **85** |
 
 ---
 

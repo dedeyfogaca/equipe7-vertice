@@ -1,7 +1,7 @@
 # 06 · Requisitos Funcionais
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 12/11/2026
 
 ---
 
@@ -38,7 +38,7 @@
 | **RF29** | O sistema deve permitir definir uma foto para o grupo, na criação ou na edição, ajustando o enquadramento antes de salvar; sem foto, o grupo é identificado pelas iniciais do seu nome. | Baixa | RF01 |
 | **RF30** | O sistema deve permitir cadastrar um conteúdo a partir do formulário de atividade, na disciplina escolhida, sem perder os dados já preenchidos, e deixar o conteúdo novo selecionado. | Média | RF03, RF14 |
 | **RF31** | O sistema deve permitir cadastrar, editar e excluir eventos (prova, apresentação, palestra, reunião ou outro), no espaço pessoal ou num grupo, com nome, tipo, dia, ou período de vários dias (do dia X ao dia Y), horário de início e fim opcionais, local, disciplina opcional e descrição, e exibi-los numa página própria, separada em próximos e passados e filtrável por disciplina, no painel e no calendário, em cada dia do período. | Alta | RF01, RF13, RF23, RF34 |
-| **RF32** | O sistema deve oferecer, na página inicial e no menu da conta, o acesso a um formulário anônimo de feedback para os usuários de teste. | Baixa | RF26 |
+| **RF32** | O sistema deve oferecer, na página inicial, no rodapé e no menu da conta, uma página de feedback dentro do próprio sistema, respondida sem conta e sem identificação, uma pergunta por vez, e uma tela em que só a equipe do projeto lê, filtra, marca como lida, exclui e baixa as respostas. | Baixa | RF26 |
 | **RF33** | O sistema deve oferecer um tutorial opcional que apresente as telas principais em passos, sugerido no painel na primeira visita e disponível a qualquer momento no menu da conta. | Baixa | RF06 |
 | **RF34** | O sistema deve oferecer a cada pessoa um espaço pessoal, aberto ao entrar, onde ela cadastra atividades e eventos só dela e vê, num lugar só, o que está com ela em todos os grupos: as atividades sob sua responsabilidade, os eventos dos grupos, a experiência, a ofensiva e as conquistas somadas e o atalho para cada grupo. O espaço pessoal é criado no primeiro acesso, inclusive para as contas que já existiam, sem alterar os dados dos grupos. | Alta | RF01, RF27 |
 | **RF35** | O sistema deve oferecer a tela Meu perfil, onde a pessoa define o nome, o avatar e a foto que a identificam em todos os grupos de que participa, de uma vez. | Alta | RF19, RF24, RF34 |

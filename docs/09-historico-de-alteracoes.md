@@ -1,7 +1,7 @@
 # 09 · Histórico de Alterações
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · atualizado em 12/11/2026
 
 ---
 
@@ -281,6 +281,18 @@ A equipe reuniu, em 09/11, as considerações sobre o uso do sistema e os coment
 | 11/11/2026 | RF20 | Na demonstração, a pessoa informa só o nome e ganha o espaço pessoal; com os dados de exemplo, entram tarefas pessoais e um grupo pronto em que ela é um dos membros | UC12 e testes (CT81) |
 | 11/11/2026 | RNF01 | As telas internas passaram a ocupar mais a largura do computador (até 1680 pixels, com margens menores), sem rolagem lateral no celular | Testes (CT84) |
 | 11/11/2026 | Docs. 05 a 16, diagramas, modelo de dados e protótipos | Requisitos, regras e casos de uso novos; matriz com RF34 a RF38 e RN24 a RN26; tarefas T78 a T89; arquitetura com o espaço pessoal e o lembrete; casos de teste CT69 a CT85 e nova execução completa; telas recapturadas | Exigência do manual |
+
+---
+
+## 2º bimestre: revisão de 12/11/2026
+
+Com os primeiros usuários de teste, a equipe achou que o formulário do Google tinha cara de formulário: abria fora do sistema, e as respostas ficavam numa planilha à parte. O feedback passou para dentro do Vértice, e o e-mail do lembrete ganhou o visual do sistema.
+
+| Data | Item | Alteração e motivo | Impacto |
+|---|---|---|---|
+| 12/11/2026 | RF32, RN27 | O feedback passou a ser respondido dentro do Vértice, na página Feedback, uma pergunta por vez, sem conta e sem nome, e as respostas vão para o banco. A equipe lê, filtra, marca como lida, exclui e baixa as respostas na tela Respostas do feedback, que só aparece para as contas da equipe. O formulário do Google ficou só para a cópia que roda sem banco | Modelo de dados (`feedback`, `equipe`), matriz, telas, testes (CT56 revisto, CT86 a CT88) |
+| 12/11/2026 | RF36 | O e-mail do lembrete ganhou o visual do sistema: a marca, as fontes Inter Tight e JetBrains Mono, as atividades atrasadas separadas das que vencem nos próximos dias e o assunto que diz quantas de cada | Script do banco (`enviar_lembretes`), verificações do banco |
+| 12/11/2026 | Docs. 05, 06, 08, 11 a 16, modelo de dados e protótipos | Requisito e regra revistos; matriz com RN27 e as tabelas novas; tarefas T90 a T93; arquitetura; casos CT86 a CT88; atualização do banco em `08-atualizacao-feedback.sql` | Documento inteiro |
 
 ---
 

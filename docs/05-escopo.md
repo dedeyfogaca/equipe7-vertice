@@ -1,7 +1,7 @@
 # 05 · Escopo
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 11/11/2026
+> Documento de Visão e Requisitos · Imersão Profissional: Projeto de Software · ADSIS4S · Entrega 2 (revisão da Entrega 1), atualizado em 12/11/2026
 
 ---
 
@@ -49,7 +49,7 @@
 - Listas de escolha e campo de data com a identidade visual do sistema: cor da disciplina, foto do membro e calendário próprio
 - Foto de perfil enviada pelo membro ou avatar sorteado e trocável, em dois estilos de desenho
 - Páginas públicas de apresentação: início, com elementos que reagem à rolagem e ao mouse, e sobre a equipe
-- Formulário anônimo de feedback para os usuários de teste, aberto pela página inicial e pelo menu da conta
+- Feedback dos usuários de teste dentro do sistema, respondido sem conta e sem identificação, com as respostas lidas só pela equipe
 - Modo de demonstração sem conta, em que a pessoa informa só o nome, com carga de dados de exemplo para conhecer o sistema sem cadastrar nada
 - Tutorial opcional que apresenta as telas principais
 

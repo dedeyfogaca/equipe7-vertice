@@ -1,7 +1,7 @@
 # Modelo Lógico do Banco de Dados
 
 > **Vértice** · Plataforma de Acompanhamento de Aprendizagem
-> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 11/11/2026
+> Entrega 2 · Modelagem do Banco de Dados · Equipe 7 · atualizado em 12/11/2026
 
 ---
 
@@ -147,6 +147,29 @@ erDiagram
     membro ||--o{ membro_conquista : ""
     conquista ||--o{ membro_conquista : ""
 
+```
+
+Duas tabelas não se ligam às demais e aparecem à parte, abaixo do diagrama na imagem: `feedback`, porque a resposta é anônima (RN27), e `equipe`, que aponta só para a conta (`auth.users`), como o perfil.
+
+```mermaid
+%%{init: {"theme": "base", "fontFamily": "Space Grotesk", "themeVariables": {"fontFamily": "Space Grotesk, Segoe UI, sans-serif", "fontSize": "14px", "primaryColor": "#E0F7FC", "primaryTextColor": "#0B1220", "primaryBorderColor": "#0891B2", "lineColor": "#5B6678", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F5F7FC", "nodeBorder": "#0891B2", "mainBkg": "#E0F7FC", "textColor": "#0B1220", "titleColor": "#0E7490"}, "er": {"diagramPadding": 24, "entityPadding": 16, "minEntityWidth": 150}}}%%
+erDiagram
+    equipe {
+        UUID id_usuario PK
+        TIMESTAMPTZ data_criacao
+    }
+
+    feedback {
+        UUID id_feedback PK
+        SMALLINT nota
+        VARCHAR funcionou
+        VARCHAR travou
+        VARCHAR faltou
+        VARCHAR contato
+        VARCHAR origem
+        BOOLEAN lida
+        TIMESTAMPTZ data_envio
+    }
 ```
 
 > Versão em imagem para inserir no documento: [`modelo-logico.png`](modelo-logico.png)
@@ -299,6 +322,31 @@ A conta não altera `id_usuario`, `id_grupo_pessoal` nem `ultimo_lembrete`: o ga
 
 A chave primária composta por `id_membro` e `codigo_conquista` é o que garante a RN12: o banco recusa uma segunda concessão da mesma conquista ao mesmo estudante. A conquista passou a ser identificada pelo próprio código, que já era único: o identificador numérico separado não acrescentava nada.
 
+### equipe
+
+| Campo | Tipo | Chave | Nulo | Restrição |
+|---|---|---|---|---|
+| id_usuario | UUID | PK, FK → conta (`auth.users`) | Não | `ON DELETE CASCADE`; preenchida pela equipe direto no banco (RN27) |
+| data_criacao | TIMESTAMPTZ | | Não | Padrão: data e hora atuais |
+
+A conta só lê a própria linha, para saber se é da equipe (função `eh_equipe`), e ninguém grava pela API.
+
+### feedback
+
+| Campo | Tipo | Chave | Nulo | Restrição |
+|---|---|---|---|---|
+| id_feedback | UUID | PK | Não | Gerado pelo banco |
+| nota | SMALLINT | | Não | `CHECK (nota BETWEEN 1 AND 5)` |
+| funcionou | VARCHAR(1000) | | Sim | O que funcionou bem; em branco vira nulo |
+| travou | VARCHAR(1000) | | Sim | O que travou ou confundiu; em branco vira nulo |
+| faltou | VARCHAR(1000) | | Sim | O que faltou; em branco vira nulo |
+| contato | VARCHAR(120) | | Sim | E-mail ou @, se a pessoa quiser retorno |
+| origem | VARCHAR(12) | | Não | Padrão `'visitante'`; `CHECK IN ('visitante', 'demonstracao', 'conta')` |
+| lida | BOOLEAN | | Não | Padrão falso |
+| data_envio | TIMESTAMPTZ | | Não | Padrão: data e hora atuais; índice `ix_feedback_data` |
+
+O gatilho `conferir_feedback` grava o identificador, a data e "não lida" na inclusão, seja o que for que chegue, recusa mais de 20 respostas no mesmo minuto e, na alteração, mantém tudo menos `lida`.
+
 ---
 
 ## Como as regras de negócio aparecem no banco
@@ -322,6 +370,7 @@ A chave primária composta por `id_membro` e `codigo_conquista` é o que garante
 | RN24: espaço pessoal | Coluna `grupo.pessoal` e a função `garantir_espaco_pessoal`, que cria o espaço e o perfil uma vez por conta; as regras de acesso não deixam criar nem excluir um grupo pessoal pela API, nem cadastrar membros ou convites nele, e a função `entrar_com_codigo` recusa o espaço pessoal |
 | RN25: lembrete por e-mail | Funções `lembretes_do_dia` (quem recebe e o quê) e `enviar_lembretes` (monta e envia pelo Brevo e grava `ultimo_lembrete`), sem permissão de execução para as contas; agendamento diário com o pg_cron |
 | RN26: perfil em todos os grupos | Tabela `perfil`, editável só pela própria conta; `entrar_com_codigo` cria o membro com o nome e a foto do perfil |
+| RN27: feedback anônimo, lido só pela equipe | Qualquer um inclui em `feedback`, com ou sem conta; só quem está em `equipe` (função `eh_equipe`) lê, marca como lida e exclui; gatilho `conferir_feedback`, com o limite de 20 respostas por minuto |
 
 ### Regras que continuam na aplicação
 

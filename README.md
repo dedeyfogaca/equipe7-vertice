@@ -44,19 +44,19 @@ Versão avaliada: tag **`entrega-27-11-2026`**.
 | O que o manual pede | Onde está |
 |---|---|
 | Software funcionando | [equipe7-vertice.vercel.app](https://equipe7-vertice.vercel.app/), o código em [`src/`](src/) e [Como rodar](#como-rodar) |
-| Revisão e alterações desde a entrega de 06/11 | Histórico de Alterações, revisões de [08/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-08112026) e de [11/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-11112026) |
+| Revisão e alterações desde a entrega de 06/11 | Histórico de Alterações, revisões de [08/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-08112026), de [11/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-11112026) e de [12/11](docs/09-historico-de-alteracoes.md#2º-bimestre-revisão-de-12112026) |
 | O que entrou e o que será demonstrado | [MVP: recorte da entrega de 27/11](docs/14-mvp.md#recorte-da-entrega-de-27112026) |
-| Banco de dados | [Modelo lógico](banco-de-dados/02-modelo-logico.md), [script de criação](banco-de-dados/04-script-criacao.sql), [verificações do banco](banco-de-dados/05-verificacoes.sql) e [atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql) |
+| Banco de dados | [Modelo lógico](banco-de-dados/02-modelo-logico.md), [script de criação](banco-de-dados/04-script-criacao.sql), [verificações do banco](banco-de-dados/05-verificacoes.sql) e atualizações de [11/11](banco-de-dados/07-atualizacao-11-11.sql) e de [12/11](banco-de-dados/08-atualizacao-feedback.sql) |
 | Arquitetura com o banco e o login | [Arquitetura e Tecnologias](docs/13-arquitetura.md) |
 | Backlog com a situação final das tarefas | [Backlog do Projeto](docs/12-backlog.md) |
-| Testes executados, resultados e evidências | [Casos de Teste](docs/15-casos-de-teste.md) e [`testes/evidencias-11-11/`](testes/evidencias-11-11/) |
+| Testes executados, resultados e evidências | [Casos de Teste](docs/15-casos-de-teste.md), [`testes/evidencias-11-11/`](testes/evidencias-11-11/) e [`testes/evidencias-12-11/`](testes/evidencias-12-11/) |
 | Defeitos e pendências | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) |
 | Rastreabilidade até o código e os testes | [Matriz de Rastreabilidade](docs/11-matriz-de-rastreabilidade.md#implementação-e-testes) |
-| Telas novas e mapa de navegação | [Telas e Navegação](prototipos/01-telas-e-navegacao.md#revisão-de-11112026) |
+| Telas novas e mapa de navegação | [Telas e Navegação](prototipos/01-telas-e-navegacao.md#revisão-de-12112026) |
 
 **Resumo:** o Vértice ficou completo. Os dados do grupo passaram do navegador para um banco PostgreSQL no Supabase, em que as próprias regras do banco garantem que cada conta só veja os grupos de que participa e só altere o que o perfil permite. A pessoa entra com e-mail e senha ou com a conta Google, o organizador chama a turma por um link ou um código de convite, as fotos vão para o armazenamento de arquivos e a tela da disciplina mostra a evolução do progresso dia a dia. Quem só quer conhecer o sistema usa o modo de demonstração, sem conta, que ganhou um tutorial opcional.
 
-Na revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste, cada pessoa ganhou um **espaço pessoal**, onde cai ao entrar e onde organiza o que é só dela e o que está com ela em todos os grupos, sem sair de um grupo para anotar uma tarefa do dia a dia. Entraram também o perfil da conta, com a foto valendo em todos os grupos, o lembrete diário por e-mail, o evento de vários dias, filtros mais claros no calendário, o responsável "A definir" com o botão Assumir, as ações em lote e telas mais largas no computador. Os dados de quem já tinha conta continuam: o banco recebe uma atualização própria, que só acrescenta. Os 38 requisitos funcionais estão implementados. Foram executados 85 casos de teste em 11/11/2026, todos aprovados, além de 280 verificações das regras em JavaScript e 77 verificações do banco em SQL; os defeitos encontrados (D11 a D18) foram corrigidos antes das execuções finais.
+Na revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste, cada pessoa ganhou um **espaço pessoal**, onde cai ao entrar e onde organiza o que é só dela e o que está com ela em todos os grupos, sem sair de um grupo para anotar uma tarefa do dia a dia. Entraram também o perfil da conta, com a foto valendo em todos os grupos, o lembrete diário por e-mail, o evento de vários dias, filtros mais claros no calendário, o responsável "A definir" com o botão Assumir, as ações em lote e telas mais largas no computador. Os dados de quem já tinha conta continuam: o banco recebe uma atualização própria, que só acrescenta. Na revisão de 12/11, o feedback dos usuários de teste passou para dentro do sistema: uma pergunta por vez, sem conta e sem nome, com as respostas lidas só pela equipe numa tela própria. Os 38 requisitos funcionais estão implementados. Foram executados 88 casos de teste em 12/11/2026, todos aprovados, além de 297 verificações das regras em JavaScript e 87 verificações do banco em SQL; os defeitos encontrados (D11 a D18) foram corrigidos antes das execuções finais.
 
 ### Entrega de 06/11/2026
 
@@ -85,7 +85,7 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 
 ## Funcionalidades disponíveis
 
-- Página inicial com movimento ao rolar e ao passar o mouse, seção de feedback dos usuários de teste e página Sobre nós, com a história da equipe
+- Página inicial com movimento ao rolar e ao passar o mouse, página Sobre nós, com a história da equipe, e o feedback dos usuários de teste dentro do sistema, com as respostas numa tela só da equipe
 - Seções do sistema numa barra no topo, que no celular vira um menu que desce do topo
 - Login com e-mail e senha ou com a conta Google, e um modo de demonstração sem conta, que começa pelo nome, com tutorial opcional
 - Espaço pessoal, aberto ao entrar, com as tarefas e os eventos só da pessoa e o que está com ela em todos os grupos, e o seletor de espaço no topo, que troca de grupo, cria grupo e entra com código sem sair do sistema
@@ -140,6 +140,7 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 │   ├── telas/          As oito telas do protótipo do MVP em imagem
 │   └── navegavel/      Protótipo clicável do MVP: abra o index.html no navegador
 ├── testes/             Evidências e registros da execução dos testes
+│   ├── evidencias-12-11/  Capturas de tela dos casos novos e revistos de 12/11
 │   ├── evidencias-11-11/  Capturas de tela da execução de 11/11, por caso de teste
 │   ├── evidencias-27-11/  Capturas de tela da execução de 08/11
 │   ├── evidencias-06-11/  Capturas de tela do ciclo de 06/11
@@ -163,14 +164,14 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 | 05 | [Escopo](docs/05-escopo.md) | Incluído, não incluído e restrições |
 | 06 | [Requisitos Funcionais](docs/06-requisitos-funcionais.md) | RF01 a RF38 |
 | 07 | [Requisitos Não Funcionais](docs/07-requisitos-nao-funcionais.md) | RNF01 a RNF11 |
-| 08 | [Regras de Negócio](docs/08-regras-de-negocio.md) | RN01 a RN26 |
+| 08 | [Regras de Negócio](docs/08-regras-de-negocio.md) | RN01 a RN27 |
 | 09 | [Histórico de Alterações](docs/09-historico-de-alteracoes.md) | Mudanças desde a Entrega 1, com data, motivo e impacto |
 | 10 | [Especificação dos Casos de Uso](docs/10-casos-de-uso.md) | UC01, UC02, UC03, UC05, UC07, UC08, UC09, UC12 a UC21 detalhados |
 | 11 | [Matriz de Rastreabilidade](docs/11-matriz-de-rastreabilidade.md) | Requisito → caso de uso → entidades → tela → MVP → código → teste |
 | 12 | [Backlog do Projeto](docs/12-backlog.md) | 89 tarefas com requisito, prioridade, responsável, prazo, situação e critérios de conclusão |
 | 13 | [Arquitetura e Tecnologias](docs/13-arquitetura.md) | Camadas, banco e login no Supabase, lembrete por e-mail, serviços externos, ambiente e organização das pastas |
 | 14 | [Produto Mínimo Viável](docs/14-mvp.md) | Classificação dos requisitos, o fluxo completo e os recortes de 20/10, 06/11 e 27/11 |
-| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 85 casos executados em 11/11, com resultado e evidência, e o resumo dos ciclos anteriores |
+| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 88 casos executados em 12/11, com resultado e evidência, e o resumo dos ciclos anteriores |
 | 16 | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) | Defeitos encontrados nos testes e pendências |
 
 ### Modelagem do software
@@ -192,11 +193,12 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 |---|---|
 | [Modelo conceitual](banco-de-dados/01-modelo-conceitual.md) | Entidades, atributos, relacionamentos e cardinalidades |
 | [Modelo lógico](banco-de-dados/02-modelo-logico.md) | Tabelas, chaves primárias e estrangeiras, tipos e restrições |
-| [Dicionário de dados](banco-de-dados/03-dicionario-de-dados.md) | Descrição campo a campo das onze tabelas |
+| [Dicionário de dados](banco-de-dados/03-dicionario-de-dados.md) | Descrição campo a campo das treze tabelas |
 | [Script de criação](banco-de-dados/04-script-criacao.sql) | PostgreSQL do Supabase, para um projeto novo: tabelas, regras de acesso por linha, gatilhos, convite, conquistas, o espaço das fotos e o lembrete por e-mail |
-| [Verificações do banco](banco-de-dados/05-verificacoes.sql) | 77 conferências das regras do banco, tentando o acesso como contas diferentes |
+| [Verificações do banco](banco-de-dados/05-verificacoes.sql) | 87 conferências das regras do banco, tentando o acesso como contas diferentes |
 | [Apoio para teste local](banco-de-dados/06-apoio-teste-local.sql) | Imita o que o Supabase já tem, para rodar as verificações num PostgreSQL local |
 | [Atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql) | Para o banco que já está no ar: acrescenta o espaço pessoal, o perfil, o "A definir", o evento de vários dias e o lembrete, sem apagar dado nenhum |
+| [Atualização de 12/11](banco-de-dados/08-atualizacao-feedback.sql) | Para o banco que já está no ar, depois da de 11/11: acrescenta as tabelas do feedback e da equipe |
 
 ---
 
@@ -248,7 +250,7 @@ npm run build      # gera a versão de produção
 npm run preview    # pré-visualiza a versão de produção
 ```
 
-Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-script-criacao.sql`](banco-de-dados/04-script-criacao.sql) no SQL Editor (num projeto que já tem dados, rode só a [atualização de 11/11](banco-de-dados/07-atualizacao-11-11.sql), que não apaga nada) e preencha `src/.env` a partir de `src/.env.example`, com a URL e a chave pública do projeto. O passo a passo, com o login do Google, está no [README de `src/`](src/README.md#ligar-o-banco-supabase), e o do lembrete por e-mail, em [Lembrete por e-mail](src/README.md#lembrete-por-e-mail). Versões das bibliotecas e organização das pastas estão em [Arquitetura e Tecnologias](docs/13-arquitetura.md#ambiente-de-desenvolvimento), e os detalhes do código no [README de `src/`](src/README.md).
+Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-script-criacao.sql`](banco-de-dados/04-script-criacao.sql) no SQL Editor (num projeto que já tem dados, rode só as atualizações de [11/11](banco-de-dados/07-atualizacao-11-11.sql) e de [12/11](banco-de-dados/08-atualizacao-feedback.sql), que não apagam nada, e cadastre as contas da equipe na tabela `equipe`) e preencha `src/.env` a partir de `src/.env.example`, com a URL e a chave pública do projeto. O passo a passo, com o login do Google, está no [README de `src/`](src/README.md#ligar-o-banco-supabase), e o do lembrete por e-mail, em [Lembrete por e-mail](src/README.md#lembrete-por-e-mail). Versões das bibliotecas e organização das pastas estão em [Arquitetura e Tecnologias](docs/13-arquitetura.md#ambiente-de-desenvolvimento), e os detalhes do código no [README de `src/`](src/README.md).
 
 ---
 
@@ -256,9 +258,8 @@ Para usar com conta, crie um projeto no Supabase, rode [`banco-de-dados/04-scrip
 
 | Até | O quê |
 |---|---|
-| Antes de publicar | Rodar a atualização de 11/11 no projeto real do Supabase |
-| 20/11/2026 | Ligar o lembrete por e-mail no projeto real (Brevo, chave no Supabase e agendamento) |
-| 20/11/2026 | Ler as respostas do formulário de feedback dos usuários de teste que chegarem |
+| Antes de publicar | Rodar a atualização de 12/11 no projeto real do Supabase e cadastrar as contas da equipe |
+| 20/11/2026 | Ler as respostas do feedback dos usuários de teste que chegarem, na tela Respostas do feedback |
 | 24/11/2026 | Conferir no sistema publicado o login com o Google, o convite entre duas contas, uma foto enviada, os feriados reais da BrasilAPI, o espaço pessoal de uma conta antiga e um lembrete recebido |
 | 24/11/2026 | Conferir num celular de verdade o arraste e o gesto de pinça do editor de foto |
 | 26/11/2026 | Executar os casos de teste no Firefox e no Edge (RNF05) |
