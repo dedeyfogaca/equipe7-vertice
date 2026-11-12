@@ -5,9 +5,9 @@
 
 ---
 
-Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, com a revisão de 11/11 (o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste) e com a de 12/11, que trouxe o feedback para dentro do sistema, a saída do grupo e o histórico do grupo. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. Os 92 casos foram executados em 12/11, e as observações de cada caso estão em [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json). As evidências têm o nome do caso no arquivo.
+Este documento registra os testes executados sobre a versão da entrega de 27/11, com o banco de dados, o acesso com conta e o convite, com a revisão de 11/11 (o espaço pessoal, o perfil da conta, o lembrete por e-mail e os pedidos dos usuários de teste) e com a de 12/11, que trouxe o feedback para dentro do sistema, a saída do grupo, o histórico do grupo e o responsável nas várias atividades de uma vez. Cada caso informa o requisito ou a regra que verifica, os passos, a entrada, o resultado esperado e o resultado observado na execução real. Os 93 casos foram executados em 12/11, e as observações de cada caso estão em [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json). As evidências têm o nome do caso no arquivo.
 
-Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 12/11 está na visão geral e no registro. Os casos CT69 a CT85 cobrem a revisão de 11/11 e mantêm a descrição e as evidências daquela execução. Os casos CT86 a CT92 são novos e cobrem a revisão de 12/11, e o CT56 foi revisto para ela; os oito têm as evidências de [`testes/evidencias-12-11/`](../testes/evidencias-12-11/).
+Os casos CT01 a CT68 vêm das execuções anteriores e foram executados de novo sobre esta versão. Nos que tiveram os passos ajustados à revisão de 11/11 (a demonstração que começa pelo nome, o seletor de espaço, a volta à tela anterior depois de criar, o botão "Marcar como concluída", a conquista retirada, a barra de filtros do calendário e a foto em Meu perfil), a descrição abaixo é a da execução de 11/11, com as evidências de [`testes/evidencias-11-11/`](../testes/evidencias-11-11/). Os demais mantêm a descrição e as evidências da execução em que foram descritos ([`evidencias-06-11/`](../testes/evidencias-06-11/) ou [`evidencias-27-11/`](../testes/evidencias-27-11/)), e o resultado de 12/11 está na visão geral e no registro. Os casos CT69 a CT85 cobrem a revisão de 11/11 e mantêm a descrição e as evidências daquela execução. Os casos CT86 a CT93 são novos e cobrem a revisão de 12/11, e o CT56 foi revisto para ela; os nove têm as evidências de [`testes/evidencias-12-11/`](../testes/evidencias-12-11/).
 
 Os ciclos anteriores (11/11, 08/11, 06/11, a rodada de 01/11 e 20/10) estão resumidos no [fim deste documento](#ciclo-de-1111). Defeitos encontrados estão no [Registro de Defeitos e Pendências](16-defeitos-e-pendencias.md).
 
@@ -17,9 +17,9 @@ Os ciclos anteriores (11/11, 08/11, 06/11, a rodada de 01/11 e 20/10) estão res
 
 | Item | Valor |
 |---|---|
-| Data da execução | 12/11/2026, das 10h13 às 10h21 |
+| Data da execução | 12/11/2026, das 14h18 às 14h26 |
 | Versão testada | O código de `src/` desta entrega (Vértice 2.0.0 com o banco de dados e as revisões de 11/11 e 12/11) |
-| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68, CT81 a CT85, CT88 e CT92), e com elas, para o modo com conta (CT57 a CT66, CT69 a CT80, CT86, CT87 e CT89 a CT91). As duas versões foram servidas com `npm run preview` |
+| Como a aplicação foi executada | `npm ci` e `npm run build` dentro de `src/`, duas vezes: sem as variáveis do banco, para o modo de demonstração (CT01 a CT56, CT67, CT68, CT81 a CT85, CT88, CT92 e CT93), e com elas, para o modo com conta (CT57 a CT66, CT69 a CT80, CT86, CT87 e CT89 a CT91). As duas versões foram servidas com `npm run preview` |
 | Banco de dados | PostgreSQL 16 local, com `06-apoio-teste-local.sql` e `04-script-criacao.sql`, zerado antes de cada roteiro com conta. O sistema falou com ele por um servidor de teste que responde como o Supabase nas chamadas que o sistema usa (login por e-mail, consulta, inclusão, alteração e exclusão de linhas, a função do convite e o envio de arquivos), executando cada consulta no banco como a conta conectada, com as regras de acesso por linha valendo. O envio do lembrete (CT80) foi simulado: a chamada ao Brevo fica gravada numa tabela do apoio local, em vez de sair para a internet |
 | Ambiente | Node.js 22.23, npm 10.9, Chromium 153, tela de 1440 × 1000; do CT81 ao CT84, 1920 × 1080. No CT34, no CT53 e em parte do CT43, do CT46, do CT54 e do CT56, 390 × 844, tamanho de celular (no CT43, no CT46 e no CT54, também com tela de toque); no CT46, também 1024 × 900 |
 | Forma de execução | Roteiro automatizado no navegador (Playwright), seguindo os passos de cada caso; as capturas de tela são da própria execução. Do CT61 ao CT64 e do CT72 ao CT80, dois navegadores ao mesmo tempo, um para cada conta |
@@ -34,9 +34,9 @@ Os casos CT01 a CT26 formam **um único cenário em sequência**: cada um parte 
 
 | Situação | Casos |
 |---|---|
-| Aprovado | 92 |
+| Aprovado | 93 |
 | Reprovado | 0 |
-| **Total executado** | **92** |
+| **Total executado** | **93** |
 
 Além dos casos de teste, foram executadas as verificações automatizadas do projeto:
 
@@ -50,7 +50,7 @@ Além dos casos de teste, foram executadas as verificações automatizadas do pr
 | Atualização da saída e do histórico | `09-atualizacao-historico.sql` sobre um banco com dados, criado com o script do feedback | Nenhum registro perdido, o histórico do que já aconteceu montado com as datas guardadas, estrutura igual à de um banco novo e a mesma atualização rodada duas vezes sem erro | Conferido durante o desenvolvimento |
 | Registro da execução dos casos | roteiro no navegador | Observações de cada caso, na ordem em que foram conferidas | [`casos-de-teste-12-11.json`](../testes/registros/casos-de-teste-12-11.json) |
 
-Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram corrigidos antes da execução de 11/11, e a de 12/11 não encontrou defeitos novos; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
+Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram corrigidos antes da execução de 11/11. O D19, encontrado pela equipe no uso do sistema em 12/11, foi corrigido antes da execução de 12/11, e o CT93 confere a correção; a relação de cada defeito com o seu teste está no [registro de defeitos](16-defeitos-e-pendencias.md).
 
 ---
 
@@ -150,6 +150,7 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 | CT90 | RF39, RN28, RF38 | Quem fica vê "A definir" e o nome de quem saiu; a última organizadora não sai | Aprovado |
 | CT91 | RF40, RN29, RN28 | Histórico do grupo: quem fez o quê, filtros, a volta pelo convite e só leitura | Aprovado |
 | CT92 | RF39, RF40, RN28, RN29 | Demonstração: o histórico fica no navegador e a saída segue as mesmas regras | Aprovado |
+| CT93 | RF37, RF38, RN24 | Várias de uma vez: responsável por linha ou "A definir", e "você" no espaço pessoal | Aprovado |
 
 ---
 
@@ -1149,6 +1150,17 @@ Os defeitos D15 a D18, encontrados nas primeiras execuções de 11/11, foram cor
 - **Observado:** o histórico trouxe "Ana Souza criou o grupo" e as disciplinas criadas. A primeira tentativa abriu "Antes de sair, torne outra pessoa organizadora do grupo.". Com o Bruno organizador, a saída foi confirmada, o "Trio do TCC" sumiu do seletor, nenhuma atividade em aberto ficou com a Ana, e o histórico guardou a saída com as 3 atividades que ficaram "A definir". Nenhum erro no console
 - **Situação:** Aprovado
 - **Evidência:** [CT92.png](../testes/evidencias-12-11/CT92.png)
+
+### CT93: Várias de uma vez: responsável por linha ou "A definir", e "você" no espaço pessoal
+
+- **Requisito:** RF37, RF38, RN24, RN06
+- **Pré-condição:** demonstração com os dados de exemplo; a pessoa está no espaço pessoal
+- **Passos:** em Atividades, abrir "Várias de uma vez"; conferir a coluna Responsável; em "Onde", escolher "Trio do TCC"; colar três títulos; na linha "Para todas as linhas", escolher a disciplina, o prazo e o Bruno como responsável; deixar a segunda linha "A definir" e passar a terceira para a Carla; criar as atividades
+- **Entrada:** títulos "Lote A", "Lote B" e "Lote C"; disciplina Estatística; prazo em 5 dias
+- **Esperado:** no espaço pessoal, a coluna aparece em cada linha, travada em "você", com o aviso de escolher um grupo; num grupo, o aviso sai e cada linha começa "A definir"; "Para todas" aplica o responsável a todas, e cada linha pode ser trocada; cada atividade é criada com o responsável escolhido
+- **Observado:** aberta do espaço pessoal, a tela mostrou a coluna Responsável nas 3 linhas, com "Ana Souza (você)" travado, e o aviso "Para escolher o responsável ou deixar "A definir", escolha um grupo aqui.". Com o "Trio do TCC", o aviso saiu e as 3 linhas mostraram "A definir". "Para todas" pôs o Bruno Lima nas três. Criadas, "Lote A" ficou com o Bruno, "Lote B" "A definir" e "Lote C" com a Carla, todas em "a fazer". Nenhum erro no console
+- **Situação:** Aprovado
+- **Evidência:** [CT93a.png](../testes/evidencias-12-11/CT93a.png) (espaço pessoal), [CT93b.png](../testes/evidencias-12-11/CT93b.png) (num grupo, com os responsáveis)
 ---
 
 ## O que não foi testado nesta entrega

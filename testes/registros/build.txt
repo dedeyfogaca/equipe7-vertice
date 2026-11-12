@@ -1,6 +1,6 @@
 $ npm ci
 
-added 154 packages, and audited 155 packages in 6s
+added 154 packages, and audited 155 packages in 3s
 
 18 packages are looking for funding
   run `npm fund` for details
@@ -16,7 +16,7 @@ transforming...
 ✓ 2234 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                                                     2.32 kB │ gzip:   0.97 kB
+dist/index.html                                                     2.32 kB │ gzip:   0.98 kB
 dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2    7.50 kB
 dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2         9.00 kB
 dist/assets/inter-tight-vietnamese-wght-normal-TKKdAiBA.woff2      10.48 kB
@@ -31,14 +31,14 @@ dist/assets/avatar-andrey-D9NfJ-69.webp                            27.60 kB
 dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2        40.40 kB
 dist/assets/inter-tight-latin-wght-normal-DX-nOvPD.woff2           44.87 kB
 dist/assets/inter-tight-latin-ext-wght-normal-B4u9PlvR.woff2       89.80 kB
-dist/assets/index-DrcT-8Gk.css                                     94.27 kB │ gzip:  18.74 kB
+dist/assets/index-uutCig2b.css                                     94.10 kB │ gzip:  18.72 kB
 dist/assets/react-B6sfNDQf.js                                     182.35 kB │ gzip:  60.11 kB
 dist/assets/interface-DTT83YKS.js                                 205.32 kB │ gzip:  60.21 kB
 dist/assets/banco-DMlzsnJz.js                                     229.19 kB │ gzip:  59.66 kB
-dist/assets/index-DLiTs_3v.js                                     782.01 kB │ gzip: 238.90 kB
+dist/assets/index-T8iimjO5.js                                     782.33 kB │ gzip: 238.97 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 4.72s
+✓ built in 4.55s

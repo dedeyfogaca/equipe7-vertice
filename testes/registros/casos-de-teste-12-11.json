@@ -1,5 +1,5 @@
 {
-  "quando": "2026-11-12T13:21:18.760Z",
+  "quando": "2026-11-12T17:26:33.139Z",
   "resultados": [
     {
       "id": "CT01",
@@ -505,9 +505,9 @@
         "ok: arrastada para a direita: o vermelho ocupa dois terços: [[\"verde\",\"vermelho\",\"azul\"],true]",
         "ok: com zoom 2: o miolo, sem o canto verde: [\"vermelho\",\"vermelho\",\"azul\"]",
         "ok: cancelar mantém a foto anterior: true",
-        "foto grande: apareceu no editor em 352 ms; o \"Aplicar\" levou 510 ms",
+        "foto grande: apareceu no editor em 804 ms; o \"Aplicar\" levou 477 ms",
         "ok: a foto grande aparece no editor em menos de 3 s: true",
-        "tarefas longas na página (ms): 103",
+        "tarefas longas na página (ms): 99",
         "ok: gravada em 256 × 256, JPEG: [\"data:image/jpeg\",[256,256]]",
         "tamanho gravado: 9 KB",
         "ok: nenhum erro no console: []"
@@ -611,7 +611,7 @@
         "ok: e para depois de um terço de volta: \"scale(1) rotate(120deg)\"",
         "ok: num ritmo calmo, abaixo de 1 s: true",
         "ok: com a tela coberta, o painel já montou por baixo: \"/painel\"",
-        "passagem inteira: 1447 ms",
+        "passagem inteira: 1440 ms",
         "ok: a passagem inteira leva menos de 1,5 s: true",
         "ok: depois, a cortina sai e fica o painel: true",
         "ok: parada, a marca não gira: 0",
@@ -715,7 +715,7 @@
         "ok: o evento entra na lista: 1",
         "ok: com horário, local e disciplina: true",
         "ok: e \"Em 3 dias\": true",
-        "ok: gravado com quem cadastrou: \"c406c089-72a3-4761-b11e-08f33484353e\"",
+        "ok: gravado com quem cadastrou: \"d2c01c98-1259-47ea-a35d-b69b6b093b5b\"",
         "ok: Carla edita a reunião que ela cadastrou: 1",
         "ok: mas não a palestra que a Ana cadastrou: 0",
         "ok: a edição aparece: true",
@@ -934,8 +934,8 @@
       "ok": true,
       "obs": [
         "ok: código com 8 letras e números: true",
-        "ok: link: \"http://localhost:4174/convite/6KF9ZH22\"",
-        "ok: convite no banco, valendo 7 dias: {\"codigo\":\"6KF9ZH22\",\"sete_dias\":true}"
+        "ok: link: \"http://localhost:4174/convite/Y824FSQ4\"",
+        "ok: convite no banco, valendo 7 dias: {\"codigo\":\"Y824FSQ4\",\"sete_dias\":true}"
       ]
     },
     {
@@ -1219,10 +1219,23 @@
         "ok: as abertas ficam \"A definir\" e o histórico guarda a saída com o número: {\"saiu\":true,\"abertasComEla\":0,\"linha\":\"3\"}",
         "ok: nenhum erro na demonstração: []"
       ]
+    },
+    {
+      "id": "CT93",
+      "titulo": "Várias de uma vez: responsável por linha ou \"A definir\", e \"você\" no espaço pessoal",
+      "ok": true,
+      "obs": [
+        "ok: aberta do espaço pessoal, a coluna Responsável aparece em cada linha: 3",
+        "ok: travada em você, com o aviso de escolher um grupo: [true,true,1]",
+        "ok: num grupo, o aviso sai e cada linha começa \"A definir\": [0,true]",
+        "ok: \"Para todas\" põe o Bruno nas três: [\"Bruno Lima\",\"Bruno Lima\",\"Bruno Lima\"]",
+        "ok: cada uma com o responsável escolhido: [[\"Lote A\",\"Bruno Lima\",\"a fazer\"],[\"Lote B\",\"A definir\",\"a fazer\"],[\"Lote C\",\"Carla Dias\",\"a fazer\"]]",
+        "ok: nenhum erro: []"
+      ]
     }
   ],
   "navegador": "Chromium (Playwright)",
-  "duracaoSegundos": 466,
+  "duracaoSegundos": 471,
   "errosDeConsole": {
     "cenario1": [],
     "cenario2": [

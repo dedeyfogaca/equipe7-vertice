@@ -105,7 +105,7 @@ O organizador aciona **Selecionar**, marca as atividades e escolhe o novo respon
 
 ![Cadastro de várias atividades de uma vez](telas-v2/lote.png)
 
-Uma linha por atividade, com o essencial. A lista de títulos pode ser colada de uma vez, e a linha "Para todas as linhas" aplica a mesma disciplina, prazo, peso ou responsável a todas.
+Uma linha por atividade, com o essencial. A lista de títulos pode ser colada de uma vez, e a linha "Para todas as linhas" aplica a mesma disciplina, prazo, peso ou responsável a todas. Num grupo, cada linha começa "A definir" e recebe quem vai fazer. Desde 12/11, a coluna Responsável aparece também no espaço pessoal, travada em "você", com o aviso de escolher um grupo em "Onde" (D19).
 
 #### Calendário com a barra de filtros
 

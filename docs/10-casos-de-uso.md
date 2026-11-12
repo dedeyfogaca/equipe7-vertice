@@ -557,7 +557,8 @@ O convite por link ou por código de acesso, para a pessoa entrar no grupo com a
 **Fluxos alternativos**
 
 - **(7A) Linha inválida:** o sistema marca o campo com problema na linha e não grava nenhuma até a correção (RNF03).
-- **(2A) No espaço pessoal:** a disciplina pode ficar "Sem disciplina" e não há coluna de responsável (RN24).
+- **(2A) No espaço pessoal:** a disciplina pode ficar "Sem disciplina", e a coluna de responsável aparece travada no próprio estudante (RN24). Se ele tem grupos, o sistema avisa que, para escolher outra pessoa ou deixar "A definir", basta escolher um grupo em "Onde".
+- **(5A) Responsável por linha:** num grupo, cada linha começa "A definir" (RN06); o estudante escolhe quem faz em cada uma ou em todas, pela linha "Para todas as linhas".
 - **(1A) Trocar o responsável de várias:** num grupo, o organizador aciona "Selecionar" na lista, marca as atividades, escolhe o novo responsável (ou "A definir") na barra que aparece no pé da tela e aciona "Trocar responsável". O sistema troca nas atividades não concluídas e informa quantas mudaram; as concluídas ficam como estão, porque a experiência é de quem as concluiu (RN10), e "A definir" só vale para as que estão em "a fazer" (RN06).
 - **(1B) Participante:** a seleção para trocar o responsável não aparece (RN07).
 

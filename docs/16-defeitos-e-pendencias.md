@@ -5,7 +5,7 @@
 
 ---
 
-Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. O ciclo de 27/11, executado em 08/11/2026 sobre a versão com o banco de dados, encontrou os defeitos D11 a D13, corrigidos no mesmo dia. A conferência no sistema publicado, com o projeto real do Supabase, encontrou o D14. A execução completa de 11/11/2026, com a revisão de 11/11, encontrou os defeitos D15 a D18, corrigidos antes da execução final. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
+Defeitos encontrados na execução dos [casos de teste](15-casos-de-teste.md). O ciclo de 20/10, executado em 19/10/2026 sobre o commit `c29279b`, encontrou os defeitos D01 a D07; o ciclo de 06/11, executado em 28/10/2026 e repetido por inteiro em 29/10/2026, em 01/11/2026 e em 06/11/2026, depois dos ajustes pedidos pela equipe, encontrou os defeitos D08 a D10. A rodada de 06/11, com a revisão de 03/11, não encontrou defeito novo. O ciclo de 27/11, executado em 08/11/2026 sobre a versão com o banco de dados, encontrou os defeitos D11 a D13, corrigidos no mesmo dia. A conferência no sistema publicado, com o projeto real do Supabase, encontrou o D14. A execução completa de 11/11/2026, com a revisão de 11/11, encontrou os defeitos D15 a D18, corrigidos antes da execução final. O D19 foi encontrado pela equipe no uso do sistema, em 12/11/2026. Cada defeito tem forma de reproduzir, comportamento esperado e observado, responsável e situação. Depois da correção, o caso de teste ligado a ele é executado de novo e o resultado é atualizado aqui e no documento de testes.
 
 Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando reteste** e **Fechado**.
 
@@ -33,12 +33,27 @@ Situações usadas: **Aberto**, **Em correção**, **Corrigido, aguardando retes
 | D16 | No sistema sem banco configurado, "Sair da demonstração" levava a uma tela de login que não funciona | Baixa | CT24 de 11/11 | Andrey | CT24 e CT65 (aprovados) | Fechado |
 | D17 | Roteiro do CT51 esperava nenhum evento em feriado, e o exemplo cai em 15/11 quando o teste roda em 11/11 | Baixa | CT51 de 11/11 | Andrey | CT51 (aprovado) | Fechado |
 | D18 | Roteiros do CT59 e do CT64 não previam o espaço pessoal | Baixa | CT59 e CT64 de 11/11 | Matheus | CT59 e CT64 (aprovados) | Fechado |
+| D19 | Nas várias atividades de uma vez, abertas do espaço pessoal, a coluna Responsável sumia, e parecia não haver como escolher o responsável nem "A definir" | Média | Uso do sistema em 12/11 | Andrey | CT93 (aprovado) | Fechado |
 
-Os defeitos D01 a D10 foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11. Os defeitos D11 a D13 foram corrigidos em 08/11/2026, e a execução completa do ciclo de 27/11 foi feita depois das correções. Os defeitos D15 a D18 foram corrigidos em 11/11/2026, e a execução completa de 11/11 foi refeita depois das correções.
+Os defeitos D01 a D10 foram corrigidos até 28/10/2026 e testados de novo nas execuções completas do ciclo de 06/11. Os defeitos D11 a D13 foram corrigidos em 08/11/2026, e a execução completa do ciclo de 27/11 foi feita depois das correções. Os defeitos D15 a D18 foram corrigidos em 11/11/2026, e a execução completa de 11/11 foi refeita depois das correções. O D19 foi corrigido em 12/11/2026, antes da execução completa de 12/11.
 
 ---
 
 ## Detalhamento
+
+### D19
+
+**Nas várias atividades de uma vez, abertas do espaço pessoal, a coluna Responsável sumia**
+
+- **Requisito afetado:** RF37, RF38
+- **Gravidade:** Média
+- **Como reproduzir:** entrar no sistema (a pessoa cai no espaço pessoal), abrir Atividades e "Várias de uma vez".
+- **Esperado:** dar para escolher quem faz cada atividade, ou deixar "A definir", como no cadastro de uma atividade só.
+- **Observado:** como "Onde" começa no espaço pessoal, em que tudo fica com a própria pessoa (RN24), a coluna Responsável não aparecia, e nada indicava que ela volta ao escolher um grupo em "Onde". A equipe entendeu que faltava a opção.
+- **Correção:** a coluna Responsável fica sempre à vista. No espaço pessoal, aparece travada em "você", com o aviso de escolher um grupo em "Onde" para escolher outra pessoa ou "A definir"; num grupo, cada linha começa "A definir" e pode receber qualquer pessoa do grupo, uma a uma ou pela linha "Para todas as linhas".
+- **Responsável:** Andrey
+- **Situação:** Fechado
+- **Novo teste:** CT93, aprovado
 
 ### D18
 

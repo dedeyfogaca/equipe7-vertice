@@ -56,7 +56,7 @@ Versão avaliada: tag **`entrega-27-11-2026`**.
 
 **Resumo:** o Vértice ficou completo. Os dados do grupo passaram do navegador para um banco PostgreSQL no Supabase, em que as próprias regras do banco garantem que cada conta só veja os grupos de que participa e só altere o que o perfil permite. A pessoa entra com e-mail e senha ou com a conta Google, o organizador chama a turma por um link ou um código de convite, as fotos vão para o armazenamento de arquivos e a tela da disciplina mostra a evolução do progresso dia a dia. Quem só quer conhecer o sistema usa o modo de demonstração, sem conta, que ganhou um tutorial opcional.
 
-Na revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste, cada pessoa ganhou um **espaço pessoal**, onde cai ao entrar e onde organiza o que é só dela e o que está com ela em todos os grupos, sem sair de um grupo para anotar uma tarefa do dia a dia. Entraram também o perfil da conta, com a foto valendo em todos os grupos, o lembrete diário por e-mail, o evento de vários dias, filtros mais claros no calendário, o responsável "A definir" com o botão Assumir, as ações em lote e telas mais largas no computador. Os dados de quem já tinha conta continuam: o banco recebe uma atualização própria, que só acrescenta. Na revisão de 12/11, o feedback dos usuários de teste passou para dentro do sistema: uma pergunta por vez, sem conta e sem nome, com as respostas lidas só pela equipe numa tela própria. Qualquer membro passou a poder sair do grupo sozinho, com o que estava em aberto ficando "A definir", e cada grupo ganhou um histórico, discreto, de tudo o que aconteceu nele e de quem fez. Os 40 requisitos funcionais estão implementados. Foram executados 92 casos de teste em 12/11/2026, todos aprovados, além de 332 verificações das regras em JavaScript e 111 verificações do banco em SQL; os defeitos encontrados (D11 a D18) foram corrigidos antes das execuções finais.
+Na revisão de 11/11, com as considerações da equipe e os comentários dos usuários de teste, cada pessoa ganhou um **espaço pessoal**, onde cai ao entrar e onde organiza o que é só dela e o que está com ela em todos os grupos, sem sair de um grupo para anotar uma tarefa do dia a dia. Entraram também o perfil da conta, com a foto valendo em todos os grupos, o lembrete diário por e-mail, o evento de vários dias, filtros mais claros no calendário, o responsável "A definir" com o botão Assumir, as ações em lote e telas mais largas no computador. Os dados de quem já tinha conta continuam: o banco recebe uma atualização própria, que só acrescenta. Na revisão de 12/11, o feedback dos usuários de teste passou para dentro do sistema: uma pergunta por vez, sem conta e sem nome, com as respostas lidas só pela equipe numa tela própria. Qualquer membro passou a poder sair do grupo sozinho, com o que estava em aberto ficando "A definir", e cada grupo ganhou um histórico, discreto, de tudo o que aconteceu nele e de quem fez. Os 40 requisitos funcionais estão implementados. Foram executados 93 casos de teste em 12/11/2026, todos aprovados, além de 332 verificações das regras em JavaScript e 111 verificações do banco em SQL; os defeitos encontrados (D11 a D19) foram corrigidos antes das execuções finais.
 
 ### Entrega de 06/11/2026
 
@@ -141,7 +141,7 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 │   ├── telas/          As oito telas do protótipo do MVP em imagem
 │   └── navegavel/      Protótipo clicável do MVP: abra o index.html no navegador
 ├── testes/             Evidências e registros da execução dos testes
-│   ├── evidencias-12-11/  Capturas de tela dos casos novos e revistos de 12/11 (CT56, CT86 a CT92)
+│   ├── evidencias-12-11/  Capturas de tela dos casos novos e revistos de 12/11 (CT56, CT86 a CT93)
 │   ├── evidencias-11-11/  Capturas de tela da execução de 11/11, por caso de teste
 │   ├── evidencias-27-11/  Capturas de tela da execução de 08/11
 │   ├── evidencias-06-11/  Capturas de tela do ciclo de 06/11
@@ -172,7 +172,7 @@ Versão avaliada: tag **`entrega-20-10-2026`**. O MVP construído, com 29 casos 
 | 12 | [Backlog do Projeto](docs/12-backlog.md) | 89 tarefas com requisito, prioridade, responsável, prazo, situação e critérios de conclusão |
 | 13 | [Arquitetura e Tecnologias](docs/13-arquitetura.md) | Camadas, banco e login no Supabase, lembrete por e-mail, serviços externos, ambiente e organização das pastas |
 | 14 | [Produto Mínimo Viável](docs/14-mvp.md) | Classificação dos requisitos, o fluxo completo e os recortes de 20/10, 06/11 e 27/11 |
-| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 92 casos executados em 12/11, com resultado e evidência, e o resumo dos ciclos anteriores |
+| 15 | [Casos de Teste](docs/15-casos-de-teste.md) | 93 casos executados em 12/11, com resultado e evidência, e o resumo dos ciclos anteriores |
 | 16 | [Defeitos e Pendências](docs/16-defeitos-e-pendencias.md) | Defeitos encontrados nos testes e pendências |
 
 ### Modelagem do software
