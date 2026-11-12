@@ -1,7 +1,7 @@
 $ npm run verificar
 
 > vertice@2.0.0 verificar
-> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js
+> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js && node verificacoes/feedback.js
 
 
 O cenário destrutivo: já migrado, mas sem o marcador de versão
@@ -505,5 +505,24 @@ ok    um ponto por dia, do primeiro cadastro até hoje -> ["2026-11-01","2026-11
 ok    sobe na conclusão e cai quando entra atividade nova (peso, não contagem) -> [0,0,75,38,38]
 ok    fotos do banco: repete o último valor nos dias sem mudança -> [20,20,50,60]
 ok    sem foto nenhuma, só hoje -> [{"data":"2026-11-05","percentual":10}]
+
+Todas as verificações passaram.
+ok    sem nota, pede a nota -> ["nota"]
+ok    nota fora de 1 a 5 é recusada -> ["nota"]
+ok    só a nota já basta -> {}
+ok    texto acima do limite é recusado -> ["travou"]
+ok    contato acima do limite é recusado -> ["contato"]
+ok    no limite exato, passa -> {}
+ok    sem localStorage, não acusa envio recente -> false
+ok    total e não lidas -> [3,2]
+ok    média das notas -> 3.67
+ok    quantas de cada nota, de 1 a 5 -> [0,1,0,1,1]
+ok    sem respostas, média zero -> {"total":0,"media":0,"porNota":[0,0,0,0,0],"naoLidas":0}
+ok    começa com a marca que faz o Excel ler os acentos -> 65279
+ok    cabeçalho e uma linha por resposta -> 4
+ok    separador ponto e vírgula -> 8
+ok    aspas do texto são dobradas -> true
+ok    data no horário de Brasília -> true
+ok    origem e lida por extenso -> [true,true]
 
 Todas as verificações passaram.

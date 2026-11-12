@@ -6,7 +6,7 @@ ok     sem conta não cria grupo: new row violates row-level security policy for
 ok     quem cria entra como organizador: organizador (esperado organizador)
 ok     código errado é recusado: Código de convite inválido ou vencido. (esperado Código de convite inválido ou vencido.)
 ok     antes do convite, Bruno não vê o grupo: 0 (esperado 0)
-ok     com o código, Bruno entra no grupo: b76b6ce8-2626-479a-8394-26b8ff04c9ee (esperado b76b6ce8-2626-479a-8394-26b8ff04c9ee)
+ok     com o código, Bruno entra no grupo: fb59adf5-f691-408e-9040-019b5668a2eb (esperado fb59adf5-f691-408e-9040-019b5668a2eb)
 ok     e entra como participante: participante (esperado participante)
 ok     Carla, já cadastrada pelo e-mail, é ligada ao cadastro existente: 1 (esperado 1)
 ok     sem criar um membro repetido: 3 (esperado 3)
@@ -79,9 +79,19 @@ ok     com a chave do Brevo no cabeçalho, vinda do Vault: chave-de-teste (esper
 ok     e o título com < e & não quebra o e-mail: t (esperado t)
 ok     rodar de novo no mesmo dia não manda nada repetido: 0 (esperado 0)
 ok     quem desligou o lembrete não recebe: 0 (esperado 0)
+ok     quem só visita envia, mas não lê as respostas: permission denied for table feedback (esperado permission denied for table feedback)
+ok     nota fora de 1 a 5 é recusada: new row for relation "feedback" violates check constraint "feedback_nota_check" (esperado new row for relation "feedback" violates check constraint "feedback_nota_check")
+ok     quem envia não escolhe a data nem a marca de lida, e o texto em branco fica vazio: false true true true (esperado false true true true)
+ok     quem tem conta e não é da equipe também não lê: 0 (esperado 0)
+ok     nem se põe na equipe: new row violates row-level security policy for table "equipe" (esperado new row violates row-level security policy for table "equipe")
+ok     quem está na equipe lê todas as respostas: 2 (esperado 2)
+ok     a equipe marca como lida, mas não muda a resposta: true 2 - (esperado true 2 -)
+ok     e exclui: 1 (esperado 1)
+ok     a equipe vale por conta: o Bruno continua sem ler: 0 (esperado 0)
+ok     mais de 20 respostas no mesmo minuto são recusadas: Muitas respostas agora. Tente de novo em um minuto. (esperado Muitas respostas agora. Tente de novo em um minuto.)
            resultado            
 --------------------------------
- 77 de 77 conferências passaram
+ 87 de 87 conferências passaram
 (1 row)
 
  falhou 
