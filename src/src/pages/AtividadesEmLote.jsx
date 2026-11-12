@@ -92,7 +92,9 @@ export default function AtividadesEmLote() {
     setTexto('');
     setColando(false);
     toast.success(`${plural(titulos.length, 'linha')} pronta${titulos.length === 1 ? '' : 's'}`, {
-      description: 'Agora escolha a disciplina e o prazo de cada uma (ou de todas, na linha de cima).',
+      description: pessoal
+        ? 'Agora escolha a disciplina e o prazo de cada uma (ou de todas, na linha de cima).'
+        : 'Agora escolha a disciplina, o prazo e quem faz cada uma (ou todas, na linha de cima).',
     });
   };
 
@@ -139,11 +141,16 @@ export default function AtividadesEmLote() {
     ...(pessoal ? [{ valor: SEM_DISCIPLINA, rotulo: 'Sem disciplina', icone: <IconeOpcao icone={CircleSlash} /> }] : []),
     ...opcoesDisciplinas(disciplinas),
   ];
-  const opcoesResponsavel = [OPCAO_A_DEFINIR, ...opcoesMembros(membros, { voceId: eu?.id })];
+  // RF37, RF38: num grupo, cada linha escolhe quem faz ou fica "A definir".
+  // No espaço pessoal, tudo fica com a pessoa (RN24): a coluna continua à
+  // vista, travada em "você", para ficar claro onde se escolhe outra pessoa.
+  const opcoesResponsavel = pessoal
+    ? opcoesMembros(eu ? [eu] : [], { voceId: eu?.id })
+    : [OPCAO_A_DEFINIR, ...opcoesMembros(membros, { voceId: eu?.id })];
+  const valorResponsavel = (id) => (pessoal ? eu?.id || '' : id || A_DEFINIR);
+  const temGrupos = espacos.some((g) => !ehPessoal(g.id));
   // Colunas da tabela (no celular, cada linha vira um cartão).
-  const colunas = pessoal
-    ? 'lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.3fr)_minmax(0,150px)_96px_40px]'
-    : 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,150px)_96px_minmax(0,1.2fr)_40px]';
+  const colunas = 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,150px)_96px_minmax(0,1.2fr)_40px]';
 
   return (
     <>
@@ -196,6 +203,12 @@ export default function AtividadesEmLote() {
             <div className="flex flex-col gap-2 sm:max-w-[360px]">
               <Label htmlFor="lote-onde">Onde</Label>
               <SelectRico id="lote-onde" valor={onde} aoMudar={trocarOnde} opcoes={opcoesGrupos(espacos)} />
+              {pessoal && temGrupos && (
+                <p className="text-[13px] leading-relaxed text-sutil">
+                  No espaço pessoal, as atividades ficam com você. Para escolher o responsável ou deixar “A definir”,
+                  escolha um grupo aqui.
+                </p>
+              )}
             </div>
           )}
 
@@ -227,25 +240,24 @@ export default function AtividadesEmLote() {
               </Label>
               <SelectRico id="todas-peso" valor="" aoMudar={(v) => paraTodas('peso', v)} opcoes={OPCOES_PESO} placeholder="Peso" />
             </div>
-            {!pessoal && (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="todas-resp" className="lg:sr-only">
-                  Responsável de todas
-                </Label>
-                <SelectRico
-                  id="todas-resp"
-                  valor=""
-                  aoMudar={(v) => paraTodas('responsavelId', v === A_DEFINIR ? '' : v)}
-                  opcoes={opcoesResponsavel}
-                  placeholder="Responsável"
-                />
-              </div>
-            )}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="todas-resp" className="lg:sr-only">
+                Responsável de todas
+              </Label>
+              <SelectRico
+                id="todas-resp"
+                valor={pessoal ? valorResponsavel('') : ''}
+                aoMudar={(v) => paraTodas('responsavelId', v === A_DEFINIR ? '' : v)}
+                opcoes={opcoesResponsavel}
+                placeholder="Responsável"
+                disabled={pessoal}
+              />
+            </div>
           </div>
 
           {/* Cabeçalho das colunas (só no computador). */}
           <div className={cn('hidden gap-3 px-3 lg:grid', colunas)} aria-hidden="true">
-            {['Título *', pessoal ? 'Disciplina' : 'Disciplina *', 'Prazo *', 'Peso', ...(pessoal ? [] : ['Responsável']), ''].map(
+            {['Título *', pessoal ? 'Disciplina' : 'Disciplina *', 'Prazo *', 'Peso', 'Responsável', ''].map(
               (t, i) => (
                 <span key={i} className="text-[13px] font-semibold tracking-wide text-suave">
                   {t}
@@ -295,20 +307,19 @@ export default function AtividadesEmLote() {
                   <Field id={`peso-${linha.chave}`} label={`Peso da linha ${n}`} erro={e.peso} className="[&>label]:lg:sr-only">
                     <SelectRico valor={linha.peso} aoMudar={(v) => mudar(linha.chave, 'peso', v)} opcoes={OPCOES_PESO} />
                   </Field>
-                  {!pessoal && (
-                    <Field
-                      id={`responsavelId-${linha.chave}`}
-                      label={`Responsável da linha ${n}`}
-                      erro={e.responsavelId}
-                      className="[&>label]:lg:sr-only"
-                    >
-                      <SelectRico
-                        valor={linha.responsavelId || A_DEFINIR}
-                        aoMudar={(v) => mudar(linha.chave, 'responsavelId', v === A_DEFINIR ? '' : v)}
-                        opcoes={opcoesResponsavel}
-                      />
-                    </Field>
-                  )}
+                  <Field
+                    id={`responsavelId-${linha.chave}`}
+                    label={`Responsável da linha ${n}`}
+                    erro={e.responsavelId}
+                    className="[&>label]:lg:sr-only"
+                  >
+                    <SelectRico
+                      valor={valorResponsavel(linha.responsavelId)}
+                      aoMudar={(v) => mudar(linha.chave, 'responsavelId', v === A_DEFINIR ? '' : v)}
+                      opcoes={opcoesResponsavel}
+                      disabled={pessoal}
+                    />
+                  </Field>
                   <Button
                     variante="fantasma"
                     tamanho="icone"
