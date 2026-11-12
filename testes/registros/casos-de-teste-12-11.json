@@ -1,5 +1,5 @@
 {
-  "quando": "2026-11-12T12:32:59.093Z",
+  "quando": "2026-11-12T13:21:18.760Z",
   "resultados": [
     {
       "id": "CT01",
@@ -505,9 +505,9 @@
         "ok: arrastada para a direita: o vermelho ocupa dois terços: [[\"verde\",\"vermelho\",\"azul\"],true]",
         "ok: com zoom 2: o miolo, sem o canto verde: [\"vermelho\",\"vermelho\",\"azul\"]",
         "ok: cancelar mantém a foto anterior: true",
-        "foto grande: apareceu no editor em 830 ms; o \"Aplicar\" levou 286 ms",
+        "foto grande: apareceu no editor em 352 ms; o \"Aplicar\" levou 510 ms",
         "ok: a foto grande aparece no editor em menos de 3 s: true",
-        "tarefas longas na página (ms): 113",
+        "tarefas longas na página (ms): 103",
         "ok: gravada em 256 × 256, JPEG: [\"data:image/jpeg\",[256,256]]",
         "tamanho gravado: 9 KB",
         "ok: nenhum erro no console: []"
@@ -611,7 +611,7 @@
         "ok: e para depois de um terço de volta: \"scale(1) rotate(120deg)\"",
         "ok: num ritmo calmo, abaixo de 1 s: true",
         "ok: com a tela coberta, o painel já montou por baixo: \"/painel\"",
-        "passagem inteira: 1440 ms",
+        "passagem inteira: 1447 ms",
         "ok: a passagem inteira leva menos de 1,5 s: true",
         "ok: depois, a cortina sai e fica o painel: true",
         "ok: parada, a marca não gira: 0",
@@ -715,7 +715,7 @@
         "ok: o evento entra na lista: 1",
         "ok: com horário, local e disciplina: true",
         "ok: e \"Em 3 dias\": true",
-        "ok: gravado com quem cadastrou: \"8e2fd8e4-302c-400d-b31d-d0aff06a4e82\"",
+        "ok: gravado com quem cadastrou: \"c406c089-72a3-4761-b11e-08f33484353e\"",
         "ok: Carla edita a reunião que ela cadastrou: 1",
         "ok: mas não a palestra que a Ana cadastrou: 0",
         "ok: a edição aparece: true",
@@ -934,8 +934,8 @@
       "ok": true,
       "obs": [
         "ok: código com 8 letras e números: true",
-        "ok: link: \"http://localhost:4174/convite/QKZAY2ZA\"",
-        "ok: convite no banco, valendo 7 dias: {\"codigo\":\"QKZAY2ZA\",\"sete_dias\":true}"
+        "ok: link: \"http://localhost:4174/convite/6KF9ZH22\"",
+        "ok: convite no banco, valendo 7 dias: {\"codigo\":\"6KF9ZH22\",\"sete_dias\":true}"
       ]
     },
     {
@@ -1165,10 +1165,64 @@
       "obs": [
         "ok: o link vai para o formulário, em outra aba: [\"https://forms.gle/QpAtRSGux4XKd67T6\",\"_blank\"]"
       ]
+    },
+    {
+      "id": "CT89",
+      "titulo": "Participante sai do grupo: o que está em aberto fica \"A definir\"",
+      "ok": true,
+      "obs": [
+        "ok: o participante tem \"Histórico do grupo\" e \"Sair do grupo\" no menu do grupo: [true,true]",
+        "ok: a confirmação diz o que acontece: [true,true,true,true]",
+        "ok: volta para o espaço pessoal: [\"/painel\",true]",
+        "ok: o grupo some do seletor: false",
+        "ok: no banco: o cadastro continua, marcado como saída: {\"saiu\":true,\"perfil\":\"participante\"}",
+        "ok: a concluída segue com ele; a aberta fica \"A definir\": [{\"titulo\":\"Lista 1\",\"status\":\"concluido\",\"a_definir\":false},{\"titulo\":\"Relatório de redes\",\"status\":\"a fazer\",\"a_definir\":true}]",
+        "ok: pela API, quem saiu não lê mais as atividades do grupo: 0"
+      ]
+    },
+    {
+      "id": "CT90",
+      "titulo": "Quem fica vê \"A definir\" e o nome de quem saiu; a última organizadora não sai",
+      "ok": true,
+      "obs": [
+        "ok: a atividade aberta aparece com \"Assumir\": 1",
+        "ok: a concluída mostra quem fez, com \"Saiu do grupo\": [true,1]",
+        "ok: em Membros, só quem está no grupo: 1",
+        "ok: a última organizadora é orientada a passar o cargo: true"
+      ]
+    },
+    {
+      "id": "CT91",
+      "titulo": "Histórico do grupo: quem fez o quê, filtros, a volta pelo convite e só leitura",
+      "ok": true,
+      "obs": [
+        "ok: com o convite, Bruno volta ao grupo: true",
+        "ok: no mesmo cadastro, como participante: {\"n\":1,\"ativo\":true,\"perfil\":\"participante\"}",
+        "linhas: Bruno Lima voltou ao grupo | Bruno Lima saiu do grupo: 1 atividade ficou “A definir” | Bruno Lima ganhou a conquista “Primeiro Passo” | Bruno Lima concluiu “Lista 1” | Ana Souza criou a atividade “Lista 1” | Ana Souza criou a atividade “Relatório de redes” | Bruno Lima entrou no grupo | Ana Souza gerou um código de convite | Ana Souza criou a disciplina “Redes” | Ana Souza criou o grupo",
+        "ok: o participante lê o histórico, do mais novo para o mais antigo: \"Bruno Lima voltou ao grupo\"",
+        "ok: com a saída e quantas atividades ficaram \"A definir\": true",
+        "ok: e as ações de cada um: [true,true,true,true,true,true]",
+        "ok: o filtro por pessoa mostra só o que ela fez: true",
+        "ok: e o filtro por tipo combina com ele: [\"Ana Souza criou a disciplina “Redes”\"]",
+        "ok: pela API, ninguém escreve no histórico: 403",
+        "ok: em Membros, o atalho discreto abre o mesmo histórico: \"Bruno Lima voltou ao grupo\""
+      ]
+    },
+    {
+      "id": "CT92",
+      "titulo": "Demonstração: o histórico fica no navegador e a saída segue as mesmas regras",
+      "ok": true,
+      "obs": [
+        "ok: o histórico do exemplo vem montado com as datas guardadas: [true,true]",
+        "ok: como única organizadora, não sai: true",
+        "ok: na demonstração, o grupo sai do seletor: false",
+        "ok: as abertas ficam \"A definir\" e o histórico guarda a saída com o número: {\"saiu\":true,\"abertasComEla\":0,\"linha\":\"3\"}",
+        "ok: nenhum erro na demonstração: []"
+      ]
     }
   ],
   "navegador": "Chromium (Playwright)",
-  "duracaoSegundos": 433,
+  "duracaoSegundos": 466,
   "errosDeConsole": {
     "cenario1": [],
     "cenario2": [

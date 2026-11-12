@@ -6,7 +6,7 @@ ok     sem conta não cria grupo: new row violates row-level security policy for
 ok     quem cria entra como organizador: organizador (esperado organizador)
 ok     código errado é recusado: Código de convite inválido ou vencido. (esperado Código de convite inválido ou vencido.)
 ok     antes do convite, Bruno não vê o grupo: 0 (esperado 0)
-ok     com o código, Bruno entra no grupo: fb59adf5-f691-408e-9040-019b5668a2eb (esperado fb59adf5-f691-408e-9040-019b5668a2eb)
+ok     com o código, Bruno entra no grupo: e2a31084-2bc0-49ce-b232-ccb187585bef (esperado e2a31084-2bc0-49ce-b232-ccb187585bef)
 ok     e entra como participante: participante (esperado participante)
 ok     Carla, já cadastrada pelo e-mail, é ligada ao cadastro existente: 1 (esperado 1)
 ok     sem criar um membro repetido: 3 (esperado 3)
@@ -89,9 +89,33 @@ ok     a equipe marca como lida, mas não muda a resposta: true 2 - (esperado tr
 ok     e exclui: 1 (esperado 1)
 ok     a equipe vale por conta: o Bruno continua sem ler: 0 (esperado 0)
 ok     mais de 20 respostas no mesmo minuto são recusadas: Muitas respostas agora. Tente de novo em um minuto. (esperado Muitas respostas agora. Tente de novo em um minuto.)
-           resultado            
---------------------------------
- 87 de 87 conferências passaram
+ok     o histórico guarda quem criou o grupo e quem entrou: Ana Souza criou grupo, Bruno entrou membro, Carla entrou membro (esperado Ana Souza criou grupo, Bruno entrou membro, Carla entrou membro)
+ok     e as ações nas atividades, com o nome de quem fez: Ana Souza criou Relatório de redes, Ana Souza criou Lista 1, Bruno concluiu Lista 1 (esperado Ana Souza criou Relatório de redes, Ana Souza criou Lista 1, Bruno concluiu Lista 1)
+ok     o participante lê o histórico do grupo: t (esperado t)
+ok     mas não escreve nele: new row violates row-level security policy for table "registro" (esperado new row violates row-level security policy for table "registro")
+ok     nem apaga ou altera uma linha: 0 8 (esperado 0 8)
+ok     nem anota pela função do banco: permission denied for function anotar (esperado permission denied for function anotar)
+ok     a saída não é gravada direto na tabela: t (esperado t)
+ok     quem é de fora não vê o histórico: 0 (esperado 0)
+ok     o participante sai, e a atividade em aberto fica "A definir": 1 (esperado 1)
+ok     a atividade em aberto fica sem responsável, em "a fazer": A definir a fazer (esperado A definir a fazer)
+ok     a concluída continua no nome de quem saiu: Bruno true (esperado Bruno true)
+ok     o histórico diz quem saiu e quantas atividades ficaram "A definir", sem uma linha por atividade: Bruno saiu 1 (esperado Bruno saiu 1)
+ok     quem saiu não recebe atividade nova: Essa pessoa saiu do grupo. (esperado Essa pessoa saiu do grupo.)
+ok     a última organizadora não sai sem passar o cargo: Antes de sair, torne outra pessoa organizadora do grupo. (esperado Antes de sair, torne outra pessoa organizadora do grupo.)
+ok     quem saiu não vê mais o grupo nem as atividades: 0 (esperado 0)
+ok     nem muda o próprio cadastro antigo: Bruno (esperado Bruno)
+ok     nem sai de novo: Você não faz parte deste grupo. (esperado Você não faz parte deste grupo.)
+ok     com o convite, volta no mesmo cadastro, como participante: 1 participante true (esperado 1 participante true)
+ok     e o histórico registra a volta: 1 (esperado 1)
+ok     o espaço pessoal não tem como sair: O espaço pessoal é seu: não dá para sair dele. (esperado O espaço pessoal é seu: não dá para sair dele.)
+ok     sozinha no grupo, a saída é excluir o grupo: Você é a única pessoa do grupo. Para sair, exclua o grupo. (esperado Você é a única pessoa do grupo. Para sair, exclua o grupo.)
+ok     excluir a disciplina vira uma linha só, sem uma por atividade: excluiu disciplina (esperado excluiu disciplina)
+ok     excluir o grupo leva o histórico junto: 0 (esperado 0)
+ok     o espaço pessoal não tem histórico: 0 (esperado 0)
+            resultado             
+----------------------------------
+ 111 de 111 conferências passaram
 (1 row)
 
  falhou 

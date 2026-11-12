@@ -1,7 +1,7 @@
 $ npm run verificar
 
 > vertice@2.0.0 verificar
-> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js && node verificacoes/feedback.js
+> node verificacoes/migracao.js && node verificacoes/progresso.js && node verificacoes/gamificacao.js && node verificacoes/perfis.js && node verificacoes/atividades.js && node verificacoes/ofensiva.js && node verificacoes/conquistas.js && node verificacoes/permissoes.js && node verificacoes/foto.js && node verificacoes/avatar.js && node verificacoes/banco.js && node verificacoes/feedback.js && node verificacoes/registro.js
 
 
 O cenário destrutivo: já migrado, mas sem o marcador de versão
@@ -524,5 +524,42 @@ ok    separador ponto e vírgula -> 8
 ok    aspas do texto são dobradas -> true
 ok    data no horário de Brasília -> true
 ok    origem e lida por extenso -> [true,true]
+
+Todas as verificações passaram.
+ok    participante sai -> ""
+ok    a última organizadora não sai sem passar o cargo -> "Antes de sair, torne outra pessoa organizadora do grupo."
+ok    com outra organizadora, sai -> ""
+ok    sozinha no grupo, a saída é excluir -> "Você é a única pessoa do grupo. Para sair, exclua o grupo."
+ok    do espaço pessoal não se sai -> "O espaço pessoal é seu: não dá para sair dele."
+ok    quem não é do grupo não sai -> "Você não faz parte deste grupo."
+ok    só as abertas ficam "A definir" -> ["a","b"]
+ok    quem saiu aparece marcado -> ["Bruno (saiu)","Bruno"]
+ok    criou a atividade -> "Ana criou a atividade “Slides”"
+ok    concluiu -> "Ana concluiu “Slides”"
+ok    desfez a conclusão -> "Ana desfez a conclusão de “Slides”"
+ok    passou para outra pessoa -> "Ana passou “Slides” para Bruno"
+ok    deixou "A definir" -> "Ana deixou “Slides” “A definir”"
+ok    começou -> "Ana começou “Slides”"
+ok    saiu, com quantas ficaram "A definir" -> ["Ana saiu do grupo: 2 atividades ficaram “A definir”","Ana saiu do grupo: 1 atividade ficou “A definir”","Ana saiu do grupo"]
+ok    mudou o perfil -> "Ana mudou o perfil de Bruno para organizador"
+ok    renomeou a disciplina -> "Ana editou a disciplina “Redes II” (antes “Redes”)"
+ok    conteúdo, com a disciplina -> "Ana criou o conteúdo “TCP” em Redes"
+ok    sem autor (montado das datas), na passiva -> ["Disciplina “Redes” criada","Evento “Prova” criado","Atividade “Slides” concluída"]
+ok    concluir e assumir -> ["Ana concluiu “Lista 1”","Ana assumiu “Slides”"]
+ok    passar para outra pessoa -> ["Ana passou “Relatório” para Bruno"]
+ok    editar sem mudar status nem responsável -> ["Ana editou a atividade “Lista 1”"]
+ok    o espaço pessoal não entra no histórico -> []
+ok    sair: uma linha só, com quantas ficaram "A definir" -> ["Ana saiu do grupo: 2 atividades ficaram “A definir”"]
+ok    excluir a disciplina vira uma linha só -> ["Ana excluiu a disciplina “Redes”"]
+ok    conquista ganha e perdida, no nome de quem -> [["Bruno ganhou a conquista “Primeiro Passo”"]]
+ok    cadastrar, mudar perfil e remover -> ["Ana mudou o perfil de Bruno para organizador","Ana cadastrou Carla no grupo"]
+ok    grupo novo (ou o exemplo carregado): o histórico sai das datas -> ["Ana criou o grupo","Disciplina “Redes” criada","Atividade “Lista 1” criada","Atividade “Relatório” criada","Atividade “Slides” criada"]
+ok    a reconstrução usa a data de cada item -> ["2026-11-01","2026-11-01","2026-11-02","2026-11-02","2026-11-02"]
+ok    da mais nova para a mais antiga -> ["2026-11-02","2026-11-02","2026-11-01","2026-11-01","2026-11-01"]
+ok    no mesmo instante, a anotada depois vem antes -> ["g11","g10"]
+ok    grupo excluído leva o histórico junto -> 0
+ok    a demonstração guarda um limite por grupo -> 400
+ok    filtro por pessoa e por tipo -> ["g11","g15"]
+ok    dias: Hoje, Ontem e a data -> ["Hoje","Ontem","qui., 05/11"]
 
 Todas as verificações passaram.
