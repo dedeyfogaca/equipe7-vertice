@@ -4,14 +4,15 @@
 -- Equipe 7 · criado em 08/11/2026 para a entrega de 27/11 (T46, T49, T50)
 -- Revisado em 11/11/2026: espaço pessoal, perfil da conta, atividade "A definir",
 -- evento de vários dias, conquista que sai junto com a experiência e lembrete
--- por e-mail.
+-- por e-mail. Em 12/11/2026: o feedback dos usuários de teste dentro do
+-- sistema (seção 8).
 --
 -- Como usar num projeto NOVO: no painel do Supabase, abrir "SQL Editor",
 -- colar este arquivo inteiro e executar.
 --
 -- ATENÇÃO: este arquivo apaga tudo antes de criar (seção 0). Num banco que já
--- tem dados, não rode este arquivo: rode o script de atualização
--- (07-atualizacao-11-11.sql), que só acrescenta.
+-- tem dados, não rode este arquivo: rode os scripts de atualização
+-- (07-atualizacao-11-11.sql e 08-atualizacao-feedback.sql), que só acrescentam.
 --
 -- O que muda em relação ao script MySQL da Entrega 2
 --   * chaves em UUID, geradas pelo próprio banco;
@@ -28,7 +29,7 @@
 -- =====================================================================
 -- 0. Limpeza (permite executar o arquivo de novo)
 -- =====================================================================
-drop table if exists membro_conquista, conquista, progresso_historico, convite,
+drop table if exists feedback, equipe, membro_conquista, conquista, progresso_historico, convite,
   evento, atividade, conteudo, disciplina, perfil, membro, grupo cascade;
 drop function if exists eh_membro(uuid), eh_organizador(uuid), membro_atual(uuid),
   grupo_da_disciplina(uuid), grupo_sem_membros(uuid), grupo_pessoal(uuid),
@@ -36,7 +37,7 @@ drop function if exists eh_membro(uuid), eh_organizador(uuid), membro_atual(uuid
   conferir_grupo(), conferir_perfil(), conferir_atividade(), conferir_membro(),
   conferir_remocao_membro(), conferir_evento(), registrar_progresso(),
   progresso_da_disciplina(uuid), escapar_html(text), lembretes_do_dia(date),
-  enviar_lembretes(text, text, text) cascade;
+  enviar_lembretes(text, text, text), eh_equipe(), conferir_feedback() cascade;
 
 
 -- =====================================================================
@@ -913,7 +914,75 @@ begin
 end $$;
 
 -- =====================================================================
--- 8. Acesso pela API do Supabase
+-- 8. Feedback dos usuários de teste (RF32, RN27)
+-- =====================================================================
+-- Qualquer pessoa envia, com conta, na demonstração ou só visitando, sem se
+-- identificar (o contato é opcional). Ninguém lê as respostas pelo site, a
+-- não ser quem está na tabela equipe, que é preenchida à mão no SQL Editor:
+--   insert into equipe (id_usuario)
+--   select id from auth.users where email in ('email-da-conta@exemplo.com');
+create table equipe (
+  id_usuario   uuid primary key references auth.users (id) on delete cascade,
+  data_criacao timestamptz not null default now()
+);
+
+create table feedback (
+  id_feedback uuid primary key default gen_random_uuid(),
+  nota        smallint not null check (nota between 1 and 5),
+  funcionou   varchar(1000),
+  travou      varchar(1000),
+  faltou      varchar(1000),
+  contato     varchar(120),
+  origem      varchar(12) not null default 'visitante'
+              check (origem in ('visitante', 'demonstracao', 'conta')),
+  lida        boolean not null default false,
+  data_envio  timestamptz not null default now()
+);
+create index ix_feedback_data on feedback (data_envio desc);
+
+create function eh_equipe() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from equipe where id_usuario = auth.uid());
+$$;
+
+-- Quem envia não escolhe a data nem a marca de lida, e o texto em branco
+-- vira vazio. Depois de enviada, a resposta não muda: a equipe só marca como
+-- lida. Para conter envio em massa, o banco aceita até 20 respostas por
+-- minuto, somando todo mundo.
+create function conferir_feedback() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' then
+    if (select count(*) from feedback where data_envio > now() - interval '1 minute') >= 20 then
+      raise exception 'Muitas respostas agora. Tente de novo em um minuto.';
+    end if;
+    new.id_feedback := gen_random_uuid();
+    new.data_envio := now();
+    new.lida := false;
+    new.funcionou := nullif(btrim(new.funcionou), '');
+    new.travou := nullif(btrim(new.travou), '');
+    new.faltou := nullif(btrim(new.faltou), '');
+    new.contato := nullif(btrim(new.contato), '');
+  else
+    new.id_feedback := old.id_feedback; new.nota := old.nota;
+    new.funcionou := old.funcionou; new.travou := old.travou; new.faltou := old.faltou;
+    new.contato := old.contato; new.origem := old.origem; new.data_envio := old.data_envio;
+  end if;
+  return new;
+end $$;
+create trigger tg_conferir_feedback before insert or update on feedback
+  for each row execute function conferir_feedback();
+
+alter table equipe   enable row level security;
+alter table feedback enable row level security;
+create policy equipe_ver on equipe for select to authenticated using (id_usuario = auth.uid());
+create policy feedback_enviar on feedback for insert to anon, authenticated with check (true);
+create policy feedback_ver on feedback for select to authenticated using (eh_equipe());
+create policy feedback_marcar on feedback for update to authenticated using (eh_equipe()) with check (eh_equipe());
+create policy feedback_excluir on feedback for delete to authenticated using (eh_equipe());
+
+-- =====================================================================
+-- 9. Acesso pela API do Supabase
 -- =====================================================================
 -- O Supabase pode criar as tabelas novas sem acesso pela API (depende da
 -- configuração do projeto). As permissões ficam explícitas aqui; quem limita
@@ -921,6 +990,7 @@ end $$;
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on all tables in schema public to authenticated;
 grant select on conquista to anon;
+grant insert on feedback to anon;
 grant execute on all functions in schema public to authenticated;
 
 -- Só o agendamento (pg_cron, que roda como dono do banco) chama o envio.

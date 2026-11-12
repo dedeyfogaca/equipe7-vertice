@@ -8,7 +8,8 @@
 -- stub-supabase.sql, schema.sql e testes.sql.
 -- Cada conferência imprime "ok" ou "FALHOU"; no fim, o total.
 -- As conferências do fim (espaço pessoal, "A definir", evento de vários dias,
--- conquista retirada e lembrete) entraram na revisão de 11/11/2026.
+-- conquista retirada e lembrete) entraram na revisão de 11/11/2026, e as do
+-- feedback, em 12/11/2026.
 -- =====================================================================
 \set ON_ERROR_STOP 1
 \o /dev/null
@@ -454,6 +455,54 @@ select teste.confere('rodar de novo no mesmo dia não manda nada repetido',
   enviar_lembretes('vertice@exemplo.com'), 0);
 update perfil set ultimo_lembrete = null, lembrete_email = false where nome = 'Eva Melo';
 select teste.confere('quem desligou o lembrete não recebe', enviar_lembretes('vertice@exemplo.com'), 0);
+
+-- ---------------------------------------------------------------------
+-- Feedback dentro do sistema (RF32, RN27), revisão de 12/11/2026
+-- ---------------------------------------------------------------------
+grant usage on schema teste to anon;
+grant all on all tables in schema teste to anon;
+grant all on all sequences in schema teste to anon;
+grant execute on all functions in schema teste to anon;
+set role anon;
+insert into feedback (nota, funcionou, travou, contato, origem, lida, data_envio)
+  values (4, 'O calendário', '   ', '', 'visitante', true, '2020-01-01');
+select teste.recusa('quem só visita envia, mas não lê as respostas',
+  $$ select count(*) from feedback $$, 'permission denied for table feedback');
+select teste.recusa('nota fora de 1 a 5 é recusada',
+  $$ insert into feedback (nota) values (6) $$,
+  'new row for relation "feedback" violates check constraint "feedback_nota_check"');
+reset role;
+select teste.confere('quem envia não escolhe a data nem a marca de lida, e o texto em branco fica vazio',
+  (select format('%s %s %s %s', lida::text, (data_envio::date = current_date)::text, (travou is null)::text, (contato is null)::text) from feedback),
+  'false true true true');
+set role authenticated;
+select teste.como('00000000-0000-0000-0000-00000000000a');
+insert into feedback (nota, faltou, origem) values (2, 'Modo escuro no e-mail', 'conta');
+select teste.confere('quem tem conta e não é da equipe também não lê', (select count(*) from feedback), 0::bigint);
+select teste.recusa('nem se põe na equipe',
+  $$ insert into equipe (id_usuario) values ('00000000-0000-0000-0000-00000000000a') $$,
+  'new row violates row-level security policy for table "equipe"');
+select teste.como(null);
+reset role;
+insert into equipe (id_usuario) values ('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select teste.como('00000000-0000-0000-0000-00000000000a');
+select teste.confere('quem está na equipe lê todas as respostas', (select count(*) from feedback), 2::bigint);
+update feedback set lida = true, nota = 5, funcionou = 'outro texto' where nota = 2;
+select teste.confere('a equipe marca como lida, mas não muda a resposta',
+  (select format('%s %s %s', lida::text, nota, coalesce(funcionou, '-')) from feedback where faltou = 'Modo escuro no e-mail'),
+  'true 2 -');
+delete from feedback where nota = 2;
+select teste.confere('e exclui', (select count(*) from feedback), 1::bigint);
+select teste.como('00000000-0000-0000-0000-00000000000b');
+select teste.confere('a equipe vale por conta: o Bruno continua sem ler', (select count(*) from feedback), 0::bigint);
+select teste.como(null);
+reset role;
+insert into feedback (nota) select 3 from generate_series(1, 19);
+set role anon;
+select teste.recusa('mais de 20 respostas no mesmo minuto são recusadas',
+  $$ insert into feedback (nota) values (3) $$, 'Muitas respostas agora. Tente de novo em um minuto.');
+reset role;
 
 \o
 -- ---------------------------------------------------------------------
